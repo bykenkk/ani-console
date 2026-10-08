@@ -1,6 +1,6 @@
 import { type InstanceEnvVar, type InstanceRecord, applyInstanceLifecycle } from "@/api/instances";
 import { DataTable, type RowAction } from "@/components/common";
-import { Empty, Space, Tooltip, Typography, Modal } from "@arco-design/web-react";
+import { Empty, Space, Tooltip, Modal } from "@arco-design/web-react";
 import { type ReactNode } from "react";
 import { useMutation } from "@tanstack/react-query";
 

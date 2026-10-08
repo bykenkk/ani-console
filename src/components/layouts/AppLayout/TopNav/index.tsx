@@ -22,6 +22,7 @@ import brandLogo from "@/assets/brand/wordmark.png";
 import { formatDateTime } from "@/lib/format";
 import { useAuthStore } from "@/stores/auth";
 import { AboutUsModal } from "@/components/layouts/AboutUsModal";
+import { KaiwuEntryButton } from "@/components/kaiwu/KaiwuEntryButton";
 
 const MOCK_REGION = { value: "guangzhou-a", label: "广州-A" };
 
@@ -211,12 +212,7 @@ export function TopNav({
             placeholder="请输入内容"
             aria-label="全局搜索"
           />
-          <button type="button" className="topnav-kaiwu" aria-label="进入开物">
-            <span className="topnav-kaiwu-switch" aria-hidden="true">
-              <span className="topnav-kaiwu-knob" />
-            </span>
-            <span>开物</span>
-          </button>
+          <KaiwuEntryButton />
           <span className="topnav-user-divider" aria-hidden="true" />
           <Dropdown
             droplist={userMenu}

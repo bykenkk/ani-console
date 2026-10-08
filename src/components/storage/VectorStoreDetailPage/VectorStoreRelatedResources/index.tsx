@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteVectorStoreKnowledgeBaseLink, type VectorStore } from "@/api/storage/vector-stores";
 import { DataTable, type RowAction } from "@/components/common";
 import { navigateToResourceDetail } from "@/lib/resources";
-import { Alert, Button, Empty, Link, Modal, Space } from "@arco-design/web-react";
+import { Button, Empty, Link, Modal, Space } from "@arco-design/web-react";
 
 import { useNavigate } from "@tanstack/react-router";
 

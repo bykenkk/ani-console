@@ -51,7 +51,7 @@
 | 持久化与临时存储 | `src/lib/storage.ts` 的 localForage 实例；Zustand 通过异步 `StateStorage` 适配 | `localStorage`、`sessionStorage`、裸 `indexedDB` |
 | WebSocket 地址 | `src/lib/browser.ts` 的 `resolveWebSocketUrl`，并在建立连接前检测 `WebSocket` | 直接使用后端 URL 创建连接、在 HTTPS 页面继续使用 `ws:` |
 | Blob 下载 | `src/lib/browser.ts` 的 `downloadBlob` | 业务组件自行调用 `URL.createObjectURL` 而遗漏能力检测或 `revokeObjectURL` |
-| 外部链接 | `src/lib/browser.ts` 的 `openExternalUrl` | 未校验协议的 `window.open`、遗漏 `noopener noreferrer` |
+| 外部链接 | `src/lib/browser.ts` 的 `openExternalUrl`；异步获取地址时先在点击事件中调用 `reserveExternalWindow`，失败或取消时关闭预留窗口 | 未校验协议的 `window.open`、遗漏 `noopener noreferrer` |
 
 旧版本数据迁移可以在公共存储模块内受控读取原生存储，但必须是一次性迁移：写入 localForage 成功后清理旧键，失败时不得阻断正常 hydration。业务模块不得复制这种例外。
 
