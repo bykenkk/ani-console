@@ -26,14 +26,14 @@ export type ContainerInstanceQuery = {
   status: ContainerInstanceStatusFilter;
   searchField: ContainerInstanceSearchField;
   keyword: string;
-  page: number;
+  cursor?: string;
   pageSize: number;
 };
 
 export type ContainerInstanceListResult = {
   items: ContainerInstance[];
   total: number;
-  hasTransitioningInstances: boolean;
+  next_cursor?: string | null;
 };
 
 export interface ContainerInstanceDataSource {

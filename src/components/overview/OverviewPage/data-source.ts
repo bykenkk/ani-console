@@ -307,11 +307,9 @@ async function getTasks(filter: HomeTaskFilter): Promise<HomeTask[]> {
       }
     }),
   );
-  const hasStatusChange = tasks.some((task) => task.status !== status);
-  const filteredResponse = hasStatusChange
-    ? await listTasks({ limit: HOME_TASK_LIMIT, status })
-    : response;
-  return filteredResponse.items.map(toHomeTask);
+  // Detail reads advance instance tasks on the current backend. Reuse those results
+  // and let the next poll fill vacated rows instead of requesting the list twice.
+  return tasks.filter((task) => task.status === status).map(toHomeTask);
 }
 
 async function getResourceTrend(

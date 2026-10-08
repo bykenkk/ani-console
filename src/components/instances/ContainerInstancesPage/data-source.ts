@@ -7,17 +7,7 @@ import type {
   ContainerInstanceListResult,
   ContainerInstanceQuery,
   ContainerInstanceRecord,
-  ContainerInstanceStatus,
 } from "./types";
-
-const API_PAGE_SIZE = 100;
-const DEPLOYING_STATES = new Set<ContainerInstanceStatus>([
-  "pending",
-  "provisioning",
-  "starting",
-  "stopping",
-  "deleting",
-]);
 
 type InstancePage = {
   items: ContainerInstanceRecord[];
@@ -26,8 +16,8 @@ type InstancePage = {
 };
 
 export type ContainerInstancePageFetcher = (
-  cursor?: string,
-  query?: ContainerInstanceQuery,
+  cursor: string | undefined,
+  query: ContainerInstanceQuery,
 ) => Promise<InstancePage>;
 
 function displayScalar(value: unknown): string | undefined {
@@ -72,40 +62,19 @@ function mapContainerInstance(record: ContainerInstanceRecord): ContainerInstanc
 }
 
 async function fetchContainerInstancePage(
-  cursor?: string,
-  filters?: ContainerInstanceQuery,
+  cursor: string | undefined,
+  filters: ContainerInstanceQuery,
 ): Promise<InstancePage> {
-  const keyword = filters?.keyword.trim() ?? "";
+  const keyword = filters.keyword.trim();
   const query = {
     kind: "container",
-    limit: API_PAGE_SIZE,
+    limit: filters.pageSize,
     ...(cursor ? { cursor } : {}),
-    state: filters?.status === "all" ? undefined : filters?.status,
-    search_field: keyword ? filters?.searchField : undefined,
+    state: filters.status === "all" ? undefined : filters.status,
+    search_field: keyword ? filters.searchField : undefined,
     keyword: keyword || undefined,
   };
   return listInstances(query);
-}
-
-async function fetchAllContainerInstances(
-  fetchPage: ContainerInstancePageFetcher,
-  query: ContainerInstanceQuery,
-) {
-  const records: ContainerInstanceRecord[] = [];
-  const seenCursors = new Set<string>();
-  let cursor: string | undefined;
-
-  do {
-    const page = await fetchPage(cursor, query);
-    records.push(...page.items);
-    const nextCursor = page.next_cursor ?? undefined;
-    if (!nextCursor) break;
-    if (seenCursors.has(nextCursor)) throw new Error("实例列表返回了重复游标");
-    seenCursors.add(nextCursor);
-    cursor = nextCursor;
-  } while (cursor);
-
-  return records;
 }
 
 export function createContainerInstanceDataSource(
@@ -113,13 +82,11 @@ export function createContainerInstanceDataSource(
 ): ContainerInstanceDataSource {
   return {
     async list(query: ContainerInstanceQuery): Promise<ContainerInstanceListResult> {
-      const records = await fetchAllContainerInstances(fetchPage, query);
-      const allItems = records.map(mapContainerInstance);
-      const start = (query.page - 1) * query.pageSize;
+      const result = await fetchPage(query.cursor, query);
       return {
-        items: allItems.slice(start, start + query.pageSize),
-        total: allItems.length,
-        hasTransitioningInstances: allItems.some((item) => DEPLOYING_STATES.has(item.status)),
+        items: result.items.map(mapContainerInstance),
+        total: result.total,
+        next_cursor: result.next_cursor,
       };
     },
   };

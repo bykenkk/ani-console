@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { useEffect, useState } from "react";
 import {
   ListPageFrame,
@@ -52,34 +52,25 @@ export function ContainerInstancesPage({
   const [searchField, setSearchField] = useState<ContainerInstanceSearchField>("name");
   const [searchText, setSearchText] = useState("");
   const keyword = useDebouncedValue(searchText, 200);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
   const [createVisible, setCreateVisible] = useState(false);
 
-  useEffect(() => {
-    setPage(1);
-  }, [keyword, searchField, status]);
-
-  const query = useQuery({
-    meta: {
+  const { query, page, pageSize, setPage, setPageSize, refresh } =
+    useCursorPaginatedQuery<ContainerInstance>({
       errorNotification: {
         id: "containers",
         action: "容器实例加载",
         fallback: "请求失败，请稍后重试",
       },
-    },
-    queryKey: ["container-instances", { status, searchField, keyword, page, pageSize }],
-    queryFn: () => dataSource.list({ status, searchField, keyword, page, pageSize }),
-    placeholderData: (previous) => previous,
-  });
-  const { dialogNode, actions } = useContainerInstanceActions<ContainerInstance>(
-    () => void query.refetch(),
-  );
+      queryKey: ["container-instances", { status, searchField, keyword }],
+      cursorScope: JSON.stringify([status, searchField, keyword]),
+      fetchPage: ({ cursor, limit }) =>
+        dataSource.list({ status, searchField, keyword, cursor, pageSize: limit }),
+    });
+  const { dialogNode, actions } = useContainerInstanceActions<ContainerInstance>(refresh);
 
   const result = query.data ?? {
     items: [],
     total: 0,
-    hasTransitioningInstances: false,
   };
   const allColumns: Array<ListColumn<ContainerInstance>> = [
     {
@@ -198,7 +189,7 @@ export function ContainerInstancesPage({
           refresh: {
             label: "刷新",
             spinning: query.isFetching,
-            onClick: () => void query.refetch(),
+            onClick: refresh,
           },
         }}
       >
@@ -214,13 +205,8 @@ export function ContainerInstancesPage({
             page,
             pageSize,
             total: result.total,
-            onPageChange: (nextPage) => {
-              setPage(nextPage);
-            },
-            onPageSizeChange: (nextPageSize) => {
-              setPageSize(nextPageSize);
-              setPage(1);
-            },
+            onPageChange: setPage,
+            onPageSizeChange: setPageSize,
           }}
         />
       </ListPageFrame>

@@ -1,13 +1,9 @@
 import { useFilesystemActions } from "@/hooks/useFilesystemActions";
 
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useMemo, useState } from "react";
-import {
-  listFilesystemMountTargets,
-  listFilesystems,
-  type StorageFilesystem,
-} from "@/api/storage/filesystems";
+import { listFilesystems, type StorageFilesystem } from "@/api/storage/filesystems";
 
 import { CreateFilesystemModal } from "@/components/storage/CreateFilesystemModal";
 
@@ -68,15 +64,6 @@ export function FilesystemsPage() {
     [filesystems.data?.items],
   );
   const paginationTotal = filesystems.data?.total ?? items.length;
-  const mountTargetQueries = useQueries({
-    queries: items.map((item) => ({
-      queryKey: ["filesystem-mounts", item.id, "count"],
-      queryFn: () => listFilesystemMountTargets(item.id, { limit: 1 }),
-    })),
-  });
-  const mountTargetCounts = new Map(
-    items.map((item, index) => [item.id, mountTargetQueries[index]?.data?.total]),
-  );
   const columns: Array<ListColumn<Filesystem>> = [
     {
       key: "name",
@@ -112,13 +99,6 @@ export function FilesystemsPage() {
           : item.performance_mode === "throughput"
             ? "吞吐型"
             : "-",
-    },
-    {
-      key: "mountTargetCount",
-      title: "挂载点",
-      width: 100,
-      ellipsis: true,
-      render: (_, item) => mountTargetCounts.get(item.id) ?? "-",
     },
     {
       key: "createdAt",
