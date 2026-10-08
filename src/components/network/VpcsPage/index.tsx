@@ -31,10 +31,6 @@ type VpcStatusFilter = "all" | Vpc["state"];
 type VpcSearchField = "name" | "id";
 
 export function VpcsPage() {
-  return <VpcList />;
-}
-
-function VpcList() {
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
   const [name, setName] = useState("");

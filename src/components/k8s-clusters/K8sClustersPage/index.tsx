@@ -19,10 +19,6 @@ type ClusterStatusFilter = "all" | NonNullable<Cluster["state"]>;
 type ClusterSearchField = "name" | "id";
 
 export function K8sClustersPage() {
-  return <ClusterList />;
-}
-
-function ClusterList() {
   const qc = useQueryClient();
   const [visible, setVisible] = useState(false);
   const [name, setName] = useState("");
