@@ -121,7 +121,7 @@ export function LoadBalancersPage() {
           subtitle: "通过 VIP、监听器和后端组对外提供高可用服务",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建负载均衡",
               iconClassName: "icon-add-1",
               variant: "primary",

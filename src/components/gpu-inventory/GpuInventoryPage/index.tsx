@@ -30,14 +30,14 @@ export function GpuInventoryPage() {
           actions: [
             /* 当前 Core API 尚未开放 GPU 配额申请，暂时隐藏入口，待接口开放后恢复。
             {
-              key: "header-action-1",
+              key: "request-expansion",
               label: "申请扩容",
               disabled: true,
               tooltip: "当前 Core API 尚未开放 GPU 配额申请",
             },
             */
             {
-              key: "header-action-2",
+              key: "create",
               label: "创建 GPU 容器",
               iconClassName: "icon-add-1",
               variant: "primary",

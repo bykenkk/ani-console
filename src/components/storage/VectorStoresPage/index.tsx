@@ -143,7 +143,7 @@ export function VectorStoresPage() {
           subtitle: "管理用于语义检索和 AI 应用的向量数据",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建向量存储",
               iconClassName: "icon-add-1",
               variant: "primary",

@@ -128,7 +128,7 @@ export function VmInstancesPage() {
           subtitle: "弹性虚拟计算资源，支持生命周期管理、VNC 控制台与运行状态观测",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建云主机",
               iconClassName: "icon-add-1",
               variant: "primary",

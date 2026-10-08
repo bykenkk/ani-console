@@ -127,7 +127,7 @@ export function NetworkRoutesPage() {
           subtitle: "管理 VPC 的自定义流量转发规则",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建路由",
               iconClassName: "icon-add-1",
               variant: "primary",

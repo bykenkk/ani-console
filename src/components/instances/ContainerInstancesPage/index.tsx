@@ -165,7 +165,7 @@ export function ContainerInstancesPage({
           subtitle: "当前租户权限范围内的资源与操作",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建容器实例",
               iconClassName: "icon-add-1",
               variant: "primary",

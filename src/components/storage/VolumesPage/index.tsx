@@ -138,7 +138,7 @@ export function VolumesPage() {
           subtitle: "管理可挂载到实例的块存储卷及快照",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建卷",
               iconClassName: "icon-add-1",
               variant: "primary",

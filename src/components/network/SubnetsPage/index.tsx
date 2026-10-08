@@ -206,7 +206,7 @@ export function SubnetsPage() {
           subtitle: "在 VPC 内划分相互隔离的私有网络地址空间",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建子网",
               iconClassName: "icon-add-1",
               variant: "primary",

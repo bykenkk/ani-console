@@ -135,7 +135,7 @@ export function ModelsPage() {
           subtitle: "统一管理模型 Catalog、版本与部署入口",
           actions: [
             {
-              key: "header-action-1",
+              key: "import",
               label: "导入模型",
               iconClassName: "icon-add-1",
               variant: "primary",

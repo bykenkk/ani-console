@@ -143,7 +143,7 @@ export function GpuInstancesPage() {
           subtitle: "GPU 工作负载的调度、发布与运行状态",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建 GPU 容器",
               iconClassName: "icon-add-1",
               variant: "primary",

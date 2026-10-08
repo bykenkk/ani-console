@@ -125,7 +125,7 @@ export function InferencePage() {
           subtitle: "部署模型并管理推理运行实例",
           actions: [
             {
-              key: "header-action-1",
+              key: "deploy",
               label: "一键部署",
               iconClassName: "icon-add-1",
               variant: "primary",

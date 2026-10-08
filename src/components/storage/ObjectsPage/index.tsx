@@ -108,7 +108,7 @@ export function ObjectsPage() {
           subtitle: "S3 兼容存储桶，用于保存非结构化对象数据",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建存储桶",
               iconClassName: "icon-add-1",
               variant: "primary",

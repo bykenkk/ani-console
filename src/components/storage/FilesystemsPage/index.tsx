@@ -136,7 +136,7 @@ export function FilesystemsPage() {
           subtitle: "管理共享文件系统、挂载目标与访问方式",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建文件存储",
               iconClassName: "icon-add-1",
               variant: "primary",

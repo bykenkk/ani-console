@@ -127,7 +127,7 @@ export function SandboxInstancesPage() {
           subtitle: "隔离会话、双超时与受控网络出口",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建沙箱",
               iconClassName: "icon-add-1",
               variant: "primary",

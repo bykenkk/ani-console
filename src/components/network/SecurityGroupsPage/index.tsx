@@ -144,7 +144,7 @@ export function SecurityGroupsPage() {
           subtitle: "通过入方向和出方向规则控制实例网络访问",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建安全组",
               iconClassName: "icon-add-1",
               variant: "primary",

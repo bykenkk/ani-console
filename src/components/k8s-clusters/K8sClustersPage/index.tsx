@@ -143,7 +143,7 @@ function ClusterList() {
           subtitle: "创建和管理托管 Kubernetes 集群，统一维护版本、节点池与工作负载",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建集群",
               iconClassName: "icon-add-1",
               variant: "primary",

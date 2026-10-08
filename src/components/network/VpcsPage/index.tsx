@@ -186,7 +186,7 @@ function VpcList() {
           subtitle: "创建和管理相互隔离的虚拟私有云网络",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建 VPC",
               iconClassName: "icon-add-1",
               variant: "primary",

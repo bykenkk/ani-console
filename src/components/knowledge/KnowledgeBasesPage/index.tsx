@@ -114,7 +114,7 @@ export function KnowledgeBasesPage() {
           subtitle: "创建知识库、管理文档并验证知识问答",
           actions: [
             {
-              key: "header-action-1",
+              key: "create",
               label: "创建知识库",
               iconClassName: "icon-add-1",
               variant: "primary",
