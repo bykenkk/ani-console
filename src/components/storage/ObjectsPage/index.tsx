@@ -146,7 +146,6 @@ export function ObjectsPage() {
           rowActions={actions}
           loading={buckets.isFetching}
           emptyIconClassName="icon-duixiangcunchu1"
-          emptyText={searchText ? "没有符合条件的存储桶" : "还没有存储桶，点击「创建存储桶」开始"}
           tableLabel="对象存储桶列表"
           preserveTableOnEmpty
           pagination={{

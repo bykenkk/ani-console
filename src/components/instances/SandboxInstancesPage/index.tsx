@@ -170,7 +170,6 @@ export function SandboxInstancesPage() {
           rowActions={actions}
           loading={query.isFetching}
           emptyIconClassName="icon-Sandbox"
-          emptyText="还没有沙箱实例，点击右上角创建"
           tableLabel="沙箱实例列表"
           preserveTableOnEmpty
           pagination={{

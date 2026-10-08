@@ -208,11 +208,6 @@ function ClusterList() {
           }}
           loading={isFetching}
           emptyIconClassName="icon-jiqun"
-          emptyText={
-            searchText || status !== "all"
-              ? "没有符合条件的 K8s 集群"
-              : "还没有 K8s 集群，点击「创建集群」开始"
-          }
           tableLabel="K8s 集群列表"
           preserveTableOnEmpty
           pagination={{

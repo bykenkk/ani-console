@@ -179,11 +179,6 @@ export function KnowledgeBasesPage() {
           rowActions={actions}
           loading={query.isFetching}
           emptyIconClassName="icon-zhishiku"
-          emptyText={
-            searchText || status !== "all"
-              ? "没有符合条件的知识库"
-              : "还没有知识库，可创建后上传文档并进行问答"
-          }
           tableLabel="知识库列表"
           preserveTableOnEmpty
           pagination={{

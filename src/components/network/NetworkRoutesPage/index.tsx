@@ -203,11 +203,6 @@ export function NetworkRoutesPage() {
           rowActions={actions}
           loading={routes.isFetching || vpcs.isFetching}
           emptyIconClassName="icon-VPCluyouqi"
-          emptyText={
-            searchText || filterVpcId
-              ? "没有符合条件的路由"
-              : "还没有自定义路由，点击「创建路由」开始"
-          }
           tableLabel="路由列表"
           preserveTableOnEmpty
           pagination={{

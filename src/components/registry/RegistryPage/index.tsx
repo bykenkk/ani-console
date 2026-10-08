@@ -267,11 +267,6 @@ export function RegistryPage() {
           loading={images.isFetching}
           preserveTableOnEmpty
           emptyIconClassName="icon-moxing"
-          emptyText={
-            keyword || purpose !== "all" || project !== "all"
-              ? "没有符合条件的镜像"
-              : "还没有镜像：按推送说明 docker push 入库后，再去创建实例"
-          }
           tableLabel="镜像仓库列表"
           pagination={{
             page,

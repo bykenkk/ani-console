@@ -290,11 +290,6 @@ export function SubnetsPage() {
           rowActions={actions}
           loading={subnets.isFetching || vpcs.isFetching}
           emptyIconClassName="icon-VPCwangluo"
-          emptyText={
-            searchText || filterVpcId || status !== "all"
-              ? "没有符合条件的子网"
-              : "还没有子网，点击「创建子网」开始"
-          }
           tableLabel="子网列表"
           preserveTableOnEmpty
           pagination={{

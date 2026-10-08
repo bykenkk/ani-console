@@ -205,11 +205,6 @@ export function LoadBalancersPage() {
           rowActions={actions}
           loading={loadBalancers.isFetching || vpcs.isFetching}
           emptyIconClassName="icon-fuzaijunhengqi"
-          emptyText={
-            searchText || vpcId || status !== "all"
-              ? "没有符合条件的负载均衡"
-              : "还没有负载均衡，点击「创建负载均衡」开始"
-          }
           tableLabel="负载均衡列表"
           preserveTableOnEmpty
           pagination={{

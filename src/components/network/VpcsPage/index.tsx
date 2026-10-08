@@ -249,11 +249,6 @@ function VpcList() {
           rowActions={actions}
           loading={vpcs.isFetching}
           emptyIconClassName="icon-VPCwangluo"
-          emptyText={
-            searchText || status !== "all"
-              ? "没有符合条件的 VPC"
-              : "还没有 VPC，点击「创建 VPC」开始"
-          }
           tableLabel="VPC 列表"
           preserveTableOnEmpty
           pagination={{

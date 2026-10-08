@@ -196,11 +196,6 @@ export function FilesystemsPage() {
           rowActions={actions}
           loading={filesystems.isFetching}
           emptyIconClassName="icon-wenjiancunchu"
-          emptyText={
-            searchText || status !== "all"
-              ? "没有符合条件的文件存储"
-              : "还没有文件存储，点击「创建文件存储」开始"
-          }
           tableLabel="文件存储列表"
           preserveTableOnEmpty
           pagination={{

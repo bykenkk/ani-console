@@ -168,11 +168,6 @@ export function VmInstancesPage() {
           rowActions={actions}
           loading={query.isFetching}
           emptyIconClassName="icon-yunzhuji"
-          emptyText={
-            status === "all" && !searchText.trim()
-              ? "还没有云主机，点击「创建云主机」开始"
-              : "后端未返回符合当前条件的云主机"
-          }
           tableLabel="云主机 VM 列表"
           pagination={{
             page,

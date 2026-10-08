@@ -228,11 +228,6 @@ export function SecurityGroupsPage() {
           rowActions={actions}
           loading={securityGroups.isFetching || vpcs.isFetching}
           emptyIconClassName="icon-anquanzu"
-          emptyText={
-            searchText || filterVpcId || status !== "all"
-              ? "没有符合条件的安全组"
-              : "还没有安全组，点击「创建安全组」开始"
-          }
           tableLabel="安全组列表"
           preserveTableOnEmpty
           pagination={{

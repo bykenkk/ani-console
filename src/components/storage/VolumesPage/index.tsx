@@ -202,11 +202,6 @@ export function VolumesPage() {
           rowActions={actions}
           loading={volumes.isFetching}
           emptyIconClassName="icon-kuaicunchu"
-          emptyText={
-            searchText || status !== "all"
-              ? "没有符合条件的块存储卷"
-              : "还没有块存储卷，点击「创建卷」开始"
-          }
           tableLabel="块存储卷列表"
           preserveTableOnEmpty
           pagination={{

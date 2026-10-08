@@ -186,11 +186,6 @@ export function GpuInstancesPage() {
           rowActions={actions}
           loading={query.isFetching}
           emptyIconClassName="icon-GPU"
-          emptyText={
-            status === "all" && !keyword
-              ? "还没有 GPU 容器实例，点击「创建 GPU 容器」开始"
-              : "后端未返回符合当前条件的 GPU 容器实例"
-          }
           tableLabel="GPU 容器实例列表"
           preserveTableOnEmpty
           pagination={{

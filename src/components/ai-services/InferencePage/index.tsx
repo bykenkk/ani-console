@@ -224,11 +224,6 @@ export function InferencePage() {
           }}
           preserveTableOnEmpty
           emptyIconClassName="icon-tuili"
-          emptyText={
-            searchText || model !== "all" || status !== "all"
-              ? "没有符合条件的推理服务"
-              : "还没有推理服务，可从模型仓库一键部署"
-          }
           tableLabel="推理服务列表"
         />
       </ListPageFrame>

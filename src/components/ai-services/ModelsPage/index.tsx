@@ -250,11 +250,6 @@ export function ModelsPage() {
           loading={models.isFetching}
           preserveTableOnEmpty
           emptyIconClassName="icon-moxing"
-          emptyText={
-            status !== "all" || searchText || source !== "all" || capability !== "all"
-              ? "没有符合条件的模型"
-              : "暂无模型，可通过“导入模型”添加"
-          }
           tableLabel="模型仓库列表"
           pagination={{
             page,

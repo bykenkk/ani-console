@@ -208,11 +208,6 @@ export function ContainerInstancesPage({
           rowActions={actions}
           loading={query.isFetching}
           emptyIconClassName="icon-rongqishili"
-          emptyText={
-            status === "all" && !keyword
-              ? "还没有容器实例，点击「创建容器实例」开始"
-              : "后端未返回符合当前条件的容器实例"
-          }
           tableLabel="容器实例列表"
           preserveTableOnEmpty
           pagination={{

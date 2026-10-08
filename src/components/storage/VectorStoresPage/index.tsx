@@ -203,11 +203,6 @@ export function VectorStoresPage() {
           rowActions={actions}
           loading={stores.isFetching}
           emptyIconClassName="icon-xiangliangcunchu"
-          emptyText={
-            searchText || status !== "all"
-              ? "没有符合条件的向量存储"
-              : "还没有向量存储，点击「创建向量存储」开始"
-          }
           tableLabel="向量存储列表"
           preserveTableOnEmpty
           pagination={{
