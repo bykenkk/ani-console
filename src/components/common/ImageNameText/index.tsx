@@ -7,7 +7,7 @@ import {
   type ImageDisplaySource,
 } from "@/lib/render";
 
-export function ImageNameText({
+export default function ImageNameText({
   image,
   showSize = false,
   className,

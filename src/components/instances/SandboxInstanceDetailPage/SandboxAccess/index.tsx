@@ -8,14 +8,14 @@ import { Button, Empty, Space, Typography, Modal } from "@arco-design/web-react"
 import { copyToClipboard } from "@/lib/clipboard";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { SandboxPortOpenModal } from "@/components/instances/SandboxPortOpenModal";
-import { SandboxTokenIssueModal } from "@/components/instances/SandboxTokenIssueModal";
+import SandboxPortOpenModal from "@/components/instances/SandboxPortOpenModal";
+import SandboxTokenIssueModal from "@/components/instances/SandboxTokenIssueModal";
 
 type SandboxInstance = InstanceRecord;
 type SandboxStatus = NonNullable<SandboxInstanceStatus>;
 type SandboxPortSummary = NonNullable<SandboxStatus["ports"]>[number];
 
-export function SandboxAccess({
+export default function SandboxAccess({
   instance,
   onChanged,
 }: {

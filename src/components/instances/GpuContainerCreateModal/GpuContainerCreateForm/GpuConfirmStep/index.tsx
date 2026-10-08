@@ -8,7 +8,7 @@ import {
   type Volume,
 } from "../../types";
 
-export function GpuConfirmStep({
+export default function GpuConfirmStep({
   values,
   image,
   volume,

@@ -8,7 +8,7 @@ export type DataTableSectionHeaderProps = {
   className?: string;
 };
 
-export function DataTableSectionHeader({
+export default function DataTableSectionHeader({
   title,
   extra,
   className = "mb-3",

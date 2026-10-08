@@ -11,7 +11,7 @@ import {
   type NetworkVPC,
 } from "@/api/network";
 
-import { CreateSecurityGroupModal } from "@/components/network/CreateSecurityGroupModal";
+import CreateSecurityGroupModal from "@/components/network/CreateSecurityGroupModal";
 import {
   ResourceNameId,
   ListPageFrame,
@@ -28,7 +28,7 @@ type Vpc = NetworkVPC;
 type StatusFilter = "all" | SecurityGroup["state"];
 type SearchField = "name" | "id";
 
-export function SecurityGroupsPage() {
+export default function SecurityGroupsPage() {
   const navigate = useNavigate();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
@@ -239,7 +239,7 @@ export function SecurityGroupsPage() {
           }}
         />
       </ListPageFrame>
-      <CreateSecurityGroupModal visible={createVisible} onCancel={() => setCreateVisible(false)} />
+      {createVisible && <CreateSecurityGroupModal onCancel={() => setCreateVisible(false)} />}
     </>
   );
 }

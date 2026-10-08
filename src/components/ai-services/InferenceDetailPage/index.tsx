@@ -1,4 +1,4 @@
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { useInferenceActions } from "@/hooks/useInferenceActions";
 
 import { getInferenceService, listInferenceServicePolicies } from "@/api/ai-services/inference";
@@ -16,17 +16,17 @@ import {
   ResourceId,
 } from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
-import { InferenceStatusTag } from "@/components/ai-services/InferenceStatusTag";
+import InferenceStatusTag from "@/components/ai-services/InferenceStatusTag";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
-import { InferenceInvocationTest } from "./InferenceInvocationTest";
-import { InferenceEvents } from "./InferenceEvents";
-import { InferenceLogs } from "./InferenceLogs";
-import { InferenceMonitoring } from "./InferenceMonitoring";
-import { InferencePolicies } from "./InferencePolicies";
-import { InferenceRelatedResources } from "./InferenceRelatedResources";
+import InferenceInvocationTest from "./InferenceInvocationTest";
+import InferenceEvents from "./InferenceEvents";
+import InferenceLogs from "./InferenceLogs";
+import InferenceMonitoring from "./InferenceMonitoring";
+import InferencePolicies from "./InferencePolicies";
+import InferenceRelatedResources from "./InferenceRelatedResources";
 
-export function InferenceDetailPage({
+export default function InferenceDetailPage({
   serviceId,
   tab,
   onTabChange,

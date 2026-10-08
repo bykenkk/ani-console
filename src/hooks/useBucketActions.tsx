@@ -2,9 +2,9 @@ import { useMutation } from "@tanstack/react-query";
 import { Modal } from "@arco-design/web-react";
 import { useState } from "react";
 import { deleteBucket, type StorageBucketRecord } from "@/api/storage/buckets";
-import { BucketAclModal } from "@/components/storage/BucketAclModal";
-import { BucketUploadModal } from "@/components/storage/BucketUploadModal";
-import { BucketStorageClassModal } from "@/components/storage/BucketStorageClassModal";
+import BucketAclModal from "@/components/storage/BucketAclModal";
+import BucketUploadModal from "@/components/storage/BucketUploadModal";
+import BucketStorageClassModal from "@/components/storage/BucketStorageClassModal";
 import type { RowAction } from "@/components/common";
 type Bucket = StorageBucketRecord;
 export function useBucketActions(onDeleted: () => void) {

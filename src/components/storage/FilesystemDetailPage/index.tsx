@@ -1,5 +1,5 @@
 import { useFilesystemActions } from "@/hooks/useFilesystemActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { getFilesystem, type StorageFilesystem } from "@/api/storage/filesystems";
 import {
@@ -17,11 +17,11 @@ import { useCallback, useState } from "react";
 
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
-import { FilesystemMountTargets } from "./FilesystemMountTargets";
+import FilesystemMountTargets from "./FilesystemMountTargets";
 
 type Filesystem = StorageFilesystem;
 
-export function FilesystemDetailPage({ filesystemId }: { filesystemId: string }) {
+export default function FilesystemDetailPage({ filesystemId }: { filesystemId: string }) {
   const goBack = useBackOrFallback("filesystem");
 
   const [mountCount, setMountCount] = useState(0);

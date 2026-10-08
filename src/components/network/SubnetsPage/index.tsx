@@ -1,11 +1,11 @@
+import CreateSubnetModal from "@/components/network/CreateSubnetModal";
 import { useSubnetActions } from "@/hooks/useSubnetActions";
 
 import { useNavigate } from "@tanstack/react-router";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Form, Input, Link, Modal, Select } from "@arco-design/web-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link, Select } from "@arco-design/web-react";
 import { useMemo, useState } from "react";
 import {
-  createNetworkSubnet,
   listNetworkSubnets,
   listNetworkVpcs,
   type NetworkSubnet,
@@ -13,7 +13,6 @@ import {
 } from "@/api/network";
 
 import {
-  Ipv4CidrInput,
   ResourceNameId,
   ListPageFrame,
   type ListColumn,
@@ -23,30 +22,17 @@ import {
 import { formatDateTime } from "@/lib/format";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { navigateToResourceDetail } from "@/lib/resources";
-import {
-  ipv4CidrWithinError,
-  optionalIpv4Error,
-  optionalIpv4WithinCidr,
-  optionalIpv4WithinCidrError,
-  requireIpv4CidrWithin,
-  subnetFixedOctets,
-  suggestGatewayIp,
-  suggestSubnetCidr,
-} from "@/lib/validators";
 
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
 type SubnetStatusFilter = "all" | Subnet["state"];
 type SubnetSearchField = "name" | "id";
 
-export function SubnetsPage() {
+export default function SubnetsPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
-  const [name, setName] = useState("");
-  const [vpcId, setVpcId] = useState("");
-  const [cidr, setCidr] = useState("10.0.1.0/24");
-  const [gateway, setGateway] = useState("");
+
   const [status, setStatus] = useState<SubnetStatusFilter>("all");
   const [searchField, setSearchField] = useState<SubnetSearchField>("name");
   const [searchText, setSearchText] = useState("");
@@ -91,59 +77,7 @@ export function SubnetsPage() {
       });
     },
   });
-  const selectedVpc = ((vpcs.data?.items ?? []) as Vpc[]).find((vpc) => vpc.id === vpcId);
-  const selectedVpcCidr = selectedVpc?.cidr ?? "";
-  const cidrError = selectedVpcCidr
-    ? ipv4CidrWithinError(cidr, selectedVpcCidr, "CIDR", "VPC CIDR")
-    : undefined;
-  const gatewayError = cidr
-    ? optionalIpv4WithinCidrError(gateway, cidr, "网关", "CIDR")
-    : optionalIpv4Error(gateway, "网关");
-  const fixedOctets = selectedVpcCidr ? subnetFixedOctets(selectedVpcCidr) : [];
-  const selectedVpcPrefix = selectedVpcCidr ? Number(selectedVpcCidr.split("/")[1]) : 0;
 
-  const resetCreateForm = () => {
-    setName("");
-    setVpcId("");
-    setCidr("10.0.1.0/24");
-    setGateway("");
-  };
-  const setSubnetCidr = (nextCidr: string) => {
-    setCidr(nextCidr);
-    try {
-      setGateway(suggestGatewayIp(nextCidr));
-    } catch {
-      /* Keep the last valid gateway while editing. */
-    }
-  };
-  const createSubnet = useMutation({
-    meta: {
-      feedback: {
-        channel: "notification",
-        id: "subnet-create",
-        action: "创建",
-        errorFallback: "请求失败",
-      },
-    },
-    mutationFn: async () => {
-      const trimmedName = name.trim();
-      if (!trimmedName) throw new Error("请输入子网名称");
-      if (!selectedVpcCidr) throw new Error("请选择 VPC");
-      const submitData = {
-        name: trimmedName,
-        vpc_id: vpcId,
-        cidr: requireIpv4CidrWithin(cidr, selectedVpcCidr, "CIDR", "VPC CIDR"),
-        gateway: optionalIpv4WithinCidr(gateway, cidr, "网关", "CIDR"),
-      };
-      return createNetworkSubnet(submitData);
-    },
-    onSuccess: () => {
-      setCreateVisible(false);
-      resetCreateForm();
-      resetPagination();
-      qc.invalidateQueries({ queryKey: ["network-subnets"] });
-    },
-  });
   const { actions } = useSubnetActions(() => {
     resetPagination();
     qc.invalidateQueries({ queryKey: ["network-subnets"] });
@@ -301,71 +235,15 @@ export function SubnetsPage() {
           }}
         />
       </ListPageFrame>
-      <Modal
-        visible={createVisible}
-        title="创建子网"
-        onCancel={() => {
-          setCreateVisible(false);
-          resetCreateForm();
-        }}
-        onOk={() => createSubnet.mutateAsync()}
-        confirmLoading={createSubnet.isPending}
-        unmountOnExit
-      >
-        <Form layout="vertical">
-          <Form.Item label="名称" required>
-            <Input
-              value={name}
-              onChange={setName}
-              placeholder="请输入子网名称"
-              maxLength={64}
-              showWordLimit
-            />
-          </Form.Item>
-          <Form.Item label="VPC" required>
-            <Select
-              value={vpcId || undefined}
-              onChange={(nextVpcId) => {
-                setVpcId(nextVpcId);
-                const vpc = ((vpcs.data?.items ?? []) as Vpc[]).find(
-                  (item) => item.id === nextVpcId,
-                );
-                if (vpc) setSubnetCidr(suggestSubnetCidr(vpc.cidr));
-              }}
-              loading={vpcs.isLoading}
-              placeholder="选择 VPC"
-            >
-              {((vpcs.data?.items ?? []) as Vpc[]).map((vpc) => (
-                <Select.Option key={vpc.id} value={vpc.id}>
-                  {vpc.name} · {vpc.cidr}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Form.Item
-            label="CIDR"
-            required
-            validateStatus={cidrError ? "error" : undefined}
-            help={cidrError}
-          >
-            <Ipv4CidrInput
-              value={cidr}
-              onChange={setSubnetCidr}
-              placeholder="10.0.1.0"
-              withPrefix
-              disabledOctets={fixedOctets}
-              minPrefix={selectedVpcPrefix}
-            />
-          </Form.Item>
-          <Form.Item
-            label="网关"
-            validateStatus={gatewayError ? "error" : undefined}
-            help={gatewayError}
-          >
-            <Ipv4CidrInput value={gateway} onChange={setGateway} placeholder="10.0.1.1" />
-          </Form.Item>
-        </Form>
-      </Modal>
+      {createVisible && (
+        <CreateSubnetModal
+          onCancel={() => setCreateVisible(false)}
+          onCreated={() => {
+            resetPagination();
+            void qc.invalidateQueries({ queryKey: ["network-subnets"] });
+          }}
+        />
+      )}
     </>
   );
 }

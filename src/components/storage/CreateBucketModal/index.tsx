@@ -16,12 +16,10 @@ type Bucket = StorageBucketRecord;
 type Acl = StorageBucketAcl;
 type StorageClass = StorageBucketClass;
 
-export function CreateBucketModal({
-  visible,
+export default function CreateBucketModal({
   onCancel,
   onCreated,
 }: {
-  visible: boolean;
   onCancel: () => void;
   onCreated?: (bucket: Bucket) => void;
 }) {
@@ -29,11 +27,7 @@ export function CreateBucketModal({
   const [name, setName] = useState("");
   const [acl, setAcl] = useState<Acl>("private");
   const [storageClass, setStorageClass] = useState<StorageClass>("standard");
-  const reset = () => {
-    setName("");
-    setAcl("private");
-    setStorageClass("standard");
-  };
+
   const create = useMutation({
     meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
     mutationFn: async (_: undefined) => {
@@ -54,19 +48,15 @@ export function CreateBucketModal({
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["buckets"] });
-      reset();
       onCreated?.(data);
       onCancel();
     },
   });
   return (
     <Modal
-      visible={visible}
+      visible
       title="创建存储桶"
-      onCancel={() => {
-        reset();
-        onCancel();
-      }}
+      onCancel={onCancel}
       onOk={() => create.mutateAsync(undefined)}
       confirmLoading={create.isPending}
       unmountOnExit

@@ -4,7 +4,7 @@ import { withId } from "@/lib/id";
 import { Empty } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
-export function VpcRoutes({ vpcId }: { vpcId: string }) {
+export default function VpcRoutes({ vpcId }: { vpcId: string }) {
   const routes = useQuery({
     meta: {
       errorNotification: {

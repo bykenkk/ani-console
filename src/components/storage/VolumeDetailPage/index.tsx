@@ -1,5 +1,5 @@
 import { useVolumeActions } from "@/hooks/useVolumeActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { getVolume, type StorageVolume } from "@/api/storage/volumes";
 import {
@@ -18,14 +18,14 @@ import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
 
 import { formatDateTime } from "@/lib/format";
-import { VolumeAutoSnapshot } from "@/components/storage/VolumeAutoSnapshot";
-import { VolumeMountHistory } from "./VolumeMountHistory";
-import { VolumeRelatedResources } from "./VolumeRelatedResources";
-import { VolumeSnapshots } from "./VolumeSnapshots";
+import VolumeAutoSnapshot from "@/components/storage/VolumeAutoSnapshot";
+import VolumeMountHistory from "./VolumeMountHistory";
+import VolumeRelatedResources from "./VolumeRelatedResources";
+import VolumeSnapshots from "./VolumeSnapshots";
 
 type Volume = StorageVolume;
 
-export function VolumeDetailPage({
+export default function VolumeDetailPage({
   volumeId,
   tab,
   onTabChange,

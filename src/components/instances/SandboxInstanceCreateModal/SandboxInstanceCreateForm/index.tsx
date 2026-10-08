@@ -9,22 +9,21 @@ import {
   type FormValues,
   type SandboxTemplate,
 } from "../types";
-import { SandboxConfirmStep } from "./SandboxConfirmStep";
-import { SandboxResourceStep } from "./SandboxResourceStep";
-import { SandboxRuntimeStep } from "./SandboxRuntimeStep";
-import { SandboxTemplateStep } from "./SandboxTemplateStep";
+import SandboxConfirmStep from "./SandboxConfirmStep";
+import SandboxResourceStep from "./SandboxResourceStep";
+import SandboxRuntimeStep from "./SandboxRuntimeStep";
+import SandboxTemplateStep from "./SandboxTemplateStep";
 import { validateForm } from "@/lib/form";
 
 const STEP_TITLES = ["基础配置", "资源配置", "摘要信息"];
 
 type Props = {
-  visible: boolean;
   submitting: boolean;
   onCancel: () => void;
   onSubmit: (values: FormValues, template: SandboxTemplate) => void;
 };
 
-export function SandboxInstanceCreateForm({ visible, submitting, onCancel, onSubmit }: Props) {
+export default function SandboxInstanceCreateForm({ submitting, onCancel, onSubmit }: Props) {
   const [form] = Form.useForm<FormValues>();
   const [step, setStep] = useState(0);
   const [values, setValues] = useState<FormValues>(INITIAL_VALUES);
@@ -37,7 +36,6 @@ export function SandboxInstanceCreateForm({ visible, submitting, onCancel, onSub
       },
     },
     queryKey: ["sandbox-templates", "create-modal"],
-    enabled: visible,
     queryFn: () => listSandboxTemplates({ limit: 100 }),
   });
   const items = useMemo(
@@ -47,21 +45,14 @@ export function SandboxInstanceCreateForm({ visible, submitting, onCancel, onSub
   const selectedTemplate = items.find((item) => item.id === values.template_id);
 
   useEffect(() => {
-    if (!visible) return;
-    form.setFieldsValue(INITIAL_VALUES);
-    setValues(INITIAL_VALUES);
-    setStep(0);
-  }, [form, visible]);
-
-  useEffect(() => {
-    if (!visible || values.template_id || !items[0]) return;
+    if (values.template_id || !items[0]) return;
     const nextValues = {
       template_id: items[0].id,
       compute_spec: getTemplateComputeSpec(items[0]),
     };
     form.setFieldsValue(nextValues);
     setValues((current) => ({ ...current, ...nextValues }));
-  }, [form, items, values.template_id, visible]);
+  }, [form, items, values.template_id]);
 
   const selectTemplate = (templateId: string) => {
     const template = items.find((item) => item.id === templateId);
@@ -85,7 +76,7 @@ export function SandboxInstanceCreateForm({ visible, submitting, onCancel, onSub
   return (
     <Modal
       title="创建沙箱"
-      visible={visible}
+      visible
       onCancel={onCancel}
       unmountOnExit
       footer={

@@ -3,7 +3,7 @@ import { IconCopy } from "@arco-design/web-react/icon";
 import clsx from "clsx";
 import { copyToClipboard } from "@/lib/clipboard";
 
-export function ResourceId({
+export default function ResourceId({
   value,
   className,
   copyable = true,

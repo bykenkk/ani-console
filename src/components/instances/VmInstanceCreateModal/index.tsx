@@ -7,7 +7,7 @@ import { listSecrets } from "@/api/secrets";
 import type { StorageFilesystem } from "@/api/storage/filesystems";
 import { listFilesystems } from "@/api/storage/filesystems";
 import { ImageNameText, Ipv4CidrInput, WizardSteps } from "@/components/common";
-import { InstanceComputeSpecSelect } from "@/components/instances/InstanceComputeSpecSelect";
+import InstanceComputeSpecSelect from "@/components/instances/InstanceComputeSpecSelect";
 import { CPU_INSTANCE_COMPUTE_SPECS, type CpuInstanceComputeSpec } from "@/lib/instances";
 import {
   Button,
@@ -22,7 +22,7 @@ import {
   Switch,
 } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import { showMessage } from "@/lib/feedback";
 import { validateForm } from "@/lib/form";
@@ -170,12 +170,10 @@ const buildPasswordCloudInit = (username: string, password: string, customUserDa
   ].join("\r\n");
 };
 
-export function VmInstanceCreateModal({
-  visible,
+export default function VmInstanceCreateModal({
   onCancel,
   onCreated,
 }: {
-  visible: boolean;
   onCancel: () => void;
   onCreated: (operationId?: string) => void;
 }) {
@@ -183,13 +181,6 @@ export function VmInstanceCreateModal({
   const [step, setStep] = useState(0);
   const [values, setValues] = useState<Values>(INITIAL);
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    if (!visible) return;
-    form.setFieldsValue(INITIAL);
-    setValues(INITIAL);
-    setStep(0);
-  }, [form, visible]);
 
   const images = useQuery({
     meta: {
@@ -200,7 +191,6 @@ export function VmInstanceCreateModal({
       },
     },
     queryKey: ["registry-images", "vm-create", "system"],
-    enabled: visible,
     queryFn: async () => (await listRegistryImages({ limit: 100, purpose: "system" })).items,
   });
   const vpcs = useQuery({
@@ -212,7 +202,6 @@ export function VmInstanceCreateModal({
       },
     },
     queryKey: ["network-vpcs", "vm-create"],
-    enabled: visible,
     queryFn: () => listNetworkVpcs({ limit: 100 }),
   });
   const subnets = useQuery({
@@ -224,7 +213,7 @@ export function VmInstanceCreateModal({
       },
     },
     queryKey: ["network-subnets", "vm-create", values.vpcId],
-    enabled: visible && !!values.vpcId,
+    enabled: !!values.vpcId,
     queryFn: () => listNetworkSubnets({ limit: 100, vpc_id: values.vpcId }),
   });
   const securityGroups = useQuery({
@@ -236,7 +225,7 @@ export function VmInstanceCreateModal({
       },
     },
     queryKey: ["network-security-groups", "vm-create", values.vpcId],
-    enabled: visible && !!values.vpcId,
+    enabled: !!values.vpcId,
     queryFn: () => listNetworkSecurityGroups({ limit: 100, vpc_id: values.vpcId }),
   });
   const filesystems = useQuery({
@@ -248,7 +237,6 @@ export function VmInstanceCreateModal({
       },
     },
     queryKey: ["filesystems", "vm-create"],
-    enabled: visible,
     queryFn: () => listFilesystems({ limit: 100 }),
   });
   const secrets = useQuery({
@@ -260,7 +248,6 @@ export function VmInstanceCreateModal({
       },
     },
     queryKey: ["secrets", "vm-create"],
-    enabled: visible,
     queryFn: () => listSecrets({ limit: 100 }),
   });
   const availableSubnets = (subnets.data?.items ?? []).filter(
@@ -404,7 +391,7 @@ export function VmInstanceCreateModal({
   return (
     <Modal
       title="创建云主机 VM"
-      visible={visible}
+      visible
       onCancel={close}
       footer={
         <Space>

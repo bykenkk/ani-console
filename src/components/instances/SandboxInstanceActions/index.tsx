@@ -1,9 +1,9 @@
 import { Button, Space } from "@arco-design/web-react";
 import type { InstanceRecord } from "@/api/instances";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { useSandboxInstanceActions } from "@/hooks/useSandboxInstanceActions";
 
-export function SandboxInstanceActions({
+export default function SandboxInstanceActions({
   instance,
   onChanged,
   onDeleted,

@@ -4,17 +4,17 @@ import { copyToClipboard } from "@/lib/clipboard";
 import { openContainerInstanceTerminalWindow } from "@/lib/instances";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { ContainerInstanceAttachFilesystemModal } from "@/components/instances/ContainerInstanceAttachFilesystemModal";
-import { InstanceAttachVolumeModal as ContainerInstanceAttachVolumeModal } from "@/components/instances/InstanceVolumeModals";
-import { ContainerInstanceBindSecretModal } from "@/components/instances/ContainerInstanceBindSecretModal";
-import { ContainerInstanceChangeSecurityGroupsModal } from "@/components/instances/ContainerInstanceChangeSecurityGroupsModal";
-import { ContainerInstanceDeleteModal } from "@/components/instances/ContainerInstanceDeleteModal";
-import { InstanceDetachVolumeModal as ContainerInstanceDetachVolumeModal } from "@/components/instances/InstanceVolumeModals";
-import { ContainerInstanceResizeModal } from "@/components/instances/ContainerInstanceResizeModal";
-import { ContainerInstanceRollbackModal } from "@/components/instances/ContainerInstanceRollbackModal";
-import { ContainerInstanceScaleModal } from "@/components/instances/ContainerInstanceScaleModal";
-import { ContainerInstanceStopModal } from "@/components/instances/ContainerInstanceStopModal";
-import { ContainerInstanceUpdateImageModal } from "@/components/instances/ContainerInstanceUpdateImageModal";
+import ContainerInstanceAttachFilesystemModal from "@/components/instances/ContainerInstanceAttachFilesystemModal";
+import ContainerInstanceAttachVolumeModal from "@/components/instances/InstanceAttachVolumeModal";
+import ContainerInstanceBindSecretModal from "@/components/instances/ContainerInstanceBindSecretModal";
+import ContainerInstanceChangeSecurityGroupsModal from "@/components/instances/ContainerInstanceChangeSecurityGroupsModal";
+import ContainerInstanceDeleteModal from "@/components/instances/ContainerInstanceDeleteModal";
+import ContainerInstanceDetachVolumeModal from "@/components/instances/InstanceDetachVolumeModal";
+import ContainerInstanceResizeModal from "@/components/instances/ContainerInstanceResizeModal";
+import ContainerInstanceRollbackModal from "@/components/instances/ContainerInstanceRollbackModal";
+import ContainerInstanceScaleModal from "@/components/instances/ContainerInstanceScaleModal";
+import ContainerInstanceStopModal from "@/components/instances/ContainerInstanceStopModal";
+import ContainerInstanceUpdateImageModal from "@/components/instances/ContainerInstanceUpdateImageModal";
 
 type Instance = InstanceRecord;
 type DialogAction =

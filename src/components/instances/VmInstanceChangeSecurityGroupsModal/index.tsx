@@ -10,7 +10,7 @@ import { validateForm } from "@/lib/form";
 type Instance = InstanceRecord;
 type SecurityGroup = NetworkSecurityGroup;
 
-export function VmInstanceChangeSecurityGroupsModal({
+export default function VmInstanceChangeSecurityGroupsModal({
   instance,
   onCancel,
   onSubmitted,

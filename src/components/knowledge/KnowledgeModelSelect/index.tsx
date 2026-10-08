@@ -8,7 +8,7 @@ import {
 } from "@/api/ai-services/inference";
 import { withId } from "@/lib/id";
 
-export function KnowledgeModelSelect({
+export default function KnowledgeModelSelect({
   capability,
   value,
   onChange,

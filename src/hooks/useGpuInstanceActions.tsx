@@ -4,17 +4,17 @@ import { copyToClipboard } from "@/lib/clipboard";
 import { openGpuInstanceTerminalWindow } from "@/lib/instances";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { GpuInstanceAttachFilesystemModal } from "@/components/instances/GpuInstanceAttachFilesystemModal";
-import { InstanceAttachVolumeModal as GpuInstanceAttachVolumeModal } from "@/components/instances/InstanceVolumeModals";
-import { GpuInstanceBindSecretModal } from "@/components/instances/GpuInstanceBindSecretModal";
-import { GpuInstanceChangeSecurityGroupsModal } from "@/components/instances/GpuInstanceChangeSecurityGroupsModal";
-import { GpuInstanceDeleteModal } from "@/components/instances/GpuInstanceDeleteModal";
-import { InstanceDetachVolumeModal as GpuInstanceDetachVolumeModal } from "@/components/instances/InstanceVolumeModals";
-import { GpuInstanceResizeModal } from "@/components/instances/GpuInstanceResizeModal";
-import { GpuInstanceRollbackModal } from "@/components/instances/GpuInstanceRollbackModal";
-import { GpuInstanceScaleModal } from "@/components/instances/GpuInstanceScaleModal";
-import { GpuInstanceStopModal } from "@/components/instances/GpuInstanceStopModal";
-import { GpuInstanceUpdateImageModal } from "@/components/instances/GpuInstanceUpdateImageModal";
+import GpuInstanceAttachFilesystemModal from "@/components/instances/GpuInstanceAttachFilesystemModal";
+import GpuInstanceAttachVolumeModal from "@/components/instances/InstanceAttachVolumeModal";
+import GpuInstanceBindSecretModal from "@/components/instances/GpuInstanceBindSecretModal";
+import GpuInstanceChangeSecurityGroupsModal from "@/components/instances/GpuInstanceChangeSecurityGroupsModal";
+import GpuInstanceDeleteModal from "@/components/instances/GpuInstanceDeleteModal";
+import GpuInstanceDetachVolumeModal from "@/components/instances/InstanceDetachVolumeModal";
+import GpuInstanceResizeModal from "@/components/instances/GpuInstanceResizeModal";
+import GpuInstanceRollbackModal from "@/components/instances/GpuInstanceRollbackModal";
+import GpuInstanceScaleModal from "@/components/instances/GpuInstanceScaleModal";
+import GpuInstanceStopModal from "@/components/instances/GpuInstanceStopModal";
+import GpuInstanceUpdateImageModal from "@/components/instances/GpuInstanceUpdateImageModal";
 
 type Instance = InstanceRecord;
 type DialogAction =

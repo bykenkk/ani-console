@@ -12,7 +12,7 @@ export type ContainerFilesystemMountValues = {
   filesystem_read_only: boolean;
 };
 
-export function ContainerFilesystemMountFields({
+export default function ContainerFilesystemMountFields({
   values,
   filesystems,
   mountPathError,

@@ -7,7 +7,7 @@ import { validateForm } from "@/lib/form";
 
 type Instance = InstanceRecord;
 
-export function GpuInstanceRollbackModal({
+export default function GpuInstanceRollbackModal({
   instance,
   onCancel,
   onSubmitted,

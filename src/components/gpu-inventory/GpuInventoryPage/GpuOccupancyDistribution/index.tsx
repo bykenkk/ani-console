@@ -3,7 +3,7 @@ import type { EChartsOption } from "echarts";
 import { CorePieChart } from "@/components/common";
 import { useGpuOccupancyQuery } from "../useGpuOccupancyQuery";
 
-export function GpuOccupancyDistribution() {
+export default function GpuOccupancyDistribution() {
   const occupancy = useGpuOccupancyQuery();
   const total = occupancy.data?.total ?? 0;
   const inUse = occupancy.data?.in_use ?? 0;

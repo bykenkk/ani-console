@@ -11,7 +11,7 @@ import {
   type NetworkVPC,
 } from "@/api/network";
 
-import { CreateRouteModal } from "@/components/network/CreateRouteModal";
+import CreateRouteModal from "@/components/network/CreateRouteModal";
 import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { navigateToResourceDetail } from "@/lib/resources";
@@ -20,7 +20,7 @@ type Vpc = NetworkVPC;
 type SearchField = "description" | "id";
 type StatusFilter = "all" | "available";
 
-export function NetworkRoutesPage() {
+export default function NetworkRoutesPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
@@ -214,7 +214,7 @@ export function NetworkRoutesPage() {
           }}
         />
       </ListPageFrame>
-      <CreateRouteModal visible={createVisible} onCancel={() => setCreateVisible(false)} />
+      {createVisible && <CreateRouteModal onCancel={() => setCreateVisible(false)} />}
     </>
   );
 }

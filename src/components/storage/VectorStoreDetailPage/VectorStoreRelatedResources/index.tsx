@@ -8,7 +8,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 type RelatedResource = { id: string; type: "知识库"; name: string };
 
-export function VectorStoreRelatedResources({ store }: { store: VectorStore }) {
+export default function VectorStoreRelatedResources({ store }: { store: VectorStore }) {
   const navigate = useNavigate();
 
   const qc = useQueryClient();

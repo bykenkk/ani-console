@@ -29,7 +29,7 @@ function getModelInventory(occupancy?: GpuOccupancyStats): ModelInventoryRow[] {
   });
 }
 
-export function GpuModelInventory({ onCreate }: { onCreate: () => void }) {
+export default function GpuModelInventory({ onCreate }: { onCreate: () => void }) {
   const occupancy = useGpuOccupancyQuery();
   const modelInventory = getModelInventory(occupancy.data);
 

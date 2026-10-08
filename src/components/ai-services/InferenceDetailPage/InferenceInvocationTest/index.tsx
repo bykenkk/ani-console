@@ -1,6 +1,6 @@
 import { Descriptions } from "@arco-design/web-react";
 
-export function InferenceInvocationTest({
+export default function InferenceInvocationTest({
   servedModelName,
   status,
   endpointUrl,

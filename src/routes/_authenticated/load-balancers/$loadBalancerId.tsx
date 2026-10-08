@@ -1,4 +1,4 @@
-import { LoadBalancerDetailPage } from "@/components/network/LoadBalancerDetailPage";
+import LoadBalancerDetailPage from "@/components/network/LoadBalancerDetailPage";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/load-balancers/$loadBalancerId")({

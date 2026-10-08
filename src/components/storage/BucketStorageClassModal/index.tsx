@@ -12,7 +12,10 @@ type BucketStorageClassModalProps = {
   onCancel: () => void;
 };
 
-export function BucketStorageClassModal({ bucket, onCancel }: BucketStorageClassModalProps) {
+export default function BucketStorageClassModal({
+  bucket,
+  onCancel,
+}: BucketStorageClassModalProps) {
   const queryClient = useQueryClient();
   const [storageClass, setStorageClass] = useState<StorageBucketClass>(
     bucket.storage_class ?? "standard",

@@ -7,7 +7,7 @@ import {
   type CreateKnowledgeBaseInput,
   type KnowledgeBase,
 } from "@/api/knowledge";
-import { KnowledgeModelSelect } from "@/components/knowledge/KnowledgeModelSelect";
+import KnowledgeModelSelect from "@/components/knowledge/KnowledgeModelSelect";
 import { validateForm } from "@/lib/form";
 
 type CreateKnowledgeBaseFormValues = CreateKnowledgeBaseInput & {
@@ -17,7 +17,7 @@ type CreateKnowledgeBaseFormValues = CreateKnowledgeBaseInput & {
   top_k: number;
 };
 
-export function CreateKnowledgeBaseModal({
+export default function CreateKnowledgeBaseModal({
   onCancel,
   onCreated,
 }: {
@@ -45,7 +45,6 @@ export function CreateKnowledgeBaseModal({
     },
     onSuccess: (item) => {
       qc.invalidateQueries({ queryKey: ["knowledge-bases"] });
-      form.resetFields();
       onCancel();
       onCreated?.(item);
     },
@@ -64,10 +63,7 @@ export function CreateKnowledgeBaseModal({
       title="创建知识库"
       visible
       confirmLoading={create.isPending}
-      onCancel={() => {
-        form.resetFields();
-        onCancel();
-      }}
+      onCancel={onCancel}
       onOk={() =>
         validateForm<CreateKnowledgeBaseFormValues>(form).then((values) => create.mutate(values))
       }

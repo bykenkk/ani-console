@@ -5,7 +5,7 @@ import {
   type ResourceDetailTypeWithoutSearch,
   type VectorStoreDetailSearch,
 } from "@/lib/resources";
-import { ResourceId } from "../ResourceId";
+import ResourceId from "../ResourceId";
 import styles from "./index.module.css";
 
 type ResourceNameIdBaseProps = {
@@ -22,7 +22,7 @@ export type ResourceNameIdProps = ResourceNameIdBaseProps &
     | { type: "vector-store"; search: VectorStoreDetailSearch }
   );
 
-export function ResourceNameId(props: ResourceNameIdProps) {
+export default function ResourceNameId(props: ResourceNameIdProps) {
   const { name, id, openable = true, copyable = true } = props;
   const navigate = useNavigate();
   const canOpen = openable && Boolean(props.type && id && id !== "-");

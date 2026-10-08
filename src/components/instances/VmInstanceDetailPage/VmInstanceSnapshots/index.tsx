@@ -2,13 +2,13 @@ import { type InstanceRecord } from "@/api/instances";
 import { Button, Empty, Tooltip } from "@arco-design/web-react";
 import { DataTable, ResourceNameId, StatusBadge, type RowAction } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
-import { VmInstanceRollbackModal } from "@/components/instances/VmInstanceRollbackModal";
+import VmInstanceRollbackModal from "@/components/instances/VmInstanceRollbackModal";
 import { useState } from "react";
 
 type VmInstance = InstanceRecord;
 type Snapshot = NonNullable<VmInstance["snapshots"]>[number];
 
-export function VmInstanceSnapshots({
+export default function VmInstanceSnapshots({
   instance,
   onChanged,
   createAction,

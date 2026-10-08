@@ -7,7 +7,7 @@ import { Button, Empty, Space } from "@arco-design/web-react";
 type Instance = InstanceRecord;
 type Volume = NonNullable<Instance["volumes"]>[number];
 type FilesystemAttachment = NonNullable<Instance["storage_attachments"]>[number];
-export function InstanceStorage({
+export default function InstanceStorage({
   instance,
   mountVolume,
   mountFilesystem,

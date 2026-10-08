@@ -5,7 +5,7 @@ import { createBucketLifecycleRule, type StorageBucketLifecycleRule } from "@/ap
 
 type LifecycleRule = StorageBucketLifecycleRule;
 
-export function CreateLifecycleRuleModal({
+export default function CreateLifecycleRuleModal({
   bucketId,
   rule,
   onCancel,

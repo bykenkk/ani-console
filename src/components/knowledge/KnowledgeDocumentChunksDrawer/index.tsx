@@ -149,7 +149,7 @@ function ParentChunkSection({ group, index }: { group: ParentChunkGroup; index: 
   );
 }
 
-export function KnowledgeDocumentChunksDrawer({
+export default function KnowledgeDocumentChunksDrawer({
   kbId,
   document,
   visible,

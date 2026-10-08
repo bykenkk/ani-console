@@ -4,12 +4,12 @@ import { useNavigate } from "@tanstack/react-router";
 import { listInferenceServices, type InferenceService } from "@/api/ai-services/inference";
 import type { Model } from "@/api/ai-services/models";
 import { DataTable } from "@/components/common";
-import { InferenceStatusTag } from "@/components/ai-services/InferenceStatusTag";
+import InferenceStatusTag from "@/components/ai-services/InferenceStatusTag";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 import { navigateToResourceDetail } from "@/lib/resources";
 
-export function ModelRelatedResources({ model }: { model: Model }) {
+export default function ModelRelatedResources({ model }: { model: Model }) {
   const navigate = useNavigate();
   const relatedServices = useQuery({
     meta: {

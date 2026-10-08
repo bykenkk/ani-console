@@ -6,13 +6,11 @@ import { copyToClipboard } from "@/lib/clipboard";
 import { withId } from "@/lib/id";
 
 interface RegistryPushInstructionsModalProps {
-  visible: boolean;
   projects?: RegistryProject[];
   onCancel: () => void;
 }
 
-export function RegistryPushInstructionsModal({
-  visible,
+export default function RegistryPushInstructionsModal({
   projects,
   onCancel,
 }: RegistryPushInstructionsModalProps) {
@@ -28,20 +26,14 @@ export function RegistryPushInstructionsModal({
     },
     queryKey: ["registry-push-instructions", project, repository],
     queryFn: () => getRegistryPushInstructions(project, repository.trim() || "demo/app"),
-    enabled: visible && Boolean(project),
+    enabled: Boolean(project),
   });
   useEffect(() => {
     if (!project && projects?.[0]) setProject(projects[0].name);
   }, [project, projects]);
 
   return (
-    <Modal
-      visible={visible}
-      title="推送镜像说明"
-      footer={null}
-      onCancel={onCancel}
-      style={{ width: 720 }}
-    >
+    <Modal visible title="推送镜像说明" footer={null} onCancel={onCancel} style={{ width: 720 }}>
       <Typography.Paragraph type="secondary" className="mb-4!">
         镜像通过 docker push 入库，不支持网页上传。项目由平台按当前租户自动创建，Console
         不展示或下发凭据明文。

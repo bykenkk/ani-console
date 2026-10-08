@@ -48,7 +48,7 @@ function gpuMemory(used?: number | null, total?: number | null) {
   return `${formatGiB(used)} / ${formatGiB(total)} GiB`;
 }
 
-export function InstanceMetrics({
+export default function InstanceMetrics({
   instanceId,
   instanceKind,
   gpuOnly = false,

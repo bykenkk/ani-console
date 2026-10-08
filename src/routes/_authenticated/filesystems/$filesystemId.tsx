@@ -1,4 +1,4 @@
-import { FilesystemDetailPage } from "@/components/storage/FilesystemDetailPage";
+import FilesystemDetailPage from "@/components/storage/FilesystemDetailPage";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/filesystems/$filesystemId")({

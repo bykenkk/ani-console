@@ -5,7 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { navigateToResourceDetail } from "@/lib/resources";
 
-export function SandboxCheckpointCloneModal({
+export default function SandboxCheckpointCloneModal({
   instanceId,
   checkpoint,
   onCancel,

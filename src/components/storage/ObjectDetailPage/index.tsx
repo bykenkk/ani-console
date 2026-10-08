@@ -1,5 +1,5 @@
 import { useObjectActions } from "@/hooks/useObjectActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { withId } from "@/lib/id";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { useQuery } from "@tanstack/react-query";
@@ -17,7 +17,13 @@ import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/nav
 
 import { formatBytes, formatDateTime } from "@/lib/format";
 
-export function ObjectDetailPage({ bucketId, objectId }: { bucketId: string; objectId: string }) {
+export default function ObjectDetailPage({
+  bucketId,
+  objectId,
+}: {
+  bucketId: string;
+  objectId: string;
+}) {
   const goBack = useBackOrFallback("object", bucketId);
 
   const detail = useQuery({

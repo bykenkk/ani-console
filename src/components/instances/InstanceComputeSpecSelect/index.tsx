@@ -21,7 +21,7 @@ const PROFILE_OPTIONS = {
   gpu: GPU_INSTANCE_COMPUTE_SPECS,
 } satisfies Record<Props["profile"], readonly ComputeSpecOption[]>;
 
-export function InstanceComputeSpecSelect({
+export default function InstanceComputeSpecSelect({
   field,
   profile,
   options = PROFILE_OPTIONS[profile],

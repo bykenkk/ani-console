@@ -30,7 +30,7 @@ function instanceDetailType(instance: InstanceRecord): ResourceDetailTypeWithout
   }
 }
 
-export function NetworkRouteRelatedResources({
+export default function NetworkRouteRelatedResources({
   route,
   parentVpc,
   vpcLoading,

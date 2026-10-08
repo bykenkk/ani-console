@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 
 type Instance = InstanceRecord;
 
-export function AttachVolumeModal({
+export default function AttachVolumeModal({
   volume,
   onCancel,
   onAttached,

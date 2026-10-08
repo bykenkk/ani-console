@@ -1,4 +1,4 @@
-import { KnowledgeBaseDetailPage } from "@/components/knowledge/KnowledgeBaseDetailPage";
+import KnowledgeBaseDetailPage from "@/components/knowledge/KnowledgeBaseDetailPage";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/kb/$kbId")({

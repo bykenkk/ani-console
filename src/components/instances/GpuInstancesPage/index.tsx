@@ -1,7 +1,7 @@
 import { listInstances, type FilterableInstanceState, type InstanceRecord } from "@/api/instances";
 import { Tooltip } from "@arco-design/web-react";
 import { useEffect, useState } from "react";
-import { GpuContainerCreateModal } from "@/components/instances/GpuContainerCreateModal";
+import GpuContainerCreateModal from "@/components/instances/GpuContainerCreateModal";
 import {
   ResourceNameId,
   ListPageFrame,
@@ -18,7 +18,7 @@ type Instance = InstanceRecord;
 type StatusFilter = "all" | FilterableInstanceState;
 type SearchField = "name" | "id";
 
-export function GpuInstancesPage() {
+export default function GpuInstancesPage() {
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [searchField, setSearchField] = useState<SearchField>("name");
@@ -197,14 +197,15 @@ export function GpuInstancesPage() {
           }}
         />
       </ListPageFrame>
-      <GpuContainerCreateModal
-        visible={createVisible}
-        onCancel={() => setCreateVisible(false)}
-        onCreated={() => {
-          setCreateVisible(false);
-          refresh();
-        }}
-      />
+      {createVisible && (
+        <GpuContainerCreateModal
+          onCancel={() => setCreateVisible(false)}
+          onCreated={() => {
+            setCreateVisible(false);
+            refresh();
+          }}
+        />
+      )}
       {dialogNode}
     </>
   );

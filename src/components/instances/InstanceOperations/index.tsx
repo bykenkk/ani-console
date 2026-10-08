@@ -28,7 +28,7 @@ const OPERATION_LABELS: Record<string, string> = {
   console_session: "终端会话",
 };
 
-export function InstanceOperations({ instanceId }: { instanceId: string }) {
+export default function InstanceOperations({ instanceId }: { instanceId: string }) {
   const { query, page, pageSize, setPage, setPageSize } =
     useCursorPaginatedQuery<InstanceOperation>({
       errorNotification: {

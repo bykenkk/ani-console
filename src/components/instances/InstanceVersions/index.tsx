@@ -1,12 +1,12 @@
 import { type InstanceRecord, applyInstanceLifecycle } from "@/api/instances";
-import { InstanceReleases } from "@/components/instances/InstanceReleases";
+import InstanceReleases from "@/components/instances/InstanceReleases";
 import { Button, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { type RowAction } from "@/components/common";
 
 type Release = NonNullable<NonNullable<InstanceRecord["container"]>["history"]>[number];
 
-export function InstanceVersions({
+export default function InstanceVersions({
   instance,
   onChanged,
   updateImage,

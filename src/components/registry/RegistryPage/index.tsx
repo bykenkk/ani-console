@@ -11,7 +11,7 @@ import {
   type RegistryPurpose,
   type RegistryScanResult,
 } from "@/api/registry";
-import { RegistryPushInstructionsModal } from "../RegistryPushInstructionsModal";
+import RegistryPushInstructionsModal from "../RegistryPushInstructionsModal";
 import { ListPageFrame, type ListColumn, ListDataTable, ResourceNameId } from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
 import { formatBytes, formatDateTime } from "@/lib/format";
@@ -33,7 +33,7 @@ function scanSummary(scan: RegistryScanResult) {
   return "未发现高危漏洞";
 }
 
-export function RegistryPage() {
+export default function RegistryPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [keyword, setKeyword] = useState("");
@@ -277,11 +277,12 @@ export function RegistryPage() {
           }}
         />
       </ListPageFrame>
-      <RegistryPushInstructionsModal
-        visible={guideVisible}
-        projects={projects.data}
-        onCancel={() => setGuideVisible(false)}
-      />
+      {guideVisible && (
+        <RegistryPushInstructionsModal
+          projects={projects.data}
+          onCancel={() => setGuideVisible(false)}
+        />
+      )}
     </>
   );
 }

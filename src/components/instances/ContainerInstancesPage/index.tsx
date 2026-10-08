@@ -9,7 +9,7 @@ import {
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
-import { ContainerInstanceCreateModal } from "@/components/instances/ContainerInstanceCreateModal";
+import ContainerInstanceCreateModal from "@/components/instances/ContainerInstanceCreateModal";
 import { containerInstanceDataSource } from "./data-source";
 import { useContainerInstanceActions } from "@/hooks/useContainerInstanceActions";
 import type {
@@ -43,7 +43,7 @@ function useDebouncedValue<T>(value: T, delay: number) {
   return debouncedValue;
 }
 
-export function ContainerInstancesPage({
+export default function ContainerInstancesPage({
   dataSource = containerInstanceDataSource,
 }: {
   dataSource?: ContainerInstanceDataSource;
@@ -210,11 +210,12 @@ export function ContainerInstancesPage({
           }}
         />
       </ListPageFrame>
-      <ContainerInstanceCreateModal
-        visible={createVisible}
-        onCancel={() => setCreateVisible(false)}
-        onCreated={() => setCreateVisible(false)}
-      />
+      {createVisible && (
+        <ContainerInstanceCreateModal
+          onCancel={() => setCreateVisible(false)}
+          onCreated={() => setCreateVisible(false)}
+        />
+      )}
       {dialogNode}
     </>
   );

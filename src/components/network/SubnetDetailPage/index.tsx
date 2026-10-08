@@ -1,5 +1,5 @@
 import { useSubnetActions } from "@/hooks/useSubnetActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import {
   getNetworkSubnet,
@@ -24,10 +24,10 @@ import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/nav
 
 type Subnet = NetworkSubnet;
 type Vpc = NetworkVPC;
-import { SubnetRelatedResources } from "./SubnetRelatedResources";
-import { SubnetRoutes } from "./SubnetRoutes";
+import SubnetRelatedResources from "./SubnetRelatedResources";
+import SubnetRoutes from "./SubnetRoutes";
 
-export function SubnetDetailPage({
+export default function SubnetDetailPage({
   subnetId,
   tab,
   onTabChange,

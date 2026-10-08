@@ -2,7 +2,7 @@ import { Button, Card, Result, Space, Typography } from "@arco-design/web-react"
 import { useNavigate, useRouter, useRouterState } from "@tanstack/react-router";
 import { isAuthenticated } from "@/stores/auth";
 
-export function NotFoundPage() {
+export default function NotFoundPage() {
   const navigate = useNavigate();
   const router = useRouter();
   const pathname = useRouterState({ select: (state) => state.location.pathname });

@@ -1,13 +1,13 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ResourcePageFrame } from "@/components/common";
-import { GpuContainerCreateModal } from "@/components/instances/GpuContainerCreateModal";
-import { GpuAdmissionSummary } from "./GpuAdmissionSummary";
-import { GpuAnomalyList } from "./GpuAnomalyList";
-import { GpuCapacityMetrics } from "./GpuCapacityMetrics";
-import { GpuModelInventory } from "./GpuModelInventory";
+import GpuContainerCreateModal from "@/components/instances/GpuContainerCreateModal";
+import GpuAdmissionSummary from "./GpuAdmissionSummary";
+import GpuAnomalyList from "./GpuAnomalyList";
+import GpuCapacityMetrics from "./GpuCapacityMetrics";
+import GpuModelInventory from "./GpuModelInventory";
 
-export function GpuInventoryPage() {
+export default function GpuInventoryPage() {
   const queryClient = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
 
@@ -61,14 +61,15 @@ export function GpuInventoryPage() {
           </section>
         </div>
       </ResourcePageFrame>
-      <GpuContainerCreateModal
-        visible={createVisible}
-        onCancel={() => setCreateVisible(false)}
-        onCreated={() => {
-          setCreateVisible(false);
-          refreshGpuData();
-        }}
-      />
+      {createVisible && (
+        <GpuContainerCreateModal
+          onCancel={() => setCreateVisible(false)}
+          onCreated={() => {
+            setCreateVisible(false);
+            refreshGpuData();
+          }}
+        />
+      )}
     </>
   );
 }

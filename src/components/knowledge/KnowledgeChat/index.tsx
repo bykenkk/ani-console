@@ -13,13 +13,13 @@ import { Spin } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-import { KnowledgeCitationsDrawer } from "./KnowledgeCitationsDrawer";
-import { KnowledgeConversation } from "./KnowledgeConversation";
-import { KnowledgeSessionsSidebar } from "./KnowledgeSessionsSidebar";
+import KnowledgeCitationsDrawer from "./KnowledgeCitationsDrawer";
+import KnowledgeConversation from "./KnowledgeConversation";
+import KnowledgeSessionsSidebar from "./KnowledgeSessionsSidebar";
 import styles from "./index.module.css";
 import { toThreadMessage, type QueryMode } from "./knowledgeQueryAdapter";
 
-export function KnowledgeChat({
+export default function KnowledgeChat({
   kbId,
   defaultTopK = 5,
   defaultInferenceService,

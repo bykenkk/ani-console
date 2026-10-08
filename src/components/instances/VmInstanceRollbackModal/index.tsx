@@ -6,7 +6,7 @@ import { useMutation } from "@tanstack/react-query";
 type Instance = InstanceRecord;
 type Snapshot = NonNullable<Instance["snapshots"]>[number];
 
-export function VmInstanceRollbackModal({
+export default function VmInstanceRollbackModal({
   instance,
   snapshot,
   onCancel,

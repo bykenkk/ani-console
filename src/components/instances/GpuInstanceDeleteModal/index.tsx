@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 
 type Instance = InstanceRecord;
 
-export function GpuInstanceDeleteModal({
+export default function GpuInstanceDeleteModal({
   instance,
   onCancel,
   onSubmitted,

@@ -5,7 +5,7 @@ import { useState } from "react";
 
 type Filesystem = StorageFilesystem;
 
-export function ExpandFilesystemModal({
+export default function ExpandFilesystemModal({
   filesystem,
   onCancel,
   onExpanded,

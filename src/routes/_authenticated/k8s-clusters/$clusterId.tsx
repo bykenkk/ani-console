@@ -1,4 +1,4 @@
-import { K8sClusterDetailPage } from "@/components/k8s-clusters/K8sClusterDetailPage";
+import K8sClusterDetailPage from "@/components/k8s-clusters/K8sClusterDetailPage";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/k8s-clusters/$clusterId")({

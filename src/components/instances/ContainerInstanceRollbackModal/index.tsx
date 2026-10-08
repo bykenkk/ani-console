@@ -8,7 +8,7 @@ import { getImageDisplayName } from "@/lib/render";
 
 type Instance = InstanceRecord;
 
-export function ContainerInstanceRollbackModal({
+export default function ContainerInstanceRollbackModal({
   instance,
   onCancel,
   onSubmitted,

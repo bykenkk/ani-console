@@ -8,7 +8,7 @@ const PERIODS: Array<{ value: HomeTimeRange; label: string }> = [
   { value: "30d", label: "30 天" },
 ];
 
-export function PeriodSwitch({
+export default function PeriodSwitch({
   value,
   onChange,
   ariaLabel = "时间范围",

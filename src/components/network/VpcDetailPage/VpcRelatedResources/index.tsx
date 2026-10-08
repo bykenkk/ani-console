@@ -22,7 +22,7 @@ type RelatedResource = {
   group: "网络" | "算力";
 };
 
-export function VpcRelatedResources({ vpcId }: { vpcId: string }) {
+export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
   const subnets = useQuery({
     meta: {
       errorNotification: {

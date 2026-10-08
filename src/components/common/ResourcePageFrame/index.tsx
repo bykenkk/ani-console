@@ -99,7 +99,7 @@ function ResourcePageHeader({
   );
 }
 
-export function ResourcePageFrame({ header, children }: ResourcePageFrameProps) {
+export default function ResourcePageFrame({ header, children }: ResourcePageFrameProps) {
   return (
     <div className={styles.page}>
       <ResourcePageHeader {...header} />

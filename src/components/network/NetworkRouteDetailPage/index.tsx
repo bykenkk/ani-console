@@ -1,5 +1,5 @@
 import { useNetworkRouteActions } from "@/hooks/useNetworkRouteActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { withId } from "@/lib/id";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
@@ -10,9 +10,9 @@ import { getNetworkRoute, getNetworkVpc, type NetworkRoute, type NetworkVPC } fr
 import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
-import { NetworkRouteRelatedResources } from "./NetworkRouteRelatedResources";
+import NetworkRouteRelatedResources from "./NetworkRouteRelatedResources";
 
-export function NetworkRouteDetailPage({ routeId }: { routeId: string }) {
+export default function NetworkRouteDetailPage({ routeId }: { routeId: string }) {
   const goBack = useBackOrFallback("network-route");
   const detail = useQuery({
     meta: {

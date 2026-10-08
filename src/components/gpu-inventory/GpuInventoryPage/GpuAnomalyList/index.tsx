@@ -10,7 +10,7 @@ const statusLabel: Record<GpuInventoryRecord["status"], string> = {
   maintenance: "维护",
 };
 
-export function GpuAnomalyList() {
+export default function GpuAnomalyList() {
   const anomalyQuery = useQuery({
     meta: {
       errorNotification: {

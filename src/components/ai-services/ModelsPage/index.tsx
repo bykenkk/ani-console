@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { listModels } from "@/api/ai-services/models";
 
-import { ImportModelModal } from "@/components/ai-services/ImportModelModal";
+import ImportModelModal from "@/components/ai-services/ImportModelModal";
 import {
   ResourceNameId,
   ListPageFrame,
@@ -30,7 +30,7 @@ function getApiStatus(status: StatusFilter) {
   return undefined;
 }
 
-export function ModelsPage() {
+export default function ModelsPage() {
   const qc = useQueryClient();
 
   const [importVisible, setImportVisible] = useState(false);
@@ -263,15 +263,16 @@ export function ModelsPage() {
           }}
         />
       </ListPageFrame>
-      <ImportModelModal
-        visible={importVisible}
-        onCancel={() => setImportVisible(false)}
-        onSubmitted={() => {
-          setStatus("all");
-          resetPagination();
-          refresh();
-        }}
-      />
+      {importVisible && (
+        <ImportModelModal
+          onCancel={() => setImportVisible(false)}
+          onSubmitted={() => {
+            setStatus("all");
+            resetPagination();
+            refresh();
+          }}
+        />
+      )}
       {dialogNode}
     </>
   );

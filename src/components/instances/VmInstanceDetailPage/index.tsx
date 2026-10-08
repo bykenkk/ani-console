@@ -10,20 +10,20 @@ import {
   ResourceId,
   StatusBadge,
 } from "@/components/common";
-import { InstanceEvents } from "@/components/instances/InstanceEvents";
-import { InstanceLogs } from "@/components/instances/InstanceLogs";
-import { InstanceMetrics } from "@/components/instances/InstanceMetrics";
-import { InstanceOperations } from "@/components/instances/InstanceOperations";
-import { InstanceStorage } from "@/components/instances/InstanceStorage";
+import InstanceEvents from "@/components/instances/InstanceEvents";
+import InstanceLogs from "@/components/instances/InstanceLogs";
+import InstanceMetrics from "@/components/instances/InstanceMetrics";
+import InstanceOperations from "@/components/instances/InstanceOperations";
+import InstanceStorage from "@/components/instances/InstanceStorage";
 import { useVmInstanceActions } from "@/hooks/useVmInstanceActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
 import { openVmInstanceRemoteWindow } from "@/lib/instances";
-import { VmInstanceSnapshots } from "./VmInstanceSnapshots";
-import { VmInstanceSshAccess } from "./VmInstanceSshAccess";
+import VmInstanceSnapshots from "./VmInstanceSnapshots";
+import VmInstanceSshAccess from "./VmInstanceSshAccess";
 
 type VmInstance = InstanceRecord;
 
@@ -49,7 +49,7 @@ function flavorLabel(instance: VmInstance) {
   return `${cpuText}C${memoryText}`;
 }
 
-export function VmInstanceDetailPage({
+export default function VmInstanceDetailPage({
   instanceId,
   tab,
   onTabChange,

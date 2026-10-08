@@ -16,7 +16,7 @@ type Values = {
   mountPath?: string;
 };
 
-export function ContainerInstanceBindSecretModal({
+export default function ContainerInstanceBindSecretModal({
   instance,
   onCancel,
   onSubmitted,

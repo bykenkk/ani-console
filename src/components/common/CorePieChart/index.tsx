@@ -13,6 +13,6 @@ type CorePieChartProps = {
   style?: React.CSSProperties;
 };
 
-export function CorePieChart({ option, className, style }: CorePieChartProps) {
+export default function CorePieChart({ option, className, style }: CorePieChartProps) {
   return <ReactEChartsCore echarts={echarts} option={option} className={className} style={style} />;
 }

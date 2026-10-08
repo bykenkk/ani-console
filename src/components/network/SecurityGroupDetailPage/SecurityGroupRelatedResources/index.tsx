@@ -17,7 +17,7 @@ type RelatedResource = {
   status: string;
 };
 
-export function SecurityGroupRelatedResources({
+export default function SecurityGroupRelatedResources({
   securityGroupId,
   parentVpc,
   vpcLoading,

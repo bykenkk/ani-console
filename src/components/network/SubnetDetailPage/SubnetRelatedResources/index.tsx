@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 
 type RelatedResource = { id: string; kind: "实例"; name: string; status: string };
 
-export function SubnetRelatedResources({ subnetId }: { subnetId: string }) {
+export default function SubnetRelatedResources({ subnetId }: { subnetId: string }) {
   const instances = useQuery({
     meta: {
       errorNotification: {

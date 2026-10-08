@@ -3,7 +3,7 @@ import { Form, InputNumber, Modal, Typography } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { validateForm } from "@/lib/form";
 
-export function InferenceScaleModal({
+export default function InferenceScaleModal({
   serviceId,
   initialReplicas,
   onCancel,

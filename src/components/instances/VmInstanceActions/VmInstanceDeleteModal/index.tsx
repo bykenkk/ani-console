@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 
 type Instance = InstanceRecord;
 
-export function VmInstanceDeleteModal({
+export default function VmInstanceDeleteModal({
   instance,
   onCancel,
   onSubmitted,

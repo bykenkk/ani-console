@@ -8,7 +8,7 @@ import { formatDurationSeconds } from "../SandboxInstanceDetailPage/utils";
 
 type SandboxInstance = InstanceRecord;
 
-export function SandboxInstanceExtendModal({
+export default function SandboxInstanceExtendModal({
   instance,
   onCancel,
   onSubmitted,

@@ -5,7 +5,7 @@ import { useState } from "react";
 
 type SandboxInstance = InstanceRecord;
 
-export function SandboxPortOpenModal({
+export default function SandboxPortOpenModal({
   instance,
   onCancel,
   onSuccess,

@@ -6,7 +6,7 @@ import { Link } from "@arco-design/web-react";
 import { useMemo, useState } from "react";
 import { listVectorStores, type VectorStore } from "@/api/storage/vector-stores";
 
-import { CreateVectorStoreModal } from "@/components/storage/CreateVectorStoreModal";
+import CreateVectorStoreModal from "@/components/storage/CreateVectorStoreModal";
 import {
   ResourceNameId,
   ListPageFrame,
@@ -21,7 +21,7 @@ import { navigateToResourceDetail } from "@/lib/resources";
 type StatusFilter = "all" | "ready" | "pending" | "failed";
 type SearchField = "name" | "id";
 
-export function VectorStoresPage() {
+export default function VectorStoresPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
@@ -214,7 +214,7 @@ export function VectorStoresPage() {
           }}
         />
       </ListPageFrame>
-      <CreateVectorStoreModal visible={createVisible} onCancel={() => setCreateVisible(false)} />
+      {createVisible && <CreateVectorStoreModal onCancel={() => setCreateVisible(false)} />}
     </>
   );
 }

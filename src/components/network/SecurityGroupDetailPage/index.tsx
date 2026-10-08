@@ -1,5 +1,5 @@
 import { useSecurityGroupActions } from "@/hooks/useSecurityGroupActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { withId } from "@/lib/id";
 import {
@@ -21,13 +21,13 @@ import {
 
 import { formatDateTime } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
-import { SecurityGroupRelatedResources } from "./SecurityGroupRelatedResources";
-import { SecurityGroupRules } from "./SecurityGroupRules";
+import SecurityGroupRelatedResources from "./SecurityGroupRelatedResources";
+import SecurityGroupRules from "./SecurityGroupRules";
 
 type SecurityGroup = NetworkSecurityGroup;
 type Vpc = NetworkVPC;
 
-export function SecurityGroupDetailPage({
+export default function SecurityGroupDetailPage({
   securityGroupId,
   tab,
   onTabChange,

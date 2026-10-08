@@ -19,7 +19,7 @@ type FilesystemPerformanceMode = "standard" | "throughput";
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
 
-export function CreateFilesystemModal({
+export default function CreateFilesystemModal({
   onCancel,
   onCreated,
 }: {
@@ -63,14 +63,7 @@ export function CreateFilesystemModal({
   useEffect(() => {
     if (subnetId && !availableSubnets.some((item) => item.id === subnetId)) setSubnetId("");
   }, [availableSubnets, subnetId]);
-  const reset = () => {
-    setName("");
-    setProtocol("nfs");
-    setPerformanceMode("standard");
-    setSizeGiB(100);
-    setVpcId("");
-    setSubnetId("");
-  };
+
   const create = useMutation({
     meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
     mutationFn: async (_: undefined) => {
@@ -93,7 +86,6 @@ export function CreateFilesystemModal({
     },
     onSuccess: (filesystem) => {
       qc.invalidateQueries({ queryKey: ["filesystems"] });
-      reset();
       onCreated?.(filesystem);
       onCancel();
     },
@@ -102,10 +94,7 @@ export function CreateFilesystemModal({
     <Modal
       visible
       title="创建文件存储"
-      onCancel={() => {
-        reset();
-        onCancel();
-      }}
+      onCancel={onCancel}
       onOk={() => create.mutateAsync(undefined)}
       confirmLoading={create.isPending}
       unmountOnExit

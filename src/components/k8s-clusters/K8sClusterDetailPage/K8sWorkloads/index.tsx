@@ -4,7 +4,7 @@ import { withId } from "@/lib/id";
 import { Card, Empty, Grid } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
-export function K8sWorkloads({ clusterId }: { clusterId: string }) {
+export default function K8sWorkloads({ clusterId }: { clusterId: string }) {
   const workloads = useQuery({
     meta: {
       errorNotification: {

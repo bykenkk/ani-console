@@ -7,10 +7,10 @@ import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 import { withId } from "@/lib/id";
 import { Button, Empty, Space, Typography, Modal } from "@arco-design/web-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { CreateLifecycleRuleModal } from "@/components/storage/CreateLifecycleRuleModal";
+import CreateLifecycleRuleModal from "@/components/storage/CreateLifecycleRuleModal";
 import { useState } from "react";
 
-export function BucketLifecycle({ bucketId }: { bucketId: string }) {
+export default function BucketLifecycle({ bucketId }: { bucketId: string }) {
   const rules = useQuery({
     meta: {
       errorNotification: {

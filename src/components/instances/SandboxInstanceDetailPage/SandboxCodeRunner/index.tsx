@@ -25,7 +25,7 @@ const SAMPLES: Record<Language, string> = {
   javascript: 'console.log("Hello from ANI Sandbox")',
 };
 
-export function SandboxCodeRunner({
+export default function SandboxCodeRunner({
   instanceId,
   running,
   onChanged,

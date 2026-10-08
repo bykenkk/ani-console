@@ -14,12 +14,10 @@ type LoadBalancer = NetworkLoadBalancer;
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
 
-export function CreateLoadBalancerModal({
-  visible,
+export default function CreateLoadBalancerModal({
   onCancel,
   onCreated,
 }: {
-  visible: boolean;
   onCancel: () => void;
   onCreated?: (item: LoadBalancer) => void;
 }) {
@@ -41,7 +39,6 @@ export function CreateLoadBalancerModal({
     },
     queryKey: ["network-vpcs", "load-balancer-create"],
     queryFn: () => listNetworkVpcs({ limit: 100 }),
-    enabled: visible,
   });
   const subnets = useQuery({
     meta: {
@@ -53,7 +50,7 @@ export function CreateLoadBalancerModal({
     },
     queryKey: ["network-subnets", "load-balancer-create", vpcId],
     queryFn: () => listNetworkSubnets({ limit: 100, vpc_id: vpcId || undefined }),
-    enabled: visible && !!vpcId,
+    enabled: !!vpcId,
   });
   // TODO: 子网接口确认按 vpc_id 过滤后，移除此处创建表单的本地兜底过滤。
   const availableSubnets = ((subnets.data?.items ?? []) as Subnet[]).filter(
@@ -62,15 +59,7 @@ export function CreateLoadBalancerModal({
   useEffect(() => {
     if (subnetId && !availableSubnets.some((item) => item.id === subnetId)) setSubnetId("");
   }, [availableSubnets, subnetId]);
-  const reset = () => {
-    setName("");
-    setVpcId("");
-    setSubnetId("");
-    setScheme("internal");
-    setListenerProtocol("tcp");
-    setListenerPort(80);
-    setTargetPort(80);
-  };
+
   const create = useMutation({
     meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
     mutationFn: async (_: undefined) => {
@@ -89,19 +78,15 @@ export function CreateLoadBalancerModal({
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["network-load-balancers"] });
-      reset();
       onCreated?.(data);
       onCancel();
     },
   });
   return (
     <Modal
-      visible={visible}
+      visible
       title="创建负载均衡"
-      onCancel={() => {
-        reset();
-        onCancel();
-      }}
+      onCancel={onCancel}
       onOk={() => create.mutateAsync(undefined)}
       confirmLoading={create.isPending}
       unmountOnExit

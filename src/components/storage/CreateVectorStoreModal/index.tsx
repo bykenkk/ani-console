@@ -9,12 +9,10 @@ import { Form, Input, InputNumber, Modal, Select, Typography } from "@arco-desig
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
-export function CreateVectorStoreModal({
-  visible,
+export default function CreateVectorStoreModal({
   onCancel,
   onCreated,
 }: {
-  visible: boolean;
   onCancel: () => void;
   onCreated?: (store: VectorStore) => void;
 }) {
@@ -47,22 +45,16 @@ export function CreateVectorStoreModal({
       } while (cursor);
       return { items };
     },
-    enabled: visible,
   });
   const modelOptions = useMemo(
     () => (models.data?.items ?? []).map((item) => item.served_model_name),
     [models.data?.items],
   );
   useEffect(() => {
-    if (!visible || embeddingModel || !modelOptions[0]) return;
+    if (embeddingModel || !modelOptions[0]) return;
     setEmbeddingModel(modelOptions[0]);
-  }, [embeddingModel, modelOptions, visible]);
-  const reset = () => {
-    setName("");
-    setEmbeddingModel("");
-    setDimension(1536);
-    setMetric("cosine");
-  };
+  }, [embeddingModel, modelOptions]);
+
   const create = useMutation({
     meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
     mutationFn: async (_: undefined) => {
@@ -81,19 +73,15 @@ export function CreateVectorStoreModal({
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["vector-stores"] });
-      reset();
       onCreated?.(data);
       onCancel();
     },
   });
   return (
     <Modal
-      visible={visible}
+      visible
       title="创建向量存储"
-      onCancel={() => {
-        reset();
-        onCancel();
-      }}
+      onCancel={onCancel}
       onOk={() => create.mutateAsync(undefined)}
       confirmLoading={create.isPending}
       unmountOnExit

@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { encodeSandboxText } from "@/components/instances/SandboxInstanceDetailPage/utils";
 
-export function SandboxFileCreateModal({
+export default function SandboxFileCreateModal({
   instanceId,
   directory,
   onCancel,

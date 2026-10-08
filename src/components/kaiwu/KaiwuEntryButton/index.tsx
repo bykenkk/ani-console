@@ -4,7 +4,7 @@ import { getKaiwuConsoleEntry } from "@/api/kaiwu";
 import { ApiError } from "@/api/request";
 import { reserveExternalWindow } from "@/lib/browser";
 
-export function KaiwuEntryButton() {
+export default function KaiwuEntryButton() {
   const pendingWindow = useRef<ReturnType<typeof reserveExternalWindow> | null>(null);
   const preparing = useRef(false);
   const requestController = useRef<AbortController | null>(null);

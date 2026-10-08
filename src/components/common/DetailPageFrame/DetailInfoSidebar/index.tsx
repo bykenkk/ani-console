@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
-import { DetailInfoCard } from "../DetailInfoCard";
+import DetailInfoCard from "../DetailInfoCard";
 import styles from "./index.module.css";
 import type { DetailCard } from "../types";
 
@@ -14,7 +14,7 @@ function buildInitialCollapsed(cardsSignature: string) {
   return Object.fromEntries(cardEntries) as Record<string, boolean>;
 }
 
-export function DetailInfoSidebar({ cards, collapsed }: DetailInfoSidebarProps) {
+export default function DetailInfoSidebar({ cards, collapsed }: DetailInfoSidebarProps) {
   const cardsSignature = JSON.stringify(
     cards.map((card) => [card.key, Boolean(card.defaultCollapsed)]),
   );

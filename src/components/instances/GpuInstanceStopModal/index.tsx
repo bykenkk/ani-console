@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 
 type Instance = InstanceRecord;
 
-export function GpuInstanceStopModal({
+export default function GpuInstanceStopModal({
   instance,
   onCancel,
   onSubmitted,

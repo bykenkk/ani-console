@@ -5,7 +5,7 @@ import type { KBSession as Session } from "@/api/knowledge";
 import { formatDateTime } from "@/lib/format";
 import styles from "./index.module.css";
 
-export function KnowledgeSessionsSidebar({
+export default function KnowledgeSessionsSidebar({
   sessions,
   loading,
   error,

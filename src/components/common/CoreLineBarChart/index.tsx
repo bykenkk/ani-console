@@ -13,6 +13,6 @@ type CoreLineBarChartProps = {
   style?: React.CSSProperties;
 };
 
-export function CoreLineBarChart({ option, className, style }: CoreLineBarChartProps) {
+export default function CoreLineBarChart({ option, className, style }: CoreLineBarChartProps) {
   return <ReactEChartsCore echarts={echarts} option={option} className={className} style={style} />;
 }

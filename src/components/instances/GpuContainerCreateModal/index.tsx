@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createInstance } from "@/api/instances";
 
-import { GpuContainerCreateForm } from "./GpuContainerCreateForm";
+import GpuContainerCreateForm from "./GpuContainerCreateForm";
 import { buildCreateRequest, type FormValues } from "./types";
 
-type Props = { visible: boolean; onCancel: () => void; onCreated: () => void };
+type Props = { onCancel: () => void; onCreated: () => void };
 
-export function GpuContainerCreateModal({ visible, onCancel, onCreated }: Props) {
+export default function GpuContainerCreateModal({ onCancel, onCreated }: Props) {
   const queryClient = useQueryClient();
   const create = useMutation({
     meta: {
@@ -42,7 +42,6 @@ export function GpuContainerCreateModal({ visible, onCancel, onCreated }: Props)
 
   return (
     <GpuContainerCreateForm
-      visible={visible}
       submitting={create.isPending}
       onCancel={close}
       onSubmit={(values, securityGroupId) => create.mutate({ values, securityGroupId })}

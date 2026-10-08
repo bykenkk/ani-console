@@ -1,4 +1,4 @@
-import { ContainerInstanceTerminalPage } from "@/components/instances/ContainerInstanceTerminalPage";
+import ContainerInstanceTerminalPage from "@/components/instances/ContainerInstanceTerminalPage";
 import { isAuthenticated } from "@/stores/auth";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 

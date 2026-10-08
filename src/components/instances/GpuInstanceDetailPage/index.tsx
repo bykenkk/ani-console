@@ -11,19 +11,19 @@ import {
   ResourceId,
   StatusBadge,
 } from "@/components/common";
-import { InstanceLogs } from "@/components/instances/InstanceLogs";
-import { InstanceVersions } from "@/components/instances/InstanceVersions";
+import InstanceLogs from "@/components/instances/InstanceLogs";
+import InstanceVersions from "@/components/instances/InstanceVersions";
 import { useGpuInstanceActions } from "@/hooks/useGpuInstanceActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
-import { InstanceConfiguration } from "@/components/instances/InstanceConfiguration";
-import { InstanceEvents } from "@/components/instances/InstanceEvents";
-import { InstanceMetrics } from "@/components/instances/InstanceMetrics";
-import { InstanceNetwork } from "@/components/instances/InstanceNetwork";
-import { InstanceOperations } from "@/components/instances/InstanceOperations";
-import { InstanceStorage } from "@/components/instances/InstanceStorage";
+import InstanceConfiguration from "@/components/instances/InstanceConfiguration";
+import InstanceEvents from "@/components/instances/InstanceEvents";
+import InstanceMetrics from "@/components/instances/InstanceMetrics";
+import InstanceNetwork from "@/components/instances/InstanceNetwork";
+import InstanceOperations from "@/components/instances/InstanceOperations";
+import InstanceStorage from "@/components/instances/InstanceStorage";
 
 type Instance = InstanceRecord;
 
@@ -36,7 +36,7 @@ function gpuLabel(instance: Instance) {
   return `${instance.gpu?.model ?? instance.compute?.gpu_type} × ${instance.gpu?.count ?? 1}`;
 }
 
-export function GpuInstanceDetailPage({
+export default function GpuInstanceDetailPage({
   instanceId,
   tab,
   onTabChange,

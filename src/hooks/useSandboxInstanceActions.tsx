@@ -1,6 +1,6 @@
 import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances";
 import type { RowAction } from "@/components/common";
-import { SandboxInstanceExtendModal } from "@/components/instances/SandboxInstanceExtendModal";
+import SandboxInstanceExtendModal from "@/components/instances/SandboxInstanceExtendModal";
 import { openSandboxInstanceTerminalWindow } from "@/lib/instances";
 import { Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";

@@ -1,10 +1,10 @@
+import CreateVpcModal from "../CreateVpcModal";
 import { useVpcActions } from "@/hooks/useVpcActions";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Form, Input, Modal, Typography } from "@arco-design/web-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 import { useMemo, useState } from "react";
 import {
-  createNetworkVpc,
   listNetworkRoutes,
   listNetworkSubnets,
   listNetworkVpcs,
@@ -14,7 +14,6 @@ import {
 } from "@/api/network";
 
 import {
-  Ipv4CidrInput,
   ResourceNameId,
   ListPageFrame,
   type ListColumn,
@@ -23,22 +22,19 @@ import {
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
-import { ipv4CidrError, requireIpv4Cidr } from "@/lib/validators";
 
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
 type VpcStatusFilter = "all" | Vpc["state"];
 type VpcSearchField = "name" | "id";
 
-export function VpcsPage() {
+export default function VpcsPage() {
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
-  const [name, setName] = useState("");
-  const [cidr, setCidr] = useState("10.0.0.0/16");
+
   const [status, setStatus] = useState<VpcStatusFilter>("all");
   const [searchField, setSearchField] = useState<VpcSearchField>("name");
   const [searchText, setSearchText] = useState("");
-  const cidrError = ipv4CidrError(cidr, "IPv4 CIDR");
 
   const {
     query: vpcs,
@@ -88,33 +84,6 @@ export function VpcsPage() {
     },
     queryKey: ["network-routes", "vpc-counts"],
     queryFn: () => listNetworkRoutes({ limit: 100 }),
-  });
-
-  const createVpc = useMutation({
-    meta: {
-      feedback: {
-        channel: "notification",
-        id: "vpc-create",
-        action: "创建",
-        errorFallback: "请求失败",
-      },
-    },
-    mutationFn: async () => {
-      const trimmedName = name.trim();
-      if (!trimmedName) throw new Error("请输入 VPC 名称");
-      const submitData = {
-        name: trimmedName,
-        cidr: requireIpv4Cidr(cidr, "IPv4 CIDR"),
-      };
-      return createNetworkVpc(submitData);
-    },
-    onSuccess: () => {
-      setCreateVisible(false);
-      setName("");
-      setCidr("10.0.0.0/16");
-      resetPagination();
-      qc.invalidateQueries({ queryKey: ["network-vpcs"] });
-    },
   });
 
   const { actions } = useVpcActions(() => {
@@ -256,39 +225,16 @@ export function VpcsPage() {
           }}
         />
       </ListPageFrame>
-      <Modal
-        visible={createVisible}
-        title="创建 VPC"
-        onCancel={() => {
-          setCreateVisible(false);
-        }}
-        onOk={() => createVpc.mutateAsync(undefined)}
-        confirmLoading={createVpc.isPending}
-        unmountOnExit
-      >
-        <Form layout="vertical">
-          <Form.Item label="名称" required>
-            <Input
-              value={name}
-              onChange={setName}
-              placeholder="请输入 VPC 名称"
-              maxLength={64}
-              showWordLimit
-            />
-          </Form.Item>
-          <Form.Item
-            label="IPv4 CIDR"
-            required
-            validateStatus={cidrError ? "error" : undefined}
-            help={cidrError}
-          >
-            <Ipv4CidrInput value={cidr} onChange={setCidr} placeholder="10.0.0.0" withPrefix />
-          </Form.Item>
-          <Typography.Text type="secondary">
-            CIDR 不能与租户下已有 VPC 网段重叠；创建后不可修改。
-          </Typography.Text>
-        </Form>
-      </Modal>
+      {createVisible && (
+        <CreateVpcModal
+          onCancel={() => setCreateVisible(false)}
+          onCreated={() => {
+            setCreateVisible(false);
+            resetPagination();
+            void qc.invalidateQueries({ queryKey: ["network-vpcs"] });
+          }}
+        />
+      )}
     </>
   );
 }

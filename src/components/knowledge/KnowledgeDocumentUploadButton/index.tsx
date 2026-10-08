@@ -10,7 +10,7 @@ import { sha256File } from "@/lib/hash";
 
 const allowedTypes = ["pdf", "docx", "xlsx", "pptx", "md", "txt"] as const;
 
-export function KnowledgeDocumentUploadButton({ kbId }: { kbId: string }) {
+export default function KnowledgeDocumentUploadButton({ kbId }: { kbId: string }) {
   const qc = useQueryClient();
   const upload = useMutation({
     meta: {

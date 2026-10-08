@@ -3,7 +3,7 @@ import type { KBCitation as Citation } from "@/api/knowledge";
 import { formatDateTime } from "@/lib/format";
 import styles from "./index.module.css";
 
-export function KnowledgeCitationsDrawer({
+export default function KnowledgeCitationsDrawer({
   visible,
   citations,
   loading,

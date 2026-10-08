@@ -5,7 +5,7 @@ import { listInstances, type InstanceRecord } from "@/api/instances";
 import { createVolume, type StorageVolume, type StorageVolumeMode } from "@/api/storage/volumes";
 import { canMountVolumeMode } from "@/lib/volumes";
 import { validateForm } from "@/lib/form";
-import { VolumeMountFields } from "@/components/storage/VolumeMountFields";
+import VolumeMountFields from "@/components/storage/VolumeMountFields";
 
 type Volume = StorageVolume;
 type Instance = InstanceRecord;
@@ -18,7 +18,7 @@ const INSTANCE_ROUTE: Record<string, string> = {
   gpu_container: "/gpu-instances",
 };
 
-export function CreateVolumeModal({
+export default function CreateVolumeModal({
   onCancel,
   onCreated,
 }: {
@@ -50,12 +50,7 @@ export function CreateVolumeModal({
     if (!mountInstanceId || instanceItems.some((item) => item.id === mountInstanceId)) return;
     setMountInstanceId("");
   }, [instanceItems, mountInstanceId]);
-  const reset = () => {
-    setStorageClass("ani-block");
-    setEncrypted(false);
-    setVolumeMode("filesystem");
-    setMountInstanceId("");
-  };
+
   const create = useMutation({
     meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
     mutationFn: async ({ name, sizeGiB }: { name: string; sizeGiB: number }) => {
@@ -78,7 +73,6 @@ export function CreateVolumeModal({
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["volumes"] });
-      reset();
       onCreated?.(data);
       onCancel();
     },
@@ -87,10 +81,7 @@ export function CreateVolumeModal({
     <Modal
       visible
       title="创建块存储卷"
-      onCancel={() => {
-        reset();
-        onCancel();
-      }}
+      onCancel={onCancel}
       onOk={async () => create.mutateAsync(await validateForm(form))}
       confirmLoading={create.isPending}
       unmountOnExit

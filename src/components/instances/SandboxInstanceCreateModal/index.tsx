@@ -1,16 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createInstance } from "@/api/instances";
 
-import { SandboxInstanceCreateForm } from "./SandboxInstanceCreateForm";
+import SandboxInstanceCreateForm from "./SandboxInstanceCreateForm";
 import { buildCreateRequest, type FormValues, type SandboxTemplate } from "./types";
 
 type Props = {
-  visible: boolean;
   onCancel: () => void;
   onCreated: () => void;
 };
 
-export function SandboxInstanceCreateModal({ visible, onCancel, onCreated }: Props) {
+export default function SandboxInstanceCreateModal({ onCancel, onCreated }: Props) {
   const queryClient = useQueryClient();
   const create = useMutation({
     meta: {
@@ -38,7 +37,6 @@ export function SandboxInstanceCreateModal({ visible, onCancel, onCreated }: Pro
 
   return (
     <SandboxInstanceCreateForm
-      visible={visible}
       submitting={create.isPending}
       onCancel={close}
       onSubmit={(values, template) => create.mutate({ values, template })}

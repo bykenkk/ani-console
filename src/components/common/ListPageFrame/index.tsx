@@ -1,10 +1,10 @@
-import { ResourcePageFrame } from "../ResourcePageFrame";
+import ResourcePageFrame from "../ResourcePageFrame";
 import { ListToolbar, ToolbarIconButton, ToolbarSearch } from "./ListToolbar";
-import { StatusTabs } from "./StatusTabs";
+import StatusTabs from "./StatusTabs";
 import type { ListPageFrameProps } from "./types";
 import styles from "./index.module.css";
 
-export function ListPageFrame<
+export default function ListPageFrame<
   TStatus extends string = string,
   TSearchField extends string = string,
 >({ header, tabs, toolbar, children }: ListPageFrameProps<TStatus, TSearchField>) {

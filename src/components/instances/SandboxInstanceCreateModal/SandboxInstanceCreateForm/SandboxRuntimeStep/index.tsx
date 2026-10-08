@@ -1,7 +1,7 @@
 import { Form, Input, Select, Switch, Typography } from "@arco-design/web-react";
 import { IDLE_TIMEOUT_OPTIONS, SESSION_TIMEOUT_OPTIONS, type FormValues } from "../../types";
 
-export function SandboxRuntimeStep({ values }: { values: FormValues }) {
+export default function SandboxRuntimeStep({ values }: { values: FormValues }) {
   return (
     <>
       <Form.Item

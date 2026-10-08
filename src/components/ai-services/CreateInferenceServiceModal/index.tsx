@@ -80,7 +80,7 @@ type CreateInferenceServiceModalProps = {
   initialModelVersionId?: string;
 };
 
-export function CreateInferenceServiceModal({
+export default function CreateInferenceServiceModal({
   onCancel,
   initialServiceName,
   initialModelId,

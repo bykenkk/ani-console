@@ -17,4 +17,6 @@ function KnowledgeMarkdownTextImpl() {
   );
 }
 
-export const KnowledgeMarkdownText = memo(KnowledgeMarkdownTextImpl);
+const KnowledgeMarkdownText = memo(KnowledgeMarkdownTextImpl);
+
+export default KnowledgeMarkdownText;

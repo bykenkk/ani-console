@@ -1,6 +1,5 @@
 import { Form, Input, Select, Switch } from "@arco-design/web-react";
-import {
-  ContainerFilesystemMountFields,
+import ContainerFilesystemMountFields, {
   type ContainerFilesystemItem,
 } from "@/components/instances/ContainerFilesystemMountFields";
 import { type ContainerStorageFormValues, hasDuplicateContainerMountPath } from "./storage";
@@ -10,7 +9,7 @@ type StorageItem = {
   name?: string | null;
 };
 
-export function ContainerStorageFields({
+export default function ContainerStorageFields({
   values,
   volumes,
   filesystems,

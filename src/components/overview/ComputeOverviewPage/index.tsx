@@ -1,8 +1,8 @@
 import { Card, Empty, Grid } from "@arco-design/web-react";
-import { MetricCard } from "@/components/common/MetricCard";
+import MetricCard from "@/components/common/MetricCard";
 import { PageHeader } from "@/components/layouts/AppLayout";
 
-export function ComputeOverviewPage() {
+export default function ComputeOverviewPage() {
   return (
     <div>
       <PageHeader title="我的资源概览" subtitle="查看当前租户的计算资源整体状态" />

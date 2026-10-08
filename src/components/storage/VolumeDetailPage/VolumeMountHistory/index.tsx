@@ -10,7 +10,7 @@ const actionText: Record<StorageVolumeMountHistoryEntry["action"], string> = {
   os_init: "OS 初始化",
 };
 
-export function VolumeMountHistory({ items }: { items: StorageVolumeMountHistoryEntry[] }) {
+export default function VolumeMountHistory({ items }: { items: StorageVolumeMountHistoryEntry[] }) {
   return (
     <DataTable<StorageVolumeMountHistoryEntry>
       columns={[

@@ -1,4 +1,4 @@
-import { GpuInstanceTerminalPage } from "@/components/instances/GpuInstanceTerminalPage";
+import GpuInstanceTerminalPage from "@/components/instances/GpuInstanceTerminalPage";
 import { isAuthenticated } from "@/stores/auth";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 

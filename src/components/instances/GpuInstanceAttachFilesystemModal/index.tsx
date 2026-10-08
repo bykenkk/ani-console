@@ -8,7 +8,7 @@ import { validateForm } from "@/lib/form";
 type Instance = InstanceRecord;
 type Values = { filesystemId: string; mountPath: string; readOnly?: boolean };
 
-export function GpuInstanceAttachFilesystemModal({
+export default function GpuInstanceAttachFilesystemModal({
   instance,
   onCancel,
   onSubmitted,

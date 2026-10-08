@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 
 import { listVolumes, type StorageVolume } from "@/api/storage/volumes";
 
-import { CreateVolumeModal } from "@/components/storage/CreateVolumeModal";
+import CreateVolumeModal from "@/components/storage/CreateVolumeModal";
 
 import {
   ResourceNameId,
@@ -23,7 +23,7 @@ type Volume = StorageVolume;
 type StatusFilter = "all" | "pending" | "available" | "mounted" | "failed";
 type SearchField = "name" | "id";
 
-export function VolumesPage() {
+export default function VolumesPage() {
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
 

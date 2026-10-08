@@ -27,7 +27,7 @@ function secretPurpose(reference: string) {
   return /pull|image|img/i.test(reference) ? "镜像拉取" : "实例密钥";
 }
 
-export function InstanceConfiguration({
+export default function InstanceConfiguration({
   instance,
   onChanged,
   secretAction,

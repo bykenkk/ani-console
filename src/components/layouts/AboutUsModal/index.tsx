@@ -5,7 +5,7 @@ interface AboutUsModalProps {
   onCancel: () => void;
 }
 
-export function AboutUsModal({ onCancel }: AboutUsModalProps) {
+export default function AboutUsModal({ onCancel }: AboutUsModalProps) {
   return (
     <Modal
       title="关于我们"

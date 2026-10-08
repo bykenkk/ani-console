@@ -5,15 +5,15 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { listInferenceServices, type InferenceService } from "@/api/ai-services/inference";
 
-import { CreateInferenceServiceModal } from "@/components/ai-services/CreateInferenceServiceModal";
-import { InferenceStatusTag } from "@/components/ai-services/InferenceStatusTag";
+import CreateInferenceServiceModal from "@/components/ai-services/CreateInferenceServiceModal";
+import InferenceStatusTag from "@/components/ai-services/InferenceStatusTag";
 import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
 type StatusFilter = "all" | "pending" | "deploying" | "running" | "stopping" | "stopped" | "failed";
 type SearchField = "name" | "id";
 
-export function InferencePage() {
+export default function InferencePage() {
   const { actions, dialogNode } = useInferenceActions();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");

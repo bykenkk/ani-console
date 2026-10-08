@@ -8,7 +8,7 @@ type DetailContentTabsProps<TKey extends string> = {
   onTabChange?: (key: TKey) => void;
 };
 
-export function DetailContentTabs<TKey extends string>({
+export default function DetailContentTabs<TKey extends string>({
   tabs,
   activeTabKey,
   onTabChange,

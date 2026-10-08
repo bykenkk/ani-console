@@ -9,7 +9,7 @@ import clsx from "clsx";
 import type { HomeTask, HomeTaskFilter } from "../types";
 import styles from "../index.module.css";
 
-export function TasksPanel({
+export default function TasksPanel({
   items,
   filter,
   loading,

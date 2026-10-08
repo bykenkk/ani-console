@@ -10,14 +10,14 @@ import {
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
-import { SandboxInstanceCreateModal } from "@/components/instances/SandboxInstanceCreateModal";
+import SandboxInstanceCreateModal from "@/components/instances/SandboxInstanceCreateModal";
 import { useSandboxInstanceActions } from "@/hooks/useSandboxInstanceActions";
 
 type SandboxInstance = InstanceRecord;
 type SandboxStatus = "all" | FilterableInstanceState;
 type SearchField = "name" | "id";
 
-export function SandboxInstancesPage() {
+export default function SandboxInstancesPage() {
   const [status, setStatus] = useState<SandboxStatus>("all");
   const [searchField, setSearchField] = useState<SearchField>("name");
   const [searchText, setSearchText] = useState("");
@@ -181,11 +181,12 @@ export function SandboxInstancesPage() {
           }}
         />
       </ListPageFrame>
-      <SandboxInstanceCreateModal
-        visible={createVisible}
-        onCancel={() => setCreateVisible(false)}
-        onCreated={() => setCreateVisible(false)}
-      />
+      {createVisible && (
+        <SandboxInstanceCreateModal
+          onCancel={() => setCreateVisible(false)}
+          onCreated={() => setCreateVisible(false)}
+        />
+      )}
       {dialogNode}
     </>
   );

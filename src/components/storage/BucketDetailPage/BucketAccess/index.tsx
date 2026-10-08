@@ -10,7 +10,7 @@ type AccessDomainRow = {
   copyable?: boolean;
 };
 
-export function BucketAccess({ bucket }: { bucket: StorageBucketRecord }) {
+export default function BucketAccess({ bucket }: { bucket: StorageBucketRecord }) {
   const rows: AccessDomainRow[] = [
     { key: "region", type: "区域", address: bucket.region ?? "-" },
     {

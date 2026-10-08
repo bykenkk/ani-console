@@ -1,5 +1,5 @@
 import { useLoadBalancerActions } from "@/hooks/useLoadBalancerActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { withId } from "@/lib/id";
 import {
@@ -23,16 +23,16 @@ import {
 
 import { formatDateTime } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
-import { LoadBalancerBackends } from "./LoadBalancerBackends";
-import { LoadBalancerEvents } from "./LoadBalancerEvents";
-import { LoadBalancerListeners } from "./LoadBalancerListeners";
-import { LoadBalancerMonitoring } from "./LoadBalancerMonitoring";
+import LoadBalancerBackends from "./LoadBalancerBackends";
+import LoadBalancerEvents from "./LoadBalancerEvents";
+import LoadBalancerListeners from "./LoadBalancerListeners";
+import LoadBalancerMonitoring from "./LoadBalancerMonitoring";
 
 type LoadBalancer = NetworkLoadBalancer;
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
 
-export function LoadBalancerDetailPage({
+export default function LoadBalancerDetailPage({
   loadBalancerId,
   tab,
   onTabChange,

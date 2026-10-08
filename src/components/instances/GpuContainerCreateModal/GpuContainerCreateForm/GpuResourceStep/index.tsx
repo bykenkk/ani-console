@@ -1,5 +1,5 @@
 import { StatusBadge } from "@/components/common";
-import { InstanceComputeSpecSelect } from "@/components/instances/InstanceComputeSpecSelect";
+import InstanceComputeSpecSelect from "@/components/instances/InstanceComputeSpecSelect";
 import { Form, Input, Select, Tag } from "@arco-design/web-react";
 import { type FormValues, type GpuSpecOption, isGpuSpecSelectable } from "../../types";
 
@@ -20,7 +20,7 @@ function specStatusTag(spec: GpuSpecOption) {
   }
 }
 
-export function GpuResourceStep({
+export default function GpuResourceStep({
   specs,
   specsLoading,
 }: {

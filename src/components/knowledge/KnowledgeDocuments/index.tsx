@@ -18,7 +18,7 @@ import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import styles from "./index.module.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { KnowledgeDocumentChunksDrawer } from "@/components/knowledge/KnowledgeDocumentChunksDrawer";
+import KnowledgeDocumentChunksDrawer from "@/components/knowledge/KnowledgeDocumentChunksDrawer";
 
 function formatBytes(value?: number) {
   if (value == null) return "-";
@@ -67,7 +67,7 @@ function statusTag(document: KBDocument) {
   );
 }
 
-export function KnowledgeDocuments({ kbId, action }: { kbId: string; action?: ReactNode }) {
+export default function KnowledgeDocuments({ kbId, action }: { kbId: string; action?: ReactNode }) {
   const {
     query: documents,
     page,

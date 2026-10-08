@@ -1,7 +1,7 @@
 import type { KBSourceChunk } from "@/api/knowledge";
 import { Drawer, Tag, Typography } from "@arco-design/web-react";
 
-export function KnowledgeSourcesDrawer({
+export default function KnowledgeSourcesDrawer({
   title,
   sources,
   onCancel,

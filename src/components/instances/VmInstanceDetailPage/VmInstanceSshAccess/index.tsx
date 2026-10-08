@@ -5,7 +5,7 @@ import { Button, Descriptions, Space, Typography } from "@arco-design/web-react"
 
 type VmInstance = InstanceRecord;
 
-export function VmInstanceSshAccess({
+export default function VmInstanceSshAccess({
   instance,
   onOpenConsole,
 }: {

@@ -30,7 +30,7 @@ const TOKEN_SCOPE_OPTIONS = [
   { label: "端口", value: "ports" },
 ];
 
-export function SandboxTokenIssueModal({
+export default function SandboxTokenIssueModal({
   instance,
   onCancel,
 }: {

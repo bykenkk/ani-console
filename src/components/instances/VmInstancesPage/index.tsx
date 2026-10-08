@@ -10,7 +10,7 @@ import {
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
-import { VmInstanceCreateModal } from "../VmInstanceCreateModal";
+import VmInstanceCreateModal from "../VmInstanceCreateModal";
 import { useVmInstanceActions } from "@/hooks/useVmInstanceActions";
 
 type VmInstance = InstanceRecord;
@@ -29,7 +29,7 @@ function specLabel(instance: VmInstance) {
   return `${cpuText}${memoryText}`;
 }
 
-export function VmInstancesPage() {
+export default function VmInstancesPage() {
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [searchText, setSearchText] = useState("");
@@ -178,14 +178,15 @@ export function VmInstancesPage() {
           }}
         />
       </ListPageFrame>
-      <VmInstanceCreateModal
-        visible={createVisible}
-        onCancel={() => setCreateVisible(false)}
-        onCreated={() => {
-          setCreateVisible(false);
-          refresh();
-        }}
-      />
+      {createVisible && (
+        <VmInstanceCreateModal
+          onCancel={() => setCreateVisible(false)}
+          onCreated={() => {
+            setCreateVisible(false);
+            refresh();
+          }}
+        />
+      )}
       {dialogNode}
     </>
   );

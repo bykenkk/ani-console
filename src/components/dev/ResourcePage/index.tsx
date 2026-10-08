@@ -72,7 +72,7 @@ const COLUMNS: TableColumnProps<StatusSample>[] = [
   },
 ];
 
-export function ResourcePage() {
+export default function ResourcePage() {
   return (
     <ResourcePageFrame
       header={{

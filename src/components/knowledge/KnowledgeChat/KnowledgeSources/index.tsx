@@ -3,7 +3,7 @@ import { useAuiState } from "@assistant-ui/react";
 import { Button, Divider } from "@arco-design/web-react";
 import { IconFile } from "@arco-design/web-react/icon";
 import { useState } from "react";
-import { KnowledgeSourcesDrawer } from "./KnowledgeSourcesDrawer";
+import KnowledgeSourcesDrawer from "./KnowledgeSourcesDrawer";
 
 interface SourceGroup {
   key: string;
@@ -31,7 +31,7 @@ function groupSources(sources: readonly KBSourceChunk[]) {
   return [...groups.values()];
 }
 
-export function KnowledgeSources() {
+export default function KnowledgeSources() {
   const sources = useAuiState(
     (state) => state.message.metadata.custom.sources as readonly KBSourceChunk[] | undefined,
   );

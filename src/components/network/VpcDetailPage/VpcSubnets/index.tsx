@@ -3,7 +3,7 @@ import { DataTable, StatusBadge } from "@/components/common";
 import { withId } from "@/lib/id";
 import { useQuery } from "@tanstack/react-query";
 
-export function VpcSubnets({ vpcId }: { vpcId: string }) {
+export default function VpcSubnets({ vpcId }: { vpcId: string }) {
   const subnets = useQuery({
     meta: {
       errorNotification: {

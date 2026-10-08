@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { listRegistryImages } from "@/api/registry";
 import { ImageNameText } from "@/components/common";
 
-export function InstanceRegistryImageSelect({
+export default function InstanceRegistryImageSelect({
   field,
   enabled,
   instanceKind,

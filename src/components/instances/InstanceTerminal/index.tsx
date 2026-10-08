@@ -92,7 +92,7 @@ function writeGatewayMessage(term: Terminal, raw: string, onError: (message: str
   term.writeln(`\r\n\x1b[33m[未识别的终端消息] ${raw}\x1b[0m`);
 }
 
-export function InstanceTerminal({
+export default function InstanceTerminal({
   instanceId,
   container,
   command = ["/bin/sh"],

@@ -1,4 +1,4 @@
-import { SubnetDetailPage } from "@/components/network/SubnetDetailPage";
+import SubnetDetailPage from "@/components/network/SubnetDetailPage";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/subnets/$subnetId")({

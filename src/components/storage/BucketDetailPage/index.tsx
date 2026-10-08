@@ -1,5 +1,5 @@
 import { useBucketActions } from "@/hooks/useBucketActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { useQuery } from "@tanstack/react-query";
@@ -7,18 +7,18 @@ import { Tag } from "@arco-design/web-react";
 
 import { getBucket, type StorageBucketRecord } from "@/api/storage/buckets";
 
-import { BucketAclEditor } from "@/components/storage/BucketAclEditor";
+import BucketAclEditor from "@/components/storage/BucketAclEditor";
 
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
-import { BucketAccess } from "./BucketAccess";
-import { BucketLifecycle } from "./BucketLifecycle";
-import { BucketObjects } from "./BucketObjects";
+import BucketAccess from "./BucketAccess";
+import BucketLifecycle from "./BucketLifecycle";
+import BucketObjects from "./BucketObjects";
 
 type Bucket = StorageBucketRecord;
 
-export function BucketDetailPage({
+export default function BucketDetailPage({
   bucketId,
   tab,
   onTabChange,

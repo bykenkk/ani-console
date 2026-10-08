@@ -1,4 +1,4 @@
-import { InferenceDetailPage } from "@/components/ai-services/InferenceDetailPage";
+import InferenceDetailPage from "@/components/ai-services/InferenceDetailPage";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/inference/$serviceId")({

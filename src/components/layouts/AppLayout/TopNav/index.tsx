@@ -21,8 +21,8 @@ import { logout as logoutRequest } from "@/api/auth";
 import brandLogo from "@/assets/brand/wordmark.png";
 import { formatDateTime } from "@/lib/format";
 import { useAuthStore } from "@/stores/auth";
-import { AboutUsModal } from "@/components/layouts/AboutUsModal";
-import { KaiwuEntryButton } from "@/components/kaiwu/KaiwuEntryButton";
+import AboutUsModal from "@/components/layouts/AboutUsModal";
+import KaiwuEntryButton from "@/components/kaiwu/KaiwuEntryButton";
 
 const MOCK_REGION = { value: "guangzhou-a", label: "广州-A" };
 
@@ -32,7 +32,7 @@ interface TopNavProps {
   onProductPanelVisibleChange: (visible: boolean) => void;
 }
 
-export function TopNav({
+export default function TopNav({
   activeKey,
   productPanelVisible,
   onProductPanelVisibleChange,

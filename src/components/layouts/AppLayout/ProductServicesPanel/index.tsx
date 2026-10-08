@@ -35,7 +35,7 @@ function filterGroup(group: ProductGroup, keyword: string): ProductGroup | null 
   return children.length ? { ...group, children } : null;
 }
 
-export function ProductServicesPanel({ visible, onClose }: ProductServicesPanelProps) {
+export default function ProductServicesPanel({ visible, onClose }: ProductServicesPanelProps) {
   const navigate = useNavigate();
   const [activeGroupId, setActiveGroupId] = useState("all");
   const [keyword, setKeyword] = useState("");

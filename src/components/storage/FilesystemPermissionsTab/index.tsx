@@ -11,7 +11,7 @@ type FilesystemAccessRule = {
 
 const unavailableReason = "当前 Core API 暂未提供文件存储访问规则与默认目录权限接口";
 
-export function FilesystemPermissionsTab() {
+export default function FilesystemPermissionsTab() {
   const rules: FilesystemAccessRule[] = [];
 
   return (

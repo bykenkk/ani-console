@@ -6,7 +6,7 @@ import { AliIcon } from "@/components/common";
 import type { HomeShortcut } from "../types";
 import styles from "../index.module.css";
 
-export function WelcomePanel({ quickCreateItems }: { quickCreateItems: HomeShortcut[] }) {
+export default function WelcomePanel({ quickCreateItems }: { quickCreateItems: HomeShortcut[] }) {
   const quickCreateMenu = (
     <Menu className={styles.quickCreateMenu}>
       {quickCreateItems.map((item) => (

@@ -1,5 +1,5 @@
 import { useKnowledgeBaseActions } from "@/hooks/useKnowledgeBaseActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { withId } from "@/lib/id";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
@@ -14,15 +14,15 @@ import {
   ResourceId,
   StatusBadge,
 } from "@/components/common";
-import { KnowledgeChat } from "@/components/knowledge/KnowledgeChat";
-import { KnowledgeDocuments } from "@/components/knowledge/KnowledgeDocuments";
-import { KnowledgeDocumentUploadButton } from "@/components/knowledge/KnowledgeDocumentUploadButton";
-import { KnowledgePermissions } from "@/components/knowledge/KnowledgePermissions";
-import { KnowledgeBaseAuditLogs } from "@/components/knowledge/KnowledgeBaseAuditLogs";
+import KnowledgeChat from "@/components/knowledge/KnowledgeChat";
+import KnowledgeDocuments from "@/components/knowledge/KnowledgeDocuments";
+import KnowledgeDocumentUploadButton from "@/components/knowledge/KnowledgeDocumentUploadButton";
+import KnowledgePermissions from "@/components/knowledge/KnowledgePermissions";
+import KnowledgeBaseAuditLogs from "@/components/knowledge/KnowledgeBaseAuditLogs";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 
-export function KnowledgeBaseDetailPage({
+export default function KnowledgeBaseDetailPage({
   kbId,
   tab,
   onTabChange,

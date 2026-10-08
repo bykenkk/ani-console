@@ -12,7 +12,7 @@ import { Button, Empty } from "@arco-design/web-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-export function FilesystemMountTargets({
+export default function FilesystemMountTargets({
   filesystemId,
   onMountCountChange,
   onCreateMountTarget,

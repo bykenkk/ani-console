@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
 
-export function CreateFilesystemMountTargetModal({
+export default function CreateFilesystemMountTargetModal({
   filesystemId,
   onCancel,
 }: {

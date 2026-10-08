@@ -10,7 +10,7 @@ import {
   type NetworkVPC,
 } from "@/api/network";
 
-import { CreateLoadBalancerModal } from "@/components/network/CreateLoadBalancerModal";
+import CreateLoadBalancerModal from "@/components/network/CreateLoadBalancerModal";
 import {
   ResourceNameId,
   ListPageFrame,
@@ -26,7 +26,7 @@ type Vpc = NetworkVPC;
 type StatusFilter = "all" | "pending" | "available" | "failed";
 type SearchField = "name" | "id";
 
-export function LoadBalancersPage() {
+export default function LoadBalancersPage() {
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
@@ -216,7 +216,7 @@ export function LoadBalancersPage() {
           }}
         />
       </ListPageFrame>
-      <CreateLoadBalancerModal visible={createVisible} onCancel={() => setCreateVisible(false)} />
+      {createVisible && <CreateLoadBalancerModal onCancel={() => setCreateVisible(false)} />}
     </>
   );
 }

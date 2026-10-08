@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 
 type Instance = InstanceRecord;
 
-export function VmInstanceRebuildModal({
+export default function VmInstanceRebuildModal({
   instance,
   onCancel,
   onSubmitted,

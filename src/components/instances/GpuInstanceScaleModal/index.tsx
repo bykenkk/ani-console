@@ -7,7 +7,7 @@ import { validateForm } from "@/lib/form";
 
 type Instance = InstanceRecord;
 
-export function GpuInstanceScaleModal({
+export default function GpuInstanceScaleModal({
   instance,
   onCancel,
   onSubmitted,

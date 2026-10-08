@@ -3,7 +3,7 @@ import { Input, Modal, Typography } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
-export function BucketFolderCreateModal({
+export default function BucketFolderCreateModal({
   bucketId,
   prefix,
   onCancel,

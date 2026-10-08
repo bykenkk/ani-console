@@ -5,14 +5,14 @@ import {
   type StorageBucketObjectEntry,
   type StorageBucketRecord,
 } from "@/api/storage/buckets";
-import { ObjectBrowser } from "@/components/storage/ObjectBrowser";
+import ObjectBrowser from "@/components/storage/ObjectBrowser";
 import { withId } from "@/lib/id";
 import { Button, Upload } from "@arco-design/web-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { BucketFolderCreateModal } from "@/components/storage/BucketFolderCreateModal";
+import BucketFolderCreateModal from "@/components/storage/BucketFolderCreateModal";
 
-export function BucketObjects({
+export default function BucketObjects({
   bucketId,
   bucket,
 }: {

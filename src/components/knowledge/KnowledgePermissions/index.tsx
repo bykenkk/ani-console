@@ -34,7 +34,7 @@ function parseUserIds(value?: string) {
   );
 }
 
-export function KnowledgePermissions({ kbId }: { kbId: string }) {
+export default function KnowledgePermissions({ kbId }: { kbId: string }) {
   const [form] = Form.useForm<PermissionFormValues>();
   const initializedKb = useRef<string>();
   const qc = useQueryClient();

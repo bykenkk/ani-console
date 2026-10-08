@@ -9,7 +9,7 @@ export interface WizardStepsProps extends Omit<ArcoStepsProps, "children"> {
   items: readonly string[];
 }
 
-export function WizardSteps({ items, className, ...stepsProps }: WizardStepsProps) {
+export default function WizardSteps({ items, className, ...stepsProps }: WizardStepsProps) {
   return (
     <Steps {...stepsProps} className={clsx(styles.steps, className)}>
       {items.map((title, index) => (

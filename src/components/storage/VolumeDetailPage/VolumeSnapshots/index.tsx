@@ -6,7 +6,7 @@ import { withId } from "@/lib/id";
 import { Button, Empty } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
-export function VolumeSnapshots({
+export default function VolumeSnapshots({
   volumeId,
   onCreateSnapshot,
 }: {

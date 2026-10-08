@@ -8,7 +8,7 @@ type BucketUploadModalProps = {
   onCancel: () => void;
 };
 
-export function BucketUploadModal({ bucket, onCancel }: BucketUploadModalProps) {
+export default function BucketUploadModal({ bucket, onCancel }: BucketUploadModalProps) {
   const upload = useBucketUpload(bucket.id, "/", onCancel);
 
   return (

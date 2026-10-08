@@ -2,8 +2,8 @@ import { Layout, Space, Typography } from "@arco-design/web-react";
 import { useRouterState } from "@tanstack/react-router";
 import { useState, type CSSProperties } from "react";
 import "./index.css";
-import { ProductServicesPanel } from "./ProductServicesPanel";
-import { TopNav } from "./TopNav";
+import ProductServicesPanel from "./ProductServicesPanel";
+import TopNav from "./TopNav";
 import { Sidebar, SIDEBAR_COLLAPSED_WIDTH, SIDEBAR_WIDTH } from "./Sidebar";
 import { activeTopNavKeyForPath, sidebarNavigationForPath } from "./navigation";
 

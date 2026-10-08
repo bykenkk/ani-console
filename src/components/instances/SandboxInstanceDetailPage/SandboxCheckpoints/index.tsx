@@ -9,10 +9,10 @@ import { withId } from "@/lib/id";
 import { Button, Empty, Space, Modal } from "@arco-design/web-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { SandboxCheckpointCloneModal } from "@/components/instances/SandboxCheckpointCloneModal";
-import { SandboxCheckpointCreateModal } from "@/components/instances/SandboxCheckpointCreateModal";
+import SandboxCheckpointCloneModal from "@/components/instances/SandboxCheckpointCloneModal";
+import SandboxCheckpointCreateModal from "@/components/instances/SandboxCheckpointCreateModal";
 
-export function SandboxCheckpoints({
+export default function SandboxCheckpoints({
   instanceId,
   sessionState,
   onChanged,

@@ -1,11 +1,11 @@
 import { Button, Tooltip } from "@arco-design/web-react";
 import clsx from "clsx";
 import { useState, type CSSProperties, type ReactNode } from "react";
-import { AliIcon } from "../AliIcon";
-import { DetailBreadcrumbs } from "./DetailBreadcrumbs";
-import { DetailContentTabs } from "./DetailContentTabs";
-import { DetailInfoSidebar } from "./DetailInfoSidebar";
-import { DetailPageHeader } from "./DetailPageHeader";
+import AliIcon from "../AliIcon";
+import DetailBreadcrumbs from "./DetailBreadcrumbs";
+import DetailContentTabs from "./DetailContentTabs";
+import DetailInfoSidebar from "./DetailInfoSidebar";
+import DetailPageHeader from "./DetailPageHeader";
 import styles from "./index.module.css";
 import type { DetailBreadcrumbItem, DetailCard, DetailHeaderItems, DetailTab } from "./types";
 
@@ -24,7 +24,7 @@ type DetailPageFrameProps<TKey extends string> = {
   | { tabs?: undefined; activeTabKey?: never; onTabChange?: never }
 );
 
-export function DetailPageFrame<TKey extends string>({
+export default function DetailPageFrame<TKey extends string>({
   breadcrumbs,
   title,
   status,

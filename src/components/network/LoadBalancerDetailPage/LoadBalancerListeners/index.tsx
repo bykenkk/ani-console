@@ -2,7 +2,11 @@ import type { NetworkLoadBalancerListener } from "@/api/network";
 import { DataTable } from "@/components/common";
 import { Empty } from "@arco-design/web-react";
 
-export function LoadBalancerListeners({ listeners }: { listeners: NetworkLoadBalancerListener[] }) {
+export default function LoadBalancerListeners({
+  listeners,
+}: {
+  listeners: NetworkLoadBalancerListener[];
+}) {
   return (
     <DataTable<NetworkLoadBalancerListener>
       columns={[

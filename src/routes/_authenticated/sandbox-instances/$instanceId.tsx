@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { SandboxInstanceDetailPage } from "@/components/instances/SandboxInstanceDetailPage";
+import SandboxInstanceDetailPage from "@/components/instances/SandboxInstanceDetailPage";
 
 export const Route = createFileRoute("/_authenticated/sandbox-instances/$instanceId")({
   validateSearch: (search: Record<string, unknown>): { tab?: string } => ({

@@ -48,7 +48,7 @@ function CapacityMetric({
   );
 }
 
-export function GpuCapacityMetrics() {
+export default function GpuCapacityMetrics() {
   const tenantQuota = useQuery({
     meta: {
       errorNotification: {

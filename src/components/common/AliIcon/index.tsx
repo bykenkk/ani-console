@@ -7,7 +7,14 @@ export interface AliIconProps extends Omit<HTMLAttributes<HTMLElement>, "childre
   color?: CSSProperties["color"];
 }
 
-export function AliIcon({ name, size, color, className = "", style, ...props }: AliIconProps) {
+export default function AliIcon({
+  name,
+  size,
+  color,
+  className = "",
+  style,
+  ...props
+}: AliIconProps) {
   const iconClassName = name.startsWith("icon-") ? name : `icon-${name}`;
   const hasAccessibleName = Boolean(props["aria-label"] || props["aria-labelledby"] || props.title);
 

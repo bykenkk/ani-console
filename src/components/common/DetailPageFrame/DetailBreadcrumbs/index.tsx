@@ -1,6 +1,6 @@
 import { Breadcrumb, Button, Tooltip } from "@arco-design/web-react";
 import { Link, useRouter } from "@tanstack/react-router";
-import { AliIcon } from "../../AliIcon";
+import AliIcon from "../../AliIcon";
 import styles from "./index.module.css";
 import type { DetailBreadcrumbItem } from "../types";
 
@@ -9,7 +9,7 @@ type DetailBreadcrumbsProps = {
   onBack?: () => void;
 };
 
-export function DetailBreadcrumbs({ items, onBack }: DetailBreadcrumbsProps) {
+export default function DetailBreadcrumbs({ items, onBack }: DetailBreadcrumbsProps) {
   const router = useRouter();
   const visibleItems = items.filter((item) => item.to !== "/");
 

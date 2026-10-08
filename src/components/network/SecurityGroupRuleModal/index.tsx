@@ -36,7 +36,7 @@ const initialRule = (direction: Direction, rule?: SecurityGroupRuleResource | nu
       }
     : emptyRule(direction);
 
-export function SecurityGroupRuleModal({
+export default function SecurityGroupRuleModal({
   securityGroupId,
   direction,
   rule,

@@ -12,7 +12,7 @@ type BucketAclEditorProps = {
   onSaved?: () => void;
 };
 
-export function BucketAclEditor({ bucket, onSaved }: BucketAclEditorProps) {
+export default function BucketAclEditor({ bucket, onSaved }: BucketAclEditorProps) {
   const queryClient = useQueryClient();
   const [acl, setAcl] = useState<StorageBucketAcl>(bucket.acl ?? "private");
 

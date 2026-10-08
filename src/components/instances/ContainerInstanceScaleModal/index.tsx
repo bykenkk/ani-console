@@ -7,7 +7,7 @@ import { validateForm } from "@/lib/form";
 
 type Instance = InstanceRecord;
 
-export function ContainerInstanceScaleModal({
+export default function ContainerInstanceScaleModal({
   instance,
   onCancel,
   onSubmitted,

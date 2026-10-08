@@ -7,7 +7,7 @@ import { Button, Empty } from "@arco-design/web-react";
 
 type MountedInstance = NonNullable<StorageVolume["used_by"]>[number];
 
-export function VolumeRelatedResources({
+export default function VolumeRelatedResources({
   volume,
   onAttach,
 }: {

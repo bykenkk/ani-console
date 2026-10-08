@@ -23,7 +23,7 @@ function formatRateLimits(policy: InferenceAccessPolicy) {
   return limits.length ? limits.join(" / ") : "-";
 }
 
-export function InferencePolicies({ serviceId }: { serviceId: string }) {
+export default function InferencePolicies({ serviceId }: { serviceId: string }) {
   const policies = useQuery({
     meta: {
       errorNotification: {

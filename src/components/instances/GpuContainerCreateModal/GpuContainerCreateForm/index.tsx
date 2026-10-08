@@ -1,6 +1,6 @@
 import { Button, Form, Input, Modal, Space } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { getGpuSpecAvailability, listGpuSchedulingQueues } from "@/api/gpu-inventory";
 import { listNetworkSecurityGroups, listNetworkSubnets, listNetworkVpcs } from "@/api/network";
 import { listRegistryImages } from "@/api/registry";
@@ -18,10 +18,10 @@ import type {
   Volume,
 } from "../types";
 import { INITIAL_VALUES, isGpuSpecSelectable } from "../types";
-import { GpuConfirmStep } from "./GpuConfirmStep";
-import { GpuImageStep } from "./GpuImageStep";
-import { GpuNetworkStorageStep } from "./GpuNetworkStorageStep";
-import { GpuResourceStep } from "./GpuResourceStep";
+import GpuConfirmStep from "./GpuConfirmStep";
+import GpuImageStep from "./GpuImageStep";
+import GpuNetworkStorageStep from "./GpuNetworkStorageStep";
+import GpuResourceStep from "./GpuResourceStep";
 import styles from "./index.module.css";
 import { validateForm } from "@/lib/form";
 import { showMessage } from "@/lib/feedback";
@@ -30,13 +30,12 @@ import { withId } from "@/lib/id";
 const STEP_TITLES = ["基本信息", "资源配置", "摘要信息"];
 
 type Props = {
-  visible: boolean;
   submitting: boolean;
   onCancel: () => void;
   onSubmit: (values: FormValues, securityGroupId: string) => void;
 };
 
-export function GpuContainerCreateForm({ visible, submitting, onCancel, onSubmit }: Props) {
+export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit }: Props) {
   const [form] = Form.useForm<FormValues>();
   const [step, setStep] = useState(0);
   const [values, setValues] = useState<FormValues>(INITIAL_VALUES);
@@ -50,7 +49,6 @@ export function GpuContainerCreateForm({ visible, submitting, onCancel, onSubmit
     },
     queryKey: ["network-vpcs", "select"],
     queryFn: () => listNetworkVpcs({ limit: 50 }),
-    enabled: visible,
   });
   const subnets = useQuery({
     meta: {
@@ -62,7 +60,7 @@ export function GpuContainerCreateForm({ visible, submitting, onCancel, onSubmit
     },
     queryKey: ["network-subnets", "select", values.vpc_id],
     queryFn: () => listNetworkSubnets({ limit: 50, vpc_id: values.vpc_id || undefined }),
-    enabled: visible && !!values.vpc_id,
+    enabled: !!values.vpc_id,
   });
   const securityGroups = useQuery({
     meta: {
@@ -74,7 +72,6 @@ export function GpuContainerCreateForm({ visible, submitting, onCancel, onSubmit
     },
     queryKey: ["network-security-groups", "select"],
     queryFn: () => listNetworkSecurityGroups({ limit: 50 }),
-    enabled: visible,
   });
   const filesystems = useQuery({
     meta: {
@@ -86,7 +83,6 @@ export function GpuContainerCreateForm({ visible, submitting, onCancel, onSubmit
     },
     queryKey: ["filesystems", "select"],
     queryFn: () => listFilesystems({ limit: 50 }),
-    enabled: visible,
   });
   const volumes = useQuery({
     meta: {
@@ -98,7 +94,6 @@ export function GpuContainerCreateForm({ visible, submitting, onCancel, onSubmit
     },
     queryKey: ["volumes", "gpu-container-create", "filesystem"],
     queryFn: () => listVolumes({ limit: 50, in_use: false, volume_mode: "filesystem" }),
-    enabled: visible,
   });
   const images = useQuery({
     meta: {
@@ -109,7 +104,6 @@ export function GpuContainerCreateForm({ visible, submitting, onCancel, onSubmit
       },
     },
     queryKey: ["registry-images", "gpu-create"],
-    enabled: visible,
     queryFn: async () => (await listRegistryImages({ limit: 100, purpose: "gpu" })).items,
   });
   const gpuSpecAvailability = useQuery({
@@ -121,7 +115,6 @@ export function GpuContainerCreateForm({ visible, submitting, onCancel, onSubmit
       },
     },
     queryKey: ["gpu-specs", "availability"],
-    enabled: visible,
     queryFn: getGpuSpecAvailability,
   });
   const gpuSchedulingQueues = useQuery({
@@ -133,7 +126,6 @@ export function GpuContainerCreateForm({ visible, submitting, onCancel, onSubmit
       },
     },
     queryKey: ["gpu-scheduling", "queues", "select"],
-    enabled: visible,
     queryFn: async () =>
       (await listGpuSchedulingQueues()) as unknown as GpuSchedulingQueueListResponse,
   });
@@ -162,14 +154,6 @@ export function GpuContainerCreateForm({ visible, submitting, onCancel, onSubmit
     schedulingQueues.find((item) => item.status?.state !== "closed");
   const hasAvailableGpuSpec = gpuSpecs.some(isGpuSpecSelectable);
   const hasAvailableQueue = defaultSchedulingQueue !== undefined;
-
-  useEffect(() => {
-    if (visible) {
-      form.setFieldsValue(INITIAL_VALUES);
-      setValues(INITIAL_VALUES);
-      setStep(0);
-    }
-  }, [form, visible]);
 
   const next = async () => {
     if (step === 1 && hasDuplicateContainerMountPath(values)) {
@@ -204,7 +188,7 @@ export function GpuContainerCreateForm({ visible, submitting, onCancel, onSubmit
   return (
     <Modal
       title="创建 GPU 容器实例"
-      visible={visible}
+      visible
       onCancel={onCancel}
       unmountOnExit
       footer={

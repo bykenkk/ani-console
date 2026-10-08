@@ -1,12 +1,12 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { VolumeOSInitGuideModal } from "@/components/storage/VolumeOSInitGuideModal";
+import VolumeOSInitGuideModal from "@/components/storage/VolumeOSInitGuideModal";
 import { useVolumeDetach } from "@/hooks/useVolumeDetach";
 import { useResourceDelete } from "@/hooks/useResourceDelete";
 import { useState } from "react";
 import { type StorageVolume } from "@/api/storage/volumes";
-import { CreateVolumeSnapshotModal } from "@/components/storage/CreateVolumeSnapshotModal";
-import { ExpandVolumeModal } from "@/components/storage/ExpandVolumeModal";
-import { AttachVolumeModal } from "@/components/storage/AttachVolumeModal";
+import CreateVolumeSnapshotModal from "@/components/storage/CreateVolumeSnapshotModal";
+import ExpandVolumeModal from "@/components/storage/ExpandVolumeModal";
+import AttachVolumeModal from "@/components/storage/AttachVolumeModal";
 import type { RowAction } from "@/components/common";
 type Volume = StorageVolume;
 export function useVolumeActions(onDeleted?: (item: Volume) => void) {

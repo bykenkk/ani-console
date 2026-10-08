@@ -3,7 +3,7 @@ import { Form, Input, Modal, Typography } from "@arco-design/web-react";
 import { useState } from "react";
 import { createVolumeSnapshot } from "@/api/storage/volumes";
 
-export function CreateVolumeSnapshotModal({
+export default function CreateVolumeSnapshotModal({
   volumeId,
   onCancel,
 }: {

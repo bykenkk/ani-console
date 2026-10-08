@@ -9,7 +9,7 @@ type Props = {
   onChange: (templateId: string) => void;
 };
 
-export function SandboxTemplateStep({ templates, loading, error, onChange }: Props) {
+export default function SandboxTemplateStep({ templates, loading, error, onChange }: Props) {
   return (
     <>
       {loading ? (

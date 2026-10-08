@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
-import { ContainerInstanceDetailPage } from "@/components/instances/ContainerInstanceDetailPage";
+import ContainerInstanceDetailPage from "@/components/instances/ContainerInstanceDetailPage";
 
 export const Route = createFileRoute("/_authenticated/container-instances/$instanceId")({
   validateSearch: (search: Record<string, unknown>): { tab?: string } => ({

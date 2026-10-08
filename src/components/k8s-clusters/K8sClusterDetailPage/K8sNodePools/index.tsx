@@ -5,7 +5,7 @@ import { Empty } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-export function K8sNodePools({
+export default function K8sNodePools({
   clusterId,
   onNodeCountChange,
 }: {

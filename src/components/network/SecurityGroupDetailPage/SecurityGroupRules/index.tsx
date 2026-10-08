@@ -1,15 +1,14 @@
 import { listNetworkSecurityGroupRules, deleteNetworkSecurityGroupRule } from "@/api/network";
 import { DataTable, type RowAction } from "@/components/common";
-import {
+import SecurityGroupRuleModal, {
   type SecurityGroupRuleResource,
-  SecurityGroupRuleModal,
 } from "@/components/network/SecurityGroupRuleModal";
 import { withId } from "@/lib/id";
 import { Button, Empty, Space, Tag, Typography, Modal } from "@arco-design/web-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
-export function SecurityGroupRules({
+export default function SecurityGroupRules({
   securityGroupId,
   direction,
 }: {

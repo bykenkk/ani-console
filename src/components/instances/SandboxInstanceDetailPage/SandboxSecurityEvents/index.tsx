@@ -9,7 +9,7 @@ import { formatDateTime } from "@/lib/format";
 type SecurityEvent = InstanceSecurityEvent;
 type Severity = "all" | "info" | "warning" | "critical";
 
-export function SandboxSecurityEvents({ instanceId }: { instanceId: string }) {
+export default function SandboxSecurityEvents({ instanceId }: { instanceId: string }) {
   const [severity, setSeverity] = useState<Severity>("all");
   const query = useQuery({
     meta: {

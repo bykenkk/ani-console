@@ -7,7 +7,7 @@ type NetworkRow = {
   name: string;
 };
 
-export function InstanceNetwork({ instance }: { instance: InstanceRecord }) {
+export default function InstanceNetwork({ instance }: { instance: InstanceRecord }) {
   const rows: NetworkRow[] = [
     { type: "VPC", name: getInstanceNetworkValue(instance, "vpc_id") },
     { type: "子网", name: getInstanceNetworkValue(instance, "subnet_id") },

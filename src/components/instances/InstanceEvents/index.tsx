@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
-export function InstanceEvents({ instanceId }: { instanceId: string }) {
+export default function InstanceEvents({ instanceId }: { instanceId: string }) {
   const events = useQuery({
     meta: {
       errorNotification: {

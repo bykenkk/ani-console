@@ -3,7 +3,7 @@ import { Button, Card, Result, Spin, Typography } from "@arco-design/web-react";
 import { useEffect, useState } from "react";
 import { exchangeOidcCode } from "@/api/auth";
 import { ApiError } from "@/api/request";
-import { AuthCenterLayout } from "@/components/layouts/AuthCenterLayout";
+import AuthCenterLayout from "@/components/layouts/AuthCenterLayout";
 import { closeNotification, showNotification } from "@/lib/feedback";
 import { oidcStorage } from "@/lib/storage";
 import { isAuthenticated, useAuthStore } from "@/stores/auth";
@@ -46,7 +46,7 @@ async function readCallbackParams(): Promise<{ code: string | null; state: strin
   return { code: null, state: null };
 }
 
-export function LoginCallbackPage() {
+export default function LoginCallbackPage() {
   const navigate = useNavigate();
   const setAuthSession = useAuthStore((s) => s.setAuthSession);
   const [phase, setPhase] = useState<CallbackPhase>("loading");

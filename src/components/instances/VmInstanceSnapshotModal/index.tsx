@@ -8,7 +8,7 @@ import { validateForm } from "@/lib/form";
 type Instance = InstanceRecord;
 type Values = { snapshotName: string; includeDataDisks?: boolean };
 
-export function VmInstanceSnapshotModal({
+export default function VmInstanceSnapshotModal({
   instance,
   onCancel,
   onSubmitted,

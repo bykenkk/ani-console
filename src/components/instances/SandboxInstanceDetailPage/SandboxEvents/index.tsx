@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { InstanceEvents } from "@/components/instances/InstanceEvents";
-import { SandboxSecurityEvents } from "../SandboxSecurityEvents";
+import InstanceEvents from "@/components/instances/InstanceEvents";
+import SandboxSecurityEvents from "../SandboxSecurityEvents";
 import styles from "./index.module.css";
 
 type EventTab = "all" | "security";
 
-export function SandboxEvents({ instanceId }: { instanceId: string }) {
+export default function SandboxEvents({ instanceId }: { instanceId: string }) {
   const [activeTab, setActiveTab] = useState<EventTab>("all");
 
   return (

@@ -7,12 +7,12 @@ import backgroundImageUrl from "@/assets/auth/login-bg.png";
 import logoUrl from "@/assets/brand/logo.png";
 import { passwordLogin } from "@/api/auth";
 import { ApiError } from "@/api/request";
-import { BorderBeamPanel } from "@/components/common/BorderBeamPanel";
+import BorderBeamPanel from "@/components/common/BorderBeamPanel";
 import { isAuthenticated, useAuthStore } from "@/stores/auth";
 import styles from "./index.module.css";
 import { showMessage } from "@/lib/feedback";
 
-export function LoginPage({ redirect = "/" }: { redirect?: string }) {
+export default function LoginPage({ redirect = "/" }: { redirect?: string }) {
   const navigate = useNavigate();
   const setAuthSession = useAuthStore((state) => state.setAuthSession);
   const setDevelopmentBypass = useAuthStore((state) => state.setDevelopmentBypass);

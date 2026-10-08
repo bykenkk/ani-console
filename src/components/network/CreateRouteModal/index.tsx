@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Form, Input, Modal, Select, Typography } from "@arco-design/web-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   createNetworkRoute,
   listNetworkVpcs,
@@ -13,13 +13,11 @@ import { ipv4CidrError, requireIpv4Cidr } from "@/lib/validators";
 
 type Vpc = NetworkVPC;
 
-export function CreateRouteModal({
-  visible,
+export default function CreateRouteModal({
   defaultVpcId,
   onCancel,
   onCreated,
 }: {
-  visible: boolean;
   defaultVpcId?: string;
   onCancel: () => void;
   onCreated?: (route: NetworkRoute) => void;
@@ -40,19 +38,9 @@ export function CreateRouteModal({
     },
     queryKey: ["network-vpcs", "route-create"],
     queryFn: () => listNetworkVpcs({ limit: 100 }),
-    enabled: visible,
   });
   const cidrError = ipv4CidrError(destinationCidr, "目标网段");
-  useEffect(() => {
-    if (visible) setVpcId(defaultVpcId ?? "");
-  }, [defaultVpcId, visible]);
-  const reset = () => {
-    setVpcId(defaultVpcId ?? "");
-    setDestinationCidr("0.0.0.0/0");
-    setNextHopType("gateway");
-    setNextHopId("");
-    setName("");
-  };
+
   const create = useMutation({
     meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
     mutationFn: async (_: undefined) => {
@@ -71,19 +59,15 @@ export function CreateRouteModal({
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["network-routes"] });
-      reset();
       onCreated?.(data);
       onCancel();
     },
   });
   return (
     <Modal
-      visible={visible}
+      visible
       title="创建路由"
-      onCancel={() => {
-        reset();
-        onCancel();
-      }}
+      onCancel={onCancel}
       onOk={() => create.mutateAsync(undefined)}
       confirmLoading={create.isPending}
       unmountOnExit

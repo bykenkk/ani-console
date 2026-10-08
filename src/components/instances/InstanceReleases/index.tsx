@@ -9,7 +9,7 @@ import { getImageDisplayName } from "@/lib/render";
 type Instance = InstanceRecord;
 type Release = NonNullable<NonNullable<Instance["container"]>["history"]>[number];
 
-export function InstanceReleases({
+export default function InstanceReleases({
   instance,
   actions,
   versionLayout = false,

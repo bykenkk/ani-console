@@ -13,12 +13,12 @@ import {
 import { Button, InputNumber, Select, Spin, Typography } from "@arco-design/web-react";
 import { IconCheck, IconCopy, IconSend, IconStop } from "@arco-design/web-react/icon";
 import { useMemo, useRef } from "react";
-import { KnowledgeMarkdownText } from "../../KnowledgeMarkdownText";
-import { KnowledgeSources } from "../KnowledgeSources";
+import KnowledgeMarkdownText from "../../KnowledgeMarkdownText";
+import KnowledgeSources from "../KnowledgeSources";
 import { createKnowledgeBaseAdapter, type QueryMode } from "../knowledgeQueryAdapter";
 import styles from "./index.module.css";
 
-export function KnowledgeConversation({
+export default function KnowledgeConversation({
   kbId,
   sessionId,
   initialMessages,

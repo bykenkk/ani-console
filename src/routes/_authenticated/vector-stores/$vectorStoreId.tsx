@@ -1,4 +1,4 @@
-import { VectorStoreDetailPage } from "@/components/storage/VectorStoreDetailPage";
+import VectorStoreDetailPage from "@/components/storage/VectorStoreDetailPage";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/vector-stores/$vectorStoreId")({

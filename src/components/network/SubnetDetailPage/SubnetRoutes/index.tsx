@@ -13,7 +13,7 @@ type SubnetRouteRow = {
   source: "系统" | "自定义";
 };
 
-export function SubnetRoutes({ subnetId, vpcId }: { subnetId: string; vpcId: string }) {
+export default function SubnetRoutes({ subnetId, vpcId }: { subnetId: string; vpcId: string }) {
   const routes = useQuery({
     meta: {
       errorNotification: {

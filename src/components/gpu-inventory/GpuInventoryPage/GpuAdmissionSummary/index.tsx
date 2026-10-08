@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getGpuSpecAvailability } from "@/api/gpu-inventory";
 import { StatusBadge } from "@/components/common";
 
-export function GpuAdmissionSummary() {
+export default function GpuAdmissionSummary() {
   const availability = useQuery({
     meta: {
       errorNotification: {

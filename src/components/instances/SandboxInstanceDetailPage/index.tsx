@@ -11,22 +11,22 @@ import {
   ResourceId,
   StatusBadge,
 } from "@/components/common";
-import { InstanceLogs } from "@/components/instances/InstanceLogs";
-import { InstanceMetrics } from "@/components/instances/InstanceMetrics";
-import { InstanceOperations } from "@/components/instances/InstanceOperations";
-import { SandboxInstanceActions } from "@/components/instances/SandboxInstanceActions";
+import InstanceLogs from "@/components/instances/InstanceLogs";
+import InstanceMetrics from "@/components/instances/InstanceMetrics";
+import InstanceOperations from "@/components/instances/InstanceOperations";
+import SandboxInstanceActions from "@/components/instances/SandboxInstanceActions";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { getSandboxProviderLabel } from "@/lib/instances";
-import { SandboxAccess } from "./SandboxAccess";
-import { SandboxCheckpoints } from "./SandboxCheckpoints";
-import { SandboxCodeRunner } from "./SandboxCodeRunner";
-import { SandboxEnvironment } from "./SandboxEnvironment";
-import { SandboxEvents } from "./SandboxEvents";
-import { SandboxFiles } from "./SandboxFiles";
+import SandboxAccess from "./SandboxAccess";
+import SandboxCheckpoints from "./SandboxCheckpoints";
+import SandboxCodeRunner from "./SandboxCodeRunner";
+import SandboxEnvironment from "./SandboxEnvironment";
+import SandboxEvents from "./SandboxEvents";
+import SandboxFiles from "./SandboxFiles";
 import { formatDurationSeconds, sandboxEgressLabel, sandboxTimeoutLabel } from "./utils";
 
-export function SandboxInstanceDetailPage({
+export default function SandboxInstanceDetailPage({
   instanceId,
   tab,
   onTabChange,

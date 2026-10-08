@@ -12,7 +12,7 @@ import type {
   HomeTrendConfig,
   HomeTrendSnapshot,
 } from "../types";
-import { PeriodSwitch } from "../PeriodSwitch";
+import PeriodSwitch from "../PeriodSwitch";
 import styles from "../index.module.css";
 
 function areaColor(color: string) {
@@ -30,7 +30,7 @@ function percentTooltip(value: unknown) {
   return Number.isFinite(number) ? `${Number(number.toFixed(2))}%` : "-";
 }
 
-export function TrendCard({
+export default function TrendCard({
   config,
   dataSource,
   metric,

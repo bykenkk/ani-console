@@ -35,7 +35,7 @@ function applyViewMode(rfb: RFB, mode: ViewMode) {
   rfb.focusOnClick = true;
 }
 
-export function InstanceVncConsole({
+export default function InstanceVncConsole({
   instanceId,
   protocol = "novnc",
 }: {

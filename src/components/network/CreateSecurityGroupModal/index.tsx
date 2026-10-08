@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Form, Input, Modal, Select, Typography } from "@arco-design/web-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   createNetworkSecurityGroup,
   listNetworkVpcs,
@@ -44,13 +44,11 @@ const RULE_TEMPLATES: Record<RuleTemplate, SecurityGroupRule[]> = {
   custom: [],
 };
 
-export function CreateSecurityGroupModal({
-  visible,
+export default function CreateSecurityGroupModal({
   defaultVpcId,
   onCancel,
   onCreated,
 }: {
-  visible: boolean;
   defaultVpcId?: string;
   onCancel: () => void;
   onCreated?: (securityGroup: NetworkSecurityGroup) => void;
@@ -69,16 +67,8 @@ export function CreateSecurityGroupModal({
     },
     queryKey: ["network-vpcs", "security-group-create"],
     queryFn: () => listNetworkVpcs({ limit: 100 }),
-    enabled: visible,
   });
-  useEffect(() => {
-    if (visible) setVpcId(defaultVpcId ?? "");
-  }, [defaultVpcId, visible]);
-  const reset = () => {
-    setName("");
-    setVpcId(defaultVpcId ?? "");
-    setRuleTemplate("common");
-  };
+
   const create = useMutation({
     meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
     mutationFn: async () => {
@@ -94,7 +84,6 @@ export function CreateSecurityGroupModal({
     },
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["network-security-groups"] });
-      reset();
       onCreated?.(data);
       onCancel();
     },
@@ -102,12 +91,9 @@ export function CreateSecurityGroupModal({
 
   return (
     <Modal
-      visible={visible}
+      visible
       title="创建安全组"
-      onCancel={() => {
-        reset();
-        onCancel();
-      }}
+      onCancel={onCancel}
       onOk={() => create.mutateAsync()}
       confirmLoading={create.isPending}
       unmountOnExit

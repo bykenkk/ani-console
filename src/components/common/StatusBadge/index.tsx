@@ -56,7 +56,7 @@ const STATUS_APPEARANCE: Record<string, { tone: StatusBadgeTone; loading?: boole
   cancelled: { tone: "neutral" },
 };
 
-export function StatusBadge({
+export default function StatusBadge({
   status,
   reason,
   message,

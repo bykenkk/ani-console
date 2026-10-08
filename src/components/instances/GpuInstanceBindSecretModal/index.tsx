@@ -16,7 +16,7 @@ type Values = {
   mountPath?: string;
 };
 
-export function GpuInstanceBindSecretModal({
+export default function GpuInstanceBindSecretModal({
   instance,
   onCancel,
   onSubmitted,

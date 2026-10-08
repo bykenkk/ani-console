@@ -5,12 +5,10 @@ import { useState } from "react";
 
 type ImportSource = ImportModelRequest["source"];
 
-export function ImportModelModal({
-  visible,
+export default function ImportModelModal({
   onCancel,
   onSubmitted,
 }: {
-  visible: boolean;
   onCancel: () => void;
   onSubmitted?: () => void;
 }) {
@@ -18,12 +16,6 @@ export function ImportModelModal({
   const [source, setSource] = useState<ImportSource>("huggingface");
   const [repoId, setRepoId] = useState("");
   const [revision, setRevision] = useState("main");
-
-  const reset = () => {
-    setSource("huggingface");
-    setRepoId("");
-    setRevision("main");
-  };
 
   const submit = useMutation({
     meta: {
@@ -45,7 +37,6 @@ export function ImportModelModal({
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["models"] });
-      reset();
       onCancel();
       onSubmitted?.();
     },
@@ -53,14 +44,11 @@ export function ImportModelModal({
 
   return (
     <Modal
-      visible={visible}
+      visible
       title="导入模型"
       okText="开始导入"
       confirmLoading={submit.isPending}
-      onCancel={() => {
-        reset();
-        onCancel();
-      }}
+      onCancel={onCancel}
       onOk={() => submit.mutateAsync()}
       unmountOnExit
     >

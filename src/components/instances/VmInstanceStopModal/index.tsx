@@ -5,7 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 
 type Instance = InstanceRecord;
 
-export function VmInstanceStopModal({
+export default function VmInstanceStopModal({
   instance,
   onCancel,
   onSubmitted,

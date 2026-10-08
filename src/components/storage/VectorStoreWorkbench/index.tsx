@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 
 type SearchHit = VectorStoreSearchHit & { content: string };
 
-export function VectorStoreWorkbench({ store }: { store: VectorStore }) {
+export default function VectorStoreWorkbench({ store }: { store: VectorStore }) {
   const [searchVector, setSearchVector] = useState("");
   const [topK, setTopK] = useState(10);
   const [filterKey, setFilterKey] = useState("");

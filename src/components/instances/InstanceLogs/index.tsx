@@ -130,7 +130,7 @@ async function connectLogStream({
   return readLogStream(data, signal, appendLog);
 }
 
-export function InstanceLogs({
+export default function InstanceLogs({
   instanceId,
   active,
 }: {

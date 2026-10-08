@@ -10,23 +10,23 @@ import {
   ResourceId,
   StatusBadge,
 } from "@/components/common";
-import { InstanceLogs } from "@/components/instances/InstanceLogs";
-import { InstanceEvents } from "@/components/instances/InstanceEvents";
-import { InstanceMetrics } from "@/components/instances/InstanceMetrics";
-import { InstanceOperations } from "@/components/instances/InstanceOperations";
-import { InstanceConfiguration } from "@/components/instances/InstanceConfiguration";
-import { InstanceNetwork } from "@/components/instances/InstanceNetwork";
-import { InstanceStorage } from "@/components/instances/InstanceStorage";
-import { InstanceVersions } from "@/components/instances/InstanceVersions";
+import InstanceLogs from "@/components/instances/InstanceLogs";
+import InstanceEvents from "@/components/instances/InstanceEvents";
+import InstanceMetrics from "@/components/instances/InstanceMetrics";
+import InstanceOperations from "@/components/instances/InstanceOperations";
+import InstanceConfiguration from "@/components/instances/InstanceConfiguration";
+import InstanceNetwork from "@/components/instances/InstanceNetwork";
+import InstanceStorage from "@/components/instances/InstanceStorage";
+import InstanceVersions from "@/components/instances/InstanceVersions";
 import { useContainerInstanceActions } from "@/hooks/useContainerInstanceActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
 import { getInstanceDisplayIp, getInstanceNetworkValue } from "@/lib/instances";
 import { containerDetailDataSource } from "./data-source";
 
-export function ContainerInstanceDetailPage({
+export default function ContainerInstanceDetailPage({
   instanceId,
   tab,
   onTabChange,

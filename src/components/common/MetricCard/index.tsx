@@ -8,7 +8,7 @@ interface MetricCardProps {
 }
 
 /** 概览页指标卡（页面模板 2.0 §4.2：Card + Statistic） */
-export function MetricCard({ title, value, extra }: MetricCardProps) {
+export default function MetricCard({ title, value, extra }: MetricCardProps) {
   return (
     <Card className="h-full">
       <Statistic title={title} value={value} />

@@ -1,4 +1,4 @@
-import { SandboxInstanceTerminalPage } from "@/components/instances/SandboxInstanceTerminalPage";
+import SandboxInstanceTerminalPage from "@/components/instances/SandboxInstanceTerminalPage";
 import { isAuthenticated } from "@/stores/auth";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 

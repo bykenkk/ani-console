@@ -6,7 +6,7 @@ type InferenceStatusTagProps = Pick<
   "status" | "status_reason" | "status_message"
 >;
 
-export function InferenceStatusTag({
+export default function InferenceStatusTag({
   status,
   status_reason,
   status_message,

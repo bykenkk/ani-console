@@ -11,7 +11,7 @@ export type ListDataTableProps<T> = Omit<DataTableProps<T>, "className" | "noDat
 
 const DEFAULT_NAME_COLUMN_WIDTH = 200;
 
-export function ListDataTable<T>({
+export default function ListDataTable<T>({
   className,
   emptyIconClassName = "icon-yunzhuji",
   emptyText = "暂无数据",

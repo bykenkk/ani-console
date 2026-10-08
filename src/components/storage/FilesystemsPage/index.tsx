@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { listFilesystems, type StorageFilesystem } from "@/api/storage/filesystems";
 
-import { CreateFilesystemModal } from "@/components/storage/CreateFilesystemModal";
+import CreateFilesystemModal from "@/components/storage/CreateFilesystemModal";
 
 import {
   ResourceNameId,
@@ -21,7 +21,7 @@ type Filesystem = StorageFilesystem;
 type StatusFilter = "all" | "available" | "pending" | "failed";
 type SearchField = "name" | "id";
 
-export function FilesystemsPage() {
+export default function FilesystemsPage() {
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
 

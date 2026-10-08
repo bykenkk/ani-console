@@ -1,5 +1,5 @@
 import { useVpcActions } from "@/hooks/useVpcActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { withId } from "@/lib/id";
 import {
@@ -16,13 +16,13 @@ import { getNetworkVpc, type NetworkVPC } from "@/api/network";
 
 import { formatDateTime } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
-import { VpcRelatedResources } from "./VpcRelatedResources";
-import { VpcRoutes } from "./VpcRoutes";
-import { VpcSubnets } from "./VpcSubnets";
+import VpcRelatedResources from "./VpcRelatedResources";
+import VpcRoutes from "./VpcRoutes";
+import VpcSubnets from "./VpcSubnets";
 
 type Vpc = NetworkVPC;
 
-export function VpcDetailPage({
+export default function VpcDetailPage({
   vpcId,
   tab,
   onTabChange,

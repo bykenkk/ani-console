@@ -8,7 +8,7 @@ type DetailPagePlaceholderProps = {
 const headerItemWidths = [152, 136, 168];
 const tabWidths = [64, 72, 56, 80, 64];
 
-export function DetailPagePlaceholder({ loading }: DetailPagePlaceholderProps) {
+export default function DetailPagePlaceholder({ loading }: DetailPagePlaceholderProps) {
   return (
     <div
       className={styles.page}

@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { applyInferenceServiceLifecycle, type InferenceService } from "@/api/ai-services/inference";
 import type { RowAction } from "@/components/common";
 import { useResourceDelete } from "@/hooks/useResourceDelete";
-import { InferenceScaleModal } from "@/components/ai-services/InferenceScaleModal";
+import InferenceScaleModal from "@/components/ai-services/InferenceScaleModal";
 
 export function useInferenceActions(onDeleted?: () => void) {
   const qc = useQueryClient();

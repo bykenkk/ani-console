@@ -20,7 +20,7 @@ function splitCidr(value: string, placeholder: string): [string[], string] {
   return [[octets[0] ?? "", octets[1] ?? "", octets[2] ?? "", octets[3] ?? ""], prefix];
 }
 
-export function Ipv4CidrInput({
+export default function Ipv4CidrInput({
   value,
   onChange,
   placeholder = "10.80.1.0",

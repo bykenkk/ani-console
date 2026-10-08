@@ -101,7 +101,7 @@ type BorderBeamStyle = React.CSSProperties & {
   "--border-beam-thickness": string;
 };
 
-export function BorderBeamPanel({
+export default function BorderBeamPanel({
   as: Component = "div",
   beams = 2,
   colors,

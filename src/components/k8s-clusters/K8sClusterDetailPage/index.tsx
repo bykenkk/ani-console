@@ -1,5 +1,5 @@
 import { useK8sClusterActions } from "@/hooks/useK8sClusterActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { getK8sCluster } from "@/api/k8s-clusters";
 import {
@@ -17,12 +17,12 @@ import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { useCallback, useState } from "react";
 
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
-import { K8sEvents } from "./K8sEvents";
-import { K8sKubeconfig } from "./K8sKubeconfig";
-import { K8sNodePools } from "./K8sNodePools";
-import { K8sWorkloads } from "./K8sWorkloads";
+import K8sEvents from "./K8sEvents";
+import K8sKubeconfig from "./K8sKubeconfig";
+import K8sNodePools from "./K8sNodePools";
+import K8sWorkloads from "./K8sWorkloads";
 
-export function K8sClusterDetailPage({
+export default function K8sClusterDetailPage({
   clusterId,
   tab,
   onTabChange,

@@ -5,7 +5,13 @@ import { expandVolume, type StorageVolume } from "@/api/storage/volumes";
 
 type Volume = StorageVolume;
 
-export function ExpandVolumeModal({ volume, onCancel }: { volume: Volume; onCancel: () => void }) {
+export default function ExpandVolumeModal({
+  volume,
+  onCancel,
+}: {
+  volume: Volume;
+  onCancel: () => void;
+}) {
   const qc = useQueryClient();
   const [sizeGiB, setSizeGiB] = useState(volume.size_gib + 1);
   const expand = useMutation({

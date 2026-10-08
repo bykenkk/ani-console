@@ -42,7 +42,7 @@ function parentPrefix(prefix: string): string {
   return `/${segments.slice(0, -1).join("/")}/`;
 }
 
-export function ObjectBrowser({
+export default function ObjectBrowser({
   bucketName,
   prefix,
   entries,

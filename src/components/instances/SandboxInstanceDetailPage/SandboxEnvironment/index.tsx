@@ -6,7 +6,7 @@ import { sandboxEgressLabel } from "../utils";
 type SandboxStatus = NonNullable<SandboxInstanceStatus>;
 type SandboxEnv = NonNullable<SandboxStatus["env"]>[number];
 
-export function SandboxEnvironment({ sandbox }: { sandbox: SandboxStatus }) {
+export default function SandboxEnvironment({ sandbox }: { sandbox: SandboxStatus }) {
   const env = sandbox.env ?? [];
   const allowlist = sandbox.egress_allowlist ?? [];
 

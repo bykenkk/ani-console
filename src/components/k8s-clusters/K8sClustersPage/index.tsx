@@ -1,9 +1,10 @@
+import CreateK8sClusterModal from "@/components/k8s-clusters/CreateK8sClusterModal";
 import { useK8sClusterActions } from "@/hooks/useK8sClusterActions";
 
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Form, Input, Modal } from "@arco-design/web-react";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { useEffect, useMemo, useState } from "react";
-import { createK8sCluster, listK8sClusters, type K8sCluster } from "@/api/k8s-clusters";
+import { listK8sClusters, type K8sCluster } from "@/api/k8s-clusters";
 import {
   StatusBadge,
   ResourceNameId,
@@ -18,11 +19,10 @@ type Cluster = K8sCluster;
 type ClusterStatusFilter = "all" | NonNullable<Cluster["state"]>;
 type ClusterSearchField = "name" | "id";
 
-export function K8sClustersPage() {
+export default function K8sClustersPage() {
   const qc = useQueryClient();
   const [visible, setVisible] = useState(false);
-  const [name, setName] = useState("");
-  const [version, setVersion] = useState("1.36.0");
+
   const [status, setStatus] = useState<ClusterStatusFilter>("all");
   const [searchField, setSearchField] = useState<ClusterSearchField>("name");
   const [searchText, setSearchText] = useState("");
@@ -61,24 +61,6 @@ export function K8sClustersPage() {
     },
   });
   const { data, isFetching } = clusters;
-  const createCluster = useMutation({
-    meta: {
-      feedback: {
-        channel: "notification",
-        id: "k8s-cluster-create",
-        action: "创建",
-        errorFallback: "请求失败",
-      },
-    },
-    mutationFn: () => createK8sCluster({ name, version: version || undefined }),
-    onSuccess: () => {
-      setVisible(false);
-      setName("");
-      setVersion("1.36.0");
-      resetPagination();
-      qc.invalidateQueries({ queryKey: ["k8s-clusters"] });
-    },
-  });
 
   const { actions } = useK8sClusterActions(() => {
     resetPagination();
@@ -221,24 +203,15 @@ export function K8sClustersPage() {
           }}
         />
       </ListPageFrame>
-      <Modal
-        visible={visible}
-        title="创建集群"
-        onCancel={() => {
-          setVisible(false);
-        }}
-        onOk={() => createCluster.mutateAsync()}
-        confirmLoading={createCluster.isPending}
-      >
-        <Form layout="vertical">
-          <Form.Item label="名称" required>
-            <Input value={name} onChange={setName} placeholder="集群名称" />
-          </Form.Item>
-          <Form.Item label="版本">
-            <Input value={version} onChange={setVersion} placeholder="1.36.0" />
-          </Form.Item>
-        </Form>
-      </Modal>
+      {visible && (
+        <CreateK8sClusterModal
+          onCancel={() => setVisible(false)}
+          onCreated={() => {
+            resetPagination();
+            void qc.invalidateQueries({ queryKey: ["k8s-clusters"] });
+          }}
+        />
+      )}
     </>
   );
 }

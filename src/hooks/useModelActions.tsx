@@ -1,6 +1,6 @@
 import { useResourceDelete } from "@/hooks/useResourceDelete";
 import { useState } from "react";
-import { CreateInferenceServiceModal } from "@/components/ai-services/CreateInferenceServiceModal";
+import CreateInferenceServiceModal from "@/components/ai-services/CreateInferenceServiceModal";
 import { getLatestModelVersion, type Model } from "@/lib/ai-models";
 import type { RowAction } from "@/components/common";
 

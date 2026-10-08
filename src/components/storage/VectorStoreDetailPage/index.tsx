@@ -1,4 +1,4 @@
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { useVectorStoreActions } from "@/hooks/useVectorStoreActions";
 
 import { getVectorStore, type VectorStore } from "@/api/storage/vector-stores";
@@ -15,11 +15,11 @@ import {
   StatusBadge,
 } from "@/components/common";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
-import { VectorStoreWorkbench } from "@/components/storage/VectorStoreWorkbench";
+import VectorStoreWorkbench from "@/components/storage/VectorStoreWorkbench";
 import { formatDateTime } from "@/lib/format";
-import { VectorStoreRelatedResources } from "./VectorStoreRelatedResources";
+import VectorStoreRelatedResources from "./VectorStoreRelatedResources";
 
-export function VectorStoreDetailPage({
+export default function VectorStoreDetailPage({
   vectorStoreId,
   tab,
   onTabChange,

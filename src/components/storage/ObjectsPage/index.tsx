@@ -4,7 +4,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { listBuckets, type StorageBucketRecord } from "@/api/storage/buckets";
 
-import { CreateBucketModal } from "@/components/storage/CreateBucketModal";
+import CreateBucketModal from "@/components/storage/CreateBucketModal";
 import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatBytes, formatDateTime } from "@/lib/format";
@@ -12,7 +12,7 @@ import { formatBytes, formatDateTime } from "@/lib/format";
 type Bucket = StorageBucketRecord;
 type SearchField = "name" | "id";
 
-export function ObjectsPage() {
+export default function ObjectsPage() {
   const queryClient = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
 
@@ -157,7 +157,7 @@ export function ObjectsPage() {
           }}
         />
       </ListPageFrame>
-      <CreateBucketModal visible={createVisible} onCancel={() => setCreateVisible(false)} />
+      {createVisible && <CreateBucketModal onCancel={() => setCreateVisible(false)} />}
       {dialogNode}
     </>
   );

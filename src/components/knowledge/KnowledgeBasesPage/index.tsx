@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { listKnowledgeBases, type KnowledgeBase } from "@/api/knowledge";
 
-import { CreateKnowledgeBaseModal } from "@/components/knowledge/CreateKnowledgeBaseModal";
+import CreateKnowledgeBaseModal from "@/components/knowledge/CreateKnowledgeBaseModal";
 import {
   ResourceNameId,
   ListPageFrame,
@@ -19,7 +19,7 @@ import { formatDateTime } from "@/lib/format";
 type StatusFilter = "all" | "active" | "rebuilding";
 type SearchField = "name" | "id";
 
-export function KnowledgeBasesPage() {
+export default function KnowledgeBasesPage() {
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");

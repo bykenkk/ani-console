@@ -8,7 +8,7 @@ const EGRESS_LABELS: Record<FormValues["egress_policy"], string> = {
   internet: "允许访问公网",
 };
 
-export function SandboxConfirmStep({
+export default function SandboxConfirmStep({
   values,
   template,
 }: {

@@ -10,7 +10,13 @@ type DetailPageHeaderProps = {
   actions?: ReactNode;
 };
 
-export function DetailPageHeader({ title, status, icon, items, actions }: DetailPageHeaderProps) {
+export default function DetailPageHeader({
+  title,
+  status,
+  icon,
+  items,
+  actions,
+}: DetailPageHeaderProps) {
   return (
     <section className={styles.headerCard}>
       <div className={styles.identity}>

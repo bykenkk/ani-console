@@ -1,5 +1,5 @@
 import { useModelActions } from "@/hooks/useModelActions";
-import { ResourceActionMenu } from "@/components/common/ResourceActionMenu";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { withId } from "@/lib/id";
 
@@ -23,11 +23,11 @@ import {
   getLatestModelVersion,
   MODEL_SOURCE_LABELS,
 } from "@/lib/ai-models";
-import { ModelRelatedResources } from "./ModelRelatedResources";
-import { ModelOperationHistory } from "./ModelOperationHistory";
+import ModelRelatedResources from "./ModelRelatedResources";
+import ModelOperationHistory from "./ModelOperationHistory";
 // import { ModelRecommendedConfiguration } from "./ModelRecommendedConfiguration";
 
-export function ModelDetailPage({
+export default function ModelDetailPage({
   modelId,
   tab,
   onTabChange,

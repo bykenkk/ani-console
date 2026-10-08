@@ -5,7 +5,7 @@ import { AliIcon } from "@/components/common";
 import type { HomeSummaryCard } from "../types";
 import styles from "../index.module.css";
 
-export function SummaryOverview({ items }: { items: HomeSummaryCard[] }) {
+export default function SummaryOverview({ items }: { items: HomeSummaryCard[] }) {
   return (
     <section className={clsx(styles.panel, styles.summaryPanel)} aria-label="资源总览">
       <div className={styles.summaryGrid}>

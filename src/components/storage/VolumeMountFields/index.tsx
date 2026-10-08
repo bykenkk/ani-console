@@ -3,7 +3,7 @@ import type { StorageVolumeMode } from "@/api/storage/volumes";
 import { VOLUME_MODE_LABELS } from "@/lib/volumes";
 import { Form, Select } from "@arco-design/web-react";
 
-export function VolumeMountFields({
+export default function VolumeMountFields({
   mode,
   instanceId,
   instances,

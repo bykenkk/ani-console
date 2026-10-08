@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { VmInstanceDetailPage } from "@/components/instances/VmInstanceDetailPage";
+import VmInstanceDetailPage from "@/components/instances/VmInstanceDetailPage";
 
 export const Route = createFileRoute("/_authenticated/vm-instances/$instanceId")({
   validateSearch: (search: Record<string, unknown>): { tab?: string } => ({

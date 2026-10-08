@@ -11,7 +11,7 @@ interface RelatedResource {
   reference: string;
 }
 
-export function InferenceRelatedResources({ service }: { service: InferenceService }) {
+export default function InferenceRelatedResources({ service }: { service: InferenceService }) {
   const navigate = useNavigate();
   const resources: RelatedResource[] = [
     {

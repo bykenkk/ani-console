@@ -3,7 +3,7 @@ import type { EChartsOption } from "echarts";
 import { CorePieChart } from "@/components/common";
 import { useGpuOccupancyQuery } from "../useGpuOccupancyQuery";
 
-export function GpuInventoryDistribution({ kind }: { kind: "vendor" | "model" }) {
+export default function GpuInventoryDistribution({ kind }: { kind: "vendor" | "model" }) {
   const occupancy = useGpuOccupancyQuery();
   // 库存接口尚未提供厂商维度，保留空环，不从型号名称猜测厂商。
   const items =

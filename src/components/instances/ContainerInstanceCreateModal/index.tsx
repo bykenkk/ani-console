@@ -11,7 +11,7 @@ import {
   Switch,
 } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { applyInstanceLifecycle, createInstance } from "@/api/instances";
 import { listNetworkSecurityGroups, listNetworkSubnets, listNetworkVpcs } from "@/api/network";
 import { listRegistryImages } from "@/api/registry";
@@ -23,8 +23,8 @@ import {
   ContainerSubnetField,
   ContainerVpcField,
 } from "@/components/instances/ContainerNetworkFields";
-import { InstanceComputeSpecSelect } from "@/components/instances/InstanceComputeSpecSelect";
-import { ContainerStorageFields } from "@/components/instances/ContainerStorageFields";
+import InstanceComputeSpecSelect from "@/components/instances/InstanceComputeSpecSelect";
+import ContainerStorageFields from "@/components/instances/ContainerStorageFields";
 import {
   type ContainerStorageFormValues,
   hasDuplicateContainerMountPath,
@@ -150,12 +150,10 @@ function buildCreateBody(values: FormValues) {
   };
 }
 
-export function ContainerInstanceCreateModal({
-  visible,
+export default function ContainerInstanceCreateModal({
   onCancel,
   onCreated,
 }: {
-  visible: boolean;
   onCancel: () => void;
   onCreated: () => void;
 }) {
@@ -178,7 +176,6 @@ export function ContainerInstanceCreateModal({
         },
       },
       queryKey: [key, "container-create"],
-      enabled: visible,
       queryFn: async () => (await request()).items,
     });
   const vpcs = useListQuery("network-vpcs", "vpcs", () => listNetworkVpcs({ limit: 100 }));
@@ -197,7 +194,6 @@ export function ContainerInstanceCreateModal({
       },
     },
     queryKey: ["volumes", "container-create", "filesystem"],
-    enabled: visible,
     queryFn: async () =>
       (await listVolumes({ limit: 100, in_use: false, volume_mode: "filesystem" })).items,
   });
@@ -214,15 +210,8 @@ export function ContainerInstanceCreateModal({
       },
     },
     queryKey: ["registry-images", "container-create", "container"],
-    enabled: visible,
     queryFn: async () => (await listRegistryImages({ limit: 100, purpose: "container" })).items,
   });
-  useEffect(() => {
-    if (!visible) return;
-    form.setFieldsValue(INITIAL_VALUES);
-    setValues(INITIAL_VALUES);
-    setStep(0);
-  }, [form, visible]);
 
   const create = useMutation({
     meta: {
@@ -282,7 +271,7 @@ export function ContainerInstanceCreateModal({
   return (
     <Modal
       title="创建容器实例"
-      visible={visible}
+      visible
       onCancel={close}
       unmountOnExit
       footer={

@@ -3,7 +3,7 @@ import { Form, Input, Modal, Switch } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
-export function SandboxCheckpointCreateModal({
+export default function SandboxCheckpointCreateModal({
   instanceId,
   onCancel,
   onCreated,

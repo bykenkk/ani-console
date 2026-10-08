@@ -1,4 +1,4 @@
-import { ModelDetailPage } from "@/components/ai-services/ModelDetailPage";
+import ModelDetailPage from "@/components/ai-services/ModelDetailPage";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/models/$modelId")({

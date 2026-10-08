@@ -1,6 +1,6 @@
 import type { InstanceRecord } from "@/api/instances";
 import { applyInstanceLifecycle } from "@/api/instances";
-import { InstanceComputeSpecSelect } from "@/components/instances/InstanceComputeSpecSelect";
+import InstanceComputeSpecSelect from "@/components/instances/InstanceComputeSpecSelect";
 import { CPU_INSTANCE_COMPUTE_SPECS } from "@/lib/instances";
 import { Form, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
@@ -26,7 +26,7 @@ function getCurrentResizeSpec(instance: Instance) {
   };
 }
 
-export function VmInstanceResizeModal({
+export default function VmInstanceResizeModal({
   instance,
   onCancel,
   onSubmitted,

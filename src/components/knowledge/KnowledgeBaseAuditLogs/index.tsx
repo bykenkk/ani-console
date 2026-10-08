@@ -22,7 +22,7 @@ const ACTION_LABELS: Record<string, string> = {
   "session.delete": "删除会话",
 };
 
-export function KnowledgeBaseAuditLogs({ kbId }: { kbId: string }) {
+export default function KnowledgeBaseAuditLogs({ kbId }: { kbId: string }) {
   const logs = useInfiniteQuery({
     meta: {
       errorNotification: {

@@ -2,7 +2,7 @@ import { useKubeconfigDownload } from "@/hooks/useKubeconfigDownload";
 
 import { Button } from "@arco-design/web-react";
 
-export function K8sKubeconfig({ clusterId }: { clusterId: string }) {
+export default function K8sKubeconfig({ clusterId }: { clusterId: string }) {
   const download = useKubeconfigDownload();
 
   return (

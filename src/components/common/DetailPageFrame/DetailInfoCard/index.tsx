@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import { AliIcon } from "../../AliIcon";
+import AliIcon from "../../AliIcon";
 import styles from "./index.module.css";
 import type { DetailCard } from "../types";
 
@@ -10,7 +10,7 @@ type DetailInfoCardProps = {
   onToggle: () => void;
 };
 
-export function DetailInfoCard({ card, collapsed, fill, onToggle }: DetailInfoCardProps) {
+export default function DetailInfoCard({ card, collapsed, fill, onToggle }: DetailInfoCardProps) {
   const bodyId = `detail-card-${card.key}`;
 
   return (

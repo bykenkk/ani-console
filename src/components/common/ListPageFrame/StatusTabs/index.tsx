@@ -13,7 +13,7 @@ type StatusTabsProps<T extends string> = {
   ariaLabel?: string;
 };
 
-export function StatusTabs<T extends string>({
+export default function StatusTabs<T extends string>({
   items,
   value,
   onChange,

@@ -8,7 +8,7 @@ import { formatDateTime } from "@/lib/format";
 
 type LogLevel = "all" | "debug" | "info" | "warn" | "error";
 
-export function InferenceLogs({ serviceId }: { serviceId: string }) {
+export default function InferenceLogs({ serviceId }: { serviceId: string }) {
   const [level, setLevel] = useState<LogLevel>("all");
   const logs = useQuery({
     meta: {

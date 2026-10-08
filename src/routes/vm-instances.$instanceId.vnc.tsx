@@ -1,4 +1,4 @@
-import { VmInstanceRemotePage } from "@/components/instances/VmInstanceRemotePage";
+import VmInstanceRemotePage from "@/components/instances/VmInstanceRemotePage";
 import { isAuthenticated } from "@/stores/auth";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 

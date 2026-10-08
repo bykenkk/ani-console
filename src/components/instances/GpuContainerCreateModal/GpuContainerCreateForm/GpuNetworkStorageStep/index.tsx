@@ -4,7 +4,7 @@ import {
   ContainerVpcField,
   type ContainerNetworkItem,
 } from "@/components/instances/ContainerNetworkFields";
-import { ContainerStorageFields } from "@/components/instances/ContainerStorageFields";
+import ContainerStorageFields from "@/components/instances/ContainerStorageFields";
 import type { Filesystem, FormValues, Volume } from "../../types";
 
 const CollapseItem = Collapse.Item;
@@ -20,7 +20,7 @@ type Props = {
   networkLoading: boolean;
 };
 
-export function GpuNetworkStorageStep({
+export default function GpuNetworkStorageStep({
   onFieldValueChange,
   values,
   vpcs,

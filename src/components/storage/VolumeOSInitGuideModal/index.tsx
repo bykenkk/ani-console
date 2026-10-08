@@ -5,7 +5,7 @@ import { completeVolumeOSInit, getVolumeOSInitGuide } from "@/api/storage/volume
 import { copyToClipboard } from "@/lib/clipboard";
 import { withId } from "@/lib/id";
 
-export function VolumeOSInitGuideModal({
+export default function VolumeOSInitGuideModal({
   volumeId,
   onCancel,
 }: {

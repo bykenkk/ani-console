@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { SummaryOverview } from "./SummaryOverview";
-import { TasksPanel } from "./TasksPanel";
-import { TrendCard } from "./TrendCard";
-import { WelcomePanel } from "./WelcomePanel";
+import SummaryOverview from "./SummaryOverview";
+import TasksPanel from "./TasksPanel";
+import TrendCard from "./TrendCard";
+import WelcomePanel from "./WelcomePanel";
 import {
   homeOverviewDataSource,
   homeQuickCreateItems,
@@ -13,7 +13,7 @@ import {
 import type { HomeOverviewDataSource, HomeTaskFilter } from "./types";
 import styles from "./index.module.css";
 
-export function OverviewPage({
+export default function OverviewPage({
   dataSource = homeOverviewDataSource,
 }: {
   dataSource?: HomeOverviewDataSource;

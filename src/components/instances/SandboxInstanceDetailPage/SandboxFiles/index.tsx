@@ -6,9 +6,9 @@ import { useState } from "react";
 import { DataTable, type RowAction } from "@/components/common";
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { copyToClipboard } from "@/lib/clipboard";
-import { SandboxFileCreateModal } from "@/components/instances/SandboxFileCreateModal";
+import SandboxFileCreateModal from "@/components/instances/SandboxFileCreateModal";
 
-export function SandboxFiles({
+export default function SandboxFiles({
   instanceId,
   running,
   onChanged,

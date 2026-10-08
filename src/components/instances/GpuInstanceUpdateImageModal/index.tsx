@@ -2,13 +2,13 @@ import { applyInstanceLifecycle } from "@/api/instances";
 import type { InstanceRecord } from "@/api/instances";
 import { Form, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
-import { InstanceRegistryImageSelect } from "@/components/instances/InstanceRegistryImageSelect";
+import InstanceRegistryImageSelect from "@/components/instances/InstanceRegistryImageSelect";
 
 import { validateForm } from "@/lib/form";
 
 type Instance = InstanceRecord;
 
-export function GpuInstanceUpdateImageModal({
+export default function GpuInstanceUpdateImageModal({
   instance,
   onCancel,
   onSubmitted,
