@@ -9,5 +9,6 @@ export type {
   LogoutRequest,
   PasswordLoginInput,
   PasswordLoginRequest,
+  PasswordLoginResponse,
   RevokeStatusResponse,
 } from "./types";

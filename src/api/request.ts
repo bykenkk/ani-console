@@ -4,6 +4,7 @@ import axios, {
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from "axios";
+import { parseTokenExpiresIn, type TokenExpiresIn } from "@/api/auth/token";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import { isDevelopmentAuthBypassActive, useAuthStore } from "@/stores/auth";
 
@@ -30,14 +31,17 @@ type AniRequestConfig<TBody = unknown> = InternalAxiosRequestConfig<TBody> & {
 
 type RefreshAccessTokenResponse = {
   access_token: string;
-  expires_in?: number;
+  refresh_token?: string;
+  expires_in?: TokenExpiresIn;
 };
 
 type ApiErrorPayload = {
   error?: unknown;
   code?: unknown;
+  reason?: unknown;
   message?: unknown;
   request_id?: unknown;
+  metadata?: unknown;
   details?: unknown;
   detail?: unknown;
 };
@@ -128,13 +132,16 @@ export function toApiError(error: unknown): ApiError {
 
   const responsePayload = payloadRecord(error.response?.data);
   const payload = payloadRecord(responsePayload?.error) ?? responsePayload;
+  const metadata = payloadRecord(payload?.metadata) ?? payloadRecord(responsePayload?.metadata);
   const message =
     (typeof payload?.message === "string" && payload.message) ||
     (typeof payload?.detail === "string" && payload.detail) ||
     error.message ||
     (error.response ? `HTTP ${error.response.status}` : "网络请求失败");
   const requestId =
-    typeof payload?.request_id === "string" && payload.request_id ? payload.request_id : undefined;
+    (typeof payload?.request_id === "string" && payload.request_id) ||
+    (typeof metadata?.request_id === "string" && metadata.request_id) ||
+    undefined;
   const details =
     payload?.details && typeof payload.details === "object"
       ? (payload.details as Record<string, unknown>)
@@ -142,7 +149,10 @@ export function toApiError(error: unknown): ApiError {
 
   return new ApiError(message, {
     status: error.response?.status,
-    code: typeof payload?.code === "string" ? payload.code : error.code,
+    code:
+      (typeof payload?.code === "string" && payload.code) ||
+      (typeof payload?.reason === "string" && payload.reason) ||
+      error.code,
     requestId,
     details,
     config: error.config,
@@ -152,14 +162,14 @@ export function toApiError(error: unknown): ApiError {
 }
 
 async function requestTokenRefresh(refreshToken: string): Promise<RefreshAccessTokenResponse> {
-  const submitData = { refresh_token: refreshToken };
-  const body = refreshScope.withKey(submitData, [refreshToken]);
+  const submitData = refreshToken ? { refresh_token: refreshToken } : {};
+  const body = refreshToken ? refreshScope.withKey(submitData, [refreshToken]) : submitData;
   try {
     const response = await refreshAxios.post<RefreshAccessTokenResponse>("/auth/refresh", body);
     if (!response.data?.access_token) {
       throw new ApiError("刷新令牌响应缺少 access_token", { response });
     }
-    refreshScope.reset([refreshToken]);
+    if (refreshToken) refreshScope.reset([refreshToken]);
     return response.data;
   } catch (error) {
     throw toApiError(error);
@@ -200,8 +210,9 @@ function installAuthInterceptors(instance: AxiosInstance): void {
 
       if (!canRefresh || !config) throw toApiError(error);
 
-      const refreshToken = useAuthStore.getState().tokens?.refresh_token;
-      if (!refreshToken) {
+      const currentAuthState = useAuthStore.getState();
+      const refreshToken = currentAuthState.tokens?.refresh_token ?? "";
+      if (!currentAuthState.tokens?.access_token) {
         expireAuthSession();
         throw toApiError(error);
       }
@@ -213,8 +224,8 @@ function installAuthInterceptors(instance: AxiosInstance): void {
         authState.setAuthSession({
           tokens: {
             access_token: refreshed.access_token,
-            refresh_token: refreshToken,
-            expires_in: refreshed.expires_in,
+            refresh_token: refreshed.refresh_token ?? refreshToken,
+            expires_in: parseTokenExpiresIn(refreshed.expires_in),
           },
           username: authState.hasKnownUsername ? authState.username : null,
         });

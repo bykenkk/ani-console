@@ -1,20 +1,31 @@
-import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
-import { createIdempotencyScope } from "@/lib/idempotency";
-import type { AuthTokenPair, PasswordLoginInput, PasswordLoginRequest } from "./types";
-
-const loginScope = createIdempotencyScope("auth-password-login", ["POST"]);
+import type {
+  AuthTokenPair,
+  PasswordLoginInput,
+  PasswordLoginRequest,
+  PasswordLoginResponse,
+} from "./types";
+import { parseTokenExpiresIn } from "./token";
 
 export async function passwordLogin(submitData: PasswordLoginInput): Promise<AuthTokenPair> {
-  const tokens = await runIdempotentRequest(loginScope, submitData, (body) =>
-    coreRequest<AuthTokenPair, PasswordLoginRequest>("/auth/password/login", {
+  const response = await coreRequest<PasswordLoginResponse, PasswordLoginRequest>(
+    "/auth/password/login",
+    {
       method: "POST",
       auth: "public",
-      data: body,
-    }),
+      data: submitData,
+    },
   );
-  if (!tokens.access_token || !tokens.refresh_token) {
-    throw new Error("登录响应缺少令牌");
+  if (response.mfa_required) {
+    throw new Error("当前账号需要二次验证，登录页暂未接入 MFA");
   }
-  return tokens;
+  if (!response.access_token) {
+    throw new Error("登录响应缺少 access_token");
+  }
+  return {
+    access_token: response.access_token,
+    refresh_token: response.refresh_token ?? "",
+    expires_in: parseTokenExpiresIn(response.expires_in) ?? 0,
+    issued_at: response.issued_at,
+  };
 }

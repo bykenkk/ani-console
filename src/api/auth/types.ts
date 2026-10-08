@@ -1,3 +1,5 @@
+import type { TokenExpiresIn } from "./token";
+
 export interface AuthTokenPair {
   access_token: string;
   refresh_token: string;
@@ -5,14 +7,21 @@ export interface AuthTokenPair {
   issued_at?: string;
 }
 
-export interface PasswordLoginInput {
+export interface PasswordLoginRequest {
   tenant_name: string;
   username: string;
   password: string;
 }
 
-export interface PasswordLoginRequest extends PasswordLoginInput {
-  idempotency_key: string;
+export type PasswordLoginInput = PasswordLoginRequest;
+
+export interface PasswordLoginResponse {
+  access_token?: string;
+  refresh_token?: string;
+  expires_in?: TokenExpiresIn;
+  issued_at?: string;
+  mfa_required?: boolean;
+  mfa_operation_id?: string;
 }
 
 export interface CompleteOidcLoginInput {
@@ -26,12 +35,10 @@ export interface CompleteOidcLoginRequest extends CompleteOidcLoginInput {
 }
 
 export interface LogoutInput {
-  jti: string;
+  jti?: string;
 }
 
-export interface LogoutRequest extends LogoutInput {
-  idempotency_key: string;
-}
+export type LogoutRequest = LogoutInput;
 
 export interface RevokeStatusResponse {
   status: "revoked";
