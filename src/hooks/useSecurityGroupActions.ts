@@ -21,7 +21,7 @@ export function useSecurityGroupActions(
     mutationFn: (item: SecurityGroup) => copyNetworkSecurityGroup(item),
     onSuccess: () => {
       onCopied?.();
-      void qc.invalidateQueries({ queryKey: ["network-security-groups"] });
+      qc.invalidateQueries({ queryKey: ["network-security-groups"] });
     },
   });
   const actions: RowAction<SecurityGroup>[] = [
@@ -38,7 +38,9 @@ export function useSecurityGroupActions(
       loading: (item) =>
         deleteSecurityGroup.isPending && deleteSecurityGroup.variables?.id === item.id,
       intent: "danger",
-      onClick: (item) => void deleteSecurityGroup.confirm(item),
+      onClick: (item) => {
+        deleteSecurityGroup.confirm(item);
+      },
     },
   ];
   return { actions };

@@ -26,7 +26,9 @@ export function useLoadBalancerActions(onDeleted: (item: LoadBalancer) => void) 
       loading: (item) =>
         deleteLoadBalancer.isPending && deleteLoadBalancer.variables?.id === item.id,
       intent: "danger",
-      onClick: (item) => void deleteLoadBalancer.confirm(item),
+      onClick: (item) => {
+        deleteLoadBalancer.confirm(item);
+      },
     },
   ];
   return { actions };

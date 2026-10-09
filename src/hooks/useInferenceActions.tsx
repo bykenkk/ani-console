@@ -26,13 +26,13 @@ export function useInferenceActions(onDeleted?: () => void) {
       action: "start" | "stop" | "restart";
     }) => applyInferenceServiceLifecycle(item.id, { action }),
     onSuccess: (_, { item }) => {
-      void qc.invalidateQueries({ queryKey: ["inference-service", item.id] });
-      void qc.invalidateQueries({ queryKey: ["inference-services"] });
+      qc.invalidateQueries({ queryKey: ["inference-service", item.id] });
+      qc.invalidateQueries({ queryKey: ["inference-services"] });
     },
   });
   const remove = useResourceDelete<InferenceService>("inference-service", () => {
     if (onDeleted) onDeleted();
-    else void qc.invalidateQueries({ queryKey: ["inference-services"] });
+    else qc.invalidateQueries({ queryKey: ["inference-services"] });
   });
   const busy = () => lifecycle.isPending || remove.isPending;
   const actions: RowAction<InferenceService>[] = [

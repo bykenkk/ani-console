@@ -236,7 +236,7 @@ export default function ContainerInstanceCreateModal({
       }
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["container-instances"] });
+      queryClient.invalidateQueries({ queryKey: ["container-instances"] });
       onCreated();
     },
   });

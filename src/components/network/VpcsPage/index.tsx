@@ -231,7 +231,7 @@ export default function VpcsPage() {
           onCreated={() => {
             setCreateVisible(false);
             resetPagination();
-            void qc.invalidateQueries({ queryKey: ["network-vpcs"] });
+            qc.invalidateQueries({ queryKey: ["network-vpcs"] });
           }}
         />
       )}

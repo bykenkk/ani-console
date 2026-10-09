@@ -90,13 +90,14 @@ export function useSandboxInstanceActions(onChanged: () => void, onDeleted?: () 
       label: "销毁",
       intent: "danger",
       disabled: (instance) => busy(instance) || sessionState(instance) === "deleted",
-      onClick: (instance) =>
-        void Modal.confirm({
+      onClick: (instance) => {
+        Modal.confirm({
           title: "销毁沙箱",
           content: `确认销毁「${instance.name || instance.id}」？工作区和未保存数据将不可恢复。`,
           okButtonProps: { status: "danger" },
           onOk: () => lifecycle.mutateAsync({ instance, action: "delete" }),
-        }),
+        });
+      },
     },
   ];
 

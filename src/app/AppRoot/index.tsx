@@ -26,7 +26,7 @@ export function AppRoot() {
         ready();
       }
     };
-    void hydrateAuth();
+    hydrateAuth();
   }, []);
 
   if (!authReady) return null;

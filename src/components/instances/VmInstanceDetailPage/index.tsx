@@ -70,7 +70,9 @@ export default function VmInstanceDetailPage({
     queryKey: ["vm-instance", instanceId],
     queryFn: () => getInstance(instanceId),
   });
-  const refreshDetail = () => void detail.refetch();
+  const refreshDetail = () => {
+    detail.refetch();
+  };
   const { actions, dialogNode } = useVmInstanceActions(refreshDetail, goBack);
   const primaryAction = actions.find((action) => action.key === "console");
   if (!detail.data) {

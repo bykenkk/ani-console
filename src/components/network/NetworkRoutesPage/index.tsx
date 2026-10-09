@@ -192,7 +192,7 @@ export default function NetworkRoutesPage() {
             spinning: routes.isFetching || vpcs.isFetching,
             onClick: () => {
               refresh();
-              void vpcs.refetch();
+              vpcs.refetch();
             },
           },
         }}

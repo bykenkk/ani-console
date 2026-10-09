@@ -140,7 +140,7 @@ export default function InstanceVncConsole({
       }
     };
 
-    void connect();
+    connect();
 
     return () => {
       disposed = true;

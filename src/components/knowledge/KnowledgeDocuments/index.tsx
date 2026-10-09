@@ -118,8 +118,8 @@ export default function KnowledgeDocuments({ kbId, action }: { kbId: string; act
     mutationFn: (doc: KBDocument) => reparseKnowledgeBaseDocument(kbId, doc.id),
     onSuccess: () => {
       resetPagination();
-      void qc.invalidateQueries({ queryKey: ["knowledge-base-documents", kbId] });
-      void qc.invalidateQueries({ queryKey: ["knowledge-base", kbId] });
+      qc.invalidateQueries({ queryKey: ["knowledge-base-documents", kbId] });
+      qc.invalidateQueries({ queryKey: ["knowledge-base", kbId] });
     },
   });
   const actions: RowAction<KBDocument>[] = [

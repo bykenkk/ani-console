@@ -36,7 +36,7 @@ export default function ImportModelModal({
       return importModel(submitData);
     },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ["models"] });
+      qc.invalidateQueries({ queryKey: ["models"] });
       onCancel();
       onSubmitted?.();
     },

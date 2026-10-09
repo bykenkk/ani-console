@@ -20,9 +20,9 @@ export function useBucketUpload(
       return uploadStorageObjectFile({ bucketId, file, prefix });
     },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ["bucket", bucketId] });
-      void qc.invalidateQueries({ queryKey: ["bucket-objects", bucketId] });
-      void qc.invalidateQueries({ queryKey: ["buckets"] });
+      qc.invalidateQueries({ queryKey: ["bucket", bucketId] });
+      qc.invalidateQueries({ queryKey: ["bucket-objects", bucketId] });
+      qc.invalidateQueries({ queryKey: ["buckets"] });
       onUploaded?.();
     },
   });

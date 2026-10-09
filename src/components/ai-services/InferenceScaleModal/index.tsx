@@ -25,8 +25,8 @@ export default function InferenceScaleModal({
     },
     mutationFn: (replicas: number) => updateInferenceService(serviceId, { replicas }),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ["inference-service", serviceId] });
-      void qc.invalidateQueries({ queryKey: ["inference-services"] });
+      qc.invalidateQueries({ queryKey: ["inference-service", serviceId] });
+      qc.invalidateQueries({ queryKey: ["inference-services"] });
       onCancel();
     },
   });

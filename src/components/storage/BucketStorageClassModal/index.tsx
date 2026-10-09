@@ -32,8 +32,8 @@ export default function BucketStorageClassModal({
     },
     mutationFn: () => updateBucketStorageClass(bucket.id, { storage_class: storageClass }),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["bucket", bucket.id] });
-      void queryClient.invalidateQueries({ queryKey: ["buckets"] });
+      queryClient.invalidateQueries({ queryKey: ["bucket", bucket.id] });
+      queryClient.invalidateQueries({ queryKey: ["buckets"] });
       onCancel();
     },
   });

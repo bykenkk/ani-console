@@ -24,7 +24,7 @@ export default function VectorStoreRelatedResources({ store }: { store: VectorSt
     mutationFn: (store: VectorStore) => deleteVectorStoreKnowledgeBaseLink(store.id),
     onSuccess: (updatedStore, store) => {
       qc.setQueryData(["vector-store", store.id], updatedStore);
-      void qc.invalidateQueries({ queryKey: ["vector-stores"] });
+      qc.invalidateQueries({ queryKey: ["vector-stores"] });
     },
   });
   const unlinkAction: RowAction<VectorStore> = {

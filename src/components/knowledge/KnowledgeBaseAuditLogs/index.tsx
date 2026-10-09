@@ -51,7 +51,9 @@ export default function KnowledgeBaseAuditLogs({ kbId }: { kbId: string }) {
             <Button
               size="small"
               loading={logs.isFetching && !logs.isFetchingNextPage}
-              onClick={() => void logs.refetch()}
+              onClick={() => {
+                logs.refetch();
+              }}
             >
               刷新
             </Button>
@@ -97,7 +99,9 @@ export default function KnowledgeBaseAuditLogs({ kbId }: { kbId: string }) {
           <Button
             loading={logs.isFetchingNextPage}
             disabled={logs.isFetching}
-            onClick={() => void logs.fetchNextPage()}
+            onClick={() => {
+              logs.fetchNextPage();
+            }}
           >
             加载更多
           </Button>

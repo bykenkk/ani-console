@@ -21,13 +21,14 @@ export default function VolumeRelatedResources({
       label: "卸载",
       intent: "danger",
       loading: () => detachVolume.isPending,
-      onClick: (item) =>
-        void detachVolume.confirm({
+      onClick: (item) => {
+        detachVolume.confirm({
           volumeId: volume.id,
           volumeName: volume.name,
           instanceId: item.instance_id,
           instanceName: item.instance_name,
-        }),
+        });
+      },
     },
   ];
 

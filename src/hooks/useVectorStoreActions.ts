@@ -8,7 +8,7 @@ export function useVectorStoreActions(onDeleted?: () => void) {
   const qc = useQueryClient();
   const remove = useResourceDelete<VectorStore>("vector-store", () => {
     if (onDeleted) onDeleted();
-    else void qc.invalidateQueries({ queryKey: ["vector-stores"] });
+    else qc.invalidateQueries({ queryKey: ["vector-stores"] });
   });
   const rebuild = useMutation({
     meta: {
@@ -22,8 +22,8 @@ export function useVectorStoreActions(onDeleted?: () => void) {
     },
     mutationFn: (item: VectorStore) => rebuildVectorStoreIndex(item.id),
     onSuccess: (_, item) => {
-      void qc.invalidateQueries({ queryKey: ["vector-stores"] });
-      void qc.invalidateQueries({ queryKey: ["vector-store", item.id] });
+      qc.invalidateQueries({ queryKey: ["vector-stores"] });
+      qc.invalidateQueries({ queryKey: ["vector-store", item.id] });
     },
   });
   const busy = () => remove.isPending || rebuild.isPending;

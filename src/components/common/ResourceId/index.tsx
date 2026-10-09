@@ -25,7 +25,9 @@ export default function ResourceId({
           size="mini"
           icon={<IconCopy />}
           aria-label="复制资源 ID"
-          onClick={() => void copyToClipboard(value, "资源 ID")}
+          onClick={() => {
+            copyToClipboard(value, "资源 ID");
+          }}
         />
       )}
     </span>

@@ -321,7 +321,7 @@ export default function CreateInferenceServiceModal({
       return createInferenceService(submitData);
     },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ["inference-services"] });
+      qc.invalidateQueries({ queryKey: ["inference-services"] });
       onCancel();
     },
   });

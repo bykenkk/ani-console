@@ -52,7 +52,9 @@ export default function VmInstanceSshAccess({
         <Button
           type="primary"
           disabled={!available || !command}
-          onClick={() => void copyToClipboard(command, "SSH 命令")}
+          onClick={() => {
+            copyToClipboard(command, "SSH 命令");
+          }}
         >
           复制 SSH 命令
         </Button>

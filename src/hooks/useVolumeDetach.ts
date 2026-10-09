@@ -21,9 +21,9 @@ export function useVolumeDetach() {
     mutationFn: ({ volumeId, instanceId }: DetachTarget) =>
       applyInstanceLifecycle(instanceId, { action: "detach_volume", volume_id: volumeId }),
     onSuccess: (_, { volumeId }) => {
-      void qc.invalidateQueries({ queryKey: ["instances"] });
-      void qc.invalidateQueries({ queryKey: ["volume", volumeId] });
-      void qc.invalidateQueries({ queryKey: ["volumes"] });
+      qc.invalidateQueries({ queryKey: ["instances"] });
+      qc.invalidateQueries({ queryKey: ["volume", volumeId] });
+      qc.invalidateQueries({ queryKey: ["volumes"] });
     },
   });
   const confirm = (target: DetachTarget) => {

@@ -97,7 +97,7 @@ export default function LoginCallbackPage() {
       }
     };
 
-    void completeLogin();
+    completeLogin();
   }, [navigate, setAuthSession]);
 
   if (phase === "missing") {

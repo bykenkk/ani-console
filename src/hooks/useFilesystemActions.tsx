@@ -32,7 +32,9 @@ export function useFilesystemActions(onDeleted?: (item: Filesystem) => void) {
       disabled: remove.isDisabled,
       loading: (item) => remove.isPending && remove.variables?.id === item.id,
       intent: "danger",
-      onClick: (item) => void remove.confirm(item),
+      onClick: (item) => {
+        remove.confirm(item);
+      },
     },
   ];
   const dialogNode = (

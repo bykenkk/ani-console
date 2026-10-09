@@ -208,7 +208,7 @@ export default function K8sClustersPage() {
           onCancel={() => setVisible(false)}
           onCreated={() => {
             resetPagination();
-            void qc.invalidateQueries({ queryKey: ["k8s-clusters"] });
+            qc.invalidateQueries({ queryKey: ["k8s-clusters"] });
           }}
         />
       )}

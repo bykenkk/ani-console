@@ -233,7 +233,7 @@ export default function InstanceTerminal({
         };
         socket.onmessage = (event) => {
           if (socketRef.current !== socket) return;
-          void handleMessage(event.data).catch(() => {
+          handleMessage(event.data).catch(() => {
             if (!disposed) term.writeln("\r\n\x1b[33m终端消息解析失败\x1b[0m");
           });
         };
@@ -274,7 +274,7 @@ export default function InstanceTerminal({
       }
     };
 
-    void connect();
+    connect();
 
     return () => {
       disposed = true;

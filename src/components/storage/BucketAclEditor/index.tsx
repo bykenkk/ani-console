@@ -31,8 +31,8 @@ export default function BucketAclEditor({ bucket, onSaved }: BucketAclEditorProp
     },
     mutationFn: (nextAcl: StorageBucketAcl) => updateBucketAcl(bucket.id, { acl: nextAcl }),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["bucket", bucket.id] });
-      void queryClient.invalidateQueries({ queryKey: ["buckets"] });
+      queryClient.invalidateQueries({ queryKey: ["bucket", bucket.id] });
+      queryClient.invalidateQueries({ queryKey: ["buckets"] });
       onSaved?.();
     },
   });

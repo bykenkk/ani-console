@@ -12,12 +12,12 @@ export default function GpuInventoryPage() {
   const [createVisible, setCreateVisible] = useState(false);
 
   const refreshGpuData = () => {
-    void queryClient.invalidateQueries({ queryKey: ["gpu-inventory"] });
-    void queryClient.invalidateQueries({ queryKey: ["gpu-occupancy"] });
-    void queryClient.invalidateQueries({
+    queryClient.invalidateQueries({ queryKey: ["gpu-inventory"] });
+    queryClient.invalidateQueries({ queryKey: ["gpu-occupancy"] });
+    queryClient.invalidateQueries({
       queryKey: ["gpu-specs", "availability"],
     });
-    void queryClient.invalidateQueries({ queryKey: ["quotas", "me"] });
+    queryClient.invalidateQueries({ queryKey: ["quotas", "me"] });
   };
 
   return (

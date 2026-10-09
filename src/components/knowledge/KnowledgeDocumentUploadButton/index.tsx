@@ -42,8 +42,8 @@ export default function KnowledgeDocumentUploadButton({ kbId }: { kbId: string }
       await notifyKnowledgeDocumentUploaded(kbId, reservation.doc_id, notifyData);
     },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ["knowledge-base-documents", kbId] });
-      void qc.invalidateQueries({ queryKey: ["knowledge-base", kbId] });
+      qc.invalidateQueries({ queryKey: ["knowledge-base-documents", kbId] });
+      qc.invalidateQueries({ queryKey: ["knowledge-base", kbId] });
     },
   });
 

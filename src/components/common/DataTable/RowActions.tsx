@@ -62,7 +62,7 @@ export function ConfiguredDataTableRowActions<T>({
       className={styles.semanticMenu}
       onClickMenuItem={(key) => {
         const action = visibleActions.find((item) => item.key === key);
-        if (action) void action.onClick(record);
+        if (action) action.onClick(record);
       }}
     >
       {visibleActions.map((action) => (

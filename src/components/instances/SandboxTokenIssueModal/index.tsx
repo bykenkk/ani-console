@@ -75,7 +75,13 @@ export default function SandboxTokenIssueModal({
       footer={
         token ? (
           <Space>
-            <Button onClick={() => void copyToClipboard(token.token, "令牌")}>复制令牌</Button>
+            <Button
+              onClick={() => {
+                copyToClipboard(token.token, "令牌");
+              }}
+            >
+              复制令牌
+            </Button>
             <Button type="primary" onClick={closeModal}>
               我已复制，关闭
             </Button>

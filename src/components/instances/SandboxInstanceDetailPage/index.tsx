@@ -90,7 +90,9 @@ export default function SandboxInstanceDetailPage({
       actions={
         <SandboxInstanceActions
           instance={instance}
-          onChanged={() => void refreshDetail()}
+          onChanged={() => {
+            refreshDetail();
+          }}
           onDeleted={goBack}
         />
       }
@@ -177,7 +179,14 @@ export default function SandboxInstanceDetailPage({
         {
           key: "access",
           label: "访问配置",
-          content: <SandboxAccess instance={instance} onChanged={() => void refreshDetail()} />,
+          content: (
+            <SandboxAccess
+              instance={instance}
+              onChanged={() => {
+                refreshDetail();
+              }}
+            />
+          ),
         },
         {
           key: "env",
@@ -191,7 +200,9 @@ export default function SandboxInstanceDetailPage({
             <SandboxFiles
               instanceId={instanceId}
               running={running}
-              onChanged={() => void refreshDetail()}
+              onChanged={() => {
+                refreshDetail();
+              }}
             />
           ),
         },
@@ -202,7 +213,9 @@ export default function SandboxInstanceDetailPage({
             <SandboxCodeRunner
               instanceId={instanceId}
               running={running}
-              onChanged={() => void refreshDetail()}
+              onChanged={() => {
+                refreshDetail();
+              }}
             />
           ),
         },
@@ -213,7 +226,9 @@ export default function SandboxInstanceDetailPage({
             <SandboxCheckpoints
               instanceId={instanceId}
               sessionState={sessionState}
-              onChanged={() => void refreshDetail()}
+              onChanged={() => {
+                refreshDetail();
+              }}
             />
           ),
         },

@@ -50,8 +50,8 @@ export default function ContainerInstanceDetailPage({
     queryFn: () => containerDetailDataSource.getDetail(instanceId),
   });
   const refreshInstance = () => {
-    void query.refetch();
-    void qc.invalidateQueries({ queryKey: ["container-instances"] });
+    query.refetch();
+    qc.invalidateQueries({ queryKey: ["container-instances"] });
   };
   const { actions, dialogNode } = useContainerInstanceActions(refreshInstance, goBack);
   const primaryAction = actions.find((action) => action.key === "terminal");
@@ -143,7 +143,9 @@ export default function ContainerInstanceDetailPage({
             content: (
               <InstanceVersions
                 instance={detail as InstanceRecord}
-                onChanged={() => void query.refetch()}
+                onChanged={() => {
+                  query.refetch();
+                }}
                 updateImage={actions.find((action) => action.key === "update_image")}
                 rollbackDisabled={!rollbackAction || Boolean(rollbackAction.disabled?.(detail))}
               />
@@ -155,7 +157,9 @@ export default function ContainerInstanceDetailPage({
             content: (
               <InstanceConfiguration
                 instance={detail as InstanceRecord}
-                onChanged={() => void query.refetch()}
+                onChanged={() => {
+                  query.refetch();
+                }}
               />
             ),
           },

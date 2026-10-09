@@ -45,7 +45,9 @@ export default function InferencePolicies({ serviceId }: { serviceId: string }) 
             <Button
               size="small"
               loading={policies.isFetching}
-              onClick={() => void policies.refetch()}
+              onClick={() => {
+                policies.refetch();
+              }}
             >
               刷新
             </Button>

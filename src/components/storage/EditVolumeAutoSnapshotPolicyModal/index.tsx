@@ -31,8 +31,8 @@ export default function EditVolumeAutoSnapshotPolicyModal({
       updateVolumeAutoSnapshotPolicy(volumeId, values),
     onSuccess: () => {
       onCancel();
-      void queryClient.invalidateQueries({ queryKey: ["volume", volumeId] });
-      void queryClient.invalidateQueries({ queryKey: ["volumes"] });
+      queryClient.invalidateQueries({ queryKey: ["volume", volumeId] });
+      queryClient.invalidateQueries({ queryKey: ["volumes"] });
     },
   });
 

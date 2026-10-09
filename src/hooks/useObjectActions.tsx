@@ -13,9 +13,9 @@ type ObjectTarget = { id?: string; key: string; kind?: string; state?: string };
 export function useObjectActions(bucketId: string, onDeleted?: () => void) {
   const qc = useQueryClient();
   const refresh = () => {
-    void qc.invalidateQueries({ queryKey: ["bucket", bucketId] });
-    void qc.invalidateQueries({ queryKey: ["bucket-objects", bucketId] });
-    void qc.invalidateQueries({ queryKey: ["buckets"] });
+    qc.invalidateQueries({ queryKey: ["bucket", bucketId] });
+    qc.invalidateQueries({ queryKey: ["bucket-objects", bucketId] });
+    qc.invalidateQueries({ queryKey: ["buckets"] });
   };
   const complete = useMutation({
     meta: {
@@ -31,7 +31,7 @@ export function useObjectActions(bucketId: string, onDeleted?: () => void) {
       return completeStorageObjectUpload(item.id);
     },
     onSuccess: (_, item) => {
-      void qc.invalidateQueries({ queryKey: ["object", item.id] });
+      qc.invalidateQueries({ queryKey: ["object", item.id] });
       refresh();
     },
   });

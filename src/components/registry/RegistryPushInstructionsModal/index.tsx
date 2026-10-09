@@ -64,7 +64,9 @@ export default function RegistryPushInstructionsModal({
                 <Button
                   size="mini"
                   type="text"
-                  onClick={() => void copyToClipboard(item.command, "命令")}
+                  onClick={() => {
+                    copyToClipboard(item.command, "命令");
+                  }}
                 >
                   复制
                 </Button>

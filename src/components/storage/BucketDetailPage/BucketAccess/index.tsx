@@ -37,7 +37,12 @@ export default function BucketAccess({ bucket }: { bucket: StorageBucketRecord }
               <Space>
                 <Typography.Text>{row.address}</Typography.Text>
                 {row.copyable ? (
-                  <Button size="mini" onClick={() => void copyToClipboard(row.address, "Endpoint")}>
+                  <Button
+                    size="mini"
+                    onClick={() => {
+                      copyToClipboard(row.address, "Endpoint");
+                    }}
+                  >
                     复制
                   </Button>
                 ) : null}

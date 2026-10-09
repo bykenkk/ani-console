@@ -91,7 +91,7 @@ export default function RegistryPage() {
     mutationFn: (item: RegistryImage) => deleteRegistryTag(item.project, item.repository, item.tag),
     onSuccess: () => {
       resetPagination();
-      void qc.invalidateQueries({ queryKey: ["registry-images"] });
+      qc.invalidateQueries({ queryKey: ["registry-images"] });
     },
   });
 
@@ -159,7 +159,7 @@ export default function RegistryPage() {
           : item.purpose === "system"
             ? "/vm-instances"
             : "/container-instances";
-    void navigate({ to: target });
+    navigate({ to: target });
   };
 
   return (
@@ -238,8 +238,9 @@ export default function RegistryPage() {
             {
               key: "copy-pull-command",
               label: "拉取命令",
-              onClick: (item) =>
-                void copyToClipboard(item.pull_command || `docker pull ${item.image}`, "拉取命令"),
+              onClick: (item) => {
+                copyToClipboard(item.pull_command || `docker pull ${item.image}`, "拉取命令");
+              },
             },
             {
               key: "create",
@@ -255,13 +256,14 @@ export default function RegistryPage() {
                 deleteTag.variables?.project === item.project &&
                 deleteTag.variables.repository === item.repository &&
                 deleteTag.variables.tag === item.tag,
-              onClick: (item) =>
-                void Modal.confirm({
+              onClick: (item) => {
+                Modal.confirm({
                   title: "删除镜像 Tag",
                   content: `确定删除 ${item.repository}:${item.tag}？被实例引用时平台会拒绝删除。`,
                   okButtonProps: { status: "danger" },
                   onOk: () => deleteTag.mutateAsync(item),
-                }),
+                });
+              },
             },
           ]}
           loading={images.isFetching}

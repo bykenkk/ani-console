@@ -213,7 +213,7 @@ export default function SubnetsPage() {
             spinning: subnets.isFetching || vpcs.isFetching,
             onClick: () => {
               refresh();
-              void vpcs.refetch();
+              vpcs.refetch();
             },
           },
         }}
@@ -240,7 +240,7 @@ export default function SubnetsPage() {
           onCancel={() => setCreateVisible(false)}
           onCreated={() => {
             resetPagination();
-            void qc.invalidateQueries({ queryKey: ["network-subnets"] });
+            qc.invalidateQueries({ queryKey: ["network-subnets"] });
           }}
         />
       )}

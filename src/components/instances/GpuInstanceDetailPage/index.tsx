@@ -59,8 +59,8 @@ export default function GpuInstanceDetailPage({
     queryFn: () => getInstance(instanceId),
   });
   const refreshInstance = () => {
-    void detail.refetch();
-    void queryClient.invalidateQueries({ queryKey: ["gpu-instances"] });
+    detail.refetch();
+    queryClient.invalidateQueries({ queryKey: ["gpu-instances"] });
   };
   const { actions, dialogNode } = useGpuInstanceActions(refreshInstance, goBack);
   const primaryAction = actions.find((action) => action.key === "terminal");

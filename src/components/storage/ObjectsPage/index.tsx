@@ -46,7 +46,7 @@ export default function ObjectsPage() {
   });
   const { actions, dialogNode } = useBucketActions(() => {
     resetPagination();
-    void queryClient.invalidateQueries({ queryKey: ["buckets"] });
+    queryClient.invalidateQueries({ queryKey: ["buckets"] });
   });
   const items = (buckets.data?.items ?? []) as Bucket[];
   const paginationTotal = buckets.data?.total ?? items.length;

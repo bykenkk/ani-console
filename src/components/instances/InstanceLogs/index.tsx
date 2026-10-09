@@ -207,7 +207,7 @@ export default function InstanceLogs({
       }
     }
 
-    void connect();
+    connect();
     return () => {
       cancelled = true;
       controller.abort();

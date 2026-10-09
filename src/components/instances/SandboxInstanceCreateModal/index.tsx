@@ -25,7 +25,7 @@ export default function SandboxInstanceCreateModal({ onCancel, onCreated }: Prop
       await createInstance(submitData);
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ["sandbox-instances"] });
+      queryClient.invalidateQueries({ queryKey: ["sandbox-instances"] });
       onCreated();
     },
   });

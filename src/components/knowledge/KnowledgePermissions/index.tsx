@@ -79,8 +79,8 @@ export default function KnowledgePermissions({ kbId }: { kbId: string }) {
       await updateKnowledgeBasePermissions(kbId, submitData);
     },
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ["knowledge-base-permissions", kbId] });
-      void qc.invalidateQueries({ queryKey: ["knowledge-base", kbId] });
+      qc.invalidateQueries({ queryKey: ["knowledge-base-permissions", kbId] });
+      qc.invalidateQueries({ queryKey: ["knowledge-base", kbId] });
     },
   });
 

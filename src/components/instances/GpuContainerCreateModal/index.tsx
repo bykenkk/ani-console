@@ -28,7 +28,7 @@ export default function GpuContainerCreateModal({ onCancel, onCreated }: Props) 
       await createInstance(submitData);
     },
     onSuccess: () => {
-      void queryClient.invalidateQueries({
+      queryClient.invalidateQueries({
         queryKey: ["instances", "gpu_container"],
       });
       onCreated();

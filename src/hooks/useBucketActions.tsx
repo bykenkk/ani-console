@@ -40,13 +40,14 @@ export function useBucketActions(onDeleted: () => void) {
       label: "删除",
       intent: "danger",
       loading: (item) => removeBucket.isPending && removeBucket.variables?.id === item.id,
-      onClick: (item) =>
-        void Modal.confirm({
+      onClick: (item) => {
+        Modal.confirm({
           title: "删除存储桶",
           content: `确定删除「${item.name}」？请先清空桶内对象，删除后不可恢复。`,
           okButtonProps: { status: "danger" },
           onOk: () => removeBucket.mutateAsync(item),
-        }),
+        });
+      },
     },
   ];
   const dialogNode = (

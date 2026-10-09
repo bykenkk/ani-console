@@ -217,7 +217,7 @@ export default function SecurityGroupsPage() {
             spinning: securityGroups.isFetching || vpcs.isFetching,
             onClick: () => {
               refresh();
-              void vpcs.refetch();
+              vpcs.refetch();
             },
           },
         }}

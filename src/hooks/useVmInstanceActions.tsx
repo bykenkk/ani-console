@@ -222,13 +222,14 @@ export function useVmInstanceActions(
       intent: "danger",
       disabled: (instance) => isBusy(instance) || isProtected(instance),
       loading: (instance) => remove.isPending && remove.variables?.id === instance.id,
-      onClick: (instance) =>
-        void Modal.confirm({
+      onClick: (instance) => {
+        Modal.confirm({
           title: "删除云主机",
           content: `确定删除「${instance.name}」？删除后资源不可恢复。`,
           okButtonProps: { status: "danger" },
           onOk: () => remove.mutateAsync(instance),
-        }),
+        });
+      },
     },
   ];
 

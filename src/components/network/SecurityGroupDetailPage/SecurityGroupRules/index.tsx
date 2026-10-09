@@ -41,13 +41,13 @@ export default function SecurityGroupRules({
     mutationFn: (rule: SecurityGroupRuleResource) =>
       deleteNetworkSecurityGroupRule(securityGroupId, rule.id),
     onSuccess: () => {
-      void qc.invalidateQueries({
+      qc.invalidateQueries({
         queryKey: ["network-security-group-rules", securityGroupId],
       });
-      void qc.invalidateQueries({
+      qc.invalidateQueries({
         queryKey: ["network-security-group", securityGroupId],
       });
-      void qc.invalidateQueries({ queryKey: ["network-security-groups"] });
+      qc.invalidateQueries({ queryKey: ["network-security-groups"] });
     },
   });
   const actions: RowAction<SecurityGroupRuleResource>[] = [
@@ -57,13 +57,14 @@ export default function SecurityGroupRules({
       label: "删除",
       intent: "danger",
       loading: (rule) => deleteRule.isPending && deleteRule.variables?.id === rule.id,
-      onClick: (rule) =>
-        void Modal.confirm({
+      onClick: (rule) => {
+        Modal.confirm({
           title: "删除规则",
           content: "确定删除这条安全组规则？",
           okButtonProps: { status: "danger" },
           onOk: () => deleteRule.mutateAsync(rule),
-        }),
+        });
+      },
     },
   ];
   const dialogNode = (

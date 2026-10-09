@@ -12,7 +12,9 @@ export function useVpcActions(onDeleted: (item: Vpc) => void) {
       disabled: deleteVpc.isDisabled,
       loading: (item) => deleteVpc.isPending && deleteVpc.variables?.id === item.id,
       intent: "danger",
-      onClick: (vpc) => void deleteVpc.confirm(vpc),
+      onClick: (vpc) => {
+        deleteVpc.confirm(vpc);
+      },
     },
   ];
   return { actions };

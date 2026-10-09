@@ -64,7 +64,7 @@ export default function SandboxAccess({
       label: "复制",
       disabled: (item) => !item.preview_url,
       onClick: (item) => {
-        if (item.preview_url) void copyToClipboard(item.preview_url, "预览地址");
+        if (item.preview_url) copyToClipboard(item.preview_url, "预览地址");
       },
     },
     {

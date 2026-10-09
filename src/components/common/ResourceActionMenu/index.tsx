@@ -27,7 +27,7 @@ export default function ResourceActionMenu<T>({
                 disabled={pending || action.disabled?.(record)}
                 style={action.intent === "danger" ? { color: "var(--color-danger-6)" } : undefined}
                 onClick={() => {
-                  void Promise.resolve(action.onClick(record)).catch(() => undefined);
+                  Promise.resolve(action.onClick(record)).catch(() => undefined);
                 }}
               >
                 {tooltip ? (

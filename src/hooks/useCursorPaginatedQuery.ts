@@ -88,7 +88,7 @@ export function useCursorPaginatedQuery<T>({
   const { refetch } = query;
   const refresh = useCallback(() => {
     pageCursors.current = new Map([[1, undefined]]);
-    if (page === 1) void refetch();
+    if (page === 1) refetch();
     else setPage(1);
   }, [page, refetch]);
 

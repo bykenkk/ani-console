@@ -152,8 +152,8 @@ export default function KnowledgeChat({
         setActiveSessionId(undefined);
         setDraftVersion((current) => current + 1);
       }
-      void qc.invalidateQueries({ queryKey: ["knowledge-base-sessions", kbId] });
-      void qc.invalidateQueries({ queryKey: ["knowledge-base-citations", kbId] });
+      qc.invalidateQueries({ queryKey: ["knowledge-base-sessions", kbId] });
+      qc.invalidateQueries({ queryKey: ["knowledge-base-citations", kbId] });
     },
   });
 
@@ -164,10 +164,10 @@ export default function KnowledgeChat({
   };
   const handleComplete = useCallback(
     (sessionId?: string) => {
-      void qc.invalidateQueries({ queryKey: ["knowledge-base-sessions", kbId] });
-      void qc.invalidateQueries({ queryKey: ["knowledge-base-citations", kbId] });
+      qc.invalidateQueries({ queryKey: ["knowledge-base-sessions", kbId] });
+      qc.invalidateQueries({ queryKey: ["knowledge-base-citations", kbId] });
       if (sessionId) {
-        void qc.invalidateQueries({
+        qc.invalidateQueries({
           queryKey: ["knowledge-base-session-messages", kbId, sessionId],
         });
         if (sessionId !== activeSessionId) setActiveSessionId(sessionId);

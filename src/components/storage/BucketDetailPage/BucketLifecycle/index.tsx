@@ -37,9 +37,9 @@ export default function BucketLifecycle({ bucketId }: { bucketId: string }) {
     },
     mutationFn: (rule: StorageBucketLifecycleRule) => deleteBucketLifecycleRule(bucketId, rule.id),
     onSuccess: () => {
-      void qc.invalidateQueries({ queryKey: ["bucket-lifecycle-rules", bucketId] });
-      void qc.invalidateQueries({ queryKey: ["bucket", bucketId] });
-      void qc.invalidateQueries({ queryKey: ["buckets"] });
+      qc.invalidateQueries({ queryKey: ["bucket-lifecycle-rules", bucketId] });
+      qc.invalidateQueries({ queryKey: ["bucket", bucketId] });
+      qc.invalidateQueries({ queryKey: ["buckets"] });
     },
   });
   const actions: RowAction<StorageBucketLifecycleRule>[] = [
@@ -56,13 +56,14 @@ export default function BucketLifecycle({ bucketId }: { bucketId: string }) {
       label: "删除",
       intent: "danger",
       loading: (row) => remove.isPending && remove.variables?.id === row.id,
-      onClick: (row) =>
-        void Modal.confirm({
+      onClick: (row) => {
+        Modal.confirm({
           title: "删除生命周期规则",
           content: `确定删除规则「${row.name}」？`,
           okButtonProps: { status: "danger" },
           onOk: () => remove.mutateAsync(row),
-        }),
+        });
+      },
     },
   ];
   const dialogNode = (

@@ -56,7 +56,7 @@ export default function KnowledgeModelSelect({
         value={value || undefined}
         onChange={onChange}
         onVisibleChange={(visible) => {
-          if (visible) void models.refetch({ cancelRefetch: false });
+          if (visible) models.refetch({ cancelRefetch: false });
         }}
         loading={models.isFetching}
         allowClear={!required}

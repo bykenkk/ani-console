@@ -34,7 +34,9 @@ export function useModelActions(onDeleted: (item: Model) => void) {
       label: "删除",
       intent: "danger",
       disabled: remove.isDisabled,
-      onClick: (item) => void remove.confirm(item),
+      onClick: (item) => {
+        remove.confirm(item);
+      },
     },
   ];
   const dialogNode = (

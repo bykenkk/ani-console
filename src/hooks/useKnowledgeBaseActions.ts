@@ -25,7 +25,9 @@ export function useKnowledgeBaseActions(onDeleted: (item: KnowledgeBase) => void
       disabled: remove.isDisabled,
       loading: (item) => remove.isPending && remove.variables?.id === item.id,
       intent: "danger",
-      onClick: (item) => void remove.confirm(item),
+      onClick: (item) => {
+        remove.confirm(item);
+      },
     },
   ];
   return { actions };

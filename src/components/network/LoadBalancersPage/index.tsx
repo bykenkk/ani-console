@@ -194,7 +194,7 @@ export default function LoadBalancersPage() {
             spinning: loadBalancers.isFetching || vpcs.isFetching,
             onClick: () => {
               refresh();
-              void vpcs.refetch();
+              vpcs.refetch();
             },
           },
         }}

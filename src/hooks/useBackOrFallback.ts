@@ -35,9 +35,9 @@ export function useBackOrFallback(
       return;
     }
     if (resourceType === "object") {
-      void router.navigate({ to: "/objects/$bucketId", params: { bucketId }, replace: true });
+      router.navigate({ to: "/objects/$bucketId", params: { bucketId }, replace: true });
       return;
     }
-    void router.navigate({ to: resourceListRoutes[resourceType], replace: true });
+    router.navigate({ to: resourceListRoutes[resourceType], replace: true });
   }, [router, resourceType, bucketId]);
 }

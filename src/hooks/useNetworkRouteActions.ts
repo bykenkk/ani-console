@@ -12,7 +12,9 @@ export function useNetworkRouteActions(onDeleted: (item: NetworkRoute) => void) 
       disabled: deleteRoute.isDisabled,
       intent: "danger",
       loading: (item) => deleteRoute.isPending && deleteRoute.variables?.id === item.id,
-      onClick: (item) => void deleteRoute.confirm(item),
+      onClick: (item) => {
+        deleteRoute.confirm(item);
+      },
     },
   ];
   return { actions };

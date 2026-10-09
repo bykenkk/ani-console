@@ -45,71 +45,71 @@ export function navigateToResourceDetail(
 ): void {
   switch (resource.type) {
     case "model":
-      void navigate({ to: "/models/$modelId", params: { modelId: resource.id } });
+      navigate({ to: "/models/$modelId", params: { modelId: resource.id } });
       return;
     case "inference-service":
-      void navigate({ to: "/inference/$serviceId", params: { serviceId: resource.id } });
+      navigate({ to: "/inference/$serviceId", params: { serviceId: resource.id } });
       return;
     case "vm-instance":
-      void navigate({ to: "/vm-instances/$instanceId", params: { instanceId: resource.id } });
+      navigate({ to: "/vm-instances/$instanceId", params: { instanceId: resource.id } });
       return;
     case "container-instance":
-      void navigate({
+      navigate({
         to: "/container-instances/$instanceId",
         params: { instanceId: resource.id },
       });
       return;
     case "gpu-instance":
-      void navigate({ to: "/gpu-instances/$instanceId", params: { instanceId: resource.id } });
+      navigate({ to: "/gpu-instances/$instanceId", params: { instanceId: resource.id } });
       return;
     case "sandbox-instance":
-      void navigate({ to: "/sandbox-instances/$instanceId", params: { instanceId: resource.id } });
+      navigate({ to: "/sandbox-instances/$instanceId", params: { instanceId: resource.id } });
       return;
     case "k8s-cluster":
-      void navigate({ to: "/k8s-clusters/$clusterId", params: { clusterId: resource.id } });
+      navigate({ to: "/k8s-clusters/$clusterId", params: { clusterId: resource.id } });
       return;
     case "knowledge-base":
-      void navigate({
+      navigate({
         to: "/kb/$kbId",
         params: { kbId: resource.id },
         search: resource.search,
       });
       return;
     case "vpc":
-      void navigate({ to: "/vpcs/$vpcId", params: { vpcId: resource.id } });
+      navigate({ to: "/vpcs/$vpcId", params: { vpcId: resource.id } });
       return;
     case "subnet":
-      void navigate({ to: "/subnets/$subnetId", params: { subnetId: resource.id } });
+      navigate({ to: "/subnets/$subnetId", params: { subnetId: resource.id } });
       return;
     case "security-group":
-      void navigate({
+      navigate({
         to: "/security-groups/$securityGroupId",
         params: { securityGroupId: resource.id },
       });
       return;
     case "network-route":
-      void navigate({ to: "/routes/$routeId", params: { routeId: resource.id } });
+      navigate({ to: "/routes/$routeId", params: { routeId: resource.id } });
       return;
     case "load-balancer":
-      void navigate({
+      navigate({
         to: "/load-balancers/$loadBalancerId",
         params: { loadBalancerId: resource.id },
       });
       return;
     case "volume":
-      void navigate({ to: "/volumes/$volumeId", params: { volumeId: resource.id } });
+      navigate({ to: "/volumes/$volumeId", params: { volumeId: resource.id } });
       return;
     case "filesystem":
-      void navigate({
+      navigate({
         to: "/filesystems/$filesystemId",
         params: { filesystemId: resource.id },
       });
       return;
     case "bucket":
-      void navigate({ to: "/objects/$bucketId", params: { bucketId: resource.id } });
+      navigate({ to: "/objects/$bucketId", params: { bucketId: resource.id } });
       return;
     case "vector-store":
-      void navigate({
+      navigate({
         to: "/vector-stores/$vectorStoreId",
         params: { vectorStoreId: resource.id },
         search: resource.search,

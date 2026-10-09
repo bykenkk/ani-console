@@ -12,7 +12,9 @@ export function useSubnetActions(onDeleted: (item: Subnet) => void) {
       disabled: deleteSubnet.isDisabled,
       loading: (item) => deleteSubnet.isPending && deleteSubnet.variables?.id === item.id,
       intent: "danger",
-      onClick: (subnet) => void deleteSubnet.confirm(subnet),
+      onClick: (subnet) => {
+        deleteSubnet.confirm(subnet);
+      },
     },
   ];
   return { actions };

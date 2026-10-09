@@ -81,7 +81,9 @@ export default function VolumeOSInitGuideModal({
                 <Button
                   type="text"
                   size="small"
-                  onClick={() => void copyToClipboard(step.command, "命令")}
+                  onClick={() => {
+                    copyToClipboard(step.command, "命令");
+                  }}
                 >
                   复制命令
                 </Button>

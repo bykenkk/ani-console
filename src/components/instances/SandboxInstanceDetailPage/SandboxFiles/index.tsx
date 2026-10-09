@@ -71,7 +71,9 @@ export default function SandboxFiles({
       key: "copy-path",
       label: "复制路径",
       visible: (item) => item.kind !== "directory",
-      onClick: (item) => void copyToClipboard(item.path, "文件路径"),
+      onClick: (item) => {
+        copyToClipboard(item.path, "文件路径");
+      },
     },
     {
       key: "delete",

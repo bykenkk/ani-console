@@ -141,7 +141,9 @@ export default function InferenceDetailPage({
                     <Button
                       type="text"
                       size="mini"
-                      onClick={() => void copyToClipboard(invocationUrl, "调用地址")}
+                      onClick={() => {
+                        copyToClipboard(invocationUrl, "调用地址");
+                      }}
                     >
                       复制
                     </Button>
