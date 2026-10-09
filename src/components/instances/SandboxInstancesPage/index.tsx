@@ -1,5 +1,5 @@
 import { listInstances, type InstanceRecord, type FilterableInstanceState } from "@/api/instances";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ResourceNameId,
   ListPageFrame,
@@ -23,32 +23,32 @@ export default function SandboxInstancesPage() {
   const [searchText, setSearchText] = useState("");
   const [createVisible, setCreateVisible] = useState(false);
 
-  const { query, page, pageSize, setPage, setPageSize, refresh } =
-    useCursorPaginatedQuery<SandboxInstance>({
-      errorNotification: {
-        id: "sandboxes",
-        action: "沙箱实例列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
-      queryKey: ["sandbox-instances", { status, searchField, searchText }],
-      cursorScope: `sandbox:${status}:${searchField}:${searchText.trim()}`,
-      fetchPage: async ({ cursor, limit }) => {
-        const keyword = searchText.trim();
-        return listInstances({
-          kind: "sandbox",
-          state: status === "all" ? undefined : status,
-          search_field: keyword ? searchField : undefined,
-          keyword: keyword || undefined,
-          cursor,
-          limit,
-        });
-      },
-    });
+  const {
+    query,
+    refresh,
+    items: rows,
+    pagination,
+  } = useCursorPaginatedQuery<SandboxInstance>({
+    errorNotification: {
+      id: "sandboxes",
+      action: "沙箱实例列表加载",
+      fallback: "请求失败，请稍后重试",
+    },
+    queryKey: ["sandbox-instances", { status, searchField, searchText }],
+    queryFn: async ({ cursor, limit }) => {
+      const keyword = searchText.trim();
+      return listInstances({
+        kind: "sandbox",
+        state: status === "all" ? undefined : status,
+        search_field: keyword ? searchField : undefined,
+        keyword: keyword || undefined,
+        cursor,
+        limit,
+      });
+    },
+  });
   const { dialogNode, actions } = useSandboxInstanceActions(refresh);
 
-  useEffect(() => setPage(1), [searchField, searchText, setPage, status]);
-
-  const rows = (query.data?.items ?? []) as SandboxInstance[];
   const statusTabs = [
     { value: "all" as const, label: "全部" },
     { value: "pending" as const, label: "等待中" },
@@ -172,13 +172,7 @@ export default function SandboxInstancesPage() {
           emptyIconClassName="icon-Sandbox"
           tableLabel="沙箱实例列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: query.data?.total ?? rows.length,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && (

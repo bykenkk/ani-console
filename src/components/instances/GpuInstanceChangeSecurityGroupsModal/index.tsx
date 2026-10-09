@@ -32,7 +32,6 @@ export default function GpuInstanceChangeSecurityGroupsModal({
     queryKey: ["network-security-groups", "gpu-instance-change-security-groups", vpcId],
     queryFn: () =>
       listNetworkSecurityGroups({
-        limit: 100,
         vpc_id: vpcId || undefined,
       }),
   });

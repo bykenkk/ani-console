@@ -26,18 +26,17 @@ export function getGpuSpecAvailability(): Promise<GpuSpecAvailabilityListRespons
   });
 }
 
-export function listGpuSpecs(
-  params: { available?: boolean; limit?: number } = {},
-): Promise<GpuSpecListResponse> {
-  return coreRequest<GpuSpecListResponse>("/gpu-specs", { method: "GET", params });
+export function listGpuSpecs(params: { available?: boolean } = {}): Promise<GpuSpecListResponse> {
+  // FIXME: 后端实现分页后移除 limit: 0；当前使用该值获取完整 GPU 规格，避免本地分支截断。
+  return coreRequest<GpuSpecListResponse>("/gpu-specs", {
+    method: "GET",
+    params: { ...params, limit: 0 },
+  });
 }
 
-export function listGpuSchedulingQueues(
-  params: { limit?: number } = {},
-): Promise<GpuSchedulingQueueListResponse> {
+export function listGpuSchedulingQueues(): Promise<GpuSchedulingQueueListResponse> {
   return coreRequest<GpuSchedulingQueueListResponse>("/gpu-scheduling/queues", {
     method: "GET",
-    params,
   });
 }
 
@@ -47,8 +46,8 @@ export function getMyQuota(): Promise<TenantQuotaResponse> {
 
 export async function listGpuAnomalies(): Promise<GpuInventoryRecord[]> {
   const [faults, maintenance] = await Promise.all([
-    listGpuInventory({ status: "fault", limit: 200 }),
-    listGpuInventory({ status: "maintenance", limit: 200 }),
+    listGpuInventory({ status: "fault" }),
+    listGpuInventory({ status: "maintenance" }),
   ]);
   return [...faults.items, ...maintenance.items];
 }

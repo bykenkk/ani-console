@@ -22,7 +22,7 @@ export default function KnowledgeBasesPage() {
   const [status, setStatus] = useState<StatusFilter>("all");
   const [searchField, setSearchField] = useState<SearchField>("name");
   const [searchText, setSearchText] = useState("");
-  const { query, page, pageSize, setPage, setPageSize, resetPagination, refresh } =
+  const { query, resetPagination, refresh, items, pagination } =
     useCursorPaginatedQuery<KnowledgeBase>({
       errorNotification: {
         id: "knowledge-bases",
@@ -30,8 +30,7 @@ export default function KnowledgeBasesPage() {
         fallback: "请求失败，请稍后重试",
       },
       queryKey: ["knowledge-bases", { status, searchField, searchText }],
-      cursorScope: `${status}:${searchField}:${searchText.trim()}`,
-      fetchPage: async ({ cursor, limit }) => {
+      queryFn: async ({ cursor, limit }) => {
         const keyword = searchText.trim();
         // TODO: 待后端联调确认 status/name/id 查询参数及筛选后 total 的最终契约。
         return listKnowledgeBases({
@@ -44,8 +43,7 @@ export default function KnowledgeBasesPage() {
       },
     });
   const { actions } = useKnowledgeBaseActions(resetPagination);
-  const items = query.data?.items ?? [];
-  const paginationTotal = query.data?.total ?? items.length;
+
   const columns: Array<ListColumn<KnowledgeBase>> = [
     {
       key: "name",
@@ -175,13 +173,7 @@ export default function KnowledgeBasesPage() {
           emptyIconClassName="icon-zhishiku"
           tableLabel="知识库列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible ? <CreateKnowledgeBaseModal onCancel={() => setCreateVisible(false)} /> : null}

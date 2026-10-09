@@ -1,17 +1,19 @@
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { listK8sClusterWorkloads, type K8sClusterWorkload } from "@/api/k8s-clusters";
 import { DataTable, StatusBadge } from "@/components/common";
 import { withId } from "@/lib/id";
 import { Card, Empty, Grid } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
 
 export default function K8sWorkloads({ clusterId }: { clusterId: string }) {
-  const workloads = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("k8s-workloads", clusterId),
-        action: "工作负载加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: workloads,
+    items: pageItems,
+    pagination,
+  } = useClientPaginatedQuery({
+    errorNotification: {
+      id: withId("k8s-workloads", clusterId),
+      action: "工作负载加载",
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["k8s-workloads", clusterId],
     queryFn: () => listK8sClusterWorkloads(clusterId),
@@ -46,10 +48,10 @@ export default function K8sWorkloads({ clusterId }: { clusterId: string }) {
             render: (_, row) => <StatusBadge status={row.status} />,
           },
         ]}
-        data={items}
+        data={pageItems}
         loading={workloads.isLoading}
         rowKey={(row) => `${row.namespace}/${row.kind}/${row.name}`}
-        pagination={false}
+        pagination={pagination}
         noDataElement={<Empty description="暂无工作负载" />}
       />
     </div>

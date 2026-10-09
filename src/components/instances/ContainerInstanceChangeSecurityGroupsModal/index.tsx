@@ -35,7 +35,6 @@ export default function ContainerInstanceChangeSecurityGroupsModal({
     ],
     queryFn: () =>
       listNetworkSecurityGroups({
-        limit: 100,
         vpc_id: instance.network?.vpc_id || undefined,
       }),
   });

@@ -13,7 +13,7 @@ import {
 
 import CreateRouteModal from "@/components/network/CreateRouteModal";
 import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { navigateToResourceDetail } from "@/lib/resources";
 
 type Vpc = NetworkVPC;
@@ -29,25 +29,24 @@ export default function NetworkRoutesPage() {
   const [filterVpcId, setFilterVpcId] = useState("");
   const {
     query: routes,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
     refresh,
-  } = useCursorPaginatedQuery<NetworkRoute>({
+    items,
+    pagination,
+  } = useClientPaginatedQuery<NetworkRoute>({
     errorNotification: {
       id: "routes",
       action: "路由列表加载",
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["network-routes", { status, searchField, searchText, filterVpcId }],
-    cursorScope: `${status}:${searchField}:${searchText.trim()}:${filterVpcId}`,
-    fetchPage: async ({ cursor, limit }) => {
+    filter: (item) =>
+      String(item[searchField] ?? "")
+        .toLowerCase()
+        .includes(searchText.trim().toLowerCase()),
+    queryFn: async () => {
       const keyword = searchText.trim();
       return listNetworkRoutes({
-        limit,
-        cursor,
         vpc_id: filterVpcId || undefined,
         status: status === "all" ? undefined : status,
         search_field: keyword ? searchField : undefined,
@@ -64,16 +63,14 @@ export default function NetworkRoutesPage() {
       },
     },
     queryKey: ["network-vpcs", "route-list"],
-    queryFn: () => listNetworkVpcs({ limit: 100 }),
+    queryFn: () => listNetworkVpcs(),
   });
   const { actions } = useNetworkRouteActions(resetPagination);
 
-  const items = (routes.data?.items ?? []) as NetworkRoute[];
   const vpcNames = useMemo(
     () => new Map(((vpcs.data?.items ?? []) as Vpc[]).map((vpc) => [vpc.id, vpc.name])),
     [vpcs.data?.items],
   );
-  const paginationTotal = routes.data?.total ?? items.length;
   const columns: Array<ListColumn<NetworkRoute>> = [
     {
       key: "name",
@@ -201,13 +198,7 @@ export default function NetworkRoutesPage() {
           emptyIconClassName="icon-VPCluyouqi"
           tableLabel="路由列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && <CreateRouteModal onCancel={() => setCreateVisible(false)} />}

@@ -1,7 +1,7 @@
 import { useModelActions } from "@/hooks/useModelActions";
 
 import { Select, Space, Tag } from "@arco-design/web-react";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { listModels } from "@/api/ai-services/models";
 
 import ImportModelModal from "@/components/ai-services/ImportModelModal";
@@ -36,16 +36,12 @@ export default function ModelsPage() {
   const [searchText, setSearchText] = useState("");
   const [source, setSource] = useState<SourceFilter>("all");
   const [capability, setCapability] = useState<CapabilityFilter>("all");
-  const cursorPageRef = useRef(new Map<string, number>());
-  const cursorScope = [status, searchText.trim(), source, capability].join(":");
   const {
     query: models,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
     refresh,
+    items,
+    pagination,
   } = useCursorPaginatedQuery<Model>({
     errorNotification: {
       id: "models",
@@ -53,9 +49,8 @@ export default function ModelsPage() {
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["models", { status, searchText, source, capability }],
-    cursorScope,
-    fetchPage: async ({ cursor, limit }) => {
-      const data = await listModels({
+    queryFn: async ({ cursor, limit }) => {
+      return listModels({
         limit,
         cursor,
         keyword: searchText.trim() || undefined,
@@ -63,17 +58,8 @@ export default function ModelsPage() {
         capability: capability === "all" ? undefined : capability,
         status: getApiStatus(status),
       });
-      const currentPage = cursor ? (cursorPageRef.current.get(cursorScope + ":" + cursor) ?? 1) : 1;
-      if (data.next_cursor) {
-        cursorPageRef.current.set(cursorScope + ":" + data.next_cursor, currentPage + 1);
-      }
-      const total =
-        data.total ?? (currentPage - 1) * limit + data.items.length + (data.next_cursor ? 1 : 0);
-      return { ...data, total };
     },
   });
-  const items = models.data?.items ?? [];
-  const paginationTotal = models.data?.total ?? items.length;
 
   const { actions, dialogNode } = useModelActions(resetPagination);
 
@@ -245,16 +231,7 @@ export default function ModelsPage() {
           preserveTableOnEmpty
           emptyIconClassName="icon-moxing"
           tableLabel="模型仓库列表"
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: (next) => {
-              setPageSize(next);
-              setPage(1);
-            },
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {importVisible && (

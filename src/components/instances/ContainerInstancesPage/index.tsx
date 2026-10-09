@@ -54,24 +54,23 @@ export default function ContainerInstancesPage({
   const keyword = useDebouncedValue(searchText, 200);
   const [createVisible, setCreateVisible] = useState(false);
 
-  const { query, page, pageSize, setPage, setPageSize, refresh } =
-    useCursorPaginatedQuery<ContainerInstance>({
-      errorNotification: {
-        id: "containers",
-        action: "容器实例加载",
-        fallback: "请求失败，请稍后重试",
-      },
-      queryKey: ["container-instances", { status, searchField, keyword }],
-      cursorScope: JSON.stringify([status, searchField, keyword]),
-      fetchPage: ({ cursor, limit }) =>
-        dataSource.list({ status, searchField, keyword, cursor, pageSize: limit }),
-    });
+  const {
+    query,
+    refresh,
+    items: pageItems,
+    pagination,
+  } = useCursorPaginatedQuery<ContainerInstance>({
+    errorNotification: {
+      id: "containers",
+      action: "容器实例加载",
+      fallback: "请求失败，请稍后重试",
+    },
+    queryKey: ["container-instances", { status, searchField, keyword }],
+    queryFn: ({ cursor, limit }) =>
+      dataSource.list({ status, searchField, keyword, cursor, pageSize: limit }),
+  });
   const { dialogNode, actions } = useContainerInstanceActions<ContainerInstance>(refresh);
 
-  const result = query.data ?? {
-    items: [],
-    total: 0,
-  };
   const allColumns: Array<ListColumn<ContainerInstance>> = [
     {
       key: "name",
@@ -194,20 +193,14 @@ export default function ContainerInstancesPage({
         }}
       >
         <ListDataTable
-          data={result.items}
+          data={pageItems}
           columns={allColumns}
           rowActions={actions}
           loading={query.isFetching}
           emptyIconClassName="icon-rongqishili"
           tableLabel="容器实例列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: result.total,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && (

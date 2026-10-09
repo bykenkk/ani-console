@@ -6,7 +6,7 @@ import { listBuckets, type StorageBucketRecord } from "@/api/storage/buckets";
 
 import CreateBucketModal from "@/components/storage/CreateBucketModal";
 import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { formatBytes, formatDateTime } from "@/lib/format";
 
 type Bucket = StorageBucketRecord;
@@ -20,25 +20,20 @@ export default function ObjectsPage() {
   const [searchText, setSearchText] = useState("");
   const {
     query: buckets,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
     refresh,
-  } = useCursorPaginatedQuery<Bucket>({
+    items,
+    pagination,
+  } = useClientPaginatedQuery<Bucket>({
     errorNotification: {
       id: "buckets",
       action: "对象存储桶列表加载",
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["buckets", { searchField, searchText }],
-    cursorScope: `${searchField}:${searchText.trim()}`,
-    fetchPage: async ({ cursor, limit }) => {
+    queryFn: async () => {
       const keyword = searchText.trim();
       return listBuckets({
-        limit,
-        cursor,
         search_field: keyword ? searchField : undefined,
         keyword: keyword || undefined,
       });
@@ -48,8 +43,7 @@ export default function ObjectsPage() {
     resetPagination();
     queryClient.invalidateQueries({ queryKey: ["buckets"] });
   });
-  const items = (buckets.data?.items ?? []) as Bucket[];
-  const paginationTotal = buckets.data?.total ?? items.length;
+
   const columns: Array<ListColumn<Bucket>> = [
     {
       key: "name",
@@ -148,13 +142,7 @@ export default function ObjectsPage() {
           emptyIconClassName="icon-duixiangcunchu1"
           tableLabel="对象存储桶列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && <CreateBucketModal onCancel={() => setCreateVisible(false)} />}

@@ -1,3 +1,4 @@
+import { useClientPagination } from "@/hooks/useClientPagination";
 import { listNetworkRoutes, type NetworkRoute } from "@/api/network";
 import { DataTable } from "@/components/common";
 import { withId } from "@/lib/id";
@@ -23,7 +24,7 @@ export default function SubnetRoutes({ subnetId, vpcId }: { subnetId: string; vp
       },
     },
     queryKey: ["network-routes", "subnet-vpc", vpcId],
-    queryFn: () => listNetworkRoutes({ vpc_id: vpcId, limit: 100 }),
+    queryFn: () => listNetworkRoutes({ vpc_id: vpcId }),
   });
   const routeRows: SubnetRouteRow[] = [
     {
@@ -45,6 +46,8 @@ export default function SubnetRoutes({ subnetId, vpcId }: { subnetId: string; vp
     })),
   ];
 
+  const { items, pagination } = useClientPagination(routeRows, subnetId);
+
   return (
     <Space direction="vertical" size={12} className="w-full">
       <DataTable<SubnetRouteRow>
@@ -55,9 +58,9 @@ export default function SubnetRoutes({ subnetId, vpcId }: { subnetId: string; vp
           { title: "优先级", dataIndex: "priority" },
           { title: "来源", dataIndex: "source" },
         ]}
-        data={routeRows}
+        data={items}
         loading={routes.isLoading}
-        pagination={false}
+        pagination={pagination}
       />
     </Space>
   );

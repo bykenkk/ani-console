@@ -41,7 +41,7 @@ export function listBuckets(
 }
 
 export async function getBucket(bucketId: string): Promise<StorageBucketRecord> {
-  const data = await listBuckets({ limit: 100 });
+  const data = await listBuckets();
   const bucket = data.items.find((item) => item.id === bucketId);
   if (!bucket) throw new Error("存储桶不存在或无权访问");
   return bucket;

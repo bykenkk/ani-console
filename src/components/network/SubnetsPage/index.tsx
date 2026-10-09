@@ -20,9 +20,8 @@ import {
   ListDataTable,
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { navigateToResourceDetail } from "@/lib/resources";
-
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
 type SubnetStatusFilter = "all" | Subnet["state"];
@@ -32,7 +31,6 @@ export default function SubnetsPage() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
-
   const [status, setStatus] = useState<SubnetStatusFilter>("all");
   const [searchField, setSearchField] = useState<SubnetSearchField>("name");
   const [searchText, setSearchText] = useState("");
@@ -47,29 +45,24 @@ export default function SubnetsPage() {
       },
     },
     queryKey: ["network-vpcs", "subnet-page"],
-    queryFn: () => listNetworkVpcs({ limit: 100 }),
+    queryFn: () => listNetworkVpcs(),
   });
   const {
     query: subnets,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
     refresh,
-  } = useCursorPaginatedQuery<Subnet>({
+    items,
+    pagination,
+  } = useClientPaginatedQuery<Subnet>({
     errorNotification: {
       id: "subnets",
       action: "子网列表加载",
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["network-subnets", { status, searchField, searchText, filterVpcId }],
-    cursorScope: `${status}:${searchField}:${searchText.trim()}:${filterVpcId}`,
-    fetchPage: async ({ cursor, limit }) => {
+    queryFn: async () => {
       const keyword = searchText.trim();
       return listNetworkSubnets({
-        limit,
-        cursor,
         vpc_id: filterVpcId || undefined,
         state: status === "all" ? undefined : status,
         search_field: keyword ? searchField : undefined,
@@ -77,15 +70,12 @@ export default function SubnetsPage() {
       });
     },
   });
-
   const { actions } = useSubnetActions(resetPagination);
 
-  const items = useMemo(() => (subnets.data?.items ?? []) as Subnet[], [subnets.data?.items]);
   const vpcNames = useMemo(
     () => new Map(((vpcs.data?.items ?? []) as Vpc[]).map((vpc) => [vpc.id, vpc.name])),
     [vpcs.data?.items],
   );
-  const paginationTotal = subnets.data?.total ?? items.length;
   const columns: Array<ListColumn<Subnet>> = [
     {
       key: "name",
@@ -223,13 +213,7 @@ export default function SubnetsPage() {
           emptyIconClassName="icon-VPCwangluo"
           tableLabel="子网列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && (

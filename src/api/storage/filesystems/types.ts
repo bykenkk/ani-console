@@ -1,4 +1,4 @@
-import type { CoreDevProfileInfo, CursorPageParams } from "@/api/types";
+import type { CoreDevProfileInfo } from "@/api/types";
 import type { StorageResourceState } from "@/api/storage/volumes";
 
 export interface StorageFilesystem {
@@ -24,7 +24,7 @@ export interface StorageFilesystem {
   updated_at: string;
 }
 
-export interface StorageFilesystemListParams extends CursorPageParams {
+export interface StorageFilesystemListParams {
   state?: string;
   search_field?: "name" | "id";
   keyword?: string;

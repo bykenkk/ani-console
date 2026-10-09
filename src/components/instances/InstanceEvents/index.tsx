@@ -1,27 +1,29 @@
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
 import { listInstanceEvents, type InstanceEvent } from "@/api/instances";
 import { Empty, Tag } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
 import { DataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
 export default function InstanceEvents({ instanceId }: { instanceId: string }) {
-  const events = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("instance-events", instanceId),
-        action: "事件加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: events,
+    items: pageItems,
+    pagination,
+  } = useCursorPaginatedQuery({
+    errorNotification: {
+      id: withId("instance-events", instanceId),
+      action: "事件加载",
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["instance-events", instanceId],
-    queryFn: async () => (await listInstanceEvents(instanceId)).items,
+    queryFn: (params) => listInstanceEvents(instanceId, params),
   });
   return (
     <DataTable<InstanceEvent>
-      data={events.data ?? []}
+      data={pageItems}
       loading={events.isLoading}
-      pagination={false}
+      pagination={pagination}
       noDataElement={<Empty description="暂无事件" />}
       columns={[
         {

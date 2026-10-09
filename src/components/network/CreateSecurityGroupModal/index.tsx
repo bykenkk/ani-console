@@ -66,7 +66,7 @@ export default function CreateSecurityGroupModal({
       },
     },
     queryKey: ["network-vpcs", "security-group-create"],
-    queryFn: () => listNetworkVpcs({ limit: 100 }),
+    queryFn: () => listNetworkVpcs(),
   });
 
   const create = useMutation({

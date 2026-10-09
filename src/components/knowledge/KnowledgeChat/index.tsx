@@ -1,12 +1,10 @@
-import { listInferenceServices, type InferenceService } from "@/api/ai-services/inference";
+import { listInferenceServices } from "@/api/ai-services/inference";
 import {
   deleteKnowledgeBaseSession,
   listKnowledgeBaseCitations,
   listKnowledgeBaseSessionMessages,
   listKnowledgeBaseSessions,
-  type KBCitation as Citation,
   type KBSession as Session,
-  type KBSessionMessage as SessionMessage,
 } from "@/api/knowledge";
 import { withId } from "@/lib/id";
 import { Spin } from "@arco-design/web-react";
@@ -44,21 +42,7 @@ export default function KnowledgeChat({
       },
     },
     queryKey: ["inference-services", "model-options", "text-generation", "running"],
-    queryFn: async () => {
-      const items: InferenceService[] = [];
-      let cursor: string | undefined;
-      do {
-        const data = await listInferenceServices({
-          limit: 100,
-          cursor,
-          capability: "text-generation",
-          status: "running",
-        });
-        items.push(...data.items);
-        cursor = data.next_cursor ?? undefined;
-      } while (cursor);
-      return { items };
-    },
+    queryFn: () => listInferenceServices({ capability: "text-generation", status: "running" }),
   });
   const inferenceModelOptions = useMemo(
     () =>
@@ -80,16 +64,7 @@ export default function KnowledgeChat({
   const sessions = useQuery({
     meta: { errorNotification: { id: withId("knowledge-sessions", kbId), action: "会话列表加载" } },
     queryKey: ["knowledge-base-sessions", kbId],
-    queryFn: async () => {
-      const items: Session[] = [];
-      let cursor: string | undefined;
-      do {
-        const data = await listKnowledgeBaseSessions(kbId, { limit: 100, cursor });
-        items.push(...data.items);
-        cursor = data.next_cursor ?? undefined;
-      } while (cursor);
-      return items;
-    },
+    queryFn: async () => (await listKnowledgeBaseSessions(kbId)).items,
   });
   const messages = useQuery({
     meta: {
@@ -101,19 +76,7 @@ export default function KnowledgeChat({
     },
     queryKey: ["knowledge-base-session-messages", kbId, activeSessionId],
     enabled: Boolean(activeSessionId),
-    queryFn: async () => {
-      const items: SessionMessage[] = [];
-      let cursor: string | undefined;
-      do {
-        const data = await listKnowledgeBaseSessionMessages(kbId, activeSessionId!, {
-          limit: 100,
-          cursor,
-        });
-        items.push(...data.items);
-        cursor = data.next_cursor ?? undefined;
-      } while (cursor);
-      return items;
-    },
+    queryFn: async () => (await listKnowledgeBaseSessionMessages(kbId, activeSessionId!)).items,
   });
   const citations = useQuery({
     meta: {
@@ -121,16 +84,7 @@ export default function KnowledgeChat({
     },
     queryKey: ["knowledge-base-citations", kbId],
     enabled: citationsVisible,
-    queryFn: async () => {
-      const items: Citation[] = [];
-      let cursor: string | undefined;
-      do {
-        const data = await listKnowledgeBaseCitations(kbId, { limit: 100, cursor });
-        items.push(...data.items);
-        cursor = data.next_cursor ?? undefined;
-      } while (cursor);
-      return { items };
-    },
+    queryFn: () => listKnowledgeBaseCitations(kbId),
   });
   const initialMessages = useMemo(
     () => (messages.data ?? []).map(toThreadMessage),

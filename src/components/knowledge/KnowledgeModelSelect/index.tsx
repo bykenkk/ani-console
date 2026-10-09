@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 
 import {
   listInferenceServices,
-  type InferenceService,
   type InferenceServiceListParams,
 } from "@/api/ai-services/inference";
 import { withId } from "@/lib/id";
@@ -21,21 +20,7 @@ export default function KnowledgeModelSelect({
 }) {
   const models = useQuery({
     queryKey: ["inference-services", "model-options", capability, "running"],
-    queryFn: async () => {
-      const items: InferenceService[] = [];
-      let cursor: string | undefined;
-      do {
-        const data = await listInferenceServices({
-          limit: 100,
-          cursor,
-          capability,
-          status: "running",
-        });
-        items.push(...data.items);
-        cursor = data.next_cursor ?? undefined;
-      } while (cursor);
-      return { items };
-    },
+    queryFn: () => listInferenceServices({ capability, status: "running" }),
     meta: {
       errorNotification: {
         id: withId("inference-models", capability),

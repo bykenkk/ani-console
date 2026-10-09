@@ -1,4 +1,4 @@
-import type { CoreDevProfileInfo, CursorPageParams } from "@/api/types";
+import type { CoreDevProfileInfo } from "@/api/types";
 
 export type K8sClusterState = "provisioning" | "running" | "deleting";
 
@@ -14,7 +14,7 @@ export interface K8sCluster {
   updated_at?: string;
 }
 
-export interface K8sClusterListParams extends CursorPageParams {
+export interface K8sClusterListParams {
   status?: K8sClusterState;
   search_field?: "name" | "id";
   keyword?: string;

@@ -38,7 +38,7 @@ export default function CreateSubnetModal({
       },
     },
     queryKey: ["network-vpcs", "subnet-page"],
-    queryFn: () => listNetworkVpcs({ limit: 100 }),
+    queryFn: () => listNetworkVpcs(),
   });
   const selectedVpc = ((vpcs.data?.items ?? []) as Vpc[]).find((vpc) => vpc.id === vpcId);
   const selectedVpcCidr = selectedVpc?.cidr ?? "";

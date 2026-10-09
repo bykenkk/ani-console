@@ -1,3 +1,4 @@
+import { useClientPagination } from "@/hooks/useClientPagination";
 import { withId } from "@/lib/id";
 import { Button, Empty } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
@@ -36,6 +37,8 @@ export default function InferencePolicies({ serviceId }: { serviceId: string }) 
     queryFn: () => listInferenceServicePolicies(serviceId),
   });
 
+  const { items, pagination } = useClientPagination(policies.data?.policies ?? [], serviceId);
+
   return (
     <div>
       <DataTable<InferenceAccessPolicy>
@@ -53,9 +56,9 @@ export default function InferencePolicies({ serviceId }: { serviceId: string }) 
             </Button>
           ),
         }}
-        data={policies.data?.policies ?? []}
+        data={items}
         loading={policies.isFetching}
-        pagination={false}
+        pagination={pagination}
         rowKey="id"
         noDataElement={<Empty description="当前服务未绑定访问策略" />}
         columns={[

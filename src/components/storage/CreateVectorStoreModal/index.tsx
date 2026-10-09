@@ -1,4 +1,4 @@
-import { listInferenceServices, type InferenceService } from "@/api/ai-services/inference";
+import { listInferenceServices } from "@/api/ai-services/inference";
 import {
   createVectorStore,
   type VectorMetric,
@@ -30,21 +30,7 @@ export default function CreateVectorStoreModal({
       },
     },
     queryKey: ["inference-services", "model-options", "embedding", "running"],
-    queryFn: async () => {
-      const items: InferenceService[] = [];
-      let cursor: string | undefined;
-      do {
-        const data = await listInferenceServices({
-          limit: 100,
-          cursor,
-          capability: "embedding",
-          status: "running",
-        });
-        items.push(...data.items);
-        cursor = data.next_cursor ?? undefined;
-      } while (cursor);
-      return { items };
-    },
+    queryFn: () => listInferenceServices({ capability: "embedding", status: "running" }),
   });
   const modelOptions = useMemo(
     () => (models.data?.items ?? []).map((item) => item.served_model_name),

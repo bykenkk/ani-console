@@ -37,7 +37,7 @@ export default function CreateRouteModal({
       },
     },
     queryKey: ["network-vpcs", "route-create"],
-    queryFn: () => listNetworkVpcs({ limit: 100 }),
+    queryFn: () => listNetworkVpcs(),
   });
   const cidrError = ipv4CidrError(destinationCidr, "目标网段");
 

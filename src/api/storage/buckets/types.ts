@@ -30,7 +30,7 @@ export interface StorageBucketRecord {
   updated_at?: string | null;
 }
 
-export interface StorageBucketListParams extends CursorPageParams {
+export interface StorageBucketListParams {
   search_field?: "name" | "id";
   keyword?: string;
 }

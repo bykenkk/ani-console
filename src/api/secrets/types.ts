@@ -1,4 +1,3 @@
-import type { CursorPageParams } from "@/api/types";
 export interface Secret {
   id: string;
   tenant_id?: string;
@@ -11,7 +10,7 @@ export interface Secret {
   updated_at?: string;
   [key: string]: unknown;
 }
-export interface SecretListParams extends CursorPageParams {
+export interface SecretListParams {
   keyword?: string;
 }
 export interface SecretListResponse {

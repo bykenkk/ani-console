@@ -1,104 +1,60 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback, useEffect } from "react";
 import type { QueryErrorNotificationMeta } from "@/vite-env";
-import { useCallback, useEffect, useRef, useState } from "react";
+import type { ListPagination } from "@/components/common/DataTable";
+import { useListPagination } from "./useListPagination";
 
-export type CursorPage<T> = {
-  items: T[];
-  total: number;
-  next_cursor?: string | null;
-};
-
+export type CursorPage<T> = { items: T[]; total?: number; next_cursor?: string | null };
 type UseCursorPaginatedQueryOptions<T> = {
   queryKey: readonly unknown[];
-  fetchPage: (input: { cursor?: string; limit: number }) => Promise<CursorPage<T>>;
+  queryFn: (input: { cursor?: string; limit: number }) => Promise<CursorPage<T>>;
   initialPageSize?: number;
   enabled?: boolean;
-  cursorScope?: unknown;
   errorNotification?: QueryErrorNotificationMeta;
+  refetchInterval?: (data: CursorPage<T> | undefined) => number | false;
 };
 
 export function useCursorPaginatedQuery<T>({
   queryKey,
-  fetchPage,
+  queryFn,
   initialPageSize = 10,
   enabled = true,
-  cursorScope,
   errorNotification,
+  refetchInterval,
 }: UseCursorPaginatedQueryOptions<T>) {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSizeState] = useState(initialPageSize);
-  const pageCursors = useRef<Map<number, string | undefined>>(new Map([[1, undefined]]));
-
-  const resetPagination = useCallback(() => {
-    pageCursors.current = new Map([[1, undefined]]);
-    setPage(1);
-  }, []);
-
-  useEffect(() => resetPagination(), [cursorScope, resetPagination]);
-
+  const queryClient = useQueryClient();
+  const { page, pageSize, setPage, setPageSize, resetPagination } = useListPagination(
+    JSON.stringify(queryKey),
+    initialPageSize,
+  );
+  const cursor = page === 1 ? undefined : String((page - 1) * pageSize);
   const query = useQuery({
-    queryKey: [...queryKey, { page, pageSize }],
+    queryKey: [...queryKey, { cursor, limit: pageSize }],
     enabled,
     meta: { errorNotification },
-    queryFn: async () => {
-      let startPage = page;
-      while (startPage > 1 && !pageCursors.current.has(startPage)) startPage -= 1;
-      let cursor = pageCursors.current.get(startPage);
-      let result: CursorPage<T> | undefined;
-
-      for (let currentPage = startPage; currentPage <= page; currentPage += 1) {
-        result = await fetchPage({ cursor, limit: pageSize });
-        const nextCursor =
-          typeof result.next_cursor === "string"
-            ? result.next_cursor.trim() || undefined
-            : undefined;
-        if (nextCursor && nextCursor === cursor) {
-          throw new Error("列表接口返回了重复分页游标");
-        }
-
-        const reachedEnd = result.items.length < pageSize || !nextCursor;
-        if (reachedEnd) {
-          const actualTotal = (currentPage - 1) * pageSize + result.items.length;
-          result = {
-            ...result,
-            total: Math.min(result.total, actualTotal),
-            next_cursor: null,
-          };
-          pageCursors.current.delete(currentPage + 1);
-          if (currentPage < page) {
-            return { items: [], total: result.total, next_cursor: null };
-          }
-          break;
-        }
-
-        pageCursors.current.set(currentPage + 1, nextCursor);
-        cursor = nextCursor;
-      }
-
-      return result ?? { items: [], total: 0, next_cursor: null };
-    },
+    queryFn: () => queryFn({ cursor, limit: pageSize }),
+    refetchInterval: refetchInterval ? (query) => refetchInterval(query.state.data) : false,
   });
-
-  const setPageSize = useCallback((nextPageSize: number) => {
-    pageCursors.current = new Map([[1, undefined]]);
-    setPageSizeState(nextPageSize);
-    setPage(1);
-  }, []);
-
+  // A deletion can empty the last page. Fetch the previous page instead of trapping the user.
+  useEffect(() => {
+    if (query.isSuccess && !query.isFetching && !query.data.items.length && page > 1) {
+      setPage(page - 1);
+    }
+  }, [query.isSuccess, query.isFetching, query.data, page, setPage]);
   const { refetch } = query;
   const refresh = useCallback(() => {
-    pageCursors.current = new Map([[1, undefined]]);
+    queryClient.invalidateQueries({ queryKey, refetchType: "none" });
+    resetPagination();
     if (page === 1) refetch();
-    else setPage(1);
-  }, [page, refetch]);
-
-  return {
-    query,
+  }, [page, refetch, resetPagination, queryClient, queryKey]);
+  const pagination: ListPagination = {
+    mode: "cursor",
     page,
     pageSize,
-    setPage,
-    setPageSize,
-    resetPagination,
-    refresh,
+    hasNextPage: Boolean(query.data?.next_cursor),
+    disabled: query.isFetching,
+    onPageChange: setPage,
+    onPageSizeChange: setPageSize,
   };
+  return { query, items: query.data?.items ?? [], pagination, resetPagination, refresh };
 }

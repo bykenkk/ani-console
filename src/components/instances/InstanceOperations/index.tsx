@@ -29,31 +29,27 @@ const OPERATION_LABELS: Record<string, string> = {
 };
 
 export default function InstanceOperations({ instanceId }: { instanceId: string }) {
-  const { query, page, pageSize, setPage, setPageSize } =
-    useCursorPaginatedQuery<InstanceOperation>({
-      errorNotification: {
-        id: withId("instance-operations", instanceId),
-        action: "操作记录加载",
-        fallback: "请求失败，请稍后重试",
-      },
-      queryKey: ["instance-operations", instanceId],
-      cursorScope: instanceId,
-      initialPageSize: 10,
-      fetchPage: async ({ cursor, limit }) => {
-        return listInstanceOperations(instanceId, { limit, cursor });
-      },
-    });
+  const {
+    query,
+    items: pageItems,
+    pagination,
+  } = useCursorPaginatedQuery<InstanceOperation>({
+    errorNotification: {
+      id: withId("instance-operations", instanceId),
+      action: "操作记录加载",
+      fallback: "请求失败，请稍后重试",
+    },
+    queryKey: ["instance-operations", instanceId],
+    initialPageSize: 10,
+    queryFn: async ({ cursor, limit }) => {
+      return listInstanceOperations(instanceId, { limit, cursor });
+    },
+  });
   return (
     <DataTable<InstanceOperation>
-      data={query.data?.items ?? []}
+      data={pageItems}
       loading={query.isFetching}
-      pagination={{
-        page,
-        pageSize,
-        total: query.data?.total ?? 0,
-        onPageChange: setPage,
-        onPageSizeChange: setPageSize,
-      }}
+      pagination={pagination}
       noDataElement={<Empty description="暂无操作记录" />}
       columns={[
         {

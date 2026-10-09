@@ -48,7 +48,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       },
     },
     queryKey: ["network-vpcs", "select"],
-    queryFn: () => listNetworkVpcs({ limit: 50 }),
+    queryFn: () => listNetworkVpcs(),
   });
   const subnets = useQuery({
     meta: {
@@ -59,7 +59,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       },
     },
     queryKey: ["network-subnets", "select", values.vpc_id],
-    queryFn: () => listNetworkSubnets({ limit: 50, vpc_id: values.vpc_id || undefined }),
+    queryFn: () => listNetworkSubnets({ vpc_id: values.vpc_id || undefined }),
     enabled: !!values.vpc_id,
   });
   const securityGroups = useQuery({
@@ -71,7 +71,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       },
     },
     queryKey: ["network-security-groups", "select"],
-    queryFn: () => listNetworkSecurityGroups({ limit: 50 }),
+    queryFn: () => listNetworkSecurityGroups(),
   });
   const filesystems = useQuery({
     meta: {
@@ -82,7 +82,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       },
     },
     queryKey: ["filesystems", "select"],
-    queryFn: () => listFilesystems({ limit: 50 }),
+    queryFn: () => listFilesystems(),
   });
   const volumes = useQuery({
     meta: {
@@ -93,7 +93,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       },
     },
     queryKey: ["volumes", "gpu-container-create", "filesystem"],
-    queryFn: () => listVolumes({ limit: 50, in_use: false, volume_mode: "filesystem" }),
+    queryFn: () => listVolumes({ in_use: false, volume_mode: "filesystem" }),
   });
   const images = useQuery({
     meta: {
@@ -104,7 +104,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       },
     },
     queryKey: ["registry-images", "gpu-create"],
-    queryFn: async () => (await listRegistryImages({ limit: 100, purpose: "gpu" })).items,
+    queryFn: async () => (await listRegistryImages({ purpose: "gpu" })).items,
   });
   const gpuSpecAvailability = useQuery({
     meta: {

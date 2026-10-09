@@ -24,7 +24,7 @@ export default function InstanceRegistryImageSelect({
     },
     queryKey: ["registry-images", "instance-select", purpose],
     enabled,
-    queryFn: () => listRegistryImages({ limit: 100, purpose }).then((data) => data.items),
+    queryFn: () => listRegistryImages({ purpose }).then((data) => data.items),
   });
   return (
     <>

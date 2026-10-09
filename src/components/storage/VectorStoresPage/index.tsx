@@ -2,7 +2,7 @@ import { useVectorStoreActions } from "@/hooks/useVectorStoreActions";
 
 import { useNavigate } from "@tanstack/react-router";
 import { Link } from "@arco-design/web-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { listVectorStores, type VectorStore } from "@/api/storage/vector-stores";
 
 import CreateVectorStoreModal from "@/components/storage/CreateVectorStoreModal";
@@ -13,7 +13,7 @@ import {
   StatusBadge,
   ListDataTable,
 } from "@/components/common";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import { navigateToResourceDetail } from "@/lib/resources";
 
@@ -28,25 +28,20 @@ export default function VectorStoresPage() {
   const [searchText, setSearchText] = useState("");
   const {
     query: stores,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
     refresh,
-  } = useCursorPaginatedQuery<VectorStore>({
+    items,
+    pagination,
+  } = useClientPaginatedQuery<VectorStore>({
     errorNotification: {
       id: "vector-stores",
       action: "向量存储列表加载",
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["vector-stores", { status, searchField, searchText }],
-    cursorScope: `${status}:${searchField}:${searchText.trim()}`,
-    fetchPage: async ({ cursor, limit }) => {
+    queryFn: async () => {
       const keyword = searchText.trim();
       return listVectorStores({
-        limit,
-        cursor,
         state: status === "all" ? undefined : status,
         search_field: keyword ? searchField : undefined,
         keyword: keyword || undefined,
@@ -55,8 +50,7 @@ export default function VectorStoresPage() {
   });
 
   const { actions } = useVectorStoreActions(resetPagination);
-  const items = useMemo(() => (stores.data?.items ?? []) as VectorStore[], [stores.data?.items]);
-  const paginationTotal = stores.data?.total ?? items.length;
+
   const columns: Array<ListColumn<VectorStore>> = [
     {
       key: "name",
@@ -200,13 +194,7 @@ export default function VectorStoresPage() {
           emptyIconClassName="icon-xiangliangcunchu"
           tableLabel="向量存储列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && <CreateVectorStoreModal onCancel={() => setCreateVisible(false)} />}

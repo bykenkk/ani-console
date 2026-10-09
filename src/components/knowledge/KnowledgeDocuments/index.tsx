@@ -70,11 +70,9 @@ function statusTag(document: KBDocument) {
 export default function KnowledgeDocuments({ kbId, action }: { kbId: string; action?: ReactNode }) {
   const {
     query: documents,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
+    items: rows,
+    pagination,
   } = useCursorPaginatedQuery<KBDocument>({
     errorNotification: {
       id: withId("knowledge-documents", kbId),
@@ -82,8 +80,7 @@ export default function KnowledgeDocuments({ kbId, action }: { kbId: string; act
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["knowledge-base-documents", kbId],
-    cursorScope: kbId,
-    fetchPage: ({ cursor, limit }) => listKnowledgeBaseDocuments(kbId, { limit, cursor }),
+    queryFn: ({ cursor, limit }) => listKnowledgeBaseDocuments(kbId, { limit, cursor }),
   });
 
   const qc = useQueryClient();
@@ -168,7 +165,6 @@ export default function KnowledgeDocuments({ kbId, action }: { kbId: string; act
     </>
   );
 
-  const rows = documents.data?.items ?? [];
   const columns: Array<ListColumn<KBDocument>> = [
     {
       title: "文档 / ID",
@@ -232,13 +228,7 @@ export default function KnowledgeDocuments({ kbId, action }: { kbId: string; act
         tableLabel="知识库文档与解析列表"
         scroll={{ x: 1370 }}
         rowActions={actions}
-        pagination={{
-          page,
-          pageSize,
-          total: documents.data?.total ?? rows.length,
-          onPageChange: setPage,
-          onPageSizeChange: setPageSize,
-        }}
+        pagination={pagination}
       />
       {dialogNode}
     </Space>

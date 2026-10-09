@@ -1,6 +1,6 @@
 import { listInstances, type FilterableInstanceState, type InstanceRecord } from "@/api/instances";
 import { Tooltip } from "@arco-design/web-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import GpuContainerCreateModal from "@/components/instances/GpuContainerCreateModal";
 import {
   ResourceNameId,
@@ -24,34 +24,27 @@ export default function GpuInstancesPage() {
   const [searchField, setSearchField] = useState<SearchField>("name");
   const [searchText, setSearchText] = useState("");
   const keyword = searchText.trim();
-  const { query, page, pageSize, setPage, setPageSize, refresh } =
-    useCursorPaginatedQuery<Instance>({
-      errorNotification: {
-        id: "gpu-containers",
-        action: "GPU 容器实例列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
-      queryKey: ["instances", "gpu_container", { status, searchField, keyword }],
-      cursorScope: `gpu:${status}:${searchField}:${keyword}`,
-      fetchPage: async ({ cursor, limit }) => {
-        const listQuery = {
-          limit,
-          cursor,
-          kind: "gpu_container",
-          state: status === "all" ? undefined : status,
-          search_field: keyword ? searchField : undefined,
-          keyword: keyword || undefined,
-        };
-        return listInstances(listQuery);
-      },
-    });
-  useEffect(() => {
-    setPage(1);
-  }, [keyword, searchField, status, setPage]);
+  const { query, refresh, items, pagination } = useCursorPaginatedQuery<Instance>({
+    errorNotification: {
+      id: "gpu-containers",
+      action: "GPU 容器实例列表加载",
+      fallback: "请求失败，请稍后重试",
+    },
+    queryKey: ["instances", "gpu_container", { status, searchField, keyword }],
+    queryFn: async ({ cursor, limit }) => {
+      const listQuery = {
+        limit,
+        cursor,
+        kind: "gpu_container",
+        state: status === "all" ? undefined : status,
+        search_field: keyword ? searchField : undefined,
+        keyword: keyword || undefined,
+      };
+      return listInstances(listQuery);
+    },
+  });
   const { dialogNode, actions } = useGpuInstanceActions(refresh);
 
-  const allItems = (query.data?.items ?? []) as Instance[];
-  const items = allItems;
   const tabs = [
     { value: "all" as const, label: "全部" },
     { value: "pending" as const, label: "等待中" },
@@ -188,13 +181,7 @@ export default function GpuInstancesPage() {
           emptyIconClassName="icon-GPU"
           tableLabel="GPU 容器实例列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: query.data?.total ?? items.length,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && (

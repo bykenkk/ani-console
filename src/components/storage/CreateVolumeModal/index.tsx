@@ -40,7 +40,7 @@ export default function CreateVolumeModal({
       },
     },
     queryKey: ["instances", "volume-create"],
-    queryFn: () => listInstances({ limit: 100, mountable: true }),
+    queryFn: () => listInstances({ mountable: true }),
   });
   // TODO: 实例接口确认按 mountable 过滤后，移除此处创建表单的本地兜底过滤。
   const instanceItems = ((instances.data?.items ?? []) as Instance[]).filter((item) =>

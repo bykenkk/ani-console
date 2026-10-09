@@ -32,13 +32,14 @@ export default function KnowledgeBaseAuditLogs({ kbId }: { kbId: string }) {
       },
     },
     queryKey: ["knowledge-base-audit-logs", kbId],
-    initialPageParam: "",
+    initialPageParam: "0",
     queryFn: ({ pageParam }) =>
       listKnowledgeBaseAuditLogs(kbId, {
         limit: PAGE_SIZE,
-        ...(pageParam ? { cursor: pageParam } : {}),
+        cursor: pageParam === "0" ? undefined : pageParam,
       }),
-    getNextPageParam: (lastPage) => lastPage.next_cursor?.trim() || undefined,
+    getNextPageParam: (lastPage, pages) =>
+      lastPage.next_cursor ? String(pages.length * PAGE_SIZE) : undefined,
   });
   const items = logs.data?.pages.flatMap((page) => page.items) ?? [];
 

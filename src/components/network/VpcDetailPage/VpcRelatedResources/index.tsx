@@ -1,3 +1,4 @@
+import { useClientPagination } from "@/hooks/useClientPagination";
 import { listInstances, type InstanceRecord } from "@/api/instances";
 import {
   listNetworkLoadBalancers,
@@ -32,7 +33,7 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
       },
     },
     queryKey: ["network-subnets", vpcId],
-    queryFn: () => listNetworkSubnets({ vpc_id: vpcId, limit: 100 }),
+    queryFn: () => listNetworkSubnets({ vpc_id: vpcId }),
   });
   const routes = useQuery({
     meta: {
@@ -43,7 +44,7 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
       },
     },
     queryKey: ["network-routes", vpcId],
-    queryFn: () => listNetworkRoutes({ vpc_id: vpcId, limit: 100 }),
+    queryFn: () => listNetworkRoutes({ vpc_id: vpcId }),
   });
   const securityGroups = useQuery({
     meta: {
@@ -53,8 +54,8 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-security-groups", "vpc-related"],
-    queryFn: () => listNetworkSecurityGroups({ limit: 100, vpc_id: vpcId }),
+    queryKey: ["network-security-groups", "vpc-related", vpcId],
+    queryFn: () => listNetworkSecurityGroups({ vpc_id: vpcId }),
   });
   const loadBalancers = useQuery({
     meta: {
@@ -65,7 +66,7 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
       },
     },
     queryKey: ["network-load-balancers", "vpc", vpcId],
-    queryFn: () => listNetworkLoadBalancers({ limit: 100, vpc_id: vpcId }),
+    queryFn: () => listNetworkLoadBalancers({ vpc_id: vpcId }),
   });
   const instances = useQuery({
     meta: {
@@ -76,7 +77,7 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
       },
     },
     queryKey: ["instances", "vpc", vpcId],
-    queryFn: () => listInstances({ limit: 100, vpc_id: vpcId }),
+    queryFn: () => listInstances({ vpc_id: vpcId }),
   });
   const resources: RelatedResource[] = [
     ...((subnets.data?.items ?? []) as NetworkSubnet[]).map((item) => ({
@@ -117,6 +118,8 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
   ];
   const networkResources = resources.filter((resource) => resource.group === "网络");
   const computeResources = resources.filter((resource) => resource.group === "算力");
+  const networkPage = useClientPagination(networkResources, vpcId);
+  const computePage = useClientPagination(computeResources, vpcId);
   const loading =
     subnets.isLoading ||
     routes.isLoading ||
@@ -143,10 +146,10 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
             extra: <Typography.Text type="secondary">{networkResources.length} 个</Typography.Text>,
           }}
           columns={columns}
-          data={networkResources}
+          data={networkPage.items}
           loading={loading}
           noDataElement={<Empty description="暂无网络关联资源" />}
-          pagination={false}
+          pagination={networkPage.pagination}
           tableLabel="VPC 网络关联资源"
         />
       </section>
@@ -157,10 +160,10 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
             extra: <Typography.Text type="secondary">{computeResources.length} 个</Typography.Text>,
           }}
           columns={columns}
-          data={computeResources}
+          data={computePage.items}
           loading={loading}
           noDataElement={<Empty description="暂无算力关联资源" />}
-          pagination={false}
+          pagination={computePage.pagination}
           tableLabel="VPC 算力关联资源"
         />
       </section>

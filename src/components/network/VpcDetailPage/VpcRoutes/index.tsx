@@ -1,22 +1,23 @@
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { listNetworkRoutes, type NetworkRoute } from "@/api/network";
 import { DataTable } from "@/components/common";
 import { withId } from "@/lib/id";
 import { Empty } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
 
 export default function VpcRoutes({ vpcId }: { vpcId: string }) {
-  const routes = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("vpc-routes", vpcId),
-        action: `路由加载`,
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: routes,
+    items: pageItems,
+    pagination,
+  } = useClientPaginatedQuery({
+    errorNotification: {
+      id: withId("vpc-routes", vpcId),
+      action: `路由加载`,
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["network-routes", vpcId],
-    queryFn: () => listNetworkRoutes({ vpc_id: vpcId, limit: 100 }),
+    queryFn: () => listNetworkRoutes({ vpc_id: vpcId }),
   });
-  const items = (routes.data?.items ?? []) as NetworkRoute[];
 
   return (
     <DataTable<NetworkRoute>
@@ -26,9 +27,9 @@ export default function VpcRoutes({ vpcId }: { vpcId: string }) {
         { title: "下一跳", dataIndex: "next_hop_id" },
         { title: "描述", dataIndex: "description", placeholder: "-" },
       ]}
-      data={items}
+      data={pageItems}
       loading={routes.isLoading}
-      pagination={false}
+      pagination={pagination}
       noDataElement={<Empty />}
     />
   );

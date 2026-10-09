@@ -1,6 +1,6 @@
 import { useFilesystemActions } from "@/hooks/useFilesystemActions";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { listFilesystems, type StorageFilesystem } from "@/api/storage/filesystems";
 
 import CreateFilesystemModal from "@/components/storage/CreateFilesystemModal";
@@ -12,7 +12,7 @@ import {
   StatusBadge,
   ListDataTable,
 } from "@/components/common";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 
 type Filesystem = StorageFilesystem;
@@ -27,25 +27,20 @@ export default function FilesystemsPage() {
   const [searchText, setSearchText] = useState("");
   const {
     query: filesystems,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
     refresh,
-  } = useCursorPaginatedQuery<Filesystem>({
+    items,
+    pagination,
+  } = useClientPaginatedQuery<Filesystem>({
     errorNotification: {
       id: "filesystems",
       action: "文件存储列表加载",
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["filesystems", { status, searchField, searchText }],
-    cursorScope: `${status}:${searchField}:${searchText.trim()}`,
-    fetchPage: async ({ cursor, limit }) => {
+    queryFn: async () => {
       const keyword = searchText.trim();
       return listFilesystems({
-        limit,
-        cursor,
         state: status === "all" ? undefined : status,
         search_field: keyword ? searchField : undefined,
         keyword: keyword || undefined,
@@ -53,11 +48,7 @@ export default function FilesystemsPage() {
     },
   });
   const { actions, dialogNode } = useFilesystemActions(resetPagination);
-  const items = useMemo(
-    () => (filesystems.data?.items ?? []) as Filesystem[],
-    [filesystems.data?.items],
-  );
-  const paginationTotal = filesystems.data?.total ?? items.length;
+
   const columns: Array<ListColumn<Filesystem>> = [
     {
       key: "name",
@@ -172,13 +163,7 @@ export default function FilesystemsPage() {
           emptyIconClassName="icon-wenjiancunchu"
           tableLabel="文件存储列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && <CreateFilesystemModal onCancel={() => setCreateVisible(false)} />}

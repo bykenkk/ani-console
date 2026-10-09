@@ -36,7 +36,7 @@ export default function GpuInstanceBindSecretModal({
       },
     },
     queryKey: ["secrets", "gpu-instance-bind-secret"],
-    queryFn: () => listSecrets({ limit: 100 }),
+    queryFn: () => listSecrets(),
   });
   const mutation = useMutation({
     meta: {

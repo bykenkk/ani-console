@@ -38,7 +38,7 @@ export default function CreateLoadBalancerModal({
       },
     },
     queryKey: ["network-vpcs", "load-balancer-create"],
-    queryFn: () => listNetworkVpcs({ limit: 100 }),
+    queryFn: () => listNetworkVpcs(),
   });
   const subnets = useQuery({
     meta: {
@@ -49,7 +49,7 @@ export default function CreateLoadBalancerModal({
       },
     },
     queryKey: ["network-subnets", "load-balancer-create", vpcId],
-    queryFn: () => listNetworkSubnets({ limit: 100, vpc_id: vpcId || undefined }),
+    queryFn: () => listNetworkSubnets({ vpc_id: vpcId || undefined }),
     enabled: !!vpcId,
   });
   // TODO: 子网接口确认按 vpc_id 过滤后，移除此处创建表单的本地兜底过滤。

@@ -1,5 +1,5 @@
 import type { AsyncTask } from "@/api/tasks";
-import type { CoreDevProfileInfo, CursorPageParams } from "@/api/types";
+import type { CoreDevProfileInfo } from "@/api/types";
 
 export type StorageResourceState = "pending" | "available" | "failed" | "deleting" | "deleted";
 export type StorageVolumeMode = "block" | "filesystem";
@@ -53,7 +53,7 @@ export interface StorageVolume {
   updated_at: string;
 }
 
-export interface StorageVolumeListParams extends CursorPageParams {
+export interface StorageVolumeListParams {
   volume_mode?: StorageVolumeMode;
   state?: string;
   search_field?: "name" | "id";

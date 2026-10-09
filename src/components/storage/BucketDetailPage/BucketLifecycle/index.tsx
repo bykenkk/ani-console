@@ -1,3 +1,4 @@
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import {
   listBucketLifecycleRules,
   type StorageBucketLifecycleRule,
@@ -6,18 +7,20 @@ import {
 import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 import { withId } from "@/lib/id";
 import { Button, Empty, Space, Typography, Modal } from "@arco-design/web-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CreateLifecycleRuleModal from "@/components/storage/CreateLifecycleRuleModal";
 import { useState } from "react";
 
 export default function BucketLifecycle({ bucketId }: { bucketId: string }) {
-  const rules = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("bucket-lifecycle", bucketId),
-        action: "生命周期规则加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: rules,
+    items: pageItems,
+    pagination,
+  } = useClientPaginatedQuery({
+    errorNotification: {
+      id: withId("bucket-lifecycle", bucketId),
+      action: "生命周期规则加载",
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["bucket-lifecycle-rules", bucketId],
     queryFn: () => listBucketLifecycleRules(bucketId),
@@ -110,9 +113,9 @@ export default function BucketLifecycle({ bucketId }: { bucketId: string }) {
               ),
             },
           ]}
-          data={items}
+          data={pageItems}
           loading={rules.isLoading}
-          pagination={false}
+          pagination={pagination}
           rowActions={actions}
           noDataElement={<Empty description="暂无生命周期规则，点击「添加规则」开始" />}
         />

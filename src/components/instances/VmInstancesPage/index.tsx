@@ -1,5 +1,5 @@
 import { listInstances, type FilterableInstanceState, type InstanceRecord } from "@/api/instances";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ResourceNameId,
   ListPageFrame,
@@ -33,34 +33,27 @@ export default function VmInstancesPage() {
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [searchText, setSearchText] = useState("");
-  const { query, page, pageSize, setPage, setPageSize, refresh } =
-    useCursorPaginatedQuery<VmInstance>({
-      errorNotification: {
-        id: "vms",
-        action: "云主机列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
-      queryKey: ["vm-instances", { status, searchText }],
-      cursorScope: `vm:${status}:${searchText.trim()}`,
-      fetchPage: async ({ cursor, limit }) => {
-        const keyword = searchText.trim();
-        return listInstances({
-          kind: "vm",
-          limit,
-          cursor,
-          state: status === "all" ? undefined : status,
-          keyword: keyword || undefined,
-        });
-      },
-    });
-
-  useEffect(() => {
-    setPage(1);
-  }, [searchText, setPage, status]);
+  const { query, refresh, items, pagination } = useCursorPaginatedQuery<VmInstance>({
+    errorNotification: {
+      id: "vms",
+      action: "云主机列表加载",
+      fallback: "请求失败，请稍后重试",
+    },
+    queryKey: ["vm-instances", { status, searchText }],
+    queryFn: async ({ cursor, limit }) => {
+      const keyword = searchText.trim();
+      return listInstances({
+        kind: "vm",
+        limit,
+        cursor,
+        state: status === "all" ? undefined : status,
+        keyword: keyword || undefined,
+      });
+    },
+  });
 
   const { dialogNode, actions } = useVmInstanceActions(refresh);
 
-  const items = query.data?.items ?? [];
   const statusTabs = [
     { value: "all" as const, label: "全部" },
     { value: "pending" as const, label: "等待中" },
@@ -169,13 +162,7 @@ export default function VmInstancesPage() {
           loading={query.isFetching}
           emptyIconClassName="icon-yunzhuji"
           tableLabel="云主机 VM 列表"
-          pagination={{
-            page,
-            pageSize,
-            total: query.data?.total ?? items.length,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && (

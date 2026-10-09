@@ -78,11 +78,11 @@ async function fetchContainerInstancePage(
 }
 
 export function createContainerInstanceDataSource(
-  fetchPage: ContainerInstancePageFetcher = fetchContainerInstancePage,
+  queryFn: ContainerInstancePageFetcher = fetchContainerInstancePage,
 ): ContainerInstanceDataSource {
   return {
     async list(query: ContainerInstanceQuery): Promise<ContainerInstanceListResult> {
-      const result = await fetchPage(query.cursor, query);
+      const result = await queryFn(query.cursor, query);
       return {
         items: result.items.map(mapContainerInstance),
         total: result.total,

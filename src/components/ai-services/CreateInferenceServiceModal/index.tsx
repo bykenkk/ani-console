@@ -108,7 +108,7 @@ export default function CreateInferenceServiceModal({
       },
     },
     queryKey: ["models", "inference-service-create"],
-    queryFn: () => listModels({ status: "ready", limit: 100 }),
+    queryFn: () => listModels({ status: "ready" }),
   });
   const selectedModelSummary = useMemo(
     () => (models.data?.items ?? []).find((item) => item.id === modelId),
@@ -146,7 +146,7 @@ export default function CreateInferenceServiceModal({
     },
     queryKey: ["gpu-specs", "inference-service-create"],
     queryFn: async () =>
-      (await listGpuSpecs({ available: true, limit: 100 })) as unknown as GpuSpecListResponse,
+      (await listGpuSpecs({ available: true })) as unknown as GpuSpecListResponse,
   });
 
   const gpuSpecAvailability = useQuery({
@@ -183,14 +183,12 @@ export default function CreateInferenceServiceModal({
     queryKey: ["inference-runtime-images"],
     enabled: runtimeImageMode === "registry" && Boolean(selectedModelVersion),
     queryFn: async () => {
-      const projectData = await listRegistryProjects({ limit: 50 });
+      const projectData = await listRegistryProjects();
       const images: RuntimeImage[] = [];
       for (const project of projectData?.items ?? []) {
-        const repoData = await listRegistryRepositories(project.name, { limit: 50 });
+        const repoData = await listRegistryRepositories(project.name);
         for (const repository of repoData?.items ?? []) {
-          const artifactData = await listRegistryArtifacts(project.name, repository.name, {
-            limit: 50,
-          });
+          const artifactData = await listRegistryArtifacts(project.name, repository.name);
           for (const artifact of artifactData?.items ?? []) {
             for (const tag of artifact.tags) {
               const id = `${artifact.project}/${artifact.repository}:${tag}`;

@@ -1,6 +1,5 @@
 import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
-import type { CursorPageParams } from "@/api/types";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
   CreateNetworkSecurityGroupInput,
@@ -85,11 +84,10 @@ export function listNetworkSecurityGroupBindings(
 
 export function listNetworkSecurityGroupRules(
   securityGroupId: string,
-  params: CursorPageParams = {},
 ): Promise<NetworkSecurityGroupRuleListResponse> {
   return coreRequest<NetworkSecurityGroupRuleListResponse>(
     `${securityGroupPath(securityGroupId)}/rules`,
-    { method: "GET", params },
+    { method: "GET" },
   );
 }
 

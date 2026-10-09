@@ -50,16 +50,14 @@ export default function RegistryPage() {
       },
     },
     queryKey: ["registry-projects"],
-    queryFn: () => listRegistryProjects({ limit: 100 }).then((data) => data.items),
+    queryFn: () => listRegistryProjects().then((data) => data.items),
   });
   const {
     query: images,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
     refresh,
+    items,
+    pagination,
   } = useCursorPaginatedQuery<RegistryImage>({
     errorNotification: {
       id: "registry-images",
@@ -67,8 +65,7 @@ export default function RegistryPage() {
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["registry-images", { keyword, project, purpose }],
-    cursorScope: `${keyword.trim()}:${project}:${purpose}`,
-    fetchPage: async ({ cursor, limit }) => {
+    queryFn: async ({ cursor, limit }) => {
       return listRegistryImages({
         limit,
         cursor,
@@ -95,8 +92,6 @@ export default function RegistryPage() {
     },
   });
 
-  const items = images.data?.items ?? [];
-  const paginationTotal = images.data?.total ?? items.length;
   const columns: Array<ListColumn<RegistryImage>> = [
     {
       key: "image",
@@ -270,13 +265,7 @@ export default function RegistryPage() {
           preserveTableOnEmpty
           emptyIconClassName="icon-moxing"
           tableLabel="镜像仓库列表"
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {guideVisible && (

@@ -1,10 +1,10 @@
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { listVolumeSnapshots, type VolumeSnapshotRecord } from "@/api/storage/volumes";
 import { DataTable, StatusBadge } from "@/components/common";
 
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 import { Button, Empty } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
 
 export default function VolumeSnapshots({
   volumeId,
@@ -13,18 +13,19 @@ export default function VolumeSnapshots({
   volumeId: string;
   onCreateSnapshot: () => void;
 }) {
-  const snapshots = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("volume-snapshots", volumeId),
-        action: "快照列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: snapshots,
+    items: pageItems,
+    pagination,
+  } = useClientPaginatedQuery({
+    errorNotification: {
+      id: withId("volume-snapshots", volumeId),
+      action: "快照列表加载",
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["volume-snapshots", volumeId],
-    queryFn: () => listVolumeSnapshots(volumeId, { limit: 100 }),
+    queryFn: () => listVolumeSnapshots(volumeId),
   });
-  const items = (snapshots.data?.items ?? []) as VolumeSnapshotRecord[];
 
   return (
     <>
@@ -44,9 +45,9 @@ export default function VolumeSnapshots({
             { title: "大小", render: (_, row) => formatBytes(row.size_bytes) },
             { title: "创建时间", render: (_, row) => formatDateTime(row.created_at) },
           ]}
-          data={items}
+          data={pageItems}
           loading={snapshots.isLoading}
-          pagination={false}
+          pagination={pagination}
           noDataElement={<Empty description="暂无快照，点击右上角「创建快照」开始" />}
         />
       </div>

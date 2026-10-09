@@ -178,12 +178,10 @@ export default function ContainerInstanceCreateModal({
       queryKey: [key, "container-create"],
       queryFn: async () => (await request()).items,
     });
-  const vpcs = useListQuery("network-vpcs", "vpcs", () => listNetworkVpcs({ limit: 100 }));
-  const subnets = useListQuery("network-subnets", "subnets", () =>
-    listNetworkSubnets({ limit: 100 }),
-  );
+  const vpcs = useListQuery("network-vpcs", "vpcs", () => listNetworkVpcs());
+  const subnets = useListQuery("network-subnets", "subnets", () => listNetworkSubnets());
   const securityGroups = useListQuery("network-security-groups", "security-groups", () =>
-    listNetworkSecurityGroups({ limit: 100 }),
+    listNetworkSecurityGroups(),
   );
   const volumes = useQuery({
     meta: {
@@ -194,13 +192,10 @@ export default function ContainerInstanceCreateModal({
       },
     },
     queryKey: ["volumes", "container-create", "filesystem"],
-    queryFn: async () =>
-      (await listVolumes({ limit: 100, in_use: false, volume_mode: "filesystem" })).items,
+    queryFn: async () => (await listVolumes({ in_use: false, volume_mode: "filesystem" })).items,
   });
-  const filesystems = useListQuery("filesystems", "filesystems", () =>
-    listFilesystems({ limit: 100 }),
-  );
-  const secrets = useListQuery("secrets", "secrets", () => listSecrets({ limit: 100 }));
+  const filesystems = useListQuery("filesystems", "filesystems", () => listFilesystems());
+  const secrets = useListQuery("secrets", "secrets", () => listSecrets());
   const images = useQuery({
     meta: {
       errorNotification: {
@@ -210,7 +205,7 @@ export default function ContainerInstanceCreateModal({
       },
     },
     queryKey: ["registry-images", "container-create", "container"],
-    queryFn: async () => (await listRegistryImages({ limit: 100, purpose: "container" })).items,
+    queryFn: async () => (await listRegistryImages({ purpose: "container" })).items,
   });
 
   const create = useMutation({

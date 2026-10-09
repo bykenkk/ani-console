@@ -36,7 +36,7 @@ export default function SandboxInstanceCreateForm({ submitting, onCancel, onSubm
       },
     },
     queryKey: ["sandbox-templates", "create-modal"],
-    queryFn: () => listSandboxTemplates({ limit: 100 }),
+    queryFn: () => listSandboxTemplates(),
   });
   const items = useMemo(
     () => (templates.data as { items?: SandboxTemplate[] } | undefined)?.items ?? [],

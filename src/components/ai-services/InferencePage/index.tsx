@@ -1,8 +1,8 @@
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { useInferenceActions } from "@/hooks/useInferenceActions";
 
 import { Select, Space } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { listInferenceServices, type InferenceService } from "@/api/ai-services/inference";
 
 import CreateInferenceServiceModal from "@/components/ai-services/CreateInferenceServiceModal";
@@ -20,22 +20,23 @@ export default function InferencePage() {
   const [searchField, setSearchField] = useState<SearchField>("name");
   const [searchText, setSearchText] = useState("");
   const [model, setModel] = useState("all");
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const services = useQuery({
-    meta: {
-      errorNotification: {
-        id: "inference-services",
-        action: "推理服务列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: services,
+    items,
+    pagination,
+    refresh,
+  } = useCursorPaginatedQuery({
+    errorNotification: {
+      id: "inference-services",
+      action: "推理服务列表加载",
+      fallback: "请求失败，请稍后重试",
     },
-    queryKey: ["inference-services", { status, searchField, searchText, model, page, pageSize }],
-    queryFn: async () => {
+    queryKey: ["inference-services", { status, searchField, searchText, model }],
+    queryFn: async ({ cursor, limit }) => {
       const keyword = searchText.trim();
       return listInferenceServices({
-        limit: pageSize,
-        offset: (page - 1) * pageSize,
+        limit,
+        cursor,
         status: status === "all" ? undefined : status,
         model: model === "all" ? undefined : model,
         search_field: keyword ? searchField : undefined,
@@ -44,7 +45,6 @@ export default function InferencePage() {
     },
   });
 
-  const items = useMemo(() => services.data?.items ?? [], [services.data?.items]);
   const modelOptions = useMemo(
     () =>
       Array.from(new Set(items.map((item) => item.model))).map((value) => ({
@@ -53,7 +53,6 @@ export default function InferencePage() {
       })),
     [items],
   );
-  useEffect(() => setPage(1), [model, searchField, searchText, status]);
   const columns: Array<ListColumn<InferenceService>> = [
     {
       key: "name",
@@ -203,7 +202,7 @@ export default function InferencePage() {
           refresh: {
             label: "刷新",
             spinning: services.isFetching,
-            onClick: () => void services.refetch(),
+            onClick: refresh,
           },
         }}
       >
@@ -212,16 +211,7 @@ export default function InferencePage() {
           columns={columns}
           rowActions={actions}
           loading={services.isFetching}
-          pagination={{
-            page,
-            pageSize,
-            total: services.data?.total ?? items.length,
-            onPageChange: setPage,
-            onPageSizeChange: (next) => {
-              setPageSize(next);
-              setPage(1);
-            },
-          }}
+          pagination={pagination}
           preserveTableOnEmpty
           emptyIconClassName="icon-tuili"
           tableLabel="推理服务列表"

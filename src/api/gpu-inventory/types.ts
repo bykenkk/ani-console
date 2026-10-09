@@ -1,4 +1,4 @@
-import type { CoreDevProfileInfo, CursorPageParams } from "@/api/types";
+import type { CoreDevProfileInfo } from "@/api/types";
 
 export type GpuInventoryStatus = "available" | "in_use" | "fault" | "maintenance";
 
@@ -15,7 +15,7 @@ export interface GpuInventoryRecord {
   dev_profile: CoreDevProfileInfo;
 }
 
-export interface GpuInventoryListParams extends CursorPageParams {
+export interface GpuInventoryListParams {
   gpu_type?: string;
   status?: GpuInventoryStatus;
   node_name?: string;

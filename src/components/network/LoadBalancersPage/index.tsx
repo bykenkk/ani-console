@@ -2,7 +2,7 @@ import { useLoadBalancerActions } from "@/hooks/useLoadBalancerActions";
 
 import { useQuery } from "@tanstack/react-query";
 import { Select } from "@arco-design/web-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   listNetworkLoadBalancers,
   listNetworkVpcs,
@@ -18,7 +18,7 @@ import {
   StatusBadge,
   ListDataTable,
 } from "@/components/common";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 
 type LoadBalancer = NetworkLoadBalancer;
@@ -34,25 +34,24 @@ export default function LoadBalancersPage() {
   const [vpcId, setVpcId] = useState("");
   const {
     query: loadBalancers,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
     refresh,
-  } = useCursorPaginatedQuery<LoadBalancer>({
+    items,
+    pagination,
+  } = useClientPaginatedQuery<LoadBalancer>({
     errorNotification: {
       id: "load-balancers",
       action: "负载均衡列表加载",
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["network-load-balancers", { status, searchField, searchText, vpcId }],
-    cursorScope: `${status}:${searchField}:${searchText.trim()}:${vpcId}`,
-    fetchPage: async ({ cursor, limit }) => {
+    filter: (item) =>
+      String(item[searchField] ?? "")
+        .toLowerCase()
+        .includes(searchText.trim().toLowerCase()),
+    queryFn: async () => {
       const keyword = searchText.trim();
       return listNetworkLoadBalancers({
-        limit,
-        cursor,
         vpc_id: vpcId || undefined,
         state: status === "all" ? undefined : status,
         search_field: keyword ? searchField : undefined,
@@ -69,14 +68,10 @@ export default function LoadBalancersPage() {
       },
     },
     queryKey: ["network-vpcs", "load-balancer-list"],
-    queryFn: () => listNetworkVpcs({ limit: 100 }),
+    queryFn: () => listNetworkVpcs(),
   });
   const { actions } = useLoadBalancerActions(resetPagination);
-  const items = useMemo(
-    () => (loadBalancers.data?.items ?? []) as LoadBalancer[],
-    [loadBalancers.data?.items],
-  );
-  const paginationTotal = loadBalancers.data?.total ?? items.length;
+
   const columns: Array<ListColumn<LoadBalancer>> = [
     {
       key: "name",
@@ -203,13 +198,7 @@ export default function LoadBalancersPage() {
           emptyIconClassName="icon-fuzaijunhengqi"
           tableLabel="负载均衡列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && <CreateLoadBalancerModal onCancel={() => setCreateVisible(false)} />}

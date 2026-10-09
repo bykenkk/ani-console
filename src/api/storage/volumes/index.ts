@@ -1,7 +1,6 @@
 import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
 import type { AsyncTask } from "@/api/tasks";
-import type { CursorPageParams } from "@/api/types";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
   CreateStorageVolumeInput,
@@ -51,13 +50,9 @@ export function deleteVolume(volumeId: string): Promise<StorageVolume> {
   return coreRequest<StorageVolume>(volumePath(volumeId), { method: "DELETE" });
 }
 
-export function listVolumeSnapshots(
-  volumeId: string,
-  params: CursorPageParams = {},
-): Promise<VolumeSnapshotListResponse> {
+export function listVolumeSnapshots(volumeId: string): Promise<VolumeSnapshotListResponse> {
   return coreRequest<VolumeSnapshotListResponse>(`${volumePath(volumeId)}/snapshots`, {
     method: "GET",
-    params,
   });
 }
 

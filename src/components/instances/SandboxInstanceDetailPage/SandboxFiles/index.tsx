@@ -1,7 +1,8 @@
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
 import { listSandboxFiles, type SandboxFile, deleteSandboxFile } from "@/api/instances";
 import { Button, Empty, Input, Space, Tag, Tooltip, Modal } from "@arco-design/web-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { DataTable, type RowAction } from "@/components/common";
 import { formatBytes, formatDateTime } from "@/lib/format";
@@ -20,16 +21,19 @@ export default function SandboxFiles({
   const [directory, setDirectory] = useState(".");
   const [pathInput, setPathInput] = useState(".");
 
-  const files = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("sandbox-files", instanceId, directory),
-        action: "工作区文件加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: files,
+    items: pageItems,
+    pagination,
+    refresh,
+  } = useCursorPaginatedQuery({
+    errorNotification: {
+      id: withId("sandbox-files", instanceId, directory),
+      action: "工作区文件加载",
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["sandbox-files", instanceId, directory],
-    queryFn: () => listSandboxFiles(instanceId, { path: directory, limit: 500 }),
+    queryFn: (params) => listSandboxFiles(instanceId, { ...params, path: directory }),
   });
   const openDirectory = (path: string) => {
     setDirectory(path || ".");
@@ -52,7 +56,7 @@ export default function SandboxFiles({
       return path;
     },
     onSuccess: () => {
-      void files.refetch();
+      refresh();
       onChanged();
     },
   });
@@ -93,7 +97,7 @@ export default function SandboxFiles({
           directory={directory}
           onCancel={() => setEditorVisible(false)}
           onCreated={() => {
-            void files.refetch();
+            refresh();
             onChanged();
           }}
         />
@@ -128,17 +132,17 @@ export default function SandboxFiles({
                 </Button>
               </span>
             </Tooltip>
-            <Button loading={files.isFetching} onClick={() => files.refetch()}>
+            <Button loading={files.isFetching} onClick={refresh}>
               刷新
             </Button>
           </div>
 
           <DataTable<SandboxFile>
             tableLabel="工作区文件"
-            data={files.data?.items ?? []}
+            data={pageItems}
             rowKey="path"
             loading={files.isLoading || files.isFetching}
-            pagination={false}
+            pagination={pagination}
             noDataElement={<Empty description="当前目录为空" />}
             rowActions={actions}
             columns={[

@@ -1,3 +1,4 @@
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { copyToClipboard } from "@/lib/clipboard";
 import {
   getFilesystemMountCommand,
@@ -9,7 +10,7 @@ import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 import { Button, Empty } from "@arco-design/web-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 export default function FilesystemMountTargets({
@@ -21,16 +22,18 @@ export default function FilesystemMountTargets({
   onCreateMountTarget: () => void;
   onMountCountChange: (count: number) => void;
 }) {
-  const mounts = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("filesystem-mounts", filesystemId),
-        action: "挂载点加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: mounts,
+    items: pageItems,
+    pagination,
+  } = useClientPaginatedQuery({
+    errorNotification: {
+      id: withId("filesystem-mounts", filesystemId),
+      action: "挂载点加载",
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["filesystem-mounts", filesystemId],
-    queryFn: () => listFilesystemMountTargets(filesystemId, { limit: 100 }),
+    queryFn: () => listFilesystemMountTargets(filesystemId),
   });
   const items = (mounts.data?.items ?? []) as FilesystemMountTarget[];
   const copyCommand = useMutation({
@@ -105,9 +108,9 @@ export default function FilesystemMountTargets({
               render: (_, row) => formatDateTime(row.created_at),
             },
           ]}
-          data={items}
+          data={pageItems}
           loading={mounts.isLoading}
-          pagination={false}
+          pagination={pagination}
           rowActions={actions}
           noDataElement={<Empty description="暂无挂载目标，请创建挂载目标后获取访问地址" />}
         />

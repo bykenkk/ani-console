@@ -1,3 +1,4 @@
+import type { CursorPageParams } from "@/api/types";
 import { coreRequest } from "@/api/request";
 export { queryObservabilityRange } from "@/api/observability";
 import { instancePath } from "./records";
@@ -6,14 +7,18 @@ type ListResponse<T> = { items: T[]; total: number; next_cursor?: string | null 
 export function getInstanceMetrics(instanceId: string): Promise<InstanceMetrics> {
   return coreRequest<InstanceMetrics>(`${instancePath(instanceId)}/metrics`, { method: "GET" });
 }
-export function listInstanceEvents(instanceId: string): Promise<ListResponse<InstanceEvent>> {
+export function listInstanceEvents(
+  instanceId: string,
+  params: CursorPageParams = {},
+): Promise<ListResponse<InstanceEvent>> {
   return coreRequest<ListResponse<InstanceEvent>>(`${instancePath(instanceId)}/events`, {
     method: "GET",
+    params,
   });
 }
 export function listInstanceSecurityEvents(
   instanceId: string,
-  params: { severity?: string; limit?: number } = {},
+  params: CursorPageParams & { severity?: string } = {},
 ): Promise<ListResponse<InstanceSecurityEvent>> {
   return coreRequest<ListResponse<InstanceSecurityEvent>>(
     `${instancePath(instanceId)}/security-events`,

@@ -1,3 +1,4 @@
+import type { CursorPageParams } from "@/api/types";
 import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
 import { createIdempotencyScope } from "@/lib/idempotency";
@@ -23,7 +24,7 @@ const cloneScope = createIdempotencyScope("sandbox-checkpoint-clone", ["POST"]);
 const codeScope = createIdempotencyScope("sandbox-code-run", ["POST"]);
 type ListResponse<T> = { items: T[]; total: number; next_cursor?: string | null };
 export function listSandboxTemplates(
-  params: { limit?: number } = {},
+  params: CursorPageParams = {},
 ): Promise<ListResponse<SandboxTemplate>> {
   return coreRequest<ListResponse<SandboxTemplate>>("/sandbox-templates", {
     method: "GET",
@@ -75,7 +76,7 @@ export function deleteSandboxPort(instanceId: string, port: number): Promise<voi
 }
 export function listSandboxFiles(
   instanceId: string,
-  params: { path?: string; limit?: number } = {},
+  params: CursorPageParams & { path?: string } = {},
 ): Promise<ListResponse<SandboxFile>> {
   return coreRequest<ListResponse<SandboxFile>>(`${instancePath(instanceId)}/sandbox/files`, {
     method: "GET",
@@ -113,10 +114,11 @@ export function deleteSandboxFile(instanceId: string, path: string): Promise<voi
 }
 export function listSandboxCheckpoints(
   instanceId: string,
+  params: CursorPageParams = {},
 ): Promise<ListResponse<SandboxCheckpoint>> {
   return coreRequest<ListResponse<SandboxCheckpoint>>(
     `${instancePath(instanceId)}/sandbox/checkpoints`,
-    { method: "GET" },
+    { method: "GET", params },
   );
 }
 export function createSandboxCheckpoint(

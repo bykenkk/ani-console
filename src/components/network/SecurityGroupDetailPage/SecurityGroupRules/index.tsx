@@ -1,11 +1,11 @@
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { listNetworkSecurityGroupRules, deleteNetworkSecurityGroupRule } from "@/api/network";
 import { DataTable, type RowAction } from "@/components/common";
-import SecurityGroupRuleModal, {
-  type SecurityGroupRuleResource,
-} from "@/components/network/SecurityGroupRuleModal";
+import SecurityGroupRuleModal from "@/components/network/SecurityGroupRuleModal";
+import { type SecurityGroupRuleResource } from "@/components/network/SecurityGroupRuleModal";
 import { withId } from "@/lib/id";
 import { Button, Empty, Space, Tag, Typography, Modal } from "@arco-design/web-react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 export default function SecurityGroupRules({
@@ -15,16 +15,20 @@ export default function SecurityGroupRules({
   securityGroupId: string;
   direction: SecurityGroupRuleResource["direction"];
 }) {
-  const rules = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("security-group-rules", securityGroupId),
-        action: `安全组规则加载`,
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: rules,
+    items: pageItems,
+    pagination,
+  } = useClientPaginatedQuery({
+    errorNotification: {
+      id: withId("security-group-rules", securityGroupId),
+      action: `安全组规则加载`,
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["network-security-group-rules", securityGroupId],
-    queryFn: () => listNetworkSecurityGroupRules(securityGroupId, { limit: 100 }),
+    filterScope: direction,
+    filter: (rule) => rule.direction === direction,
+    queryFn: () => listNetworkSecurityGroupRules(securityGroupId),
   });
 
   const qc = useQueryClient();
@@ -118,8 +122,8 @@ export default function SecurityGroupRules({
           },
           { title: "描述", dataIndex: "description", placeholder: "-" },
         ]}
-        data={directionRules}
-        pagination={false}
+        data={pageItems}
+        pagination={pagination}
         noDataElement={
           <Empty description={`暂无${direction === "ingress" ? "入站" : "出站"}规则`} />
         }

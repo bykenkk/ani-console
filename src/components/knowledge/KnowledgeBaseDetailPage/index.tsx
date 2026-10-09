@@ -52,7 +52,7 @@ export default function KnowledgeBaseDetailPage({
       },
     },
     queryKey: ["vector-stores", "knowledge-base", kbId],
-    queryFn: () => listVectorStores({ limit: 100 }),
+    queryFn: () => listVectorStores(),
   });
   const { actions } = useKnowledgeBaseActions(goBack);
   if (!detail.data) return <DetailPagePlaceholder loading={detail.isLoading} />;

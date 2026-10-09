@@ -2,8 +2,7 @@ import CreateK8sClusterModal from "@/components/k8s-clusters/CreateK8sClusterMod
 import { useK8sClusterActions } from "@/hooks/useK8sClusterActions";
 
 import { useQueryClient } from "@tanstack/react-query";
-
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { listK8sClusters, type K8sCluster } from "@/api/k8s-clusters";
 import {
   StatusBadge,
@@ -14,7 +13,7 @@ import {
 } from "@/components/common";
 
 import { formatDateTime } from "@/lib/format";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 type Cluster = K8sCluster;
 type ClusterStatusFilter = "all" | NonNullable<Cluster["state"]>;
 type ClusterSearchField = "name" | "id";
@@ -22,7 +21,6 @@ type ClusterSearchField = "name" | "id";
 export default function K8sClustersPage() {
   const qc = useQueryClient();
   const [visible, setVisible] = useState(false);
-
   const [status, setStatus] = useState<ClusterStatusFilter>("all");
   const [searchField, setSearchField] = useState<ClusterSearchField>("name");
   const [searchText, setSearchText] = useState("");
@@ -30,47 +28,32 @@ export default function K8sClustersPage() {
 
   const {
     query: clusters,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
     refresh,
-  } = useCursorPaginatedQuery<Cluster>({
+    items,
+    pagination,
+  } = useClientPaginatedQuery<Cluster>({
     errorNotification: {
       id: "k8s-clusters",
       action: "K8s 集群列表加载",
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["k8s-clusters", { status, searchField, searchText }],
-    cursorScope: `${status}:${searchField}:${searchText.trim()}`,
-    fetchPage: async ({ cursor, limit }) => {
-      const keyword = searchText.trim();
-      const data = await listK8sClusters({
-        limit,
-        cursor,
-        status: status === "all" ? undefined : status,
-        search_field: keyword ? searchField : undefined,
-        keyword: keyword || undefined,
-      });
-      return {
-        items: data.items ?? [],
-        total: data.total ?? 0,
-        next_cursor: data.next_cursor,
-      };
+    filter: (item) =>
+      (status === "all" || item.state === status) &&
+      String(item[searchField] ?? "")
+        .toLowerCase()
+        .includes(searchText.trim().toLowerCase()),
+    queryFn: async () => {
+      return listK8sClusters();
     },
   });
-  const { data, isFetching } = clusters;
-
+  const { isFetching } = clusters;
   const { actions } = useK8sClusterActions(resetPagination);
 
-  const items = useMemo(() => (data?.items ?? []) as Cluster[], [data?.items]);
-  const paginationTotal = data?.total ?? items.length;
-
   useEffect(() => {
-    setPage(1);
     setSelectedKeys([]);
-  }, [searchField, searchText, setPage, status]);
+  }, [searchField, searchText, status, pagination.page, pagination.pageSize]);
 
   const columns: Array<ListColumn<Cluster>> = [
     {
@@ -185,19 +168,7 @@ export default function K8sClustersPage() {
           emptyIconClassName="icon-jiqun"
           tableLabel="K8s 集群列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: (nextPage) => {
-              setPage(nextPage);
-              setSelectedKeys([]);
-            },
-            onPageSizeChange: (nextPageSize) => {
-              setPageSize(nextPageSize);
-              setSelectedKeys([]);
-            },
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {visible && (

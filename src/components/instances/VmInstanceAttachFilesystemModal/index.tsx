@@ -34,7 +34,6 @@ export default function VmInstanceAttachFilesystemModal({
     queryKey: ["filesystems", "vm-instance-attach-filesystem", instance.id],
     queryFn: () =>
       listFilesystems({
-        limit: 100,
         protocol: "nfs",
         available_for_instance_id: instance.id,
       }),
@@ -48,7 +47,7 @@ export default function VmInstanceAttachFilesystemModal({
       },
     },
     queryKey: ["filesystem-mount-targets", selectedId],
-    queryFn: async () => (await listFilesystemMountTargets(selectedId, { limit: 100 })).items,
+    queryFn: async () => (await listFilesystemMountTargets(selectedId)).items,
     enabled: Boolean(selectedId),
   });
   const mutation = useMutation({

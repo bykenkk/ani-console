@@ -1,7 +1,6 @@
 import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
 import type { AsyncTask } from "@/api/tasks";
-import type { CursorPageParams } from "@/api/types";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
   CreateFilesystemMountTargetInput,
@@ -49,11 +48,10 @@ export function deleteFilesystem(filesystemId: string): Promise<StorageFilesyste
 
 export function listFilesystemMountTargets(
   filesystemId: string,
-  params: CursorPageParams = {},
 ): Promise<FilesystemMountTargetListResponse> {
   return coreRequest<FilesystemMountTargetListResponse>(
     `${filesystemPath(filesystemId)}/mount-targets`,
-    { method: "GET", params },
+    { method: "GET" },
   );
 }
 

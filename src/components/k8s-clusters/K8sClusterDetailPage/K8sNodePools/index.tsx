@@ -1,8 +1,8 @@
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { listK8sClusterNodePools, type K8sClusterNodePool } from "@/api/k8s-clusters";
 import { DataTable, StatusBadge } from "@/components/common";
 import { withId } from "@/lib/id";
 import { Empty } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 export default function K8sNodePools({
@@ -12,13 +12,15 @@ export default function K8sNodePools({
   clusterId: string;
   onNodeCountChange: (count: number) => void;
 }) {
-  const nodePools = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("k8s-node-pools", clusterId),
-        action: "节点池加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: nodePools,
+    items: pageItems,
+    pagination,
+  } = useClientPaginatedQuery({
+    errorNotification: {
+      id: withId("k8s-node-pools", clusterId),
+      action: "节点池加载",
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["k8s-node-pools", clusterId],
     queryFn: () => listK8sClusterNodePools(clusterId),
@@ -41,9 +43,9 @@ export default function K8sNodePools({
           render: (_, row) => <StatusBadge status={row.state} />,
         },
       ]}
-      data={items}
+      data={pageItems}
       loading={nodePools.isLoading}
-      pagination={false}
+      pagination={pagination}
       noDataElement={<Empty description="暂无节点池，点击上方创建" />}
     />
   );

@@ -1,4 +1,4 @@
-import type { CoreDevProfileInfo, CursorPageParams } from "@/api/types";
+import type { CoreDevProfileInfo } from "@/api/types";
 
 export type VectorMetric = "cosine" | "l2" | "ip";
 export type VectorStoreState = "pending" | "ready" | "failed" | "deleting" | "deleted";
@@ -25,7 +25,7 @@ export interface VectorStore {
   updated_at: string;
 }
 
-export interface VectorStoreListParams extends CursorPageParams {
+export interface VectorStoreListParams {
   state?: string;
   search_field?: "name" | "id";
   keyword?: string;

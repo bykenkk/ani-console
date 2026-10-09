@@ -31,7 +31,6 @@ export default function InstanceAttachVolumeModal({ instance, onCancel, onSubmit
     queryKey: ["volumes", withId("instance-attach", instance.kind, instance.id), volumeMode],
     queryFn: () =>
       listVolumes({
-        limit: 100,
         state: "pending,available",
         volume_mode: volumeMode,
         available_for_instance_id: instance.id,

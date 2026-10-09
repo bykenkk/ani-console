@@ -28,7 +28,7 @@ export interface NetworkSubnet {
   updated_at: string;
 }
 
-export interface NetworkSubnetListParams extends CursorPageParams {
+export interface NetworkSubnetListParams {
   vpc_id?: string;
   state?: string;
   search_field?: "name" | "id";
@@ -43,7 +43,6 @@ export interface NetworkVPCListParams extends CursorPageParams {
 
 export interface NetworkVPCListResponse {
   items: NetworkVPC[];
-  total: number;
   next_cursor?: string | null;
 }
 
@@ -100,7 +99,7 @@ export interface NetworkSecurityGroup {
   updated_at: string;
 }
 
-export interface NetworkSecurityGroupListParams extends CursorPageParams {
+export interface NetworkSecurityGroupListParams {
   vpc_id?: string;
   state?: string;
   search_field?: "name" | "id";
@@ -133,7 +132,7 @@ export interface NetworkSecurityGroupBinding {
   target_id: string;
   created_at: string;
 }
-export interface NetworkSecurityGroupBindingListParams extends CursorPageParams {
+export interface NetworkSecurityGroupBindingListParams {
   target_type?: NetworkSecurityGroupBindingTargetType;
 }
 export interface NetworkSecurityGroupBindingListResponse {
@@ -180,7 +179,7 @@ export interface NetworkLoadBalancer {
   created_at: string;
   updated_at: string;
 }
-export interface NetworkLoadBalancerListParams extends CursorPageParams {
+export interface NetworkLoadBalancerListParams {
   vpc_id?: string;
   state?: string;
   search_field?: "name" | "id";
@@ -212,7 +211,7 @@ export interface NetworkRoute {
   created_at: string;
   dev_profile: CoreDevProfileInfo;
 }
-export interface NetworkRouteListParams extends CursorPageParams {
+export interface NetworkRouteListParams {
   vpc_id?: string;
   subnet_id?: string;
   status?: string;

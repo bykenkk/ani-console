@@ -37,7 +37,6 @@ export default function SecurityGroupRelatedResources({
     queryKey: ["network-security-group-bindings", securityGroupId],
     queryFn: () =>
       listNetworkSecurityGroupBindings(securityGroupId, {
-        limit: 100,
         target_type: "instance",
       }),
   });
@@ -50,7 +49,7 @@ export default function SecurityGroupRelatedResources({
       },
     },
     queryKey: ["instances", "security-group-related"],
-    queryFn: () => listInstances({ limit: 100 }),
+    queryFn: () => listInstances(),
   });
   const instanceById = new Map(
     ((instances.data?.items ?? []) as InstanceRecord[]).map((instance) => [instance.id, instance]),

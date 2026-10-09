@@ -1,7 +1,7 @@
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
 import { listInstanceSecurityEvents, type InstanceSecurityEvent } from "@/api/instances";
 import { Empty, Select, Space, Tag } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { DataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
@@ -11,22 +11,22 @@ type Severity = "all" | "info" | "warning" | "critical";
 
 export default function SandboxSecurityEvents({ instanceId }: { instanceId: string }) {
   const [severity, setSeverity] = useState<Severity>("all");
-  const query = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("sandbox-security", instanceId, severity),
-        action: "安全事件加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query,
+    items: pageItems,
+    pagination,
+  } = useCursorPaginatedQuery({
+    errorNotification: {
+      id: withId("sandbox-security", instanceId, severity),
+      action: "安全事件加载",
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["sandbox-security-events", instanceId, severity],
-    queryFn: async () =>
-      (
-        await listInstanceSecurityEvents(instanceId, {
-          limit: 100,
-          severity: severity === "all" ? undefined : severity,
-        })
-      ).items,
+    queryFn: (params) =>
+      listInstanceSecurityEvents(instanceId, {
+        ...params,
+        severity: severity === "all" ? undefined : severity,
+      }),
   });
   return (
     <Space direction="vertical" size={24} className="w-full">
@@ -49,9 +49,9 @@ export default function SandboxSecurityEvents({ instanceId }: { instanceId: stri
         </div>
         <DataTable<SecurityEvent>
           tableLabel="安全事件"
-          data={query.data ?? []}
+          data={pageItems}
           loading={query.isLoading || query.isFetching}
-          pagination={false}
+          pagination={pagination}
           noDataElement={<Empty description="暂无安全事件" />}
           columns={[
             {

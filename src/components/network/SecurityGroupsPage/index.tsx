@@ -20,7 +20,7 @@ import {
   StatusBadge,
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { navigateToResourceDetail } from "@/lib/resources";
 
 type SecurityGroup = NetworkSecurityGroup;
@@ -37,25 +37,20 @@ export default function SecurityGroupsPage() {
   const [filterVpcId, setFilterVpcId] = useState("");
   const {
     query: securityGroups,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
     refresh,
-  } = useCursorPaginatedQuery<SecurityGroup>({
+    items,
+    pagination,
+  } = useClientPaginatedQuery<SecurityGroup>({
     errorNotification: {
       id: "security-groups",
       action: "安全组列表加载",
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["network-security-groups", { status, searchField, searchText, filterVpcId }],
-    cursorScope: `${status}:${searchField}:${searchText.trim()}:${filterVpcId}`,
-    fetchPage: async ({ cursor, limit }) => {
+    queryFn: async () => {
       const keyword = searchText.trim();
       return listNetworkSecurityGroups({
-        limit,
-        cursor,
         vpc_id: filterVpcId || undefined,
         state: status === "all" ? undefined : status,
         search_field: keyword ? searchField : undefined,
@@ -72,20 +67,15 @@ export default function SecurityGroupsPage() {
       },
     },
     queryKey: ["network-vpcs", "security-group-create"],
-    queryFn: () => listNetworkVpcs({ limit: 100 }),
+    queryFn: () => listNetworkVpcs(),
   });
 
   const { actions } = useSecurityGroupActions(resetPagination, resetPagination);
 
-  const items = useMemo(
-    () => (securityGroups.data?.items ?? []) as SecurityGroup[],
-    [securityGroups.data?.items],
-  );
   const vpcNames = useMemo(
     () => new Map(((vpcs.data?.items ?? []) as Vpc[]).map((vpc) => [vpc.id, vpc.name])),
     [vpcs.data?.items],
   );
-  const paginationTotal = securityGroups.data?.total ?? items.length;
   const columns: Array<ListColumn<SecurityGroup>> = [
     {
       key: "name",
@@ -226,13 +216,7 @@ export default function SecurityGroupsPage() {
           emptyIconClassName="icon-anquanzu"
           tableLabel="安全组列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && <CreateSecurityGroupModal onCancel={() => setCreateVisible(false)} />}

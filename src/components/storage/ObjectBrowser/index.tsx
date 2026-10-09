@@ -1,3 +1,4 @@
+import type { ListPagination } from "@/components/common/DataTable";
 import type { RowAction } from "@/components/common";
 import {
   Breadcrumb,
@@ -16,14 +17,12 @@ import { formatBytes, formatDateTime } from "@/lib/format";
 import styles from "./index.module.css";
 
 type BucketEntry = StorageBucketObjectEntry;
-type BrowserEntry = BucketEntry & {
-  parentTarget?: string;
-};
 
 type ObjectBrowserProps = {
   bucketName: string;
   prefix: string;
   entries: BucketEntry[];
+  pagination: ListPagination;
   aclLabel: string;
   loading?: boolean;
   actions: RowAction<BucketEntry>[];
@@ -46,6 +45,7 @@ export default function ObjectBrowser({
   bucketName,
   prefix,
   entries,
+  pagination,
   aclLabel,
   loading,
   actions,
@@ -55,42 +55,21 @@ export default function ObjectBrowser({
 }: ObjectBrowserProps) {
   const segments = prefixSegments(prefix);
   const canGoUp = prefix !== "/";
-  const tableEntries: BrowserEntry[] = canGoUp
-    ? [
-        {
-          kind: "prefix",
-          name: "..",
-          key: `__parent__:${prefix}`,
-          parentTarget: parentPrefix(prefix),
-        },
-        ...entries,
-      ]
-    : entries;
-
-  const columns: Array<TableColumnProps<BrowserEntry>> = [
+  const columns: Array<TableColumnProps<BucketEntry>> = [
     {
       title: "名称",
       render: (_, entry) => {
-        const isParent = Boolean(entry.parentTarget);
-        const canNavigate = isParent || entry.kind === "prefix";
-        const target = entry.parentTarget ?? entry.key;
+        const canNavigate = entry.kind === "prefix";
+        const target = entry.key;
 
         return (
           <button
             type="button"
             className={canNavigate ? styles.entryButton : styles.entryLabel}
             onClick={canNavigate ? () => onNavigate(target) : undefined}
-            aria-label={
-              isParent
-                ? "返回上一级"
-                : entry.kind === "prefix"
-                  ? `进入文件夹 ${entry.name}`
-                  : undefined
-            }
+            aria-label={canNavigate ? `进入文件夹 ${entry.name}` : undefined}
           >
-            {isParent ? (
-              <IconArrowLeft className={styles.backIcon} />
-            ) : entry.kind === "prefix" ? (
+            {entry.kind === "prefix" ? (
               <IconFolder className={styles.folderIcon} />
             ) : (
               <IconFile className={styles.fileIcon} />
@@ -143,6 +122,11 @@ export default function ObjectBrowser({
           })}
         </Breadcrumb>
         <Space>
+          {canGoUp ? (
+            <Button icon={<IconArrowLeft />} onClick={() => onNavigate(parentPrefix(prefix))}>
+              返回上一级
+            </Button>
+          ) : null}
           <Typography.Text type="secondary">当前路径：{prefix}</Typography.Text>
           <Tag>{aclLabel}</Tag>
           <Button onClick={onCreateFolder}>新建文件夹</Button>
@@ -150,20 +134,16 @@ export default function ObjectBrowser({
         </Space>
       </div>
 
-      <DataTable<BrowserEntry>
+      <DataTable<BucketEntry>
         className={styles.table}
         tableLabel="文件"
         rowKey={(entry) => entry.key}
         columns={columns}
-        data={tableEntries}
+        data={entries}
         loading={loading}
-        pagination={false}
+        pagination={pagination}
         scroll={{ x: "max-content" }}
-        rowActions={actions.map((action) => ({
-          ...action,
-          visible: (entry: BrowserEntry) =>
-            !entry.parentTarget && action.visible?.(entry) !== false,
-        }))}
+        rowActions={actions}
         noDataElement={<Empty description="当前文件夹暂无对象，可上传对象或新建文件夹" />}
       />
     </div>

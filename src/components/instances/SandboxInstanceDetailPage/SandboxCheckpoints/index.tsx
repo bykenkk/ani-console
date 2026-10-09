@@ -1,3 +1,4 @@
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import {
   listSandboxCheckpoints,
   type SandboxCheckpoint,
@@ -7,7 +8,7 @@ import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 import { Button, Empty, Space, Modal } from "@arco-design/web-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import SandboxCheckpointCloneModal from "@/components/instances/SandboxCheckpointCloneModal";
 import SandboxCheckpointCreateModal from "@/components/instances/SandboxCheckpointCreateModal";
@@ -21,16 +22,19 @@ export default function SandboxCheckpoints({
   sessionState: string;
   onChanged: () => void;
 }) {
-  const checkpoints = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("sandbox-checkpoints", instanceId),
-        action: "检查点加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: checkpoints,
+    items: pageItems,
+    pagination,
+    refresh,
+  } = useCursorPaginatedQuery({
+    errorNotification: {
+      id: withId("sandbox-checkpoints", instanceId),
+      action: "检查点加载",
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["sandbox-checkpoints", instanceId],
-    queryFn: () => listSandboxCheckpoints(instanceId),
+    queryFn: (params) => listSandboxCheckpoints(instanceId, params),
   });
 
   const [createVisible, setCreateVisible] = useState(false);
@@ -51,7 +55,7 @@ export default function SandboxCheckpoints({
       return checkpoint;
     },
     onSuccess: () => {
-      void checkpoints.refetch();
+      refresh();
       onChanged();
     },
   });
@@ -86,7 +90,7 @@ export default function SandboxCheckpoints({
           instanceId={instanceId}
           onCancel={() => setCreateVisible(false)}
           onCreated={() => {
-            void checkpoints.refetch();
+            refresh();
             onChanged();
           }}
         />
@@ -108,11 +112,7 @@ export default function SandboxCheckpoints({
         <section>
           <div className="mb-3 flex items-center justify-end gap-3">
             <Space>
-              <Button
-                size="small"
-                loading={checkpoints.isFetching}
-                onClick={() => checkpoints.refetch()}
-              >
+              <Button size="small" loading={checkpoints.isFetching} onClick={refresh}>
                 刷新
               </Button>
               <Button size="small" type="primary" disabled={!canCheckpoint} onClick={openCreate}>
@@ -123,10 +123,10 @@ export default function SandboxCheckpoints({
 
           <DataTable<SandboxCheckpoint>
             tableLabel="检查点"
-            data={checkpoints.data?.items ?? []}
+            data={pageItems}
             rowKey="id"
             loading={checkpoints.isLoading || checkpoints.isFetching}
-            pagination={false}
+            pagination={pagination}
             noDataElement={<Empty description="暂无检查点" />}
             rowActions={actions}
             columns={[

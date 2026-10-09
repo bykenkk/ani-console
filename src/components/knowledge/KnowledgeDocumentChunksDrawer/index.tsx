@@ -170,19 +170,7 @@ export default function KnowledgeDocumentChunksDrawer({
     },
     queryKey: ["knowledge-base-document-chunks", kbId, document?.id],
     enabled: visible && Boolean(document),
-    queryFn: async () => {
-      const items: KBChunk[] = [];
-      let cursor: string | undefined;
-      do {
-        const data = await listKnowledgeBaseDocumentChunks(kbId, document!.id, {
-          limit: 100,
-          cursor,
-        });
-        items.push(...data.items);
-        cursor = data.next_cursor ?? undefined;
-      } while (cursor);
-      return items;
-    },
+    queryFn: async () => (await listKnowledgeBaseDocumentChunks(kbId, document!.id)).items,
   });
   const groupedChunks = groupChunks(chunks.data ?? []);
   return (

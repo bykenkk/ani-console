@@ -38,10 +38,8 @@ export default function VpcsPage() {
 
   const {
     query: vpcs,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
+    items,
+    pagination,
     resetPagination,
     refresh,
   } = useCursorPaginatedQuery<Vpc>({
@@ -51,8 +49,7 @@ export default function VpcsPage() {
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["network-vpcs", { status, searchField, searchText }],
-    cursorScope: `${status}:${searchField}:${searchText.trim()}`,
-    fetchPage: async ({ cursor, limit }) => {
+    queryFn: async ({ cursor, limit }) => {
       const keyword = searchText.trim();
       return listNetworkVpcs({
         limit,
@@ -72,7 +69,7 @@ export default function VpcsPage() {
       },
     },
     queryKey: ["network-subnets", "vpc-counts"],
-    queryFn: () => listNetworkSubnets({ limit: 100 }),
+    queryFn: () => listNetworkSubnets(),
   });
   const routes = useQuery({
     meta: {
@@ -83,7 +80,7 @@ export default function VpcsPage() {
       },
     },
     queryKey: ["network-routes", "vpc-counts"],
-    queryFn: () => listNetworkRoutes({ limit: 100 }),
+    queryFn: () => listNetworkRoutes(),
   });
 
   const { actions } = useVpcActions(() => {
@@ -92,7 +89,6 @@ export default function VpcsPage() {
     qc.invalidateQueries({ queryKey: ["network-routes"] });
   });
 
-  const items = useMemo(() => (vpcs.data?.items ?? []) as Vpc[], [vpcs.data?.items]);
   const subnetCounts = useMemo(() => {
     const counts = new Map<string, number>();
     for (const subnet of (subnets.data?.items ?? []) as Subnet[])
@@ -109,7 +105,6 @@ export default function VpcsPage() {
     }
     return names;
   }, [routes.data?.items]);
-  const paginationTotal = vpcs.data?.total ?? items.length;
   const columns: Array<ListColumn<Vpc>> = [
     {
       key: "name",
@@ -215,13 +210,7 @@ export default function VpcsPage() {
           emptyIconClassName="icon-VPCwangluo"
           tableLabel="VPC 列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && (

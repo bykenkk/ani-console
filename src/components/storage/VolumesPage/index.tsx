@@ -1,6 +1,6 @@
 import { useVolumeActions } from "@/hooks/useVolumeActions";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { listVolumes, type StorageVolume } from "@/api/storage/volumes";
 
@@ -13,7 +13,7 @@ import {
   StatusBadge,
   ListDataTable,
 } from "@/components/common";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import { VOLUME_MODE_LABELS } from "@/lib/volumes";
 
@@ -29,25 +29,20 @@ export default function VolumesPage() {
   const [searchText, setSearchText] = useState("");
   const {
     query: volumes,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
     resetPagination,
     refresh,
-  } = useCursorPaginatedQuery<Volume>({
+    items,
+    pagination,
+  } = useClientPaginatedQuery<Volume>({
     errorNotification: {
       id: "volumes",
       action: "块存储卷列表加载",
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["volumes", { status, searchField, searchText }],
-    cursorScope: `${status}:${searchField}:${searchText.trim()}`,
-    fetchPage: async ({ cursor, limit }) => {
+    queryFn: async () => {
       const keyword = searchText.trim();
       return listVolumes({
-        limit,
-        cursor,
         state: status === "all" || status === "mounted" ? undefined : status,
         in_use: status === "mounted" ? true : undefined,
         search_field: keyword ? searchField : undefined,
@@ -57,9 +52,6 @@ export default function VolumesPage() {
   });
   const { actions, dialogNode } = useVolumeActions(resetPagination);
 
-  const items = useMemo(() => (volumes.data?.items ?? []) as Volume[], [volumes.data?.items]);
-
-  const paginationTotal = volumes.data?.total ?? items.length;
   const columns: Array<ListColumn<Volume>> = [
     {
       key: "name",
@@ -198,13 +190,7 @@ export default function VolumesPage() {
           emptyIconClassName="icon-kuaicunchu"
           tableLabel="块存储卷列表"
           preserveTableOnEmpty
-          pagination={{
-            page,
-            pageSize,
-            total: paginationTotal,
-            onPageChange: setPage,
-            onPageSizeChange: setPageSize,
-          }}
+          pagination={pagination}
         />
       </ListPageFrame>
       {createVisible && <CreateVolumeModal onCancel={() => setCreateVisible(false)} />}

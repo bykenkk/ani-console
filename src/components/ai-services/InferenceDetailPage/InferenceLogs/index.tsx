@@ -1,6 +1,6 @@
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
 import { Button, Empty, Select, Space } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { listInferenceServiceLogs, type InferenceServiceLog } from "@/api/ai-services/inference";
 import { DataTable } from "@/components/common";
@@ -10,18 +10,22 @@ type LogLevel = "all" | "debug" | "info" | "warn" | "error";
 
 export default function InferenceLogs({ serviceId }: { serviceId: string }) {
   const [level, setLevel] = useState<LogLevel>("all");
-  const logs = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("inference-logs", serviceId, level),
-        action: "推理日志加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  const {
+    query: logs,
+    items,
+    pagination,
+    refresh,
+  } = useCursorPaginatedQuery({
+    errorNotification: {
+      id: withId("inference-logs", serviceId, level),
+      action: "推理日志加载",
+      fallback: "请求失败，请稍后重试",
     },
     queryKey: ["inference-service-logs", serviceId, level],
-    queryFn: () =>
+    queryFn: ({ cursor, limit }) =>
       listInferenceServiceLogs(serviceId, {
-        limit: 200,
+        limit,
+        cursor,
         ...(level === "all" ? {} : { level }),
       }),
   });
@@ -46,16 +50,16 @@ export default function InferenceLogs({ serviceId }: { serviceId: string }) {
                   { value: "error", label: "Error" },
                 ]}
               />
-              <Button size="small" loading={logs.isFetching} onClick={() => void logs.refetch()}>
+              <Button size="small" loading={logs.isFetching} onClick={refresh}>
                 刷新
               </Button>
             </Space>
           ),
         }}
         loading={logs.isFetching}
-        data={logs.data?.items ?? []}
+        data={items}
         rowKey={(row) => `${row.timestamp}-${row.container}-${row.stream}-${row.message}`}
-        pagination={false}
+        pagination={pagination}
         noDataElement={<Empty description="暂无日志" />}
         columns={[
           {

@@ -20,11 +20,11 @@ export type ListColumn<T> = TableColumnProps<T>;
 export type ListPagination = {
   page: number;
   pageSize: number;
-  total: number;
+  disabled?: boolean;
   pageSizeOptions?: number[];
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
-};
+} & ({ mode?: "total"; total: number } | { mode: "cursor"; hasNextPage: boolean });
 
 export type DataTableProps<T> = {
   className?: string;
@@ -93,13 +93,19 @@ export function DataTable<T>({
       : {
           current: pagination.page,
           pageSize: pagination.pageSize,
-          total: Math.max(pagination.total, 1),
+          // Cursor APIs expose a reachable page boundary, not a record total.
+          total:
+            pagination.mode === "cursor"
+              ? (pagination.page + Number(pagination.hasNextPage)) * pagination.pageSize
+              : Math.max(pagination.total, 1),
+          disabled: pagination.disabled,
           sizeCanChange: true,
           sizeOptions: pagination.pageSizeOptions ?? [10, 20, 50],
           pageSizeChangeResetCurrent: true,
           hideOnSinglePage: false,
-          showTotal: () => `共 ${pagination.total} 条记录`,
-          showJumper: true,
+          showTotal: pagination.mode === "cursor" ? false : () => `共 ${pagination.total} 条记录`,
+          showJumper: pagination.mode !== "cursor",
+          showMore: pagination.mode === "cursor" && pagination.hasNextPage,
         };
 
   return (

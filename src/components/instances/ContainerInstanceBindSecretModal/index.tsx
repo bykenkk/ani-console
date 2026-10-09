@@ -36,7 +36,7 @@ export default function ContainerInstanceBindSecretModal({
       },
     },
     queryKey: ["secrets", "container-instance-bind-secret"],
-    queryFn: () => listSecrets({ limit: 100 }),
+    queryFn: () => listSecrets(),
   });
   const mutation = useMutation({
     meta: {

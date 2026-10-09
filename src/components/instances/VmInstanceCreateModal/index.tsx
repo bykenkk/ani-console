@@ -191,7 +191,7 @@ export default function VmInstanceCreateModal({
       },
     },
     queryKey: ["registry-images", "vm-create", "system"],
-    queryFn: async () => (await listRegistryImages({ limit: 100, purpose: "system" })).items,
+    queryFn: async () => (await listRegistryImages({ purpose: "system" })).items,
   });
   const vpcs = useQuery({
     meta: {
@@ -202,7 +202,7 @@ export default function VmInstanceCreateModal({
       },
     },
     queryKey: ["network-vpcs", "vm-create"],
-    queryFn: () => listNetworkVpcs({ limit: 100 }),
+    queryFn: () => listNetworkVpcs(),
   });
   const subnets = useQuery({
     meta: {
@@ -214,7 +214,7 @@ export default function VmInstanceCreateModal({
     },
     queryKey: ["network-subnets", "vm-create", values.vpcId],
     enabled: !!values.vpcId,
-    queryFn: () => listNetworkSubnets({ limit: 100, vpc_id: values.vpcId }),
+    queryFn: () => listNetworkSubnets({ vpc_id: values.vpcId }),
   });
   const securityGroups = useQuery({
     meta: {
@@ -226,7 +226,7 @@ export default function VmInstanceCreateModal({
     },
     queryKey: ["network-security-groups", "vm-create", values.vpcId],
     enabled: !!values.vpcId,
-    queryFn: () => listNetworkSecurityGroups({ limit: 100, vpc_id: values.vpcId }),
+    queryFn: () => listNetworkSecurityGroups({ vpc_id: values.vpcId }),
   });
   const filesystems = useQuery({
     meta: {
@@ -237,7 +237,7 @@ export default function VmInstanceCreateModal({
       },
     },
     queryKey: ["filesystems", "vm-create"],
-    queryFn: () => listFilesystems({ limit: 100 }),
+    queryFn: () => listFilesystems(),
   });
   const secrets = useQuery({
     meta: {
@@ -248,7 +248,7 @@ export default function VmInstanceCreateModal({
       },
     },
     queryKey: ["secrets", "vm-create"],
-    queryFn: () => listSecrets({ limit: 100 }),
+    queryFn: () => listSecrets(),
   });
   const availableSubnets = (subnets.data?.items ?? []).filter(
     (item) => item.vpc_id === values.vpcId,
