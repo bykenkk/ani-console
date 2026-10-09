@@ -1,7 +1,5 @@
 import { useFilesystemActions } from "@/hooks/useFilesystemActions";
 
-import { useQueryClient } from "@tanstack/react-query";
-
 import { useMemo, useState } from "react";
 import { listFilesystems, type StorageFilesystem } from "@/api/storage/filesystems";
 
@@ -22,7 +20,6 @@ type StatusFilter = "all" | "available" | "pending" | "failed";
 type SearchField = "name" | "id";
 
 export default function FilesystemsPage() {
-  const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
 
   const [status, setStatus] = useState<StatusFilter>("all");
@@ -55,10 +52,7 @@ export default function FilesystemsPage() {
       });
     },
   });
-  const { actions, dialogNode } = useFilesystemActions(() => {
-    resetPagination();
-    void qc.invalidateQueries({ queryKey: ["filesystems"] });
-  });
+  const { actions, dialogNode } = useFilesystemActions(resetPagination);
   const items = useMemo(
     () => (filesystems.data?.items ?? []) as Filesystem[],
     [filesystems.data?.items],

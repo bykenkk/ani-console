@@ -1,7 +1,7 @@
 import { useNetworkRouteActions } from "@/hooks/useNetworkRouteActions";
 
 import { useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link, Select } from "@arco-design/web-react";
 import { useMemo, useState } from "react";
 import {
@@ -22,7 +22,6 @@ type StatusFilter = "all" | "available";
 
 export default function NetworkRoutesPage() {
   const navigate = useNavigate();
-  const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
   const [searchField, setSearchField] = useState<SearchField>("description");
   const [searchText, setSearchText] = useState("");
@@ -67,10 +66,7 @@ export default function NetworkRoutesPage() {
     queryKey: ["network-vpcs", "route-list"],
     queryFn: () => listNetworkVpcs({ limit: 100 }),
   });
-  const { actions } = useNetworkRouteActions(() => {
-    resetPagination();
-    qc.invalidateQueries({ queryKey: ["network-routes"] });
-  });
+  const { actions } = useNetworkRouteActions(resetPagination);
 
   const items = (routes.data?.items ?? []) as NetworkRoute[];
   const vpcNames = useMemo(

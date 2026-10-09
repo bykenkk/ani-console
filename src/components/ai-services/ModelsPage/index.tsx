@@ -1,7 +1,6 @@
 import { useModelActions } from "@/hooks/useModelActions";
 
 import { Select, Space, Tag } from "@arco-design/web-react";
-import { useQueryClient } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { listModels } from "@/api/ai-services/models";
 
@@ -31,8 +30,6 @@ function getApiStatus(status: StatusFilter) {
 }
 
 export default function ModelsPage() {
-  const qc = useQueryClient();
-
   const [importVisible, setImportVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [searchField, setSearchField] = useState<SearchField>("name");
@@ -78,10 +75,7 @@ export default function ModelsPage() {
   const items = models.data?.items ?? [];
   const paginationTotal = models.data?.total ?? items.length;
 
-  const { actions, dialogNode } = useModelActions(() => {
-    void qc.invalidateQueries({ queryKey: ["models"] });
-    refresh();
-  });
+  const { actions, dialogNode } = useModelActions(resetPagination);
 
   const columns: Array<ListColumn<Model>> = [
     {

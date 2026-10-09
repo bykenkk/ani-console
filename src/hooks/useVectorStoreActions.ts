@@ -6,10 +6,7 @@ import type { RowAction } from "@/components/common";
 
 export function useVectorStoreActions(onDeleted?: () => void) {
   const qc = useQueryClient();
-  const remove = useResourceDelete<VectorStore>("vector-store", () => {
-    if (onDeleted) onDeleted();
-    else qc.invalidateQueries({ queryKey: ["vector-stores"] });
-  });
+  const remove = useResourceDelete<VectorStore>("vector-store", onDeleted);
   const rebuild = useMutation({
     meta: {
       feedback: {
@@ -21,10 +18,11 @@ export function useVectorStoreActions(onDeleted?: () => void) {
       },
     },
     mutationFn: (item: VectorStore) => rebuildVectorStoreIndex(item.id),
-    onSuccess: (_, item) => {
-      qc.invalidateQueries({ queryKey: ["vector-stores"] });
-      qc.invalidateQueries({ queryKey: ["vector-store", item.id] });
-    },
+    onSuccess: (_, item) =>
+      Promise.all([
+        qc.invalidateQueries({ queryKey: ["vector-stores"] }),
+        qc.invalidateQueries({ queryKey: ["vector-store", item.id] }),
+      ]),
   });
   const busy = () => remove.isPending || rebuild.isPending;
   const actions: RowAction<VectorStore>[] = [

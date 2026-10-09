@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useResourceDelete } from "@/hooks/useResourceDelete";
 import { useState } from "react";
 import { type StorageFilesystem } from "@/api/storage/filesystems";
@@ -9,11 +8,7 @@ type Filesystem = StorageFilesystem;
 export function useFilesystemActions(onDeleted?: (item: Filesystem) => void) {
   const [expandTarget, setExpandTarget] = useState<Filesystem | null>(null);
   const [mountTargetFilesystem, setMountTargetFilesystem] = useState<{ id: string } | null>(null);
-  const qc = useQueryClient();
-  const remove = useResourceDelete<Filesystem>("filesystem", (item) => {
-    if (onDeleted) onDeleted(item);
-    else void qc.invalidateQueries({ queryKey: ["filesystems"] });
-  });
+  const remove = useResourceDelete<Filesystem>("filesystem", onDeleted);
 
   const actions: RowAction<Filesystem>[] = [
     {

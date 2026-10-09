@@ -1,6 +1,6 @@
 import { useLoadBalancerActions } from "@/hooks/useLoadBalancerActions";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Select } from "@arco-design/web-react";
 import { useMemo, useState } from "react";
 import {
@@ -27,7 +27,6 @@ type StatusFilter = "all" | "pending" | "available" | "failed";
 type SearchField = "name" | "id";
 
 export default function LoadBalancersPage() {
-  const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [searchField, setSearchField] = useState<SearchField>("name");
@@ -72,10 +71,7 @@ export default function LoadBalancersPage() {
     queryKey: ["network-vpcs", "load-balancer-list"],
     queryFn: () => listNetworkVpcs({ limit: 100 }),
   });
-  const { actions } = useLoadBalancerActions(() => {
-    resetPagination();
-    qc.invalidateQueries({ queryKey: ["network-load-balancers"] });
-  });
+  const { actions } = useLoadBalancerActions(resetPagination);
   const items = useMemo(
     () => (loadBalancers.data?.items ?? []) as LoadBalancer[],
     [loadBalancers.data?.items],

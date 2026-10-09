@@ -88,7 +88,6 @@ export default function VpcsPage() {
 
   const { actions } = useVpcActions(() => {
     resetPagination();
-    qc.invalidateQueries({ queryKey: ["network-vpcs"] });
     qc.invalidateQueries({ queryKey: ["network-subnets"] });
     qc.invalidateQueries({ queryKey: ["network-routes"] });
   });

@@ -1,4 +1,3 @@
-import { useQueryClient } from "@tanstack/react-query";
 import VolumeOSInitGuideModal from "@/components/storage/VolumeOSInitGuideModal";
 import { useVolumeDetach } from "@/hooks/useVolumeDetach";
 import { useResourceDelete } from "@/hooks/useResourceDelete";
@@ -14,11 +13,7 @@ export function useVolumeActions(onDeleted?: (item: Volume) => void) {
   const [expandTarget, setExpandTarget] = useState<Volume | null>(null);
   const [snapshotTarget, setSnapshotTarget] = useState<{ id: string } | null>(null);
   const [initGuideId, setInitGuideId] = useState<string>();
-  const qc = useQueryClient();
-  const deleteVolume = useResourceDelete<Volume>("volume", (item) => {
-    if (onDeleted) onDeleted(item);
-    else void qc.invalidateQueries({ queryKey: ["volumes"] });
-  });
+  const deleteVolume = useResourceDelete<Volume>("volume", onDeleted);
   const detachVolume = useVolumeDetach();
   const isMounted = (item: Volume) => Boolean(item.mount_instance_id);
   const actions: RowAction<Volume>[] = [

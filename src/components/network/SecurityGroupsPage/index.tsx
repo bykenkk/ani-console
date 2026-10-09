@@ -1,7 +1,7 @@
 import { useSecurityGroupActions } from "@/hooks/useSecurityGroupActions";
 
 import { useNavigate } from "@tanstack/react-router";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { Link, Select } from "@arco-design/web-react";
 import { useMemo, useState } from "react";
 import {
@@ -75,11 +75,7 @@ export default function SecurityGroupsPage() {
     queryFn: () => listNetworkVpcs({ limit: 100 }),
   });
 
-  const qc = useQueryClient();
-  const { actions } = useSecurityGroupActions(() => {
-    resetPagination();
-    qc.invalidateQueries({ queryKey: ["network-security-groups"] });
-  }, resetPagination);
+  const { actions } = useSecurityGroupActions(resetPagination, resetPagination);
 
   const items = useMemo(
     () => (securityGroups.data?.items ?? []) as SecurityGroup[],

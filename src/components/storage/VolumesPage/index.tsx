@@ -1,7 +1,5 @@
 import { useVolumeActions } from "@/hooks/useVolumeActions";
 
-import { useQueryClient } from "@tanstack/react-query";
-
 import { useMemo, useState } from "react";
 
 import { listVolumes, type StorageVolume } from "@/api/storage/volumes";
@@ -24,7 +22,6 @@ type StatusFilter = "all" | "pending" | "available" | "mounted" | "failed";
 type SearchField = "name" | "id";
 
 export default function VolumesPage() {
-  const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
 
   const [status, setStatus] = useState<StatusFilter>("all");
@@ -58,10 +55,7 @@ export default function VolumesPage() {
       });
     },
   });
-  const { actions, dialogNode } = useVolumeActions(() => {
-    resetPagination();
-    void qc.invalidateQueries({ queryKey: ["volumes"] });
-  });
+  const { actions, dialogNode } = useVolumeActions(resetPagination);
 
   const items = useMemo(() => (volumes.data?.items ?? []) as Volume[], [volumes.data?.items]);
 

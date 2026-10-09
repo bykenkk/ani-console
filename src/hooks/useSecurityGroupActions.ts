@@ -19,9 +19,9 @@ export function useSecurityGroupActions(
       },
     },
     mutationFn: (item: SecurityGroup) => copyNetworkSecurityGroup(item),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["network-security-groups"] });
       onCopied?.();
-      qc.invalidateQueries({ queryKey: ["network-security-groups"] });
     },
   });
   const actions: RowAction<SecurityGroup>[] = [

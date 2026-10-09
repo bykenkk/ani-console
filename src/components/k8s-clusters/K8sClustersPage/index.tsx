@@ -62,10 +62,7 @@ export default function K8sClustersPage() {
   });
   const { data, isFetching } = clusters;
 
-  const { actions } = useK8sClusterActions(() => {
-    resetPagination();
-    qc.invalidateQueries({ queryKey: ["k8s-clusters"] });
-  });
+  const { actions } = useK8sClusterActions(resetPagination);
 
   const items = useMemo(() => (data?.items ?? []) as Cluster[], [data?.items]);
   const paginationTotal = data?.total ?? items.length;

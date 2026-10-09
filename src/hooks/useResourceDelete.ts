@@ -1,5 +1,5 @@
 import { Modal } from "@arco-design/web-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteNetworkVpc } from "@/api/network";
 import { deleteNetworkSubnet } from "@/api/network";
 import { deleteNetworkSecurityGroup } from "@/api/network";
@@ -22,6 +22,8 @@ type ResourceDeleteTarget = {
   destination_cidr?: string;
 };
 type DeleteConfig = {
+  listQueryKey: string;
+  detailQueryKey: string;
   feedback: MutationFeedbackMeta;
   title: string;
   content: (item: ResourceDeleteTarget) => string;
@@ -29,6 +31,8 @@ type DeleteConfig = {
 };
 const resourceDeletion = {
   vpc: {
+    listQueryKey: "network-vpcs",
+    detailQueryKey: "network-vpc",
     feedback: {
       channel: "notification",
       id: "vpc-delete",
@@ -40,6 +44,8 @@ const resourceDeletion = {
     remove: deleteNetworkVpc,
   },
   subnet: {
+    listQueryKey: "network-subnets",
+    detailQueryKey: "network-subnet",
     feedback: {
       channel: "notification",
       id: "subnet-delete",
@@ -51,6 +57,8 @@ const resourceDeletion = {
     remove: deleteNetworkSubnet,
   },
   "security-group": {
+    listQueryKey: "network-security-groups",
+    detailQueryKey: "network-security-group",
     feedback: {
       channel: "notification",
       id: "security-group-delete",
@@ -62,6 +70,8 @@ const resourceDeletion = {
     remove: deleteNetworkSecurityGroup,
   },
   "network-route": {
+    listQueryKey: "network-routes",
+    detailQueryKey: "network-route",
     feedback: {
       channel: "notification",
       id: "route-delete",
@@ -74,6 +84,8 @@ const resourceDeletion = {
     remove: deleteNetworkRoute,
   },
   "load-balancer": {
+    listQueryKey: "network-load-balancers",
+    detailQueryKey: "network-load-balancer",
     feedback: {
       channel: "notification",
       id: "load-balancer-delete",
@@ -85,6 +97,8 @@ const resourceDeletion = {
     remove: deleteNetworkLoadBalancer,
   },
   volume: {
+    listQueryKey: "volumes",
+    detailQueryKey: "volume",
     feedback: {
       channel: "notification",
       id: "volume-delete",
@@ -96,6 +110,8 @@ const resourceDeletion = {
     remove: deleteVolume,
   },
   filesystem: {
+    listQueryKey: "filesystems",
+    detailQueryKey: "filesystem",
     feedback: {
       channel: "notification",
       id: "filesystem-delete",
@@ -107,6 +123,8 @@ const resourceDeletion = {
     remove: deleteFilesystem,
   },
   "vector-store": {
+    listQueryKey: "vector-stores",
+    detailQueryKey: "vector-store",
     feedback: {
       channel: "notification",
       id: "vector-store-delete",
@@ -118,6 +136,8 @@ const resourceDeletion = {
     remove: deleteVectorStore,
   },
   model: {
+    listQueryKey: "models",
+    detailQueryKey: "model",
     feedback: {
       channel: "notification",
       id: "model-delete",
@@ -129,6 +149,8 @@ const resourceDeletion = {
     remove: deleteModel,
   },
   "inference-service": {
+    listQueryKey: "inference-services",
+    detailQueryKey: "inference-service",
     feedback: {
       channel: "notification",
       id: "inference-delete",
@@ -141,6 +163,8 @@ const resourceDeletion = {
     remove: deleteInferenceService,
   },
   "knowledge-base": {
+    listQueryKey: "knowledge-bases",
+    detailQueryKey: "knowledge-base",
     feedback: {
       channel: "notification",
       id: "knowledge-base-delete",
@@ -152,6 +176,8 @@ const resourceDeletion = {
     remove: deleteKnowledgeBase,
   },
   "k8s-cluster": {
+    listQueryKey: "k8s-clusters",
+    detailQueryKey: "k8s-cluster",
     feedback: {
       channel: "notification",
       id: "k8s-cluster-delete",
@@ -167,8 +193,9 @@ type ResourceDeleteKind = keyof typeof resourceDeletion;
 
 export function useResourceDelete<T extends ResourceDeleteTarget = ResourceDeleteTarget>(
   kind: ResourceDeleteKind,
-  onDeleted: (item: T) => void,
+  onDeleted?: (item: T) => void | Promise<void>,
 ) {
+  const qc = useQueryClient();
   const config = resourceDeletion[kind];
   const mutation = useMutation({
     meta: { feedback: config.feedback },
@@ -176,7 +203,15 @@ export function useResourceDelete<T extends ResourceDeleteTarget = ResourceDelet
       if (!item.id) throw new Error("缺少资源 ID");
       await config.remove(item.id);
     },
-    onSuccess: (_, item) => onDeleted(item),
+    onSuccess: async (_, item) => {
+      await qc.invalidateQueries({
+        queryKey: [config.detailQueryKey, item.id],
+        exact: true,
+        refetchType: "none",
+      });
+      await qc.invalidateQueries({ queryKey: [config.listQueryKey] });
+      await onDeleted?.(item);
+    },
   });
   const isDisabled = (item: T) =>
     mutation.isPending ||

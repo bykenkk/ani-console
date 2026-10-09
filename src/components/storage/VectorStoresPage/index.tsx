@@ -1,7 +1,6 @@
 import { useVectorStoreActions } from "@/hooks/useVectorStoreActions";
 
 import { useNavigate } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@arco-design/web-react";
 import { useMemo, useState } from "react";
 import { listVectorStores, type VectorStore } from "@/api/storage/vector-stores";
@@ -23,7 +22,6 @@ type SearchField = "name" | "id";
 
 export default function VectorStoresPage() {
   const navigate = useNavigate();
-  const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [searchField, setSearchField] = useState<SearchField>("name");
@@ -56,10 +54,7 @@ export default function VectorStoresPage() {
     },
   });
 
-  const { actions } = useVectorStoreActions(() => {
-    resetPagination();
-    void qc.invalidateQueries({ queryKey: ["vector-stores"] });
-  });
+  const { actions } = useVectorStoreActions(resetPagination);
   const items = useMemo(() => (stores.data?.items ?? []) as VectorStore[], [stores.data?.items]);
   const paginationTotal = stores.data?.total ?? items.length;
   const columns: Array<ListColumn<VectorStore>> = [

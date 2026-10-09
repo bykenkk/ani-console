@@ -1,15 +1,10 @@
-import { useQueryClient } from "@tanstack/react-query";
 import { useKubeconfigDownload } from "@/hooks/useKubeconfigDownload";
 import { useResourceDelete } from "@/hooks/useResourceDelete";
 import { type K8sCluster } from "@/api/k8s-clusters";
 import type { RowAction } from "@/components/common";
 type Cluster = K8sCluster;
 export function useK8sClusterActions(onDeleted?: (item: Cluster) => void) {
-  const qc = useQueryClient();
-  const deleteCluster = useResourceDelete<Cluster>("k8s-cluster", (item) => {
-    if (onDeleted) onDeleted(item);
-    else void qc.invalidateQueries({ queryKey: ["k8s-clusters"] });
-  });
+  const deleteCluster = useResourceDelete<Cluster>("k8s-cluster", onDeleted);
   const downloadKubeconfig = useKubeconfigDownload();
   const actions: RowAction<Cluster>[] = [
     {

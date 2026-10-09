@@ -78,10 +78,7 @@ export default function SubnetsPage() {
     },
   });
 
-  const { actions } = useSubnetActions(() => {
-    resetPagination();
-    qc.invalidateQueries({ queryKey: ["network-subnets"] });
-  });
+  const { actions } = useSubnetActions(resetPagination);
 
   const items = useMemo(() => (subnets.data?.items ?? []) as Subnet[], [subnets.data?.items]);
   const vpcNames = useMemo(

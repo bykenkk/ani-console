@@ -1,7 +1,5 @@
 import { useKnowledgeBaseActions } from "@/hooks/useKnowledgeBaseActions";
 
-import { useQueryClient } from "@tanstack/react-query";
-
 import { useState } from "react";
 import { listKnowledgeBases, type KnowledgeBase } from "@/api/knowledge";
 
@@ -20,7 +18,6 @@ type StatusFilter = "all" | "active" | "rebuilding";
 type SearchField = "name" | "id";
 
 export default function KnowledgeBasesPage() {
-  const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [searchField, setSearchField] = useState<SearchField>("name");
@@ -46,10 +43,7 @@ export default function KnowledgeBasesPage() {
         });
       },
     });
-  const { actions } = useKnowledgeBaseActions(() => {
-    resetPagination();
-    void qc.invalidateQueries({ queryKey: ["knowledge-bases"] });
-  });
+  const { actions } = useKnowledgeBaseActions(resetPagination);
   const items = query.data?.items ?? [];
   const paginationTotal = query.data?.total ?? items.length;
   const columns: Array<ListColumn<KnowledgeBase>> = [

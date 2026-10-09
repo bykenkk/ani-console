@@ -12,11 +12,12 @@ import type { RowAction } from "@/components/common";
 type ObjectTarget = { id?: string; key: string; kind?: string; state?: string };
 export function useObjectActions(bucketId: string, onDeleted?: () => void) {
   const qc = useQueryClient();
-  const refresh = () => {
-    qc.invalidateQueries({ queryKey: ["bucket", bucketId] });
-    qc.invalidateQueries({ queryKey: ["bucket-objects", bucketId] });
-    qc.invalidateQueries({ queryKey: ["buckets"] });
-  };
+  const refresh = () =>
+    Promise.all([
+      qc.invalidateQueries({ queryKey: ["bucket", bucketId] }),
+      qc.invalidateQueries({ queryKey: ["bucket-objects", bucketId] }),
+      qc.invalidateQueries({ queryKey: ["buckets"] }),
+    ]);
   const complete = useMutation({
     meta: {
       feedback: {
@@ -30,10 +31,8 @@ export function useObjectActions(bucketId: string, onDeleted?: () => void) {
       if (!item.id) throw new Error("缺少对象 ID");
       return completeStorageObjectUpload(item.id);
     },
-    onSuccess: (_, item) => {
-      qc.invalidateQueries({ queryKey: ["object", item.id] });
-      refresh();
-    },
+    onSuccess: (_, item) =>
+      Promise.all([qc.invalidateQueries({ queryKey: ["object", item.id] }), refresh()]),
   });
   const remove = useMutation({
     meta: {
@@ -48,9 +47,16 @@ export function useObjectActions(bucketId: string, onDeleted?: () => void) {
       if (item.id) await deleteStorageObject(item.id);
       else await deleteBucketObject(bucketId, item.key);
     },
-    onSuccess: () => {
-      if (onDeleted) onDeleted();
-      else refresh();
+    onSuccess: async (_, item) => {
+      if (item.id) {
+        await qc.invalidateQueries({
+          queryKey: ["object", item.id],
+          exact: true,
+          refetchType: "none",
+        });
+      }
+      await refresh();
+      onDeleted?.();
     },
   });
   const link = useMutation({

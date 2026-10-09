@@ -33,7 +33,7 @@
 - 简单领域使用 `index.ts` 与 `types.ts`；包含多个独立资源的领域按资源拆分文件或子目录，再由领域 `index.ts` 汇总公开接口。
 - 页面提交类型命名为 `*Input`，不得包含 `idempotency_key`；API 内部最终请求类型命名为 `*Request`，需要幂等时在这里加入 key。响应、列表参数及资源记录使用具有业务含义的稳定名称。
 - API 函数返回解包后的响应 data，并通过异常报告失败；不得恢复 `{ data, error }` 双通道或要求页面重复解包。
-- 服务端请求状态、缓存和失效由页面组件中的 TanStack Query 管理；API 模块不持有 React 状态，也不包装或改变 `useQuery`、`useMutation` 的行为。
+- 服务端请求状态、缓存和失效由 TanStack Query 管理；查询按页面或业务组件落位，复用资源操作及其缓存刷新收敛在业务 Hook，具体职责遵循下文“页面接入”。API 模块不持有 React 状态，也不包装或改变 `useQuery`、`useMutation` 的行为。
 
 ## 公共请求层
 
@@ -72,7 +72,9 @@
 ## 页面接入
 
 - 查询和 mutation 通过 TanStack Query 调用领域 API 函数；mutation 只提交无 key DTO。反馈渠道、meta、稳定 ID、请求状态展示及错误呈现统一遵循 [UI 开发约定](./UI-CONVENTIONS.md)。
-- 成功后由页面按资源关系失效或刷新查询缓存，API 模块不直接操作 Query Client。
+- 复用资源操作成功后的缓存失效与刷新统一在业务 Hook 中按资源关系处理；页面回调只处理分页、关闭弹窗、导航等页面行为，不重复刷新同一操作的数据。仅属于单个业务组件的操作可在该组件的 mutation 中处理刷新；API 模块不直接操作 Query Client。
+- 服务端资源变更后统一通过 `invalidateQueries` 或 `refetch` 获取最新数据，不使用 `setQueryData`、`setQueriesData` 将操作响应直接写入资源缓存，也不假设删除接口返回更新后的资源。
+- 删除成功后使相关列表查询失效，由活跃列表重新请求；对应详情缓存只标记失效，不立即请求可能已不存在的资源，详情页按既有交互返回。操作后仍展示详情时刷新详情，并使受影响列表失效。需要将刷新纳入 mutation 完成阶段时，在 `onSuccess` 中返回或等待刷新 Promise；外部回调不得绕过 Hook 的刷新。
 - 页面、路由和组件中不得出现 `coreRequest`、`servicesRequest`、Axios 平台请求或 `idempotency_key`；这些能力分别收敛在公共请求层和业务 API 模块。
 
 ## 完成检查
