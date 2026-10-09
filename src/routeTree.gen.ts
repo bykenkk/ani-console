@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as LoginCallbackRouteImport } from './routes/login.callback'
+import { Route as AuthenticatedApiKeysIndexRouteImport } from './routes/_authenticated/api-keys/index'
 import { Route as AuthenticatedContainerInstancesIndexRouteImport } from './routes/_authenticated/container-instances/index'
 import { Route as AuthenticatedContainerInstancesInstanceIdRouteImport } from './routes/_authenticated/container-instances/$instanceId'
 import { Route as AuthenticatedDevIndexRouteImport } from './routes/_authenticated/dev/index'
@@ -84,6 +85,12 @@ const LoginCallbackRoute = LoginCallbackRouteImport.update({
   path: '/callback',
   getParentRoute: () => LoginRoute,
 } as any)
+const AuthenticatedApiKeysIndexRoute =
+  AuthenticatedApiKeysIndexRouteImport.update({
+    id: '/api-keys/',
+    path: '/api-keys/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedContainerInstancesIndexRoute =
   AuthenticatedContainerInstancesIndexRouteImport.update({
     id: '/container-instances/',
@@ -377,6 +384,7 @@ export interface FileRoutesByFullPath {
   '/gpu-instances/$instanceId/terminal': typeof GpuInstancesInstanceIdTerminalRoute
   '/sandbox-instances/$instanceId/terminal': typeof SandboxInstancesInstanceIdTerminalRoute
   '/vm-instances/$instanceId/vnc': typeof VmInstancesInstanceIdVncRoute
+  '/api-keys/': typeof AuthenticatedApiKeysIndexRoute
   '/container-instances/': typeof AuthenticatedContainerInstancesIndexRoute
   '/dev/': typeof AuthenticatedDevIndexRoute
   '/filesystems/': typeof AuthenticatedFilesystemsIndexRoute
@@ -426,6 +434,7 @@ export interface FileRoutesByTo {
   '/gpu-instances/$instanceId/terminal': typeof GpuInstancesInstanceIdTerminalRoute
   '/sandbox-instances/$instanceId/terminal': typeof SandboxInstancesInstanceIdTerminalRoute
   '/vm-instances/$instanceId/vnc': typeof VmInstancesInstanceIdVncRoute
+  '/api-keys': typeof AuthenticatedApiKeysIndexRoute
   '/container-instances': typeof AuthenticatedContainerInstancesIndexRoute
   '/dev': typeof AuthenticatedDevIndexRoute
   '/filesystems': typeof AuthenticatedFilesystemsIndexRoute
@@ -479,6 +488,7 @@ export interface FileRoutesById {
   '/gpu-instances/$instanceId/terminal': typeof GpuInstancesInstanceIdTerminalRoute
   '/sandbox-instances/$instanceId/terminal': typeof SandboxInstancesInstanceIdTerminalRoute
   '/vm-instances/$instanceId/vnc': typeof VmInstancesInstanceIdVncRoute
+  '/_authenticated/api-keys/': typeof AuthenticatedApiKeysIndexRoute
   '/_authenticated/container-instances/': typeof AuthenticatedContainerInstancesIndexRoute
   '/_authenticated/dev/': typeof AuthenticatedDevIndexRoute
   '/_authenticated/filesystems/': typeof AuthenticatedFilesystemsIndexRoute
@@ -532,6 +542,7 @@ export interface FileRouteTypes {
     | '/gpu-instances/$instanceId/terminal'
     | '/sandbox-instances/$instanceId/terminal'
     | '/vm-instances/$instanceId/vnc'
+    | '/api-keys/'
     | '/container-instances/'
     | '/dev/'
     | '/filesystems/'
@@ -581,6 +592,7 @@ export interface FileRouteTypes {
     | '/gpu-instances/$instanceId/terminal'
     | '/sandbox-instances/$instanceId/terminal'
     | '/vm-instances/$instanceId/vnc'
+    | '/api-keys'
     | '/container-instances'
     | '/dev'
     | '/filesystems'
@@ -633,6 +645,7 @@ export interface FileRouteTypes {
     | '/gpu-instances/$instanceId/terminal'
     | '/sandbox-instances/$instanceId/terminal'
     | '/vm-instances/$instanceId/vnc'
+    | '/_authenticated/api-keys/'
     | '/_authenticated/container-instances/'
     | '/_authenticated/dev/'
     | '/_authenticated/filesystems/'
@@ -703,6 +716,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/login/callback'
       preLoaderRoute: typeof LoginCallbackRouteImport
       parentRoute: typeof LoginRoute
+    }
+    '/_authenticated/api-keys/': {
+      id: '/_authenticated/api-keys/'
+      path: '/api-keys'
+      fullPath: '/api-keys/'
+      preLoaderRoute: typeof AuthenticatedApiKeysIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/container-instances/': {
       id: '/_authenticated/container-instances/'
@@ -1060,6 +1080,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedVmInstancesInstanceIdRoute: typeof AuthenticatedVmInstancesInstanceIdRoute
   AuthenticatedVolumesVolumeIdRoute: typeof AuthenticatedVolumesVolumeIdRoute
   AuthenticatedVpcsVpcIdRoute: typeof AuthenticatedVpcsVpcIdRoute
+  AuthenticatedApiKeysIndexRoute: typeof AuthenticatedApiKeysIndexRoute
   AuthenticatedContainerInstancesIndexRoute: typeof AuthenticatedContainerInstancesIndexRoute
   AuthenticatedDevIndexRoute: typeof AuthenticatedDevIndexRoute
   AuthenticatedFilesystemsIndexRoute: typeof AuthenticatedFilesystemsIndexRoute
@@ -1113,6 +1134,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedVmInstancesInstanceIdRoute,
   AuthenticatedVolumesVolumeIdRoute: AuthenticatedVolumesVolumeIdRoute,
   AuthenticatedVpcsVpcIdRoute: AuthenticatedVpcsVpcIdRoute,
+  AuthenticatedApiKeysIndexRoute: AuthenticatedApiKeysIndexRoute,
   AuthenticatedContainerInstancesIndexRoute:
     AuthenticatedContainerInstancesIndexRoute,
   AuthenticatedDevIndexRoute: AuthenticatedDevIndexRoute,

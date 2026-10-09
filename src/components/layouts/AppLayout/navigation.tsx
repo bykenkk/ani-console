@@ -5,6 +5,7 @@ import {
   IconCodeSandbox,
   IconDashboard,
   IconFile,
+  IconLock,
   IconMessage,
 } from "@arco-design/web-react/icon";
 import { AliIcon } from "@/components/common";
@@ -142,6 +143,12 @@ export const menuItems: readonly MenuItem[] = [
         icon: <IconFile />,
         children: [{ key: "/registry", label: "镜像仓库", icon: <AliIcon name="Harbor" /> }],
       },
+      {
+        key: "security-identity",
+        label: "安全与身份",
+        icon: <IconLock />,
+        children: [{ key: "/api-keys", label: "API Key", icon: <AliIcon name="Ukeyguanli" /> }],
+      },
     ],
   },
 ] as const;
@@ -155,7 +162,7 @@ export const productGroupSections = [
     label: "AI算力服务",
     groupKeys: ["compute-management", "cluster-management", "ai-services", "knowledge-services"],
   },
-  { label: "公共服务", groupKeys: ["registry-management"] },
+  { label: "公共服务", groupKeys: ["registry-management", "security-identity"] },
 ] as const satisfies readonly ProductGroupSection[];
 
 export function isGroupItem(item: MenuItem): item is MenuItem & { children: MenuItem[] } {
@@ -221,6 +228,7 @@ const PATH_SUBMENU: { prefix: string; key: string }[] = [
   { prefix: "/routes", key: "network-management" },
   { prefix: "/load-balancers", key: "network-management" },
   { prefix: "/registry", key: "registry-management" },
+  { prefix: "/api-keys", key: "security-identity" },
 ];
 
 /** 当前路由应展开的侧栏分组 keys。 */

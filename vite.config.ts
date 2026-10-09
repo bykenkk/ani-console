@@ -31,7 +31,7 @@ export default defineConfig(({ command, mode }) => {
       host: "0.0.0.0",
       port: 5173,
       proxy: {
-        "/api": {
+        "^/api(?:/|$)": {
           target: apiTarget,
           changeOrigin: true,
         },
