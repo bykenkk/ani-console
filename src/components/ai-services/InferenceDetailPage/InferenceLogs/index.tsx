@@ -1,6 +1,6 @@
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
-import { Button, Empty, Select, Space } from "@arco-design/web-react";
+import { Button, Select, Space } from "@arco-design/web-react";
 import { useState } from "react";
 import { listInferenceServiceLogs, type InferenceServiceLog } from "@/api/ai-services/inference";
 import { DataTable } from "@/components/common";
@@ -60,7 +60,6 @@ export default function InferenceLogs({ serviceId }: { serviceId: string }) {
         data={items}
         rowKey={(row) => `${row.timestamp}-${row.container}-${row.stream}-${row.message}`}
         pagination={pagination}
-        noDataElement={<Empty description="暂无日志" />}
         columns={[
           {
             title: "时间",

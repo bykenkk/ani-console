@@ -1,6 +1,6 @@
 import { useClientPagination } from "@/hooks/useClientPagination";
 import { withId } from "@/lib/id";
-import { Button, Empty } from "@arco-design/web-react";
+import { Button } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import {
   listInferenceServicePolicies,
@@ -60,7 +60,6 @@ export default function InferencePolicies({ serviceId }: { serviceId: string }) 
         loading={policies.isFetching}
         pagination={pagination}
         rowKey="id"
-        noDataElement={<Empty description="当前服务未绑定访问策略" />}
         columns={[
           { title: "策略名称", dataIndex: "name", ellipsis: true },
           {

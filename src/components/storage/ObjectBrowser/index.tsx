@@ -3,7 +3,6 @@ import type { RowAction } from "@/components/common";
 import {
   Breadcrumb,
   Button,
-  Empty,
   Space,
   Tag,
   Typography,
@@ -144,7 +143,6 @@ export default function ObjectBrowser({
         pagination={pagination}
         scroll={{ x: "max-content" }}
         rowActions={actions}
-        noDataElement={<Empty description="当前文件夹暂无对象，可上传对象或新建文件夹" />}
       />
     </div>
   );

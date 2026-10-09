@@ -2,7 +2,7 @@ import type { InstanceRecord } from "@/api/instances";
 
 import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 
-import { Button, Empty, Space } from "@arco-design/web-react";
+import { Button, Space } from "@arco-design/web-react";
 
 type Instance = InstanceRecord;
 type Volume = NonNullable<Instance["volumes"]>[number];
@@ -41,7 +41,6 @@ export default function InstanceStorage({
               `${volume.kind}:${volume.source_ref ?? volume.name}:${volume.mount_path ?? ""}`
             }
             pagination={false}
-            noDataElement={<Empty description="暂无挂载点" />}
             columns={[
               { title: "名称", dataIndex: "name" },
               { title: "类型", dataIndex: "kind", width: 150 },
@@ -75,7 +74,6 @@ export default function InstanceStorage({
             data={filesystems}
             rowKey={(filesystem) => `${filesystem.resource_id}:${filesystem.mount_path ?? ""}`}
             pagination={false}
-            noDataElement={<Empty description="暂无文件存储 NFS" />}
             columns={[
               {
                 title: "文件存储",

@@ -1,5 +1,5 @@
 import { DataTable } from "@/components/common";
-import { Button, Descriptions, Empty, Space, Tooltip, Typography } from "@arco-design/web-react";
+import { Button, Descriptions, Space, Tooltip, Typography } from "@arco-design/web-react";
 
 type FilesystemAccessRule = {
   id: string;
@@ -38,9 +38,6 @@ export default function FilesystemPermissionsTab() {
           ]}
           data={rules}
           pagination={false}
-          noDataElement={
-            <Empty description="暂无可展示的访问规则；Core API 开放后可在此配置授权网段" />
-          }
         />
       </section>
 

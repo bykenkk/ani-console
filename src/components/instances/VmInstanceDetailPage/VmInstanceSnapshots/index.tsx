@@ -1,5 +1,5 @@
 import { type InstanceRecord } from "@/api/instances";
-import { Button, Empty, Tooltip } from "@arco-design/web-react";
+import { Button, Tooltip } from "@arco-design/web-react";
 import { DataTable, ResourceNameId, StatusBadge, type RowAction } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import VmInstanceRollbackModal from "@/components/instances/VmInstanceRollbackModal";
@@ -61,7 +61,6 @@ export default function VmInstanceSnapshots({
           data={instance.snapshots ?? []}
           rowKey="id"
           pagination={false}
-          noDataElement={<Empty description="暂无快照" />}
           rowActions={actions}
           columns={[
             {

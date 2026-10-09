@@ -4,7 +4,7 @@ import { DataTable, StatusBadge } from "@/components/common";
 
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
-import { Button, Empty } from "@arco-design/web-react";
+import { Button } from "@arco-design/web-react";
 
 export default function VolumeSnapshots({
   volumeId,
@@ -48,7 +48,6 @@ export default function VolumeSnapshots({
           data={pageItems}
           loading={snapshots.isLoading}
           pagination={pagination}
-          noDataElement={<Empty description="暂无快照，点击右上角「创建快照」开始" />}
         />
       </div>
     </>

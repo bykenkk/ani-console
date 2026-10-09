@@ -1,5 +1,5 @@
 import { withId } from "@/lib/id";
-import { Empty, Space, Tag, Modal } from "@arco-design/web-react";
+import { Space, Tag, Modal } from "@arco-design/web-react";
 import { type ReactNode, useState } from "react";
 import {
   listKnowledgeBaseDocuments,
@@ -224,7 +224,6 @@ export default function KnowledgeDocuments({ kbId, action }: { kbId: string; act
         columns={columns}
         loading={documents.isLoading}
         data={rows}
-        noDataElement={<Empty description="还没有文档，上传后可进行解析和问答" />}
         tableLabel="知识库文档与解析列表"
         scroll={{ x: 1370 }}
         rowActions={actions}

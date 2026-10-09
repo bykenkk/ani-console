@@ -2,7 +2,6 @@ import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { listNetworkRoutes, type NetworkRoute } from "@/api/network";
 import { DataTable } from "@/components/common";
 import { withId } from "@/lib/id";
-import { Empty } from "@arco-design/web-react";
 
 export default function VpcRoutes({ vpcId }: { vpcId: string }) {
   const {
@@ -30,7 +29,6 @@ export default function VpcRoutes({ vpcId }: { vpcId: string }) {
       data={pageItems}
       loading={routes.isLoading}
       pagination={pagination}
-      noDataElement={<Empty />}
     />
   );
 }

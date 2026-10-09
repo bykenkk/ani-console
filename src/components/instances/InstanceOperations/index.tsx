@@ -1,6 +1,5 @@
 import { withId } from "@/lib/id";
 import { listInstanceOperations, type InstanceOperation } from "@/api/instances";
-import { Empty } from "@arco-design/web-react";
 import { DataTable, StatusBadge } from "@/components/common";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
@@ -50,7 +49,6 @@ export default function InstanceOperations({ instanceId }: { instanceId: string 
       data={pageItems}
       loading={query.isFetching}
       pagination={pagination}
-      noDataElement={<Empty description="暂无操作记录" />}
       columns={[
         {
           title: "操作时间",

@@ -1,7 +1,7 @@
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
 import { listInstanceSecurityEvents, type InstanceSecurityEvent } from "@/api/instances";
-import { Empty, Select, Space, Tag } from "@arco-design/web-react";
+import { Select, Space, Tag } from "@arco-design/web-react";
 import { useState } from "react";
 import { DataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
@@ -52,7 +52,6 @@ export default function SandboxSecurityEvents({ instanceId }: { instanceId: stri
           data={pageItems}
           loading={query.isLoading || query.isFetching}
           pagination={pagination}
-          noDataElement={<Empty description="暂无安全事件" />}
           columns={[
             {
               title: "级别",

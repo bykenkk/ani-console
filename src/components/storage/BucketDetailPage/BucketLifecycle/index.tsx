@@ -6,7 +6,7 @@ import {
 } from "@/api/storage/buckets";
 import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 import { withId } from "@/lib/id";
-import { Button, Empty, Space, Typography, Modal } from "@arco-design/web-react";
+import { Button, Space, Typography, Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CreateLifecycleRuleModal from "@/components/storage/CreateLifecycleRuleModal";
 import { useState } from "react";
@@ -117,7 +117,6 @@ export default function BucketLifecycle({ bucketId }: { bucketId: string }) {
           loading={rules.isLoading}
           pagination={pagination}
           rowActions={actions}
-          noDataElement={<Empty description="暂无生命周期规则，点击「添加规则」开始" />}
         />
       </Space>
       {dialogNode}

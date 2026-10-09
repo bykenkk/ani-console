@@ -2,7 +2,7 @@ import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { listInstances } from "@/api/instances";
 import { DataTable, StatusBadge, type ListColumn } from "@/components/common";
 import { withId } from "@/lib/id";
-import { Empty, Tag } from "@arco-design/web-react";
+import { Tag } from "@arco-design/web-react";
 
 type RelatedResource = { id: string; kind: "实例"; name: string; status: string };
 
@@ -42,7 +42,6 @@ export default function SubnetRelatedResources({ subnetId }: { subnetId: string 
         columns={columns}
         data={resources}
         loading={instances.isLoading}
-        noDataElement={<Empty description="暂无关联资源" />}
         pagination={pagination}
         tableLabel="子网关联资源"
       />

@@ -33,7 +33,6 @@ export default function VpcSubnets({ vpcId }: { vpcId: string }) {
       data={pageItems}
       loading={subnets.isLoading}
       pagination={pagination}
-      noDataElement="当前 VPC 暂无子网"
     />
   );
 }

@@ -1,6 +1,5 @@
 import type { NetworkLoadBalancerListener } from "@/api/network";
 import { DataTable } from "@/components/common";
-import { Empty } from "@arco-design/web-react";
 
 export default function LoadBalancerListeners({
   listeners,
@@ -17,7 +16,6 @@ export default function LoadBalancerListeners({
       data={listeners}
       rowKey={(row) => `${row.protocol}-${row.port}-${row.target_port}`}
       pagination={false}
-      noDataElement={<Empty description="暂无监听器" />}
     />
   );
 }

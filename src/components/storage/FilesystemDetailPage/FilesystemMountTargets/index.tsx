@@ -9,7 +9,7 @@ import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
-import { Button, Empty } from "@arco-design/web-react";
+import { Button } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 
@@ -112,7 +112,6 @@ export default function FilesystemMountTargets({
           loading={mounts.isLoading}
           pagination={pagination}
           rowActions={actions}
-          noDataElement={<Empty description="暂无挂载目标，请创建挂载目标后获取访问地址" />}
         />
       </div>
     </>

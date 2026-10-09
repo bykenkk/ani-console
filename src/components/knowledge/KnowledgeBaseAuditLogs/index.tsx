@@ -1,6 +1,6 @@
 import { withId } from "@/lib/id";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { Button, Empty } from "@arco-design/web-react";
+import { Button } from "@arco-design/web-react";
 import { listKnowledgeBaseAuditLogs, type KBAuditLog } from "@/api/knowledge";
 import { DataTable, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
@@ -63,7 +63,6 @@ export default function KnowledgeBaseAuditLogs({ kbId }: { kbId: string }) {
         data={items}
         loading={logs.isPending}
         pagination={false}
-        noDataElement={<Empty description="暂无操作记录" />}
         tableLabel="知识库操作记录列表"
         columns={[
           {

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteVectorStoreKnowledgeBaseLink, type VectorStore } from "@/api/storage/vector-stores";
 import { DataTable, type RowAction } from "@/components/common";
 import { navigateToResourceDetail } from "@/lib/resources";
-import { Button, Empty, Link, Modal, Space } from "@arco-design/web-react";
+import { Button, Link, Modal, Space } from "@arco-design/web-react";
 
 import { useNavigate } from "@tanstack/react-router";
 
@@ -65,7 +65,6 @@ export default function VectorStoreRelatedResources({ store }: { store: VectorSt
           data={resources}
           rowKey="id"
           pagination={false}
-          noDataElement={<Empty description="暂无关联资源" />}
           tableLabel="向量存储关联资源列表"
           columns={[
             { title: "类型", dataIndex: "type", width: 160 },

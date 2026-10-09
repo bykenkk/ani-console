@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import type { ReactNode } from "react";
-import { Table, type TableColumnProps, type TableProps } from "@arco-design/web-react";
+import { Empty, Table, type TableColumnProps, type TableProps } from "@arco-design/web-react";
 import DataTableSectionHeader from "./DataTableSectionHeader";
 import { type DataTableSectionHeaderProps } from "./DataTableSectionHeader";
 import {
@@ -51,7 +51,7 @@ export function DataTable<T>({
   rowSelection,
   pagination,
   loading = false,
-  noDataElement,
+  noDataElement = <Empty />,
   tableLabel = "数据列表",
   scroll,
   rowActions,

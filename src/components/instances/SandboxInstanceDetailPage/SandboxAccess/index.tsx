@@ -4,7 +4,7 @@ import {
   deleteSandboxPort,
 } from "@/api/instances";
 import { DataTable, StatusBadge, type RowAction } from "@/components/common";
-import { Button, Empty, Space, Typography, Modal } from "@arco-design/web-react";
+import { Button, Space, Typography, Modal } from "@arco-design/web-react";
 import { copyToClipboard } from "@/lib/clipboard";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -109,7 +109,6 @@ export default function SandboxAccess({
           data={sandbox.ports ?? []}
           rowKey={(item) => String(item.port)}
           pagination={false}
-          noDataElement={<Empty description="暂无预览端口" />}
           rowActions={actions}
           columns={[
             {

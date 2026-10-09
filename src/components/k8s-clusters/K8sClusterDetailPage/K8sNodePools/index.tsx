@@ -2,7 +2,6 @@ import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { listK8sClusterNodePools, type K8sClusterNodePool } from "@/api/k8s-clusters";
 import { DataTable, StatusBadge } from "@/components/common";
 import { withId } from "@/lib/id";
-import { Empty } from "@arco-design/web-react";
 import { useEffect } from "react";
 
 export default function K8sNodePools({
@@ -46,7 +45,6 @@ export default function K8sNodePools({
       data={pageItems}
       loading={nodePools.isLoading}
       pagination={pagination}
-      noDataElement={<Empty description="暂无节点池，点击上方创建" />}
     />
   );
 }

@@ -1,4 +1,4 @@
-import { Empty, Link } from "@arco-design/web-react";
+import { Link } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { listInferenceServices, type InferenceService } from "@/api/ai-services/inference";
@@ -71,7 +71,6 @@ export default function ModelRelatedResources({ model }: { model: Model }) {
         data={services}
         loading={relatedServices.isFetching}
         pagination={false}
-        noDataElement={<Empty description="暂无关联推理服务" />}
         tableLabel="关联推理服务列表"
       />
     </div>

@@ -2,7 +2,7 @@ import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { listK8sClusterWorkloads, type K8sClusterWorkload } from "@/api/k8s-clusters";
 import { DataTable, StatusBadge } from "@/components/common";
 import { withId } from "@/lib/id";
-import { Card, Empty, Grid } from "@arco-design/web-react";
+import { Card, Grid } from "@arco-design/web-react";
 
 export default function K8sWorkloads({ clusterId }: { clusterId: string }) {
   const {
@@ -52,7 +52,6 @@ export default function K8sWorkloads({ clusterId }: { clusterId: string }) {
         loading={workloads.isLoading}
         rowKey={(row) => `${row.namespace}/${row.kind}/${row.name}`}
         pagination={pagination}
-        noDataElement={<Empty description="暂无工作负载" />}
       />
     </div>
   );

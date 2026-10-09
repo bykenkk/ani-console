@@ -4,7 +4,7 @@ import {
   type VectorStoreSearchHit,
 } from "@/api/storage/vector-stores";
 import { DataTable } from "@/components/common";
-import { Alert, Button, Empty, Form, Input, InputNumber, Typography } from "@arco-design/web-react";
+import { Alert, Button, Form, Input, InputNumber, Typography } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
@@ -146,7 +146,6 @@ export default function VectorStoreWorkbench({ store }: { store: VectorStore }) 
             ]}
             data={hits}
             pagination={false}
-            noDataElement={<Empty description="没有匹配的向量结果" />}
             tableLabel="向量检索结果"
           />
         </section>

@@ -1,6 +1,6 @@
 import type { SandboxInstanceStatus } from "@/api/instances";
 import { DataTable } from "@/components/common";
-import { Descriptions, Empty, Space, Tag, Typography } from "@arco-design/web-react";
+import { Descriptions, Space, Tag, Typography } from "@arco-design/web-react";
 import { sandboxEgressLabel } from "../utils";
 
 type SandboxStatus = NonNullable<SandboxInstanceStatus>;
@@ -18,7 +18,6 @@ export default function SandboxEnvironment({ sandbox }: { sandbox: SandboxStatus
           data={env}
           rowKey="name"
           pagination={false}
-          noDataElement={<Empty description="暂无环境变量" />}
           columns={[
             { title: "名称", dataIndex: "name" },
             {

@@ -12,7 +12,7 @@ import {
 } from "@/api/network";
 import { DataTable, StatusBadge, type ListColumn } from "@/components/common";
 import { withId } from "@/lib/id";
-import { Empty, Space, Tag, Typography } from "@arco-design/web-react";
+import { Space, Tag, Typography } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
 type RelatedResource = {
@@ -148,7 +148,6 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
           columns={columns}
           data={networkPage.items}
           loading={loading}
-          noDataElement={<Empty description="暂无网络关联资源" />}
           pagination={networkPage.pagination}
           tableLabel="VPC 网络关联资源"
         />
@@ -162,7 +161,6 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
           columns={columns}
           data={computePage.items}
           loading={loading}
-          noDataElement={<Empty description="暂无算力关联资源" />}
           pagination={computePage.pagination}
           tableLabel="VPC 算力关联资源"
         />

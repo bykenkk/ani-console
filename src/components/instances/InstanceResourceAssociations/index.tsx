@@ -1,5 +1,5 @@
 import type { InstanceRecord } from "@/api/instances";
-import { Empty, Space } from "@arco-design/web-react";
+import { Space } from "@arco-design/web-react";
 import { DataTable } from "@/components/common";
 import { getImageDisplayName } from "@/lib/render";
 
@@ -127,7 +127,6 @@ export default function InstanceResourceAssociations({ instance }: { instance: I
           data={images}
           rowKey="key"
           pagination={false}
-          noDataElement={<Empty description="暂无关联镜像" />}
           columns={[
             {
               title: "镜像",
@@ -144,7 +143,6 @@ export default function InstanceResourceAssociations({ instance }: { instance: I
           data={Array.from(storageAssociations.values())}
           rowKey="key"
           pagination={false}
-          noDataElement={<Empty description="暂无存储关联" />}
           columns={[
             { title: "存储类型", dataIndex: "type", width: 160 },
             { title: "关联对象", dataIndex: "name" },
@@ -158,7 +156,6 @@ export default function InstanceResourceAssociations({ instance }: { instance: I
           data={securityAssociations}
           rowKey="key"
           pagination={false}
-          noDataElement={<Empty description="暂无安全关联" />}
           columns={[
             { title: "关联类型", dataIndex: "type", width: 160 },
             { title: "关联对象", dataIndex: "name" },

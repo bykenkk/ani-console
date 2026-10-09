@@ -1,6 +1,6 @@
 import type { RowAction } from "@/components/common";
 import type { InstanceRecord } from "@/api/instances";
-import { Descriptions, Empty, Space, Tooltip, Typography } from "@arco-design/web-react";
+import { Descriptions, Space, Tooltip, Typography } from "@arco-design/web-react";
 import type { ReactNode } from "react";
 import { DataTable, ImageNameText, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
@@ -62,7 +62,6 @@ export default function InstanceReleases({
             data={releases}
             rowKey="revision"
             pagination={false}
-            noDataElement={<Empty description="暂无版本记录" />}
             rowActions={revisionActions}
             columns={[
               {
@@ -129,7 +128,6 @@ export default function InstanceReleases({
         data={releases}
         rowKey="revision"
         pagination={false}
-        noDataElement={<Empty description="暂无发布历史" />}
         columns={[
           { title: "修订版本", dataIndex: "revision", fixed: "left" },
           {

@@ -1,6 +1,6 @@
 import { type InstanceEnvVar, type InstanceRecord, applyInstanceLifecycle } from "@/api/instances";
 import { DataTable, type RowAction } from "@/components/common";
-import { Empty, Space, Tooltip, Modal } from "@arco-design/web-react";
+import { Space, Tooltip, Modal } from "@arco-design/web-react";
 import { type ReactNode } from "react";
 import { useMutation } from "@tanstack/react-query";
 
@@ -90,7 +90,6 @@ export default function InstanceConfiguration({
           data={environmentVariables}
           rowKey="name"
           pagination={false}
-          noDataElement={<Empty description="暂无环境变量" />}
           columns={[
             { title: "名称", dataIndex: "name", ellipsis: true },
             // {
@@ -136,7 +135,6 @@ export default function InstanceConfiguration({
           data={secretRows}
           rowKey="reference"
           pagination={false}
-          noDataElement={<Empty description="暂无绑定密钥" />}
           rowActions={actions}
           columns={[
             { title: "密钥", dataIndex: "id", ellipsis: true },

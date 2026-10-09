@@ -1,7 +1,7 @@
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
 import { listInstanceEvents, type InstanceEvent } from "@/api/instances";
-import { Empty, Tag } from "@arco-design/web-react";
+import { Tag } from "@arco-design/web-react";
 import { DataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
@@ -24,7 +24,6 @@ export default function InstanceEvents({ instanceId }: { instanceId: string }) {
       data={pageItems}
       loading={events.isLoading}
       pagination={pagination}
-      noDataElement={<Empty description="暂无事件" />}
       columns={[
         {
           title: "类型",

@@ -1,7 +1,7 @@
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
 import { listSandboxFiles, type SandboxFile, deleteSandboxFile } from "@/api/instances";
-import { Button, Empty, Input, Space, Tag, Tooltip, Modal } from "@arco-design/web-react";
+import { Button, Input, Space, Tag, Tooltip, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { DataTable, type RowAction } from "@/components/common";
@@ -143,7 +143,6 @@ export default function SandboxFiles({
             rowKey="path"
             loading={files.isLoading || files.isFetching}
             pagination={pagination}
-            noDataElement={<Empty description="当前目录为空" />}
             rowActions={actions}
             columns={[
               {

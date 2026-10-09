@@ -7,7 +7,7 @@ import {
 import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
-import { Button, Empty, Space, Modal } from "@arco-design/web-react";
+import { Button, Space, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import SandboxCheckpointCloneModal from "@/components/instances/SandboxCheckpointCloneModal";
@@ -127,7 +127,6 @@ export default function SandboxCheckpoints({
             rowKey="id"
             loading={checkpoints.isLoading || checkpoints.isFetching}
             pagination={pagination}
-            noDataElement={<Empty description="暂无检查点" />}
             rowActions={actions}
             columns={[
               {

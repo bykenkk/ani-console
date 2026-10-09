@@ -1,7 +1,6 @@
 import type { StorageVolumeMountHistoryEntry } from "@/api/storage/volumes";
 import { DataTable, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
-import { Empty } from "@arco-design/web-react";
 
 const actionText: Record<StorageVolumeMountHistoryEntry["action"], string> = {
   mount: "挂载",
@@ -21,7 +20,6 @@ export default function VolumeMountHistory({ items }: { items: StorageVolumeMoun
       ]}
       data={items}
       pagination={false}
-      noDataElement={<Empty description="暂无挂载历史" />}
     />
   );
 }

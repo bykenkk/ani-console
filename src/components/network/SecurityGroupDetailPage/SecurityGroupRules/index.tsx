@@ -4,7 +4,7 @@ import { DataTable, type RowAction } from "@/components/common";
 import SecurityGroupRuleModal from "@/components/network/SecurityGroupRuleModal";
 import { type SecurityGroupRuleResource } from "@/components/network/SecurityGroupRuleModal";
 import { withId } from "@/lib/id";
-import { Button, Empty, Space, Tag, Typography, Modal } from "@arco-design/web-react";
+import { Button, Space, Tag, Typography, Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -124,9 +124,6 @@ export default function SecurityGroupRules({
         ]}
         data={pageItems}
         pagination={pagination}
-        noDataElement={
-          <Empty description={`暂无${direction === "ingress" ? "入站" : "出站"}规则`} />
-        }
       />
       {dialogNode}
     </Space>

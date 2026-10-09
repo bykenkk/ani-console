@@ -3,7 +3,7 @@ import { useVolumeDetach } from "@/hooks/useVolumeDetach";
 import type { StorageVolume } from "@/api/storage/volumes";
 import { DataTable, ResourceNameId, StatusBadge, type RowAction } from "@/components/common";
 
-import { Button, Empty } from "@arco-design/web-react";
+import { Button } from "@arco-design/web-react";
 
 type MountedInstance = NonNullable<StorageVolume["used_by"]>[number];
 
@@ -55,7 +55,6 @@ export default function VolumeRelatedResources({
           data={items}
           pagination={false}
           rowActions={actions}
-          noDataElement={<Empty description="该卷当前未挂载实例，点击右上角「挂载」开始" />}
         />
       </div>
     </>
