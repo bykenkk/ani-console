@@ -1,7 +1,8 @@
 import clsx from "clsx";
 import type { ReactNode } from "react";
 import { Table, type TableColumnProps, type TableProps } from "@arco-design/web-react";
-import DataTableSectionHeader, { type DataTableSectionHeaderProps } from "./DataTableSectionHeader";
+import DataTableSectionHeader from "./DataTableSectionHeader";
+import { type DataTableSectionHeaderProps } from "./DataTableSectionHeader";
 import {
   getRowActionsColumnWidth,
   normalizeDataTableColumns,

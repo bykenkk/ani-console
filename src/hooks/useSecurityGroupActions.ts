@@ -38,9 +38,7 @@ export function useSecurityGroupActions(
       loading: (item) =>
         deleteSecurityGroup.isPending && deleteSecurityGroup.variables?.id === item.id,
       intent: "danger",
-      onClick: (item) => {
-        deleteSecurityGroup.confirm(item);
-      },
+      onClick: (item) => deleteSecurityGroup.confirm(item),
     },
   ];
   return { actions };

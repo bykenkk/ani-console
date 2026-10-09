@@ -19,9 +19,7 @@ export function useK8sClusterActions(onDeleted?: (item: Cluster) => void) {
       disabled: deleteCluster.isDisabled,
       loading: (item) => deleteCluster.isPending && deleteCluster.variables?.id === item.id,
       intent: "danger",
-      onClick: (cluster) => {
-        deleteCluster.confirm(cluster);
-      },
+      onClick: (cluster) => deleteCluster.confirm(cluster),
     },
   ];
   return { actions };

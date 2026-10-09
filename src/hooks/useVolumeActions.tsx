@@ -35,14 +35,13 @@ export function useVolumeActions(onDeleted?: (item: Volume) => void) {
       intent: "danger",
       visible: isMounted,
       loading: (item) => detachVolume.isPending && detachVolume.variables?.volumeId === item.id,
-      onClick: (item) => {
+      onClick: (item) =>
         detachVolume.confirm({
           volumeId: item.id,
           volumeName: item.name,
           instanceId: item.mount_instance_id!,
           instanceName: item.mount_name ?? undefined,
-        });
-      },
+        }),
     },
     {
       key: "snapshot",
@@ -55,9 +54,7 @@ export function useVolumeActions(onDeleted?: (item: Volume) => void) {
       disabled: deleteVolume.isDisabled,
       loading: (item) => deleteVolume.isPending && deleteVolume.variables?.id === item.id,
       intent: "danger",
-      onClick: (item) => {
-        deleteVolume.confirm(item);
-      },
+      onClick: (item) => deleteVolume.confirm(item),
     },
   ];
   const dialogNode = (
