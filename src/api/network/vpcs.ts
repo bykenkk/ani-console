@@ -15,7 +15,10 @@ const vpcPath = (vpcId: string) => `/networks/vpcs/${encodeURIComponent(vpcId)}`
 export function listNetworkVpcs(
   params: NetworkVPCListParams = {},
 ): Promise<NetworkVPCListResponse> {
-  return coreRequest<NetworkVPCListResponse>("/networks/vpcs", { method: "GET", params });
+  return coreRequest<NetworkVPCListResponse>("/networks/vpcs", {
+    method: "GET",
+    params,
+  });
 }
 
 export function createNetworkVpc(submitData: CreateNetworkVPCInput): Promise<NetworkVPC> {

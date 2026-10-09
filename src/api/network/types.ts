@@ -1,17 +1,37 @@
 import type { CoreDevProfileInfo, CursorPageParams } from "@/api/types";
 
-export type NetworkResourceState = "pending" | "available" | "failed" | "deleting" | "deleted";
+export type NetworkResourceState =
+  | "pending"
+  | "provisioning"
+  | "available"
+  | "failed"
+  | "deleting"
+  | "deleted";
+
+// Governance network query values; response states remain lowercase.
+export type NetworkResourceStateFilter =
+  | "RESOURCE_STATE_PROVISIONING"
+  | "RESOURCE_STATE_AVAILABLE"
+  | "RESOURCE_STATE_FAILED"
+  | "RESOURCE_STATE_DELETING"
+  | "RESOURCE_STATE_DELETED";
 
 export interface NetworkVPC {
   id: string;
-  tenant_id: string;
+  tenant_id?: string;
   name: string;
+  description?: string;
   cidr: string;
   state: NetworkResourceState;
   reason?: string | null;
   dev_profile?: CoreDevProfileInfo;
   created_at: string;
   updated_at: string;
+  version?: string;
+  observed_at?: string;
+  observation_stale?: boolean;
+  last_operation_id?: string;
+  subnet_count?: string;
 }
 
 export interface NetworkSubnet {
@@ -36,9 +56,8 @@ export interface NetworkSubnetListParams {
 }
 
 export interface NetworkVPCListParams extends CursorPageParams {
-  state?: string;
-  search_field?: "name" | "id";
-  keyword?: string;
+  state?: "" | NetworkResourceStateFilter;
+  name?: string;
 }
 
 export interface NetworkVPCListResponse {
@@ -55,6 +74,7 @@ export interface NetworkSubnetListResponse {
 export interface CreateNetworkVPCInput {
   name: string;
   cidr: string;
+  description?: string;
 }
 export type CreateNetworkVPCRequest = CreateNetworkVPCInput & { idempotency_key: string };
 

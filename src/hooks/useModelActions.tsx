@@ -6,7 +6,9 @@ import type { RowAction } from "@/components/common";
 
 export function useModelActions(onDeleted: (item: Model) => void) {
   const [deployModel, setDeployModel] = useState<Model | null>(null);
-  const remove = useResourceDelete<Model>("model", onDeleted);
+  const remove = useResourceDelete<Model>("model", onDeleted, {
+    isDisabled: (item) => item.status === "deleted",
+  });
   const deploymentOptions = deployModel ? getModelDeploymentOptions(deployModel) : undefined;
   const actions: RowAction<Model>[] = [
     {

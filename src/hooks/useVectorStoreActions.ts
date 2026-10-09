@@ -6,7 +6,9 @@ import type { RowAction } from "@/components/common";
 
 export function useVectorStoreActions(onDeleted?: () => void) {
   const qc = useQueryClient();
-  const remove = useResourceDelete<VectorStore>("vector-store", onDeleted);
+  const remove = useResourceDelete<VectorStore>("vector-store", onDeleted, {
+    isDisabled: (item) => Boolean(item.knowledge_base_ref),
+  });
   const rebuild = useMutation({
     meta: {
       feedback: {

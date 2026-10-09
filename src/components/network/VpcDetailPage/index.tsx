@@ -42,6 +42,10 @@ export default function VpcDetailPage({
     },
     queryKey: ["network-vpc", vpcId],
     queryFn: () => getNetworkVpc(vpcId),
+    refetchInterval: (query) =>
+      query.state.data?.state === "provisioning" || query.state.data?.state === "deleting"
+        ? 5000
+        : false,
   });
   const { actions } = useVpcActions(goBack);
 
@@ -53,7 +57,7 @@ export default function VpcDetailPage({
     <DetailPageFrame
       breadcrumbs={[...navigationBreadcrumbsForPath("/vpcs"), { label: vpc.name }]}
       title={vpc.name}
-      status={<StatusBadge status={vpc.state} />}
+      status={<StatusBadge status={vpc.state} reason={vpc.reason} />}
       icon={<AliIcon name="VPCwangluo" size={28} />}
       headerItems={[{ label: "CIDR", value: vpc.cidr }]}
       actions={<ResourceActionMenu record={vpc} actions={actions} />}

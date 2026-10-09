@@ -1,18 +1,8 @@
-import CreateVpcModal from "../CreateVpcModal";
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useQueryClient } from "@tanstack/react-query";
 import { useVpcActions } from "@/hooks/useVpcActions";
-
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-
-import { useMemo, useState } from "react";
-import {
-  listNetworkRoutes,
-  listNetworkSubnets,
-  listNetworkVpcs,
-  type NetworkRoute,
-  type NetworkSubnet,
-  type NetworkVPC,
-} from "@/api/network";
-
+import { useState } from "react";
+import { listNetworkVpcs, type NetworkVPC, type NetworkResourceStateFilter } from "@/api/network";
 import {
   ResourceNameId,
   ListPageFrame,
@@ -21,90 +11,38 @@ import {
   ListDataTable,
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import CreateVpcModal from "../CreateVpcModal";
 
 type Vpc = NetworkVPC;
-type Subnet = NetworkSubnet;
-type VpcStatusFilter = "all" | Vpc["state"];
-type VpcSearchField = "name" | "id";
+type VpcStatusFilter = "" | NetworkResourceStateFilter;
 
 export default function VpcsPage() {
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
-
-  const [status, setStatus] = useState<VpcStatusFilter>("all");
-  const [searchField, setSearchField] = useState<VpcSearchField>("name");
+  const [status, setStatus] = useState<VpcStatusFilter>("");
   const [searchText, setSearchText] = useState("");
-
   const {
     query: vpcs,
     items,
     pagination,
     resetPagination,
     refresh,
-  } = useCursorPaginatedQuery<Vpc>({
-    errorNotification: {
-      id: "vpcs",
-      action: "VPC 列表加载",
-      fallback: "请求失败，请稍后重试",
-    },
-    queryKey: ["network-vpcs", { status, searchField, searchText }],
-    queryFn: async ({ cursor, limit }) => {
-      const keyword = searchText.trim();
-      return listNetworkVpcs({
+  } = useCursorPaginatedQuery<NetworkVPC>({
+    errorNotification: { id: "vpcs", action: "VPC 列表加载", fallback: "请求失败，请稍后重试" },
+    queryKey: ["network-vpcs", { status, name: searchText.trim() }],
+    queryFn: ({ cursor, limit }) =>
+      listNetworkVpcs({
         limit,
         cursor,
-        state: status === "all" ? undefined : status,
-        search_field: keyword ? searchField : undefined,
-        keyword: keyword || undefined,
-      });
-    },
+        state: status,
+        name: searchText.trim() || undefined,
+      }),
+    refetchInterval: (data) =>
+      data?.items?.some((vpc) => vpc.state === "provisioning" || vpc.state === "deleting")
+        ? 5000
+        : false,
   });
-  const subnets = useQuery({
-    meta: {
-      errorNotification: {
-        id: "subnets",
-        action: "数据加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-subnets", "vpc-counts"],
-    queryFn: () => listNetworkSubnets(),
-  });
-  const routes = useQuery({
-    meta: {
-      errorNotification: {
-        id: "routes",
-        action: "数据加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-routes", "vpc-counts"],
-    queryFn: () => listNetworkRoutes(),
-  });
-
-  const { actions } = useVpcActions(() => {
-    resetPagination();
-    qc.invalidateQueries({ queryKey: ["network-subnets"] });
-    qc.invalidateQueries({ queryKey: ["network-routes"] });
-  });
-
-  const subnetCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const subnet of (subnets.data?.items ?? []) as Subnet[])
-      counts.set(subnet.vpc_id, (counts.get(subnet.vpc_id) ?? 0) + 1);
-    return counts;
-  }, [subnets.data?.items]);
-  const routeTableNames = useMemo(() => {
-    const names = new Map<string, string[]>();
-    for (const route of (routes.data?.items ?? []) as NetworkRoute[]) {
-      names.set(route.vpc_id, [
-        ...(names.get(route.vpc_id) ?? []),
-        route.description?.trim() || route.id,
-      ]);
-    }
-    return names;
-  }, [routes.data?.items]);
+  const { actions } = useVpcActions(resetPagination);
   const columns: Array<ListColumn<Vpc>> = [
     {
       key: "name",
@@ -115,19 +53,11 @@ export default function VpcsPage() {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, vpc) => <StatusBadge status={vpc.state} />,
+      render: (_, vpc) => <StatusBadge status={vpc.state} reason={vpc.reason} />,
     },
     { key: "cidr", title: "CIDR", dataIndex: "cidr" },
-    {
-      key: "subnets",
-      title: "子网数",
-      render: (_, vpc) => (subnets.isError ? "-" : (subnetCounts.get(vpc.id) ?? 0)),
-    },
-    {
-      key: "routeTable",
-      title: "路由表",
-      render: (_, vpc) => (routes.isError ? "-" : routeTableNames.get(vpc.id)?.join("、") || "-"),
-    },
+    { key: "subnets", title: "子网数", dataIndex: "subnet_count", placeholder: "-" },
+
     {
       key: "createdAt",
       title: "创建时间",
@@ -135,7 +65,6 @@ export default function VpcsPage() {
       render: (_, vpc) => formatDateTime(vpc.created_at),
     },
   ];
-
   return (
     <>
       <ListPageFrame
@@ -155,58 +84,40 @@ export default function VpcsPage() {
         }}
         tabs={{
           value: status,
-          onChange: setStatus,
+          onChange: (value) => {
+            setStatus(value);
+            resetPagination();
+          },
           items: [
-            {
-              value: "all",
-              label: "全部",
-            },
-            {
-              value: "available",
-              label: "可用",
-            },
-            {
-              value: "pending",
-              label: "创建中",
-            },
-            {
-              value: "failed",
-              label: "异常",
-            },
+            { value: "", label: "全部" },
+            { value: "RESOURCE_STATE_AVAILABLE", label: "可用" },
+            { value: "RESOURCE_STATE_PROVISIONING", label: "创建中" },
+            { value: "RESOURCE_STATE_FAILED", label: "异常" },
           ],
         }}
         toolbar={{
           search: {
-            fields: [
-              {
-                value: "name",
-                label: "名称",
-              },
-              {
-                value: "id",
-                label: "ID",
-              },
-            ],
-            field: searchField,
+            fields: [{ value: "name", label: "名称" }],
+            field: "name",
             value: searchText,
-            onFieldChange: setSearchField,
-            onChange: setSearchText,
+            onFieldChange: () => {},
+            onChange: (value) => {
+              setSearchText(value);
+              resetPagination();
+            },
           },
           refresh: {
             label: "刷新",
             spinning: vpcs.isFetching,
-            onClick: () => {
-              refresh();
-              void Promise.all([subnets.refetch(), routes.refetch()]);
-            },
+            onClick: refresh,
           },
         }}
       >
         <ListDataTable
           data={items}
           columns={columns}
-          rowActions={actions}
           loading={vpcs.isFetching}
+          rowActions={actions}
           emptyIconClassName="icon-VPCwangluo"
           tableLabel="VPC 列表"
           preserveTableOnEmpty

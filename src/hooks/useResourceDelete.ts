@@ -16,8 +16,6 @@ import type { MutationFeedbackMeta } from "@/vite-env";
 type ResourceDeleteTarget = {
   id?: string;
   name?: string;
-  status?: string;
-  knowledge_base_ref?: unknown;
   description?: string | null;
   destination_cidr?: string;
 };
@@ -194,6 +192,7 @@ type ResourceDeleteKind = keyof typeof resourceDeletion;
 export function useResourceDelete<T extends ResourceDeleteTarget = ResourceDeleteTarget>(
   kind: ResourceDeleteKind,
   onDeleted?: (item: T) => void | Promise<void>,
+  options: { isDisabled?: (item: T) => boolean } = {},
 ) {
   const qc = useQueryClient();
   const config = resourceDeletion[kind];
@@ -213,10 +212,7 @@ export function useResourceDelete<T extends ResourceDeleteTarget = ResourceDelet
       await onDeleted?.(item);
     },
   });
-  const isDisabled = (item: T) =>
-    mutation.isPending ||
-    (kind === "model" && item.status === "deleted") ||
-    (kind === "vector-store" && Boolean(item.knowledge_base_ref));
+  const isDisabled = (item: T) => mutation.isPending || Boolean(options.isDisabled?.(item));
   const confirm = (item: T) => {
     if (isDisabled(item)) return;
     Modal.confirm({
