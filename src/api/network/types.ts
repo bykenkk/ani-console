@@ -62,7 +62,13 @@ export interface NetworkVPCListParams extends CursorPageParams {
 
 export interface NetworkVPCListResponse {
   items: NetworkVPC[];
+  /** Safely converted from the Governance int64 JSON string for existing consumers. */
+  total: number;
   next_cursor?: string | null;
+}
+
+export interface NetworkVPCListWireResponse extends Omit<NetworkVPCListResponse, "total"> {
+  total: string;
 }
 
 export interface NetworkSubnetListResponse {
@@ -251,3 +257,64 @@ export interface CreateNetworkRouteInput {
   description?: string;
 }
 export type CreateNetworkRouteRequest = CreateNetworkRouteInput & { idempotency_key: string };
+
+/** Governance network DTOs; int64 fields retain their JSON string representation. */
+export interface NetworkEip {
+  id: string;
+  name: string;
+  description?: string;
+  state: string;
+  reason?: string;
+  created_at?: string;
+  updated_at?: string;
+  version?: string;
+  observed_at?: string;
+  observation_stale?: boolean;
+  last_operation_id?: string;
+  address?: string;
+  binding_id?: string;
+  binding_state?: string;
+  scope?: string;
+  managed_by?: string;
+  binding_target?: { kind?: string; id?: string; state?: string };
+}
+export type NetworkEipListParams = NetworkVPCListParams;
+export interface NetworkEipListResponse {
+  items: NetworkEip[];
+  next_cursor?: string;
+  total: string;
+}
+export interface CreateNetworkEipInput {
+  name: string;
+  description?: string;
+}
+export type CreateNetworkEipRequest = CreateNetworkEipInput & { idempotency_key: string };
+export interface NetworkSnat {
+  id: string;
+  vpc_id: string;
+  eip_id?: string;
+  eip_address?: string;
+  state: string;
+  reason?: string;
+  created_at?: string;
+  updated_at?: string;
+  version?: string;
+  desired_enabled?: boolean;
+  applied_enabled?: boolean;
+}
+export interface BindNetworkSnatInput {
+  eip_id: string;
+}
+export type BindNetworkSnatRequest = BindNetworkSnatInput & { idempotency_key: string };
+export interface NetworkOperation {
+  id: string;
+  resource_id?: string;
+  resource_type?: string;
+  kind?: string;
+  state: string;
+  reason?: string;
+  created_at?: string;
+  updated_at?: string;
+  completed_at?: string;
+  next_attempt_at?: string;
+}

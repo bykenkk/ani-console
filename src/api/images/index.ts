@@ -244,3 +244,26 @@ export type {
   ImageUploadSession,
   UploadImageFileInput,
 } from "./types";
+
+export * from "./space";
+export * from "./registrations";
+export type {
+  ImageSpace,
+  ImagePublisherCredential,
+  ImageCredentialDelivery,
+  EnableImageSpaceInput,
+  EnableImageSpaceRequest,
+  ImageCredentialVersionInput,
+  ImageCredentialVersionRequest,
+  ImageRegistrationScope,
+  ImageRegistrationPlatform,
+  ImageRegistration,
+  ImageRegistrationListParams,
+  ImageRegistrationListResponse,
+  RegisterImageInput,
+  RegisterImageRequest,
+  UpdateImageRegistrationInput,
+  UpdateImageRegistrationRequest,
+  UnregisterImageInput,
+  UnregisterImageRequest,
+} from "./types";

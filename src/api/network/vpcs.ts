@@ -7,33 +7,37 @@ import type {
   NetworkVPC,
   NetworkVPCListParams,
   NetworkVPCListResponse,
+  NetworkVPCListWireResponse,
 } from "./types";
 
 const createScope = createIdempotencyScope("network-vpc-create", ["POST"]);
 const vpcPath = (vpcId: string) => `/networks/vpcs/${encodeURIComponent(vpcId)}`;
 
-export function listNetworkVpcs(
+export async function listNetworkVpcs(
   params: NetworkVPCListParams = {},
 ): Promise<NetworkVPCListResponse> {
-  return coreRequest<NetworkVPCListResponse>("/networks/vpcs", {
+  const response = await coreRequest<NetworkVPCListWireResponse>("/networks/vpcs", {
     method: "GET",
     params,
   });
+  return { ...response, total: Number(response.total) };
 }
 
-export function createNetworkVpc(submitData: CreateNetworkVPCInput): Promise<NetworkVPC> {
-  return runIdempotentRequest(createScope, submitData, (body) =>
-    coreRequest<NetworkVPC, CreateNetworkVPCRequest>("/networks/vpcs", {
+export function createNetworkVpc(submitData: CreateNetworkVPCInput): Promise<void> {
+  return runIdempotentRequest(createScope, submitData, async (body) => {
+    await coreRequest<unknown, CreateNetworkVPCRequest>("/networks/vpcs", {
       method: "POST",
       data: body,
-    }),
-  );
+    });
+  });
 }
 
 export function getNetworkVpc(vpcId: string): Promise<NetworkVPC> {
   return coreRequest<NetworkVPC>(vpcPath(vpcId), { method: "GET" });
 }
 
-export function deleteNetworkVpc(vpcId: string): Promise<NetworkVPC> {
-  return coreRequest<NetworkVPC>(vpcPath(vpcId), { method: "DELETE" });
+export async function deleteNetworkVpc(vpcId: string): Promise<void> {
+  await coreRequest<unknown>(vpcPath(vpcId), {
+    method: "DELETE",
+  });
 }
