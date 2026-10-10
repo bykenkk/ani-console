@@ -250,9 +250,7 @@ export default function VmInstanceCreateModal({
     queryKey: ["secrets", "vm-create"],
     queryFn: () => listSecrets(),
   });
-  const availableSubnets = (subnets.data?.items ?? []).filter(
-    (item) => item.vpc_id === values.vpcId,
-  );
+  const availableSubnets = subnets.data?.items ?? [];
   const availableSecurityGroups = ((securityGroups.data?.items ?? []) as SecurityGroup[]).filter(
     (item) => !item.vpc_id || item.vpc_id === values.vpcId,
   );

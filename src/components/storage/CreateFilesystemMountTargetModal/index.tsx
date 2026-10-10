@@ -45,14 +45,11 @@ export default function CreateFilesystemMountTargetModal({
     queryFn: () => listNetworkSubnets({ vpc_id: vpcId || undefined }),
     enabled: !!vpcId,
   });
-  // TODO: 子网接口确认按 vpc_id 过滤后，移除此处创建表单的本地兜底过滤。
-  const availableSubnets = ((subnets.data?.items ?? []) as Subnet[]).filter(
-    (item) => item.vpc_id === vpcId,
-  );
+  const availableSubnets = (subnets.data?.items ?? []) as Subnet[];
 
   useEffect(() => {
-    if (subnetId && !availableSubnets.some((item) => item.id === subnetId)) setSubnetId("");
-  }, [availableSubnets, subnetId]);
+    if (subnetId && !subnets.data?.items.some((item) => item.id === subnetId)) setSubnetId("");
+  }, [subnets.data?.items, subnetId]);
 
   const create = useMutation({
     meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
