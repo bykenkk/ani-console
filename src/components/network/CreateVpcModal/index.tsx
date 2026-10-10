@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { Form, Input, Modal, Typography } from "@arco-design/web-react";
+import { Form, Input, Modal } from "@arco-design/web-react";
 import { useState } from "react";
 import { createNetworkVpc } from "@/api/network";
 import { Ipv4CidrInput } from "@/components/common";
@@ -63,7 +63,6 @@ export default function CreateVpcModal({
         >
           <Ipv4CidrInput value={cidr} onChange={setCidr} placeholder="10.0.0.0" withPrefix />
         </Form.Item>
-        <Typography.Text type="secondary">创建后请等待 VPC 状态变为可用。</Typography.Text>
       </Form>
     </Modal>
   );

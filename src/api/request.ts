@@ -13,8 +13,6 @@ export const SERVICES_API_BASE = "/api/v1/svc";
 export const ADMIN_API_BASE = "/admin/v1";
 
 export type ApiAuthMode = "required" | "public";
-export type ApiQueryValue = string | number | boolean | null | undefined;
-export type ApiQuery = Record<string, ApiQueryValue | readonly ApiQueryValue[]>;
 
 export interface ApiRequestOptions<TBody = unknown> extends Omit<
   AxiosRequestConfig<TBody>,

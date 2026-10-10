@@ -1,4 +1,3 @@
-import type { AsyncTask } from "@/api/tasks";
 import type { CoreDevProfileInfo, CursorPageParams } from "@/api/types";
 
 export type { ObservabilityRangeQueryResponse } from "@/api/observability";
@@ -451,4 +450,3 @@ export interface SandboxCodeRun {
   created_at: string;
   completed_at?: string | null;
 }
-export type SandboxCodeRunTask = AsyncTask;

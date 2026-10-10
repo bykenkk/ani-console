@@ -1,4 +1,3 @@
-import type { AsyncTask } from "@/api/tasks";
 import type { CoreDevProfileInfo } from "@/api/types";
 
 export type StorageResourceState = "pending" | "available" | "failed" | "deleting" | "deleted";
@@ -132,5 +131,3 @@ export interface VolumeOSInitCompleteInput {
 export type VolumeOSInitCompleteRequest = VolumeOSInitCompleteInput & {
   idempotency_key: string;
 };
-
-export type StorageAsyncTask = AsyncTask;
