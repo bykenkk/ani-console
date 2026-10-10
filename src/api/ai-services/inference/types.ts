@@ -47,7 +47,6 @@ export interface InferenceServiceListParams {
   limit?: number;
   cursor?: string;
   capability?: "embedding" | "text-generation" | "speech-to-text";
-  offset?: number;
   status?: string;
   model?: string;
   search_field?: "name" | "id";

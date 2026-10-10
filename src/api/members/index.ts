@@ -1,6 +1,5 @@
 import { adminRequest } from "@/api/request";
 import type { TenantUser } from "@/api/auth/types";
-import type { CursorPageParams } from "@/api/types";
 import type {
   TenantMemberListParams,
   TenantMemberListResponse,
@@ -9,6 +8,7 @@ import type {
   UpdateTenantMemberInput,
   UpdateTenantMemberRequest,
   TenantRole,
+  TenantRoleListParams,
   TenantRoleListResponse,
 } from "./types";
 
@@ -50,9 +50,8 @@ export async function deleteTenantMember(id: number, signal?: AbortSignal): Prom
   await adminRequest<unknown>(memberPath(id), { method: "DELETE", signal });
 }
 /** Read existing tenant roles only; this module intentionally exposes no role writes. */
-// TODO(backend): 角色列表需调整为接收 CursorPageParams 的 limit、cursor 参数。
 export function listTenantRoles(
-  params: CursorPageParams = {},
+  params: TenantRoleListParams = {},
   signal?: AbortSignal,
 ): Promise<TenantRoleListResponse> {
   return adminRequest<TenantRoleListResponse>("/roles", { method: "GET", params, signal });

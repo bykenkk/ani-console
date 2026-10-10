@@ -9,10 +9,10 @@ export interface ApiKeyRecord {
   created_at?: string | null;
 }
 
+/** FIXME(backend): 后端统一支持 limit/cursor 后，移除此旧分页类型并改用 CursorPageParams；当前保留 page/pageSize，返回 items/total。 */
 export interface ApiKeyListParams {
   page?: number;
   pageSize?: number;
-  noPaging?: boolean;
 }
 
 export interface ApiKeyListResponse {

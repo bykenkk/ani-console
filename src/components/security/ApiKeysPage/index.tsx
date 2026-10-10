@@ -69,7 +69,7 @@ export function ApiKeysPage() {
       },
     },
     queryKey: ["api-keys"],
-    queryFn: () => listApiKeys({ noPaging: true }),
+    queryFn: ({ signal }) => listApiKeys({}, signal),
   });
   const toggleStatus = useMutation({
     meta: {

@@ -1,8 +1,10 @@
 import type { TenantUser, TenantUserStatus } from "@/api/auth/types";
-import type { CursorPageParams } from "@/api/types";
 
-/** TODO(backend): 租户成员列表需调整为接收 CursorPageParams 的 limit、cursor 参数。 */
-export type TenantMemberListParams = CursorPageParams;
+/** FIXME(backend): 后端统一支持 limit/cursor 后，移除此旧分页类型并改用 CursorPageParams；当前保留 page/pageSize，返回 items/total。 */
+export interface TenantMemberListParams {
+  page?: number;
+  pageSize?: number;
+}
 export interface TenantMemberListResponse {
   items: TenantUser[];
   total: string;
@@ -61,6 +63,12 @@ export interface TenantRole {
   updatedAt?: string;
   deletedAt?: string;
 }
+/** FIXME(backend): 后端统一支持 limit/cursor 后，移除此旧分页类型并改用 CursorPageParams；当前保留 page/pageSize，返回 items/total。 */
+export interface TenantRoleListParams {
+  page?: number;
+  pageSize?: number;
+}
+
 export interface TenantRoleListResponse {
   items: TenantRole[];
   total: string;

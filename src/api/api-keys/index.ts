@@ -12,8 +12,11 @@ import type {
 
 const apiKeyPath = (keyId: number) => `/auth/api-keys/${encodeURIComponent(keyId)}`;
 
-export function listApiKeys(params: ApiKeyListParams = {}): Promise<ApiKeyListResponse> {
-  return coreRequest<ApiKeyListResponse>("/auth/api-keys", { method: "GET", params });
+export function listApiKeys(
+  params: ApiKeyListParams = {},
+  signal?: AbortSignal,
+): Promise<ApiKeyListResponse> {
+  return coreRequest<ApiKeyListResponse>("/auth/api-keys", { method: "GET", params, signal });
 }
 
 export function createApiKey(submitData: CreateApiKeyInput): Promise<ApiKeyCredentials> {
@@ -47,7 +50,6 @@ export function resetApiKeySecret(keyId: number): Promise<ApiKeyCredentials> {
 
 export type {
   ApiKeyCredentials,
-  ApiKeyListParams,
   ApiKeyListResponse,
   ApiKeyRecord,
   CreateApiKeyInput,

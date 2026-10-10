@@ -32,7 +32,7 @@ export default function KnowledgeBasesPage() {
       queryKey: ["knowledge-bases", { status, searchField, searchText }],
       queryFn: async ({ cursor, limit }) => {
         const keyword = searchText.trim();
-        // TODO: 待后端联调确认 status/name/id 查询参数及筛选后 total 的最终契约。
+        // FIXME(backend): 待后端联调确认 status/name/id 查询参数及筛选后 total 的最终契约。
         return listKnowledgeBases({
           limit,
           cursor,

@@ -38,6 +38,7 @@ export default function KnowledgeBaseAuditLogs({ kbId }: { kbId: string }) {
         limit: PAGE_SIZE,
         cursor: pageParam === "0" ? undefined : pageParam,
       }),
+    // FIXME: 后端补齐 total 契约后，按已加载条数与 total 判断是否继续，移除对 next_cursor 的依赖。
     getNextPageParam: (lastPage, pages) =>
       lastPage.next_cursor ? String(pages.length * PAGE_SIZE) : undefined,
   });

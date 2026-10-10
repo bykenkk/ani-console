@@ -51,6 +51,7 @@ export function useCursorPaginatedQuery<T>({
     mode: "cursor",
     page,
     pageSize,
+    // FIXME: 核对各列表 total 契约后，按当前偏移量和 total 判断下一页，移除对 next_cursor 的依赖。
     hasNextPage: Boolean(query.data?.next_cursor),
     disabled: query.isFetching,
     onPageChange: setPage,
