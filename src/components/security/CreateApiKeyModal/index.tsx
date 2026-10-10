@@ -1,7 +1,8 @@
 import { createApiKey, type ApiKeyCredentials } from "@/api/api-keys";
+import { ApiKeyRoleField } from "@/components/security/ApiKeyRoleField";
 import { formatIsoDateTime } from "@/lib/date";
 import { validateForm } from "@/lib/form";
-import { DatePicker, Form, Input, InputNumber, Modal } from "@arco-design/web-react";
+import { DatePicker, Form, Input, Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface CreateApiKeyFormValues {
@@ -65,19 +66,8 @@ export function CreateApiKeyModal({
         >
           <Input placeholder="例如：ci-bot" maxLength={128} showWordLimit />
         </Form.Item>
-        <Form.Item
-          label="权限范围（角色 ID）"
-          field="role_id"
-          extra="权限由同租户的启用角色决定，请填写已分配的租户角色 ID。"
-          rules={[{ required: true, message: "请输入角色 ID" }]}
-        >
-          <InputNumber min={1} precision={0} placeholder="例如：12" className="w-full" />
-        </Form.Item>
-        <Form.Item
-          label="过期时间"
-          field="expires_on"
-          extra="可选；不设置表示永不过期。选择日期后，该 Key 将在所选日期结束时过期。"
-        >
+        <ApiKeyRoleField />
+        <Form.Item label="过期时间" field="expires_on" extra="不选则永久有效；所选日期结束时过期。">
           <DatePicker allowClear className="w-full" placeholder="请选择过期日期" />
         </Form.Item>
       </Form>
