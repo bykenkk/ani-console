@@ -23,6 +23,8 @@ import {
 
 import { formatDateTime } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { loadBalancerLabel } from "@/lib/load-balancers";
+import LoadBalancerOperation from "./LoadBalancerOperation";
 import LoadBalancerBackends from "./LoadBalancerBackends";
 import LoadBalancerEvents from "./LoadBalancerEvents";
 import LoadBalancerListeners from "./LoadBalancerListeners";
@@ -51,7 +53,11 @@ export default function LoadBalancerDetailPage({
       },
     },
     queryKey: ["network-load-balancer", loadBalancerId],
-    queryFn: () => getNetworkLoadBalancer(loadBalancerId),
+    queryFn: ({ signal }) => getNetworkLoadBalancer(loadBalancerId, signal),
+    refetchInterval: (query) =>
+      query.state.error || !query.state.data || query.state.data.state === "deleted"
+        ? false
+        : 10000,
   });
   const vpc = useQuery({
     meta: {
@@ -109,25 +115,56 @@ export default function LoadBalancerDetailPage({
     <DetailPageFrame
       breadcrumbs={[...navigationBreadcrumbsForPath("/load-balancers"), { label: item.name }]}
       title={item.name}
-      status={<StatusBadge status={item.state} />}
+      status={
+        <StatusBadge status={item.state} reason={item.reason} message={item.reason_message} />
+      }
       icon={<AliIcon name="fuzaijunhengqi" size={28} />}
-      headerItems={[{ label: "VIP", value: item.vip || "-" }]}
+      headerItems={[{ label: "私网 IP", value: item.private_ip || "-" }]}
       actions={<ResourceActionMenu record={item} actions={actions} />}
       cards={[
+        {
+          key: "operation",
+          title: "最近操作",
+          fields: [
+            {
+              label: "操作进度",
+              value: <LoadBalancerOperation operationId={item.last_operation_id} />,
+            },
+          ],
+        },
         {
           key: "basic",
           title: "基本信息",
           fields: [
             { label: "ID", value: <ResourceId value={item.id} /> },
-            { label: "VIP", value: item.vip || "-" },
+            { label: "私网 IP", value: item.private_ip || "-" },
             {
               label: "类型",
-              value: item.scheme === "public" ? "公网" : "私网",
+              value: loadBalancerLabel(item.exposure),
             },
             { label: "VPC", value: parentVpc?.name ?? item.vpc_id },
             {
               label: "子网",
               value: parentSubnet?.name ?? item.subnet_id ?? "-",
+            },
+            { label: "描述", value: item.description || "-" },
+            { label: "公网 IP", value: item.public_address || "-" },
+            { label: "规格", value: item.flavor || "-" },
+            { label: "配置状态", value: loadBalancerLabel(item.configuration_state) },
+            { label: "流量健康", value: loadBalancerLabel(item.data_plane_state) },
+            {
+              label: "期望版本 / 已应用版本",
+              value: (item.desired_version ?? "-") + " / " + (item.applied_version ?? "-"),
+            },
+            { label: "观测时间", value: item.observed_at ? formatDateTime(item.observed_at) : "-" },
+            {
+              label: "观测数据",
+              value:
+                item.observation_stale === undefined
+                  ? "-"
+                  : item.observation_stale
+                    ? "已过期"
+                    : "有效",
             },
             { label: "创建时间", value: formatDateTime(item.created_at) },
             { label: "更新时间", value: formatDateTime(item.updated_at) },
@@ -150,12 +187,12 @@ export default function LoadBalancerDetailPage({
         {
           key: "listeners",
           label: "监听器",
-          content: <LoadBalancerListeners listeners={item.listeners} />,
+          content: <LoadBalancerListeners listener={item.listener} />,
         },
         {
           key: "backends",
           label: "后端组",
-          content: <LoadBalancerBackends />,
+          content: <LoadBalancerBackends backends={item.backends} />,
         },
         {
           key: "metrics",

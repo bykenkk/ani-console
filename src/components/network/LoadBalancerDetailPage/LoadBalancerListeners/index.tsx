@@ -1,20 +1,21 @@
-import type { NetworkLoadBalancerListener } from "@/api/network";
+import type { NetworkLoadBalancerListenerResource } from "@/api/network";
 import { DataTable } from "@/components/common";
+import { loadBalancerLabel } from "@/lib/load-balancers";
 
 export default function LoadBalancerListeners({
-  listeners,
+  listener,
 }: {
-  listeners: NetworkLoadBalancerListener[];
+  listener?: NetworkLoadBalancerListenerResource;
 }) {
   return (
-    <DataTable<NetworkLoadBalancerListener>
+    <DataTable<NetworkLoadBalancerListenerResource>
       columns={[
-        { title: "协议", render: (_, row) => row.protocol.toUpperCase() },
+        { title: "ID", dataIndex: "id", ellipsis: true },
+        { title: "协议", render: (_, row) => loadBalancerLabel(row.protocol) },
         { title: "监听端口", dataIndex: "port" },
-        { title: "目标端口", dataIndex: "target_port" },
       ]}
-      data={listeners}
-      rowKey={(row) => `${row.protocol}-${row.port}-${row.target_port}`}
+      data={listener ? [listener] : []}
+      rowKey="id"
       pagination={false}
     />
   );

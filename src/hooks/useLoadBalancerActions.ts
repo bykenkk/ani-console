@@ -6,17 +6,19 @@ import type { RowAction } from "@/components/common";
 type LoadBalancer = NetworkLoadBalancer;
 export function useLoadBalancerActions(onDeleted: (item: LoadBalancer) => void) {
   const navigate = useNavigate();
-  const deleteLoadBalancer = useResourceDelete<LoadBalancer>("load-balancer", onDeleted);
+  const deleteLoadBalancer = useResourceDelete<LoadBalancer>("load-balancer", onDeleted, {
+    isDisabled: (item) => item.state === "deleting" || item.state === "deleted",
+  });
 
   const actions: RowAction<LoadBalancer>[] = [
     {
       key: "listeners",
-      label: "配置监听",
+      label: "查看监听器",
       onClick: (item) => navigateToResourceDetail(navigate, { type: "load-balancer", id: item.id }),
     },
     {
       key: "backends",
-      label: "绑定后端",
+      label: "查看后端",
       onClick: (item) => navigateToResourceDetail(navigate, { type: "load-balancer", id: item.id }),
     },
     {

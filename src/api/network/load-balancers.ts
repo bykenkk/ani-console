@@ -7,6 +7,8 @@ import type {
   NetworkLoadBalancer,
   NetworkLoadBalancerListParams,
   NetworkLoadBalancerListResponse,
+  NetworkLoadBalancerMutationResponse,
+  NetworkOperation,
 } from "./types";
 
 const createScope = createIdempotencyScope("network-load-balancer-create", ["POST"]);
@@ -15,10 +17,12 @@ const loadBalancerPath = (loadBalancerId: string) =>
 
 export function listNetworkLoadBalancers(
   params: NetworkLoadBalancerListParams = {},
+  signal?: AbortSignal,
 ): Promise<NetworkLoadBalancerListResponse> {
   return coreRequest<NetworkLoadBalancerListResponse>("/networks/load-balancers", {
     method: "GET",
     params,
+    signal,
   });
 }
 
@@ -33,10 +37,30 @@ export function createNetworkLoadBalancer(
   );
 }
 
-export function getNetworkLoadBalancer(loadBalancerId: string): Promise<NetworkLoadBalancer> {
-  return coreRequest<NetworkLoadBalancer>(loadBalancerPath(loadBalancerId), { method: "GET" });
+export function getNetworkLoadBalancer(
+  loadBalancerId: string,
+  signal?: AbortSignal,
+): Promise<NetworkLoadBalancer> {
+  return coreRequest<NetworkLoadBalancer>(loadBalancerPath(loadBalancerId), {
+    method: "GET",
+    signal,
+  });
 }
 
-export function deleteNetworkLoadBalancer(loadBalancerId: string): Promise<NetworkLoadBalancer> {
-  return coreRequest<NetworkLoadBalancer>(loadBalancerPath(loadBalancerId), { method: "DELETE" });
+export function deleteNetworkLoadBalancer(
+  loadBalancerId: string,
+): Promise<NetworkLoadBalancerMutationResponse> {
+  return coreRequest<NetworkLoadBalancerMutationResponse>(loadBalancerPath(loadBalancerId), {
+    method: "DELETE",
+  });
+}
+
+export function getNetworkLoadBalancerOperation(
+  id: string,
+  signal?: AbortSignal,
+): Promise<NetworkOperation> {
+  return coreRequest<NetworkOperation>(
+    "/networks/load-balancers/operations/" + encodeURIComponent(id),
+    { method: "GET", signal },
+  );
 }

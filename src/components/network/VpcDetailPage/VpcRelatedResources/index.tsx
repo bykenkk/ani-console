@@ -66,7 +66,7 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
       },
     },
     queryKey: ["network-load-balancers", "vpc", vpcId],
-    queryFn: () => listNetworkLoadBalancers({ vpc_id: vpcId }),
+    queryFn: ({ signal }) => listNetworkLoadBalancers({ vpc_id: vpcId }, signal),
   });
   const instances = useQuery({
     meta: {

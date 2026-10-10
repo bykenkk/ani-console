@@ -18,12 +18,13 @@ import {
   StatusBadge,
   ListDataTable,
 } from "@/components/common";
-import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
+import { useClientPagination } from "@/hooks/useClientPagination";
+import { isLoadBalancerChanging } from "@/lib/load-balancers";
 import { formatDateTime } from "@/lib/format";
 
 type LoadBalancer = NetworkLoadBalancer;
 type Vpc = NetworkVPC;
-type StatusFilter = "all" | "pending" | "available" | "failed";
+type StatusFilter = "all" | "provisioning" | "available" | "failed";
 type SearchField = "name" | "id";
 
 export default function LoadBalancersPage() {
@@ -32,33 +33,42 @@ export default function LoadBalancersPage() {
   const [searchField, setSearchField] = useState<SearchField>("name");
   const [searchText, setSearchText] = useState("");
   const [vpcId, setVpcId] = useState("");
-  const {
-    query: loadBalancers,
-    resetPagination,
-    refresh,
-    items,
-    pagination,
-  } = useClientPaginatedQuery<LoadBalancer>({
-    errorNotification: {
-      id: "load-balancers",
-      action: "负载均衡列表加载",
-      fallback: "请求失败，请稍后重试",
+  const loadBalancers = useQuery({
+    meta: {
+      errorNotification: {
+        id: "load-balancers",
+        action: "负载均衡列表加载",
+        fallback: "请求失败，请稍后重试",
+      },
     },
-    queryKey: ["network-load-balancers", { status, searchField, searchText, vpcId }],
-    filter: (item) =>
+    queryKey: ["network-load-balancers", { status, vpcId }],
+    queryFn: ({ signal }) =>
+      listNetworkLoadBalancers(
+        {
+          vpc_id: vpcId || undefined,
+          state: status === "all" ? undefined : status,
+        },
+        signal,
+      ),
+    refetchInterval: (query) =>
+      query.state.error
+        ? false
+        : query.state.data?.items.some(isLoadBalancerChanging)
+          ? 5000
+          : false,
+  });
+  const { items, pagination, resetPagination } = useClientPagination(
+    (loadBalancers.data?.items ?? []).filter((item) =>
       String(item[searchField] ?? "")
         .toLowerCase()
         .includes(searchText.trim().toLowerCase()),
-    queryFn: async () => {
-      const keyword = searchText.trim();
-      return listNetworkLoadBalancers({
-        vpc_id: vpcId || undefined,
-        state: status === "all" ? undefined : status,
-        search_field: keyword ? searchField : undefined,
-        keyword: keyword || undefined,
-      });
-    },
-  });
+    ),
+    JSON.stringify([status, vpcId, searchField, searchText]),
+  );
+  const refresh = () => {
+    resetPagination();
+    loadBalancers.refetch();
+  };
   const vpcs = useQuery({
     meta: {
       errorNotification: {
@@ -82,20 +92,22 @@ export default function LoadBalancersPage() {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, item) => <StatusBadge status={item.state} />,
+      render: (_, item) => (
+        <StatusBadge status={item.state} reason={item.reason} message={item.reason_message} />
+      ),
     },
     {
       key: "vip",
-      title: "VIP",
-      dataIndex: "vip",
+      title: "私网 IP",
+      dataIndex: "private_ip",
       placeholder: "-",
     },
     {
       key: "listeners",
       title: "监听器",
-      dataIndex: "listeners.length",
+      render: (_, item) => (item.listener ? 1 : 0),
     },
-    { key: "backends", title: "后端数", render: () => "-" },
+    { key: "backends", title: "后端数", render: (_, item) => item.backends?.length ?? 0 },
     {
       key: "createdAt",
       title: "创建时间",
@@ -129,7 +141,7 @@ export default function LoadBalancersPage() {
               label: "全部",
             },
             {
-              value: "pending",
+              value: "provisioning",
               label: "创建中",
             },
             {
@@ -198,7 +210,7 @@ export default function LoadBalancersPage() {
           emptyIconClassName="icon-fuzaijunhengqi"
           tableLabel="负载均衡列表"
           preserveTableOnEmpty
-          pagination={pagination}
+          pagination={{ ...pagination, disabled: loadBalancers.isFetching }}
         />
       </ListPageFrame>
       {createVisible && <CreateLoadBalancerModal onCancel={() => setCreateVisible(false)} />}

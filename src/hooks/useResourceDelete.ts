@@ -88,6 +88,7 @@ const resourceDeletion = {
       channel: "notification",
       id: "load-balancer-delete",
       action: "删除",
+      successText: "删除请求已受理，资源将异步清理",
       errorFallback: "请求失败",
     },
     title: "删除负载均衡",

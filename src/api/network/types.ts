@@ -190,37 +190,82 @@ export interface NetworkLoadBalancerListener {
   port: number;
   target_port: number;
 }
+/** Governance read model; int64 values retain their JSON string representation. */
 export interface NetworkLoadBalancer {
   id: string;
-  tenant_id: string;
   name: string;
+  description?: string;
   vpc_id: string;
-  subnet_id?: string | null;
-  scheme: "internal" | "public";
-  vip?: string | null;
-  listeners: NetworkLoadBalancerListener[];
+  subnet_id: string;
+  exposure: string;
+  flavor?: string;
+  public_eip_id?: string;
+  private_ip?: string;
+  public_address?: string;
+  listener?: NetworkLoadBalancerListenerResource;
+  backends?: NetworkLoadBalancerBackend[];
+  health_check?: {
+    protocol?: string;
+    interval_seconds?: number;
+    timeout_seconds?: number;
+    unhealthy_threshold?: number;
+    healthy_threshold?: number;
+    port?: number;
+  };
+  algorithm?: string;
   state: NetworkResourceState;
   reason?: string | null;
-  dev_profile?: CoreDevProfileInfo;
+  reason_message?: string;
+  version?: string;
+  desired_version?: string;
+  applied_version?: string;
+  configuration_state?: string;
+  data_plane_state?: string;
+  observed_at?: string;
+  data_plane_observed_at?: string;
+  observation_stale?: boolean;
+  last_operation_id?: string;
   created_at: string;
   updated_at: string;
 }
-export interface NetworkLoadBalancerListParams {
-  vpc_id?: string;
+export interface NetworkLoadBalancerListenerResource {
+  id: string;
+  protocol: string;
+  port: number;
+}
+export interface NetworkLoadBalancerBackend {
+  id: string;
+  subnet_id: string;
+  address: string;
+  port: number;
+  weight: number;
+  attachment_id?: string;
   state?: string;
-  search_field?: "name" | "id";
-  keyword?: string;
+  reason?: string;
+  observed_at?: string;
+  observation_stale?: boolean;
+}
+export interface NetworkLoadBalancerMutationResponse {
+  load_balancer: NetworkLoadBalancer;
+  operation: NetworkOperation;
+}
+export interface NetworkLoadBalancerListParams extends CursorPageParams {
+  vpc_id?: string;
+  subnet_id?: string;
+  exposure?: string;
+  state?: string;
+  name?: string;
 }
 export interface NetworkLoadBalancerListResponse {
   items: NetworkLoadBalancer[];
-  total: number;
+  total: string;
   next_cursor?: string | null;
 }
 export interface CreateNetworkLoadBalancerInput {
   name: string;
   vpc_id: string;
   subnet_id?: string | null;
-  scheme: "internal" | "public";
+  scheme?: "internal" | "public";
   listeners?: NetworkLoadBalancerListener[];
 }
 export type CreateNetworkLoadBalancerRequest = CreateNetworkLoadBalancerInput & {

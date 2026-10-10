@@ -1,81 +1,48 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Form, Input, InputNumber, Modal, Select, Typography } from "@arco-design/web-react";
-import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Alert, Button, Form, Input, Modal, Radio, Space, Steps } from "@arco-design/web-react";
+import { useState } from "react";
 import {
   createNetworkLoadBalancer,
-  listNetworkSubnets,
-  listNetworkVpcs,
+  type CreateNetworkLoadBalancerInput,
   type NetworkLoadBalancer,
-  type NetworkSubnet,
-  type NetworkVPC,
 } from "@/api/network";
+import LoadBalancerListenersField from "@/components/network/LoadBalancerListenersField";
+import LoadBalancerNetworkFields from "@/components/network/LoadBalancerNetworkFields";
+import LoadBalancerCreateSummary from "@/components/network/LoadBalancerCreateSummary";
+import { validateForm } from "@/lib/form";
 
-type LoadBalancer = NetworkLoadBalancer;
-type Vpc = NetworkVPC;
-type Subnet = NetworkSubnet;
+import type { LoadBalancerListenerValues } from "@/components/network/LoadBalancerListenerForm";
+import { showMessage } from "@/lib/feedback";
+
+type BasicValues = { name: string; description?: string };
+export type LoadBalancerConfigurationValues = {
+  vpc_id: string;
+  subnet_id?: string;
+  scheme: "internal" | "public" | "both";
+  size: "small" | "medium" | "large";
+  vip: string;
+  publicIp?: string;
+  listeners: LoadBalancerListenerValues[];
+};
 
 export default function CreateLoadBalancerModal({
   onCancel,
   onCreated,
 }: {
   onCancel: () => void;
-  onCreated?: (item: LoadBalancer) => void;
+  onCreated?: (item: NetworkLoadBalancer) => void;
 }) {
   const qc = useQueryClient();
-  const [name, setName] = useState("");
-  const [vpcId, setVpcId] = useState("");
-  const [subnetId, setSubnetId] = useState("");
-  const [scheme, setScheme] = useState<LoadBalancer["scheme"]>("internal");
-  const [listenerProtocol, setListenerProtocol] = useState<"http" | "https" | "tcp">("tcp");
-  const [listenerPort, setListenerPort] = useState(80);
-  const [targetPort, setTargetPort] = useState(80);
-  const vpcs = useQuery({
-    meta: {
-      errorNotification: {
-        id: "vpcs",
-        action: "VPC 列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-vpcs", "load-balancer-create"],
-    queryFn: () => listNetworkVpcs(),
-  });
-  const subnets = useQuery({
-    meta: {
-      errorNotification: {
-        id: "subnets",
-        action: "子网列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-subnets", "load-balancer-create", vpcId],
-    queryFn: () => listNetworkSubnets({ vpc_id: vpcId || undefined }),
-    enabled: !!vpcId,
-  });
-  // TODO: 子网接口确认按 vpc_id 过滤后，移除此处创建表单的本地兜底过滤。
-  const availableSubnets = ((subnets.data?.items ?? []) as Subnet[]).filter(
-    (item) => !vpcId || item.vpc_id === vpcId,
-  );
-  useEffect(() => {
-    if (subnetId && !availableSubnets.some((item) => item.id === subnetId)) setSubnetId("");
-  }, [availableSubnets, subnetId]);
-
+  const [step, setStep] = useState(1);
+  const [summary, setSummary] = useState<{
+    basic: BasicValues;
+    configuration: LoadBalancerConfigurationValues;
+  }>();
+  const [basicForm] = Form.useForm<BasicValues>();
+  const [configurationForm] = Form.useForm<LoadBalancerConfigurationValues>();
   const create = useMutation({
     meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
-    mutationFn: async (_: undefined) => {
-      if (!name.trim()) throw new Error("请输入负载均衡名称");
-      if (!vpcId) throw new Error("请选择 VPC");
-      if (listenerPort < 1 || listenerPort > 65535) throw new Error("监听端口必须在 1–65535 之间");
-      if (targetPort < 1 || targetPort > 65535) throw new Error("目标端口必须在 1–65535 之间");
-      const submitData = {
-        name: name.trim(),
-        vpc_id: vpcId,
-        subnet_id: subnetId || undefined,
-        scheme,
-        listeners: [{ protocol: listenerProtocol, port: listenerPort, target_port: targetPort }],
-      };
-      return createNetworkLoadBalancer(submitData);
-    },
+    mutationFn: (input: CreateNetworkLoadBalancerInput) => createNetworkLoadBalancer(input),
     onSuccess: (data) => {
       qc.invalidateQueries({ queryKey: ["network-load-balancers"] });
       onCreated?.(data);
@@ -83,92 +50,160 @@ export default function CreateLoadBalancerModal({
     },
   });
   return (
-    <Modal
-      visible
-      title="创建负载均衡"
-      onCancel={onCancel}
-      onOk={() => create.mutateAsync(undefined)}
-      confirmLoading={create.isPending}
-      unmountOnExit
-    >
-      <Form layout="vertical">
-        <Form.Item label="名称" required>
-          <Input
-            value={name}
-            onChange={setName}
-            placeholder="请输入负载均衡名称"
-            maxLength={64}
-            showWordLimit
+    <>
+      <Modal
+        visible
+        title="创建负载均衡"
+        autoFocus={false}
+        style={{ width: 720 }}
+        onCancel={onCancel}
+        maskClosable={!create.isPending}
+        closable={!create.isPending}
+        cancelButtonProps={{ disabled: create.isPending }}
+        okText={step < 3 ? "下一步" : "创建"}
+        confirmLoading={create.isPending}
+        okButtonProps={{ disabled: step === 3 }}
+        onOk={async () => {
+          if (step === 3) return; // Creation awaits the agreed listener, flavor and IP contracts.
+          const basic = await validateForm<BasicValues>(basicForm);
+          if (step === 1) {
+            setStep(2);
+            return;
+          }
+          const configuration =
+            await validateForm<LoadBalancerConfigurationValues>(configurationForm);
+          if (step === 2) {
+            setSummary({ basic, configuration });
+            setStep(3);
+            return;
+          }
+          const listeners = configuration.listeners.flatMap(({ protocol, port, target_port }) =>
+            protocol === "http" || protocol === "https" || protocol === "tcp"
+              ? [{ protocol, port, target_port }]
+              : [],
+          );
+          if (listeners.length !== configuration.listeners.length) {
+            showMessage({
+              type: "error",
+              content: "UDP 和 SSL 监听器暂不支持提交，请移除后再创建",
+            });
+            return;
+          }
+          // TODO: 后端契约确认后接入 description、size、vip 及双网络类型。当前只提交已支持字段。
+          await create.mutateAsync({
+            name: basic.name.trim(),
+            vpc_id: configuration.vpc_id,
+            subnet_id: configuration.subnet_id,
+            scheme: configuration.scheme === "both" ? undefined : configuration.scheme,
+            listeners,
+          });
+        }}
+        footer={(cancelButton, okButton) => (
+          <Space>
+            {cancelButton}
+            {step > 1 && (
+              <Button disabled={create.isPending} onClick={() => setStep((current) => current - 1)}>
+                上一步
+              </Button>
+            )}
+            {okButton}
+          </Space>
+        )}
+      >
+        <div className="flex flex-col" style={{ height: "min(560px, calc(100vh - 240px))" }}>
+          <Alert
+            type="info"
+            content="创建暂未开放，监听器、规格与可用 IP 配置正在完善。"
+            style={{ marginBottom: 16 }}
           />
-        </Form.Item>
-        <Form.Item label="VPC" required>
-          <Select
-            value={vpcId || undefined}
-            onChange={setVpcId}
-            loading={vpcs.isLoading}
-            placeholder="请选择 VPC"
-          >
-            {((vpcs.data?.items ?? []) as Vpc[]).map((item) => (
-              <Select.Option key={item.id} value={item.id}>
-                {item.name} · {item.cidr}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item label="子网">
-          <Select
-            value={subnetId || undefined}
-            onChange={setSubnetId}
-            loading={subnets.isLoading}
-            allowClear
-            placeholder="请选择用于 VIP 的子网"
-          >
-            {availableSubnets.map((item) => (
-              <Select.Option key={item.id} value={item.id}>
-                {item.name} · {item.cidr}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item label="类型" required>
-          <Select value={scheme} onChange={setScheme}>
-            <Select.Option value="internal">私网</Select.Option>
-            <Select.Option value="public">公网</Select.Option>
-          </Select>
-        </Form.Item>
-        <Form.Item label="监听协议" required>
-          <Select value={listenerProtocol} onChange={setListenerProtocol}>
-            <Select.Option value="tcp">TCP</Select.Option>
-            <Select.Option value="http">HTTP</Select.Option>
-            <Select.Option value="https">HTTPS</Select.Option>
-          </Select>
-        </Form.Item>
-        <div className="grid grid-cols-2 gap-3">
-          <Form.Item label="监听端口" required>
-            <InputNumber
-              value={listenerPort}
-              onChange={(value) => setListenerPort(Number(value ?? 80))}
-              min={1}
-              max={65535}
-              precision={0}
-              className="w-full"
-            />
-          </Form.Item>
-          <Form.Item label="目标端口" required>
-            <InputNumber
-              value={targetPort}
-              onChange={(value) => setTargetPort(Number(value ?? 80))}
-              min={1}
-              max={65535}
-              precision={0}
-              className="w-full"
-            />
-          </Form.Item>
+          <Steps current={step} size="small" className="shrink-0" style={{ marginBottom: 28 }}>
+            <Steps.Step title="基本信息" />
+            <Steps.Step title="配置信息" />
+            <Steps.Step title="摘要信息" />
+          </Steps>
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <div hidden={step !== 1}>
+              <Form form={basicForm} layout="vertical" disabled={create.isPending}>
+                <Form.Item
+                  label="名称"
+                  field="name"
+                  rules={[
+                    { required: true, message: "请输入负载均衡名称" },
+                    {
+                      validator: (value, callback) => {
+                        if (!value?.trim()) callback("请输入负载均衡名称");
+                      },
+                    },
+                  ]}
+                >
+                  <Input placeholder="请输入负载均衡名称" maxLength={64} showWordLimit />
+                </Form.Item>
+                <Form.Item label="描述" field="description">
+                  <Input.TextArea placeholder="请输入描述" autoSize={{ minRows: 3, maxRows: 5 }} />
+                </Form.Item>
+              </Form>
+            </div>
+            <div hidden={step !== 2}>
+              <Form
+                form={configurationForm}
+                layout="vertical"
+                initialValues={{ scheme: "internal", size: "small", listeners: [] }}
+                disabled={create.isPending}
+              >
+                <Form.Item
+                  label="规格"
+                  field="size"
+                  rules={[{ required: true, message: "请选择规格" }]}
+                >
+                  <Radio.Group
+                    type="button"
+                    options={[
+                      { label: "小型", value: "small" },
+                      { label: "中型", value: "medium" },
+                      { label: "大型", value: "large" },
+                    ]}
+                  />
+                </Form.Item>
+                <Form.Item
+                  label="网络类型"
+                  field="scheme"
+                  rules={[{ required: true, message: "请选择网络类型" }]}
+                >
+                  <Radio.Group
+                    type="button"
+                    options={[
+                      { label: "公网", value: "public" },
+                      { label: "私网", value: "internal" },
+                      { label: "公网+私网", value: "both" },
+                    ]}
+                  />
+                </Form.Item>
+                <LoadBalancerNetworkFields form={configurationForm} />
+                <Form.Item
+                  label="监听器"
+                  field="listeners"
+                  rules={[
+                    {
+                      required: true,
+                      type: "array",
+                      minLength: 1,
+                      message: "请至少添加一个监听器",
+                    },
+                  ]}
+                >
+                  <LoadBalancerListenersField disabled={create.isPending} />
+                </Form.Item>
+              </Form>
+            </div>
+            {step === 3 && summary && (
+              <LoadBalancerCreateSummary
+                basic={summary.basic}
+                configuration={summary.configuration}
+              />
+            )}
+          </div>
         </div>
-        <Typography.Text type="secondary">
-          Kubernetes Service 至少需要一个监听端口；当前 Core API 暂不支持创建后独立添加监听器。
-        </Typography.Text>
-      </Form>
-    </Modal>
+      </Modal>
+    </>
   );
 }
