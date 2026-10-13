@@ -3,7 +3,7 @@ import "@/assets/iconfont/iconfont.css";
 import "@/styles/global.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { ConfigProvider, type ConfigProviderProps } from "@arco-design/web-react";
+import { ConfigProvider, Modal, type ConfigProviderProps } from "@arco-design/web-react";
 import { AppRoot } from "@/app/AppRoot";
 import { showMessage } from "@/lib/feedback";
 
@@ -23,6 +23,8 @@ const COMPONENT_CONFIG = {
     },
   },
 } satisfies ConfigProviderProps["componentConfig"];
+
+Modal.config({ simple: false });
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
