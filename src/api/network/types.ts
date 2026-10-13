@@ -363,3 +363,7 @@ export interface NetworkOperation {
   completed_at?: string;
   next_attempt_at?: string;
 }
+
+export interface NetworkVPCCidrPresetsResponse {
+  cidrs: string[];
+}

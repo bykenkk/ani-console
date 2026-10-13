@@ -5,6 +5,7 @@ import type {
   CreateNetworkVPCInput,
   CreateNetworkVPCRequest,
   NetworkVPC,
+  NetworkVPCCidrPresetsResponse,
   NetworkVPCListParams,
   NetworkVPCListResponse,
   NetworkVPCListWireResponse,
@@ -39,5 +40,14 @@ export function getNetworkVpc(vpcId: string): Promise<NetworkVPC> {
 export async function deleteNetworkVpc(vpcId: string): Promise<void> {
   await coreRequest<unknown>(vpcPath(vpcId), {
     method: "DELETE",
+  });
+}
+
+export function listNetworkVpcCidrPresets(
+  signal?: AbortSignal,
+): Promise<NetworkVPCCidrPresetsResponse> {
+  return coreRequest<NetworkVPCCidrPresetsResponse>("/networks/vpc-cidr-presets", {
+    method: "GET",
+    signal,
   });
 }

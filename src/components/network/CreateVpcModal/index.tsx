@@ -1,9 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { Form, Input, Modal } from "@arco-design/web-react";
 import { useState } from "react";
-import { createNetworkVpc } from "@/api/network";
-import { Ipv4CidrInput } from "@/components/common";
-import { ipv4CidrError, requireIpv4Cidr } from "@/lib/validators";
+import { createNetworkVpc, listNetworkVpcCidrPresets } from "@/api/network";
+import VpcCidrField from "../VpcCidrField";
 
 export default function CreateVpcModal({
   onCancel,
@@ -13,10 +12,23 @@ export default function CreateVpcModal({
   onCreated: () => void;
 }) {
   const [name, setName] = useState("");
-  const [cidr, setCidr] = useState("10.0.0.0/16");
+  const [cidr, setCidr] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const cidrError = ipv4CidrError(cidr, "IPv4 CIDR");
+  const presets = useQuery({
+    queryKey: ["network-vpc-cidr-presets"],
+    enabled: false,
+    queryFn: ({ signal }) => listNetworkVpcCidrPresets(signal),
+    meta: {
+      errorNotification: {
+        id: "vpc-cidr-presets",
+        action: "VPC CIDR 加载",
+        fallback: "请求失败，请稍后重试",
+      },
+    },
+  });
+  const cidrs = presets.data?.cidrs ?? [];
   const create = useMutation({
+    mutationKey: ["vpc-create"],
     meta: {
       feedback: {
         channel: "message",
@@ -28,7 +40,10 @@ export default function CreateVpcModal({
     mutationFn: async () => {
       setSubmitted(true);
       if (!name.trim()) throw new Error("请输入 VPC 名称");
-      return createNetworkVpc({ name: name.trim(), cidr: requireIpv4Cidr(cidr, "IPv4 CIDR") });
+      if (presets.isFetching || presets.isError || !cidrs.includes(cidr)) {
+        throw new Error("请选择当前可用的 IPv4 CIDR");
+      }
+      return createNetworkVpc({ name: name.trim(), cidr });
     },
     onSuccess: onCreated,
   });
@@ -39,8 +54,9 @@ export default function CreateVpcModal({
       onCancel={onCancel}
       onOk={() => create.mutateAsync()}
       confirmLoading={create.isPending}
+      okButtonProps={{ disabled: presets.isFetching || presets.isError || !cidrs.includes(cidr) }}
     >
-      <Form layout="vertical">
+      <Form layout="vertical" style={{ minHeight: "min(360px, max(0px, calc(100vh - 240px)))" }}>
         <Form.Item
           label="名称"
           required
@@ -53,16 +69,20 @@ export default function CreateVpcModal({
             placeholder="请输入 VPC 名称"
             maxLength={64}
             showWordLimit
+            disabled={create.isPending}
           />
         </Form.Item>
-        <Form.Item
-          label="IPv4 CIDR"
-          required
-          validateStatus={cidrError ? "error" : undefined}
-          help={cidrError}
-        >
-          <Ipv4CidrInput value={cidr} onChange={setCidr} placeholder="10.0.0.0" withPrefix />
-        </Form.Item>
+        <VpcCidrField
+          value={cidr}
+          onChange={setCidr}
+          cidrs={cidrs}
+          loading={presets.isFetching}
+          disabled={create.isPending}
+          submitted={submitted}
+          onOpen={() => {
+            presets.refetch({ cancelRefetch: false });
+          }}
+        />
       </Form>
     </Modal>
   );
