@@ -165,9 +165,7 @@ export default function K8sClustersPage() {
             onChange: (keys) => setSelectedKeys(keys.map(String)),
           }}
           loading={isFetching}
-          emptyIconClassName="icon-jiqun"
           tableLabel="K8s 集群列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

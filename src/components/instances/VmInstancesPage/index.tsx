@@ -160,7 +160,6 @@ export default function VmInstancesPage() {
           columns={columns}
           rowActions={actions}
           loading={query.isFetching}
-          emptyIconClassName="icon-yunzhuji"
           tableLabel="云主机 VM 列表"
           pagination={pagination}
         />

@@ -210,9 +210,7 @@ export default function SubnetsPage() {
           columns={columns}
           rowActions={actions}
           loading={subnets.isFetching || vpcs.isFetching}
-          emptyIconClassName="icon-VPCwangluo"
           tableLabel="子网列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

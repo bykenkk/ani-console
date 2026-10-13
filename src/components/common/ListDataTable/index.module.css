@@ -1,90 +1,48 @@
 .listDataTable {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: 100%;
   max-width: 100%;
-  min-width: 0;
-  min-height: 0;
   overflow: hidden;
 }
 
+/* Keep the body scrollable within the available page height. */
+.listDataTable,
 .listDataTable > :global(.arco-spin),
-.listDataTable > :global(.arco-spin) > :global(.arco-spin-children) {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.listDataTable :global(.arco-table-container) {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.listDataTable :global(.arco-table-content-scroll) {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
+.listDataTable > :global(.arco-spin) > :global(.arco-spin-children),
+.listDataTable :global(.arco-table-container),
+.listDataTable :global(.arco-table-content-scroll),
 .listDataTable :global(.arco-table-content-inner) {
   display: flex;
   flex: 1;
   flex-direction: column;
   min-width: 0;
   min-height: 0;
-  overflow: hidden;
+}
+
+.listDataTable :global(.arco-table-header),
+.listDataTable :global(.arco-table-pagination) {
+  flex: 0 0 auto;
 }
 
 .listDataTable :global(.arco-table-header) {
-  flex: 0 0 auto;
   min-width: 0;
-  overflow: hidden;
 }
 
 .listDataTable :global(.arco-table-body) {
   flex: 1 1 0;
   min-width: 0;
   min-height: 0;
-  overflow: auto;
 }
 
-.listDataTable :global(.arco-table-pagination) {
-  flex: 0 0 auto;
+/* Arco's empty row otherwise keeps its content height inside the flex body. */
+.empty :global(.arco-table-body) > table {
+  height: 100%;
 }
 
-.listDataTable :global(.arco-table-td) {
-  box-sizing: border-box;
-  max-width: 300px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.empty :global(.arco-table-empty-row) > :global(.arco-table-td) {
+  padding: 0;
+  border-bottom: 0;
+  vertical-align: middle;
 }
 
-.tableState {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 12px;
-  width: 100%;
-  min-height: 220px;
-  color: var(--list-text-secondary);
-}
-
-.emptyIcon {
-  color: var(--list-text-tertiary);
-  font-size: 48px !important;
+.empty :global(.arco-table-no-data) {
+  margin: 0;
 }

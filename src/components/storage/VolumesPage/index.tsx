@@ -187,9 +187,7 @@ export default function VolumesPage() {
           columns={columns}
           rowActions={actions}
           loading={volumes.isFetching}
-          emptyIconClassName="icon-kuaicunchu"
           tableLabel="块存储卷列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

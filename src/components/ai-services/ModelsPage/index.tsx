@@ -228,8 +228,6 @@ export default function ModelsPage() {
           columns={columns}
           rowActions={actions}
           loading={models.isFetching}
-          preserveTableOnEmpty
-          emptyIconClassName="icon-moxing"
           tableLabel="模型仓库列表"
           pagination={pagination}
         />

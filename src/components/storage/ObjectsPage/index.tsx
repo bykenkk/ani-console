@@ -139,9 +139,7 @@ export default function ObjectsPage() {
           columns={columns}
           rowActions={actions}
           loading={buckets.isFetching}
-          emptyIconClassName="icon-duixiangcunchu1"
           tableLabel="对象存储桶列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

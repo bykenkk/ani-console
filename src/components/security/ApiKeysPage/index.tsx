@@ -312,7 +312,6 @@ export function ApiKeysPage() {
             },
           ]}
           loading={apiKeys.isFetching}
-          emptyIconClassName="icon-Ukeyguanli"
           emptyText={
             searchText || status !== "all" || expiration !== "all"
               ? "没有符合条件的 API Key"

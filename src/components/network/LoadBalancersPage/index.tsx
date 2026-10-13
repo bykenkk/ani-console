@@ -207,9 +207,7 @@ export default function LoadBalancersPage() {
           columns={columns}
           rowActions={actions}
           loading={loadBalancers.isFetching || vpcs.isFetching}
-          emptyIconClassName="icon-fuzaijunhengqi"
           tableLabel="负载均衡列表"
-          preserveTableOnEmpty
           pagination={{ ...pagination, disabled: loadBalancers.isFetching }}
         />
       </ListPageFrame>

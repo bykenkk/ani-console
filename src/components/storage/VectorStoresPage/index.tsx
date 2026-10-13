@@ -191,9 +191,7 @@ export default function VectorStoresPage() {
           columns={columns}
           rowActions={actions}
           loading={stores.isFetching}
-          emptyIconClassName="icon-xiangliangcunchu"
           tableLabel="向量存储列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

@@ -197,9 +197,7 @@ export default function ContainerInstancesPage({
           columns={allColumns}
           rowActions={actions}
           loading={query.isFetching}
-          emptyIconClassName="icon-rongqishili"
           tableLabel="容器实例列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

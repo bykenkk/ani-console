@@ -178,9 +178,7 @@ export default function GpuInstancesPage() {
           columns={columns}
           rowActions={actions}
           loading={query.isFetching}
-          emptyIconClassName="icon-GPU"
           tableLabel="GPU 容器实例列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

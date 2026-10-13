@@ -195,9 +195,7 @@ export default function NetworkRoutesPage() {
           columns={columns}
           rowActions={actions}
           loading={routes.isFetching || vpcs.isFetching}
-          emptyIconClassName="icon-VPCluyouqi"
           tableLabel="路由列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

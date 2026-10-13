@@ -170,9 +170,7 @@ export default function KnowledgeBasesPage() {
           columns={columns}
           rowActions={actions}
           loading={query.isFetching}
-          emptyIconClassName="icon-zhishiku"
           tableLabel="知识库列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

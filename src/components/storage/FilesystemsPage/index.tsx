@@ -160,9 +160,7 @@ export default function FilesystemsPage() {
           columns={columns}
           rowActions={actions}
           loading={filesystems.isFetching}
-          emptyIconClassName="icon-wenjiancunchu"
           tableLabel="文件存储列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

@@ -213,9 +213,7 @@ export default function SecurityGroupsPage() {
           columns={columns}
           rowActions={actions}
           loading={securityGroups.isFetching || vpcs.isFetching}
-          emptyIconClassName="icon-anquanzu"
           tableLabel="安全组列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

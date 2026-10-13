@@ -212,8 +212,6 @@ export default function InferencePage() {
           rowActions={actions}
           loading={services.isFetching}
           pagination={pagination}
-          preserveTableOnEmpty
-          emptyIconClassName="icon-tuili"
           tableLabel="推理服务列表"
         />
       </ListPageFrame>

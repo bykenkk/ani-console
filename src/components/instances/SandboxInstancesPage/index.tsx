@@ -169,9 +169,7 @@ export default function SandboxInstancesPage() {
           columns={columns}
           rowActions={actions}
           loading={query.isFetching}
-          emptyIconClassName="icon-Sandbox"
           tableLabel="沙箱实例列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

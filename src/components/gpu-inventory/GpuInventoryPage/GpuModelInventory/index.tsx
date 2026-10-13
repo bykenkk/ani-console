@@ -47,7 +47,6 @@ export default function GpuModelInventory({ onCreate }: { onCreate: () => void }
         loading={occupancy.isLoading}
         pagination={false}
         scroll={{ x: 850, y: false }}
-        emptyIconClassName="icon-GPU"
         tableLabel="GPU 型号库存"
         columns={[
           {

@@ -118,9 +118,7 @@ export default function VpcsPage() {
           columns={columns}
           loading={vpcs.isFetching}
           rowActions={actions}
-          emptyIconClassName="icon-VPCwangluo"
           tableLabel="VPC 列表"
-          preserveTableOnEmpty
           pagination={pagination}
         />
       </ListPageFrame>

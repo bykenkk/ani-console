@@ -262,8 +262,6 @@ export default function RegistryPage() {
             },
           ]}
           loading={images.isFetching}
-          preserveTableOnEmpty
-          emptyIconClassName="icon-moxing"
           tableLabel="镜像仓库列表"
           pagination={pagination}
         />
