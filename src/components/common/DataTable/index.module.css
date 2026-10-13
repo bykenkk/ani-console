@@ -14,8 +14,9 @@
   display: inline-flex;
 }
 
-.semanticMenu :global(.arco-menu-item).menuItemDanger:not(:global(.arco-menu-disabled)) {
-  color: var(--color-danger-6);
+.semanticMenu
+  :global(.arco-dropdown-menu-item).menuItemDanger:not(:global(.arco-dropdown-menu-disabled)) {
+  color: rgb(var(--danger-6));
 }
 
 .semanticMenu :global(.arco-menu-item).menuItemWarning:not(:global(.arco-menu-disabled)) {

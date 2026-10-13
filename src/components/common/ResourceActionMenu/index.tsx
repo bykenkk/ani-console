@@ -18,14 +18,19 @@ export default function ResourceActionMenu<T>({
         <Menu>
           {visible.map((action) => {
             const pending = action.loading?.(record) ?? false;
+            const disabled = pending || action.disabled?.(record);
             const tooltip =
               typeof action.tooltip === "function" ? action.tooltip(record) : action.tooltip;
             const label = typeof action.label === "function" ? action.label(record) : action.label;
             return (
               <Menu.Item
                 key={action.key}
-                disabled={pending || action.disabled?.(record)}
-                style={action.intent === "danger" ? { color: "var(--color-danger-6)" } : undefined}
+                disabled={disabled}
+                style={
+                  action.intent === "danger" && !disabled
+                    ? { color: "rgb(var(--danger-6))" }
+                    : undefined
+                }
                 onClick={() => {
                   Promise.resolve(action.onClick(record)).catch(() => undefined);
                 }}
