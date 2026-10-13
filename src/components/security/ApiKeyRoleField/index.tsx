@@ -19,11 +19,7 @@ export function ApiKeyRoleField() {
     .map((role) => ({ value: role.id!, label: role.name || role.code! }));
 
   return (
-    <Form.Item
-      label="权限角色"
-      field="role_id"
-      rules={[{ required: true, message: "请选择权限角色" }]}
-    >
+    <Form.Item label="角色" field="role_id" rules={[{ required: true, message: "请选择角色" }]}>
       <Select
         placeholder="请选择角色"
         options={options}

@@ -6,6 +6,7 @@ export interface ApiKeyRecord {
   expires_at?: string | null;
   last_used_at?: string | null;
   role_id: number;
+  role_name?: string | null;
   created_at?: string | null;
 }
 

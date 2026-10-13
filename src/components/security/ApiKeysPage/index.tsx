@@ -9,45 +9,17 @@ import {
 import { ListDataTable, ListPageFrame, type ListColumn } from "@/components/common";
 import { ApiKeyCredentialsModal } from "@/components/security/ApiKeyCredentialsModal";
 import { CreateApiKeyModal } from "@/components/security/CreateApiKeyModal";
-import { downloadBlob } from "@/lib/browser";
 import { formatDateTime, isDateTimeExpired } from "@/lib/date";
-import { Modal, Select, Tag, Typography } from "@arco-design/web-react";
+import { Modal, Select, Tag } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 
 type StatusFilter = "all" | "active" | "disabled";
 type ExpirationFilter = "all" | "never" | "valid" | "expired";
-type SearchField = "name" | "prefix";
+type SearchField = "name" | "access_key";
 
 function isExpired(item: ApiKeyRecord): boolean {
   return Boolean(item.expires_at && isDateTimeExpired(item.expires_at));
-}
-
-function apiKeyPrefix(value: string): string {
-  return value.length > 14 ? `${value.slice(0, 14)}…` : value;
-}
-
-function csvCell(value: unknown): string {
-  const text = value === null || value === undefined ? "" : String(value);
-  const safeText = /^[=+\-@]/.test(text) ? `'${text}` : text;
-  return `"${safeText.replaceAll('"', '""')}"`;
-}
-
-function exportApiKeys(items: ApiKeyRecord[]): void {
-  const rows = [
-    ["名称", "前缀", "状态", "角色 ID", "过期时间", "最近使用", "创建时间"],
-    ...items.map((item) => [
-      item.name,
-      apiKeyPrefix(item.access_key),
-      isExpired(item) ? "已过期" : item.is_active ? "启用" : "已禁用",
-      item.role_id,
-      item.expires_at ? formatDateTime(item.expires_at) : "永不过期",
-      formatDateTime(item.last_used_at),
-      formatDateTime(item.created_at),
-    ]),
-  ];
-  const csv = `\uFEFF${rows.map((row) => row.map(csvCell).join(",")).join("\r\n")}`;
-  downloadBlob(new Blob([csv], { type: "text/csv;charset=utf-8" }), "api-keys.csv");
 }
 
 export function ApiKeysPage() {
@@ -138,11 +110,11 @@ export function ApiKeysPage() {
       ellipsis: true,
     },
     {
-      key: "prefix",
-      title: "前缀",
+      key: "access_key",
+      title: "Access Key",
       width: 180,
       ellipsis: true,
-      render: (_, item) => <Typography.Text code>{apiKeyPrefix(item.access_key)}</Typography.Text>,
+      dataIndex: "access_key",
     },
     {
       key: "status",
@@ -159,9 +131,11 @@ export function ApiKeysPage() {
     },
     {
       key: "scope",
-      title: "权限范围",
+      title: "角色",
       width: 140,
-      render: (_, item) => `角色 #${item.role_id}`,
+      dataIndex: "role_name",
+      placeholder: "-",
+      ellipsis: true,
     },
     {
       key: "expiresAt",
@@ -200,14 +174,6 @@ export function ApiKeysPage() {
           subtitle: "管理用于 CLI、SDK 与签名调用的租户访问凭据",
           actions: [
             {
-              key: "export",
-              label: "导出",
-              iconClassName: "icon-download",
-              variant: "outline",
-              disabled: filteredItems.length === 0,
-              onClick: () => exportApiKeys(filteredItems),
-            },
-            {
               key: "create",
               label: "创建 API Key",
               iconClassName: "icon-add-1",
@@ -229,7 +195,7 @@ export function ApiKeysPage() {
           search: {
             fields: [
               { value: "name", label: "名称" },
-              { value: "prefix", label: "前缀" },
+              { value: "access_key", label: "Access Key" },
             ],
             field: searchField,
             value: searchText,
@@ -284,7 +250,7 @@ export function ApiKeysPage() {
             },
             {
               key: "reset-secret",
-              label: "重置 Secret Key",
+              label: "重置",
               intent: "warning",
               loading: (item) => resetSecret.isPending && resetSecret.variables?.id === item.id,
               onClick: (item) => {

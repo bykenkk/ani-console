@@ -1,6 +1,7 @@
 import type { ApiKeyCredentials } from "@/api/api-keys";
 import { copyToClipboard } from "@/lib/clipboard";
-import { Alert, Button, Input, Modal, Space, Typography } from "@arco-design/web-react";
+import { Alert, Button, Modal, Space, Typography } from "@arco-design/web-react";
+import { IconCopy } from "@arco-design/web-react/icon";
 
 export function ApiKeyCredentialsModal({
   credentials,
@@ -32,31 +33,37 @@ export function ApiKeyCredentialsModal({
         />
         <div>
           <Typography.Text bold>Access Key</Typography.Text>
-          <Space className="mt-2 w-full" align="start">
-            <Input.TextArea
-              aria-label="Access Key"
-              value={credentials.data.access_key}
-              readOnly
-              autoSize={{ minRows: 1, maxRows: 2 }}
+          <div className="mt-2 flex items-start gap-2">
+            <code className="min-w-0 flex-1 self-center font-mono break-all select-text">
+              {credentials.data.access_key}
+            </code>
+            <Button
+              type="text"
+              size="mini"
+              className="shrink-0"
+              icon={<IconCopy />}
+              title="复制 Access Key"
+              aria-label="复制 Access Key"
+              onClick={() => copyToClipboard(credentials.data.access_key, "Access Key")}
             />
-            <Button onClick={() => copyToClipboard(credentials.data.access_key, "Access Key")}>
-              复制
-            </Button>
-          </Space>
+          </div>
         </div>
         <div>
           <Typography.Text bold>Secret Key</Typography.Text>
-          <Space className="mt-2 w-full" align="start">
-            <Input.TextArea
-              aria-label="Secret Key"
-              value={credentials.secret_key}
-              readOnly
-              autoSize={{ minRows: 2, maxRows: 4 }}
+          <div className="mt-2 flex items-start gap-2">
+            <code className="min-w-0 flex-1 self-center font-mono break-all select-text">
+              {credentials.secret_key}
+            </code>
+            <Button
+              type="text"
+              size="mini"
+              className="shrink-0"
+              icon={<IconCopy />}
+              title="复制 Secret Key"
+              aria-label="复制 Secret Key"
+              onClick={() => copyToClipboard(credentials.secret_key, "Secret Key")}
             />
-            <Button onClick={() => copyToClipboard(credentials.secret_key, "Secret Key")}>
-              复制
-            </Button>
-          </Space>
+          </div>
         </div>
       </Space>
     </Modal>
