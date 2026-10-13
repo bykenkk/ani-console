@@ -6,8 +6,8 @@ import path from "node:path";
 
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  // 开发态可选：通过 .env.local 中的配置将 /api 代理到 ANI Gateway。
-  const apiTarget = env.VITE_API_PROXY_TARGET || "http://127.0.0.1:4010";
+  // 开发态可选：通过 .env.local 中的配置将 /api 和 /admin 代理到 ANI Gateway。
+  const apiTarget = env.VITE_API_PROXY_TARGET;
 
   return {
     plugins: [
@@ -30,12 +30,19 @@ export default defineConfig(({ command, mode }) => {
     server: {
       host: "0.0.0.0",
       port: 5173,
-      proxy: {
-        "^/api(?:/|$)": {
-          target: apiTarget,
-          changeOrigin: true,
-        },
-      },
+      proxy: apiTarget
+        ? {
+            // FIXME: 后端当前路径为 /admin/v1，迁移后改为 /api/v1/admin。
+            "^/admin(?:/|$)": {
+              target: apiTarget,
+              changeOrigin: true,
+            },
+            "^/api(?:/|$)": {
+              target: apiTarget,
+              changeOrigin: true,
+            },
+          }
+        : undefined,
     },
     optimizeDeps: {
       include: ["@novnc/novnc/lib/rfb"],
