@@ -1,277 +1,323 @@
-import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button, Modal, Select, Space } from "@arco-design/web-react";
-import { useState } from "react";
-
 import {
-  deleteRegistryTag,
-  listRegistryImages,
-  listRegistryProjects,
-  type RegistryImage,
-  type RegistryPurpose,
-  type RegistryScanResult,
-} from "@/api/registry";
-import RegistryPushInstructionsModal from "../RegistryPushInstructionsModal";
-import { ListPageFrame, type ListColumn, ListDataTable, ResourceNameId } from "@/components/common";
+  getImageSpace,
+  listImageRegistrations,
+  unregisterImage,
+  type ImageRegistration,
+  type ImageRegistrationScope,
+} from "@/api/images";
+import { ApiError } from "@/api/request";
+import type { ListPagination } from "@/components/common/DataTable";
+import { ListPageFrame, ListDataTable, ResourceNameId, type ListColumn } from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
-import { formatBytes, formatDateTime } from "@/lib/format";
-import { getImageDisplayName } from "@/lib/render";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
-
-const PURPOSE_LABELS: Record<RegistryPurpose, string> = {
-  container: "容器镜像",
-  gpu: "GPU 镜像",
-  sandbox: "沙箱镜像",
-  system: "云主机镜像",
-};
-
-function scanSummary(scan: RegistryScanResult) {
-  if (scan.status === "not_scanned") return "未扫描";
-  if (scan.status === "pending" || scan.status === "running") return "扫描中";
-  if (scan.status === "failed") return "扫描失败";
-  if (scan.critical || scan.high) return `严重 ${scan.critical} · 高危 ${scan.high}`;
-  return "未发现高危漏洞";
-}
+import { formatDateTime } from "@/lib/format";
+import { IMAGE_ACCELERATORS, IMAGE_PURPOSES } from "../options";
+import RegisterImageModal from "../RegisterImageModal";
+import EditImageRegistrationModal from "../EditImageRegistrationModal";
+import ManageImageSpaceModal from "../ManageImageSpaceModal";
 
 export default function RegistryPage() {
-  const navigate = useNavigate();
-  const qc = useQueryClient();
-  const [keyword, setKeyword] = useState("");
-  const [purpose, setPurpose] = useState<"all" | RegistryPurpose>("all");
-  const [project, setProject] = useState("all");
-  const [guideVisible, setGuideVisible] = useState(false);
-
-  const projects = useQuery({
+  const [scope, setScope] = useState<ImageRegistrationScope>("tenant");
+  const [search, setSearch] = useState("");
+  const [purposes, setPurposes] = useState<string[]>([]);
+  const [accelerator, setAccelerator] = useState("");
+  const [register, setRegister] = useState(false);
+  const [edit, setEdit] = useState<ImageRegistration>();
+  const [manage, setManage] = useState(false);
+  const client = useQueryClient();
+  const space = useQuery({
+    queryKey: ["image-space"],
+    queryFn: async ({ signal }) => {
+      try {
+        return await getImageSpace(signal);
+      } catch (error) {
+        // Space provisioning belongs to the platform; Console only reads its state.
+        if (error instanceof ApiError && error.status === 404 && error.code === "SPACE_NOT_FOUND")
+          return null;
+        throw error;
+      }
+    },
     meta: {
       errorNotification: {
-        id: "registry-projects",
-        action: "数据加载",
+        id: "image-space",
+        action: "镜像空间加载",
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["registry-projects"],
-    queryFn: () => listRegistryProjects().then((data) => data.items),
+    refetchInterval: (query) => (query.state.data?.state === "provisioning" ? 3000 : false),
   });
-  const {
-    query: images,
-    resetPagination,
-    refresh,
-    items,
-    pagination,
-  } = useCursorPaginatedQuery<RegistryImage>({
-    errorNotification: {
-      id: "registry-images",
-      action: "镜像列表加载",
-      fallback: "请求失败，请稍后重试",
-    },
-    queryKey: ["registry-images", { keyword, project, purpose }],
-    queryFn: async ({ cursor, limit }) => {
-      return listRegistryImages({
-        limit,
-        cursor,
-        keyword: keyword.trim() || undefined,
-        project: project === "all" ? undefined : project,
-        purpose: purpose === "all" ? undefined : purpose,
-      });
+  const filters = {
+    scope,
+    search: search.trim() || undefined,
+    purposes,
+    accelerator: accelerator || undefined,
+  };
+  const filterKey = JSON.stringify(filters);
+  const [window, setWindow] = useState({
+    filterKey,
+    page: 1,
+    pageSize: 10,
+    cursors: [undefined] as Array<string | undefined>,
+  });
+  const current =
+    window.filterKey === filterKey
+      ? window
+      : { ...window, filterKey, page: 1, cursors: [undefined] };
+  if (window.filterKey !== filterKey) setWindow(current);
+  const query = useQuery({
+    queryKey: [
+      "image-registrations",
+      filters,
+      { cursor: current.cursors[current.page - 1], limit: current.pageSize },
+    ],
+    queryFn: ({ signal }) =>
+      listImageRegistrations(
+        { ...filters, cursor: current.cursors[current.page - 1], limit: current.pageSize },
+        signal,
+      ),
+    meta: {
+      errorNotification: {
+        id: "image-registrations",
+        action: "镜像登记列表加载",
+        fallback: "请求失败，请稍后重试",
+      },
     },
   });
-  const deleteTag = useMutation({
+  const reset = () => setWindow((value) => ({ ...value, page: 1, cursors: [undefined] }));
+  const refresh = () => {
+    reset();
+    return client.invalidateQueries({ queryKey: ["image-registrations"] });
+  };
+  const pagination: ListPagination = {
+    mode: "cursor",
+    page: current.page,
+    pageSize: current.pageSize,
+    hasNextPage: Boolean(query.data?.nextCursor),
+    disabled: query.isFetching,
+    onPageChange: (page) => {
+      if (query.isFetching || page < 1 || page > current.page + 1) return;
+      if (page > current.page) {
+        if (!query.data?.nextCursor) return;
+        setWindow({
+          ...current,
+          page,
+          cursors: [...current.cursors.slice(0, current.page), query.data.nextCursor],
+        });
+      } else if (page === 1 || current.cursors[page - 1]) {
+        setWindow({ ...current, page });
+      }
+    },
+    onPageSizeChange: (pageSize) =>
+      setWindow({ filterKey, page: 1, pageSize, cursors: [undefined] }),
+  };
+  const remove = useMutation({
+    mutationFn: (image: ImageRegistration) =>
+      unregisterImage(image.image_id, { expectedVersion: image.version }),
     meta: {
       feedback: {
         channel: "notification",
-        id: "registry-tag-delete",
-        action: "删除",
-        successText: "镜像 Tag 已删除",
-        errorFallback: "请求失败",
+        id: "image-registration-unregister",
+        action: "注销镜像登记",
+        successText: "镜像登记已注销",
+        errorFallback: "注销失败；如版本已变化，请刷新列表重试",
       },
     },
-    mutationFn: (item: RegistryImage) => deleteRegistryTag(item.project, item.repository, item.tag),
-    onSuccess: () => {
-      resetPagination();
-      qc.invalidateQueries({ queryKey: ["registry-images"] });
+    onSuccess: async (_, image) => {
+      reset();
+      await client.invalidateQueries({ queryKey: ["image-registrations"] });
+      await client.invalidateQueries({
+        queryKey: ["image-registration", image.scope, image.image_id],
+        refetchType: "none",
+      });
     },
   });
-
-  const columns: Array<ListColumn<RegistryImage>> = [
+  const columns: Array<ListColumn<ImageRegistration>> = [
     {
-      key: "image",
-      title: "镜像名",
-      ellipsis: true,
-      width: 200,
-      render: (_, item) => (
-        <ResourceNameId name={getImageDisplayName(item)} id={item.repository} copyable={false} />
+      key: "name",
+      title: "名称 / ID",
+      width: 240,
+      render: (_, image) => (
+        <ResourceNameId name={image.displayName} id={image.image_id} openable={false} />
       ),
+    },
+    { key: "repository", title: "仓库", dataIndex: "repository", ellipsis: true, width: 180 },
+    {
+      key: "reference",
+      title: "镜像地址",
+      dataIndex: "resolvedReference",
+      ellipsis: true,
+      width: 280,
+    },
+    {
+      key: "description",
+      title: "描述",
+      dataIndex: "description",
+      placeholder: "-",
+      ellipsis: true,
+      width: 180,
     },
     {
       key: "purpose",
       title: "用途",
-      width: 120,
-      ellipsis: true,
-      render: (_, item) => (item.purpose ? PURPOSE_LABELS[item.purpose] : "-"),
-    },
-    {
-      key: "project",
-      title: "项目",
-      width: 200,
-      ellipsis: true,
-      dataIndex: "project",
-    },
-    {
-      key: "tag",
-      title: "Tag",
-      width: 120,
-      ellipsis: true,
-      dataIndex: "tag",
-    },
-    {
-      key: "size",
-      title: "大小",
-      width: 120,
-      ellipsis: true,
-      render: (_, item) => formatBytes(item.size_bytes),
-    },
-    {
-      key: "pushedAt",
-      title: "推送时间",
       width: 160,
       ellipsis: true,
-      render: (_, item) => formatDateTime(item.pushed_at),
+      render: (_, image) =>
+        image.purposes
+          ?.map(
+            (purpose) => IMAGE_PURPOSES.find((item) => item.value === purpose)?.label || purpose,
+          )
+          .join("、") || "-",
     },
     {
-      key: "scan",
-      title: "漏洞摘要",
+      key: "accelerator",
+      title: "加速器",
       width: 120,
+      render: (_, image) =>
+        IMAGE_ACCELERATORS.find((item) => item.value === image.accelerator)?.label ||
+        image.accelerator ||
+        "-",
+    },
+    {
+      key: "platforms",
+      title: "平台架构",
+      width: 180,
       ellipsis: true,
-      render: (_, item) => scanSummary(item.scan_status),
+      render: (_, image) =>
+        image.platforms
+          ?.map((item) => [item.os, item.architecture, item.variant].filter(Boolean).join("/"))
+          .join("、") || "-",
+    },
+    {
+      key: "created",
+      title: "登记时间",
+      width: 170,
+      render: (_, image) => formatDateTime(image.createdAt),
     },
   ];
-  const goCreate = (item: RegistryImage) => {
-    const target =
-      item.purpose === "gpu"
-        ? "/gpu-instances"
-        : item.purpose === "sandbox"
-          ? "/sandbox-instances"
-          : item.purpose === "system"
-            ? "/vm-instances"
-            : "/container-instances";
-    navigate({ to: target });
-  };
-
   return (
     <>
       <ListPageFrame
         header={{
           iconClassName: "icon-moxing",
           title: "镜像仓库",
-          subtitle: "推送入库 · 扫描摘要 · 四类实例共用选 Tag",
+          subtitle: "管理镜像空间、发布凭证与镜像登记",
           extra: (
-            <Button type="primary" onClick={() => setGuideVisible(true)}>
-              推送镜像说明
-            </Button>
+            <Space>
+              <Button onClick={() => setManage(true)}>空间与凭证</Button>
+              <Button
+                type="primary"
+                disabled={scope !== "tenant" || space.data?.state !== "available"}
+                onClick={() => setRegister(true)}
+              >
+                登记镜像
+              </Button>
+            </Space>
           ),
+        }}
+        tabs={{
+          value: scope,
+          onChange: setScope,
+          items: [
+            { value: "tenant", label: "用户镜像" },
+            { value: "platform", label: "平台镜像" },
+          ],
         }}
         toolbar={{
           search: {
-            fields: [
-              {
-                value: "keyword",
-                label: "关键词",
-              },
-            ],
-            field: "keyword",
-            value: keyword,
-            onFieldChange: () => undefined,
-            onChange: setKeyword,
-            placeholder: "搜索镜像名 / Tag / 项目",
+            fields: [{ value: "search", label: "关键词" }],
+            field: "search",
+            value: search,
+            onFieldChange: () => {},
+            onChange: setSearch,
+            placeholder: "搜索镜像",
           },
           filters: (
             <Space>
               <Select
-                value={purpose}
-                onChange={setPurpose}
-                className="w-35"
-                options={[
-                  {
-                    value: "all",
-                    label: "全部用途",
-                  },
-                  ...Object.entries(PURPOSE_LABELS).map(([value, label]) => ({
-                    value,
-                    label,
-                  })),
-                ]}
+                mode="multiple"
+                aria-label="用途筛选"
+                placeholder="全部用途"
+                allowClear
+                value={purposes}
+                onChange={setPurposes}
+                options={IMAGE_PURPOSES}
+                className="min-w-40"
               />
               <Select
-                value={project}
-                onChange={setProject}
-                className="w-40"
-                options={[
-                  {
-                    value: "all",
-                    label: "全部项目",
-                  },
-                  ...(projects.data ?? []).map((item) => ({
-                    value: item.name,
-                    label: item.name,
-                  })),
-                ]}
+                aria-label="加速器筛选"
+                value={accelerator}
+                onChange={setAccelerator}
+                options={[{ value: "", label: "全部加速器" }, ...IMAGE_ACCELERATORS]}
+                className="w-36"
               />
             </Space>
           ),
-          refresh: {
-            label: "刷新",
-            spinning: images.isFetching,
-            onClick: refresh,
-          },
+          refresh: { onClick: refresh, spinning: query.isFetching },
         }}
       >
         <ListDataTable
-          data={items}
-          rowKey={(item) => `${item.project}/${item.repository}:${item.tag}`}
+          data={query.data?.items ?? []}
+          rowKey="image_id"
           columns={columns}
+          loading={query.isFetching}
+          pagination={pagination}
+          tableLabel="镜像登记列表"
           rowActions={[
             {
-              key: "copy-pull-command",
-              label: "拉取命令",
-              onClick: (item) => {
-                copyToClipboard(item.pull_command || `docker pull ${item.image}`, "拉取命令");
-              },
+              key: "copy",
+              label: "复制拉取命令",
+              onClick: (image) =>
+                copyToClipboard(`docker pull ${image.resolvedReference}`, "拉取命令"),
             },
             {
-              key: "create",
-              label: "去创建",
-              onClick: goCreate,
+              key: "edit",
+              label: "编辑",
+              visible: (image) => scope === "tenant" && image.scope === "tenant",
+              disabled: () => remove.isPending,
+              onClick: setEdit,
             },
             {
-              key: "delete",
-              label: "删除",
+              key: "unregister",
+              label: "注销登记",
               intent: "danger",
-              loading: (item) =>
-                deleteTag.isPending &&
-                deleteTag.variables?.project === item.project &&
-                deleteTag.variables.repository === item.repository &&
-                deleteTag.variables.tag === item.tag,
-              onClick: (item) => {
+              visible: (image) => scope === "tenant" && image.scope === "tenant",
+              disabled: () => remove.isPending,
+              loading: (image) => remove.isPending && remove.variables?.image_id === image.image_id,
+              onClick: (image) => {
                 Modal.confirm({
-                  title: "删除镜像 Tag",
-                  content: `确定删除 ${item.repository}:${item.tag}？被实例引用时平台会拒绝删除。`,
+                  title: "注销镜像登记",
+                  content: `确定注销“${image.displayName}”？此操作移除镜像登记，不会删除仓库中的镜像 Tag。`,
                   okButtonProps: { status: "danger" },
-                  onOk: () => deleteTag.mutateAsync(item),
+                  onOk: () => remove.mutateAsync(image),
                 });
               },
             },
           ]}
-          loading={images.isFetching}
-          tableLabel="镜像仓库列表"
-          pagination={pagination}
         />
       </ListPageFrame>
-      {guideVisible && (
-        <RegistryPushInstructionsModal
-          projects={projects.data}
-          onCancel={() => setGuideVisible(false)}
+      {manage && (
+        <ManageImageSpaceModal
+          space={space.data}
+          loading={space.isLoading}
+          refreshing={space.isFetching}
+          onRefresh={() => {
+            space.refetch();
+          }}
+          onCancel={() => setManage(false)}
         />
       )}
+      {register && (
+        <RegisterImageModal
+          onCancel={() => setRegister(false)}
+          onCreated={() => {
+            setRegister(false);
+            reset();
+          }}
+        />
+      )}
+      {edit && <EditImageRegistrationModal image={edit} onCancel={() => setEdit(undefined)} />}
     </>
   );
 }

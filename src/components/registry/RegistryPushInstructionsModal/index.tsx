@@ -1,85 +1,49 @@
-import { useQuery } from "@tanstack/react-query";
-import { Button, Form, Input, Modal, Select, Space, Typography } from "@arco-design/web-react";
-import { useEffect, useState } from "react";
-import { getRegistryPushInstructions, type RegistryProject } from "@/api/registry";
+import { Button, Modal, Space, Typography } from "@arco-design/web-react";
+import type { ImageSpace } from "@/api/images";
 import { copyToClipboard } from "@/lib/clipboard";
-import { withId } from "@/lib/id";
-
-interface RegistryPushInstructionsModalProps {
-  projects?: RegistryProject[];
-  onCancel: () => void;
-}
 
 export default function RegistryPushInstructionsModal({
-  projects,
+  space,
   onCancel,
-}: RegistryPushInstructionsModalProps) {
-  const [project, setProject] = useState("");
-  const [repository, setRepository] = useState("demo/app");
-  const instructions = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("registry-push", project, repository),
-        action: "推送说明加载",
-        fallback: "请求失败，请稍后重试",
-      },
+}: {
+  space: ImageSpace;
+  onCancel: () => void;
+}) {
+  const target = `${space.registryAuthority}/${space.projectName}/app:latest`;
+  const commands = [
+    {
+      label: "登录仓库（按提示输入发布用户名和密钥）",
+      command: `docker login ${space.registryAuthority}`,
     },
-    queryKey: ["registry-push-instructions", project, repository],
-    queryFn: () => getRegistryPushInstructions(project, repository.trim() || "demo/app"),
-    enabled: Boolean(project),
-  });
-  useEffect(() => {
-    if (!project && projects?.[0]) setProject(projects[0].name);
-  }, [project, projects]);
-
+    {
+      label: "标记镜像（将 local-image:latest 替换为本地镜像）",
+      command: `docker tag local-image:latest ${target}`,
+    },
+    { label: "推送镜像", command: `docker push ${target}` },
+  ];
   return (
     <Modal visible title="推送镜像说明" footer={null} onCancel={onCancel} style={{ width: 720 }}>
-      <Typography.Paragraph type="secondary" className="mb-4!">
-        镜像通过 docker push 入库，不支持网页上传。项目由平台按当前租户自动创建，Console
-        不展示或下发凭据明文。
+      <Typography.Paragraph>
+        先签发并保存发布凭证，再在本地终端执行以下示例命令。推送成功后返回镜像仓库，点击“登记镜像”并填写推送地址。
       </Typography.Paragraph>
-      <Form layout="vertical">
-        <Form.Item label="项目" required>
-          <Select
-            value={project}
-            onChange={setProject}
-            options={(projects ?? []).map((item) => ({
-              value: item.name,
-              label: item.name,
-            }))}
-          />
-        </Form.Item>
-        <Form.Item label="仓库路径">
-          <Input value={repository} onChange={setRepository} placeholder="例如 demo/app" />
-        </Form.Item>
-      </Form>
-      {instructions.isLoading ? (
-        <Typography.Text type="secondary">正在获取推送说明…</Typography.Text>
-      ) : instructions.data ? (
-        <Space direction="vertical" className="w-full">
-          {instructions.data.commands.map((item) => (
-            <div key={item.label} className="rounded border border-app-border-strong p-3">
-              <div className="mb-2 flex items-center justify-between">
-                <Typography.Text className="font-medium">{item.label}</Typography.Text>
-                <Button
-                  size="mini"
-                  type="text"
-                  onClick={() => {
-                    copyToClipboard(item.command, "命令");
-                  }}
-                >
-                  复制
-                </Button>
-              </div>
-              <Typography.Text code className="break-all">
-                {item.command}
-              </Typography.Text>
+      <Typography.Paragraph type="secondary">
+        示例使用仓库 app、Tag latest，可按实际镜像调整。网页不直接上传镜像文件。
+      </Typography.Paragraph>
+      <Space direction="vertical" className="w-full" size="large">
+        {commands.map(({ label, command }) => (
+          <div key={label}>
+            <div className="mb-2 flex items-center justify-between">
+              <Typography.Text>{label}</Typography.Text>
+              <Button type="text" size="small" onClick={() => copyToClipboard(command, "命令")}>
+                复制
+              </Button>
             </div>
-          ))}
-        </Space>
-      ) : (
-        <div className="min-h-24" />
-      )}
+            <Typography.Text code className="break-all">
+              {command}
+            </Typography.Text>
+          </div>
+        ))}
+      </Space>
     </Modal>
   );
 }
