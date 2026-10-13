@@ -3,7 +3,7 @@ import "@/assets/iconfont/iconfont.css";
 import "@/styles/global.css";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { ConfigProvider } from "@arco-design/web-react";
+import { ConfigProvider, type ConfigProviderProps } from "@arco-design/web-react";
 import { AppRoot } from "@/app/AppRoot";
 import { showMessage } from "@/lib/feedback";
 
@@ -15,7 +15,14 @@ const COMPONENT_CONFIG = {
   Modal: {
     maskClosable: false,
   },
-};
+  Select: {
+    triggerProps: {
+      autoAlignPopupWidth: false,
+      autoAlignPopupMinWidth: true,
+      position: "bl",
+    },
+  },
+} satisfies ConfigProviderProps["componentConfig"];
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
