@@ -18,7 +18,7 @@ import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import styles from "./index.module.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import KnowledgeDocumentChunksDrawer from "@/components/knowledge/KnowledgeDocumentChunksDrawer";
+import ChunksDrawer from "./ChunksDrawer";
 
 function formatBytes(value?: number) {
   if (value == null) return "-";
@@ -156,7 +156,7 @@ export default function KnowledgeDocuments({ kbId, action }: { kbId: string; act
   ];
   const dialogNode = (
     <>
-      <KnowledgeDocumentChunksDrawer
+      <ChunksDrawer
         kbId={kbId}
         document={previewDocument}
         visible={Boolean(previewDocument)}
