@@ -16,7 +16,7 @@ export default function KnowledgeSourcesDrawer({
       width={880}
       style={{ maxWidth: "100vw" }}
       title={
-        <span className="[overflow-wrap:anywhere]">
+        <span className="wrap-anywhere">
           {title} · {sources.length} 个引用分段
         </span>
       }
@@ -28,7 +28,7 @@ export default function KnowledgeSourcesDrawer({
         {sources.map(({ source, index }) => (
           <article
             key={index}
-            className="rounded-lg border border-solid border-(--color-neutral-3) bg-(--color-bg-2) p-4"
+            className="rounded-lg border border-solid border-(--color-neutral-3) bg-app-surface p-4"
           >
             <div className="mb-3 flex flex-wrap items-center gap-2">
               <Tag size="small">引用 {index + 1}</Tag>
@@ -38,7 +38,7 @@ export default function KnowledgeSourcesDrawer({
                 {source.score != null ? ` · 匹配度 ${source.score.toFixed(3)}` : ""}
               </Typography.Text>
             </div>
-            <Typography.Paragraph className="mb-0! whitespace-pre-wrap leading-7 [overflow-wrap:anywhere]">
+            <Typography.Paragraph className="mb-0! whitespace-pre-wrap leading-7 wrap-anywhere">
               {source.content || "-"}
             </Typography.Paragraph>
           </article>

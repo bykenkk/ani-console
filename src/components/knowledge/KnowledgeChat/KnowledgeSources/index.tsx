@@ -59,8 +59,8 @@ export default function KnowledgeSources() {
             style={{ display: "inline-flex", maxWidth: "100%", minWidth: 0 }}
           >
             <IconFile className="shrink-0" />
-            <span className="min-w-0 max-w-[180px] truncate">{group.title}</span>
-            <span className="shrink-0 text-(--color-text-3)">{group.sources.length}</span>
+            <span className="min-w-0 max-w-45 truncate">{group.title}</span>
+            <span className="shrink-0 text-app-text-tertiary">{group.sources.length}</span>
           </span>
         </Button>
       ))}

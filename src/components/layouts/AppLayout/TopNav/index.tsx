@@ -140,7 +140,7 @@ export default function TopNav({
             title="返回控制台首页"
             onClick={() => onProductPanelVisibleChange(false)}
           >
-            <img src={brandLogo} alt="常青云" className="block h-[25px] w-auto" />
+            <img src={brandLogo} alt="常青云" className="block h-6.25 w-auto" />
           </Link>
           <nav className="topnav-primary" aria-label="主导航">
             <button
