@@ -222,9 +222,9 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       }
       style={{ width: 820 }}
     >
-      <div className={styles.form}>
+      <div className="flex flex-col">
         <WizardSteps current={step + 1} items={STEP_TITLES} size="small" className={styles.steps} />
-        <div className={styles.content}>
+        <div className="pt-7">
           <Form<FormValues>
             form={form}
             layout="vertical"

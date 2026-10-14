@@ -15,17 +15,28 @@ export default function SummaryOverview({ items }: { items: HomeSummaryCard[] })
             <span className={styles.summaryDecorRing} aria-hidden="true">
               <AliIcon name={item.icon} size={16} />
             </span>
-            <span className={styles.summaryLabelRow}>
-              <span className={styles.summaryLabel}>{item.label}</span>
+            <span className="z-1 flex items-center gap-2">
+              <span className="font-bold leading-5.5 text-(--home-text-secondary)">
+                {item.label}
+              </span>
               <IconRight className={styles.inlineArrow} aria-hidden="true" />
             </span>
-            <strong className={styles.summaryValue}>{item.value}</strong>
-            <span className={styles.summaryStatuses}>
+            <strong className="z-1 text-[28px] leading-8 font-semibold!">{item.value}</strong>
+            <span className="z-1 flex flex-wrap items-center gap-x-3 gap-y-1.5">
               {item.statuses.map((status) => (
-                <span key={`${item.id}-${status.label}`} className={styles.summaryStatus}>
-                  <span className={clsx(styles.statusDot, styles[`statusDot_${status.tone}`])} />
+                <span
+                  key={`${item.id}-${status.label}`}
+                  className="inline-flex items-center gap-1.5 text-[12px] leading-4 whitespace-nowrap text-(--home-text-secondary)"
+                >
+                  <span
+                    className={clsx("size-1.5 flex-none rounded-[50%]", {
+                      "bg-[#67c23a]": status.tone === "success",
+                      "bg-(--home-danger)": status.tone === "danger",
+                      "bg-[rgba(0,0,0,0.26)]": status.tone === "neutral",
+                    })}
+                  />
                   <span>
-                    {status.label} <b>{status.value}</b>
+                    {status.label} <b className="font-bold!">{status.value}</b>
                   </span>
                 </span>
               ))}

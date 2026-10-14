@@ -124,19 +124,6 @@
   margin-bottom: 22px;
 }
 
-.passwordLabel {
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.forgotPassword {
-  color: var(--color-text-3);
-  font-size: 12px;
-  font-weight: 400;
-}
-
 .submitButton:global(.arco-btn-primary) {
   height: 48px;
   border: 0;
@@ -162,21 +149,6 @@
   color: var(--color-text-4);
   font-size: 12px;
   line-height: 16px;
-}
-
-.alternativeMethods {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  color: var(--color-text-2);
-  font-size: 12px;
-}
-
-.alternativeMethod {
-  display: inline-flex;
-  gap: 8px;
-  align-items: center;
-  white-space: nowrap;
 }
 
 .alternativeMethod :global(.arco-icon) {
@@ -323,9 +295,5 @@
   .loginCard {
     padding-right: 28px;
     padding-left: 28px;
-  }
-
-  .alternativeMethods {
-    gap: 16px;
   }
 }

@@ -2,6 +2,7 @@ import { Button, Divider, Form, Input } from "@arco-design/web-react";
 import { IconDriveFile, IconLock } from "@arco-design/web-react/icon";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import clsx from "clsx";
 import { useEffect } from "react";
 import backgroundImageUrl from "@/assets/auth/login-bg.png";
 import logoUrl from "@/assets/brand/logo.png";
@@ -117,9 +118,12 @@ export default function LoginPage({ redirect = "/" }: { redirect?: string }) {
           <Form.Item
             className={styles.passwordItem}
             label={
-              <span className={styles.passwordLabel}>
+              <span className="flex w-full items-center justify-between">
                 <span>密码</span>
-                <span className={styles.forgotPassword} aria-disabled="true">
+                <span
+                  className="text-[12px] font-normal text-app-text-tertiary"
+                  aria-disabled="true"
+                >
                   忘记密码？
                 </span>
               </span>
@@ -148,12 +152,27 @@ export default function LoginPage({ redirect = "/" }: { redirect?: string }) {
 
         <div hidden>
           <Divider className={styles.divider}>OR</Divider>
-          <div className={styles.alternativeMethods} aria-label="其他登录方式">
-            <span className={styles.alternativeMethod} aria-disabled="true">
+          <div
+            className="flex items-center justify-around text-[12px] text-app-text-secondary [@media(max-width:480px)]:gap-4"
+            aria-label="其他登录方式"
+          >
+            <span
+              className={clsx(
+                styles.alternativeMethod,
+                "inline-flex items-center gap-2 whitespace-nowrap",
+              )}
+              aria-disabled="true"
+            >
               <IconDriveFile />
               Ukey登录
             </span>
-            <span className={styles.alternativeMethod} aria-disabled="true">
+            <span
+              className={clsx(
+                styles.alternativeMethod,
+                "inline-flex items-center gap-2 whitespace-nowrap",
+              )}
+              aria-disabled="true"
+            >
               <IconLock />
               AD/LDAP账户
             </span>

@@ -1,7 +1,7 @@
+import clsx from "clsx";
 import { useState } from "react";
 import InstanceEvents from "@/components/instances/InstanceEvents";
 import SandboxSecurityEvents from "../SandboxSecurityEvents";
-import styles from "./index.module.css";
 
 type EventTab = "all" | "security";
 
@@ -10,7 +10,11 @@ export default function SandboxEvents({ instanceId }: { instanceId: string }) {
 
   return (
     <div>
-      <div className={styles.tabList} role="tablist" aria-label="事件类型">
+      <div
+        className="box-border grid h-6.5 w-[min(165px,100%)] grid-cols-2 overflow-hidden rounded-sm border border-solid border-app-border-strong bg-app-surface"
+        role="tablist"
+        aria-label="事件类型"
+      >
         {[
           { key: "all" as const, label: "全部" },
           { key: "security" as const, label: "安全" },
@@ -19,7 +23,12 @@ export default function SandboxEvents({ instanceId }: { instanceId: string }) {
           return (
             <button
               key={item.key}
-              className={active ? styles.activeTab : styles.tab}
+              className={clsx(
+                "relative cursor-pointer border-0 px-3 py-0 text-center [font:inherit] text-[14px]! font-semibold! leading-6.5! focus-visible:outline-2! focus-visible:outline-solid! focus-visible:outline-app-primary! focus-visible:-outline-offset-3 [&+button]:[border-left:1px_solid_var(--color-border-2)]",
+                active
+                  ? "bg-(--color-primary-light-1) text-app-primary after:absolute after:bottom-0 after:left-1/2 after:h-0.5 after:w-5.5 after:-translate-x-1/2 after:bg-app-primary after:content-['']"
+                  : "bg-transparent text-app-text [&:hover]:text-app-primary",
+              )}
               type="button"
               role="tab"
               aria-selected={active}
@@ -30,7 +39,7 @@ export default function SandboxEvents({ instanceId }: { instanceId: string }) {
           );
         })}
       </div>
-      <div className={styles.content} role="tabpanel">
+      <div className="mt-4" role="tabpanel">
         {activeTab === "all" ? (
           <InstanceEvents instanceId={instanceId} />
         ) : (

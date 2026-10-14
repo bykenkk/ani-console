@@ -6,7 +6,6 @@ import {
   type VectorStoreDetailSearch,
 } from "@/lib/resources";
 import ResourceId from "../ResourceId";
-import styles from "./index.module.css";
 
 type ResourceNameIdBaseProps = {
   name: string;
@@ -41,17 +40,21 @@ export default function ResourceNameId(props: ResourceNameIdProps) {
   };
 
   return (
-    <div className={styles.nameCell}>
-      <span className={styles.name} title={name}>
+    <div className="flex min-w-0 flex-col gap-0.5">
+      <span className="block max-w-full truncate text-[14px] leading-5 text-app-text" title={name}>
         {canOpen ? (
-          <button type="button" className={styles.nameButton} onClick={handleOpen}>
+          <button
+            type="button"
+            className="max-w-full cursor-pointer overflow-hidden! border-0 bg-transparent p-0 text-left text-ellipsis whitespace-nowrap text-(--list-primary) no-underline [font:inherit]! [&:hover]:text-(--list-primary-hover) [&:hover]:no-underline"
+            onClick={handleOpen}
+          >
             {name}
           </button>
         ) : (
           name
         )}
       </span>
-      <span className={styles.nameId}>
+      <span className="text-[12px] leading-4 text-(--list-text-secondary)">
         {id && id !== "-" ? <ResourceId value={id} copyable={copyable} /> : "-"}
       </span>
     </div>

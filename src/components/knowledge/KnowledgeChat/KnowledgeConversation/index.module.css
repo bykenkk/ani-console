@@ -1,12 +1,3 @@
-.conversationPane {
-  display: flex;
-  width: 100%;
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
 .threadRoot {
   flex: 1 1 auto;
   min-height: 0;
@@ -19,34 +10,6 @@
   overflow-x: hidden;
   overflow-y: auto;
   scroll-behavior: smooth;
-}
-
-.threadContent {
-  display: flex;
-  box-sizing: border-box;
-  width: min(100%, 760px);
-  min-height: 100%;
-  margin: 0 auto;
-  padding: 16px 16px 0 16px;
-  flex-direction: column;
-}
-
-.welcome {
-  display: flex;
-  margin: auto 0;
-  padding: 32px 0;
-  align-items: center;
-  flex-direction: column;
-  gap: 10px;
-  text-align: center;
-}
-
-.suggestions {
-  display: flex;
-  margin-top: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
 }
 
 .suggestion {
@@ -64,28 +27,9 @@
   background: var(--color-primary-light-1);
 }
 
-.messages {
-  display: flex;
-  min-width: 0;
-  margin-bottom: 24px;
-  flex: 1;
-  flex-direction: column;
-  gap: 24px;
-}
-
 .userMessage {
   display: flex;
   justify-content: flex-end;
-}
-
-.userBubble {
-  max-width: 78%;
-  padding: 10px 14px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  color: var(--color-text-1);
-  border-radius: 12px;
-  background: var(--color-fill-2);
 }
 
 .assistantMessage {
@@ -93,16 +37,6 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-}
-
-.assistantBubble {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 4px 8px;
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
-  line-height: 1.7;
-  color: var(--color-text-1);
 }
 
 .messageActions {
@@ -125,16 +59,6 @@
   z-index: 1;
   margin-top: auto;
   background: var(--color-bg-2);
-}
-
-.generating {
-  display: flex;
-  margin-bottom: 8px;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  color: var(--color-text-3);
-  font-size: 12px;
 }
 
 .composer {
@@ -173,32 +97,6 @@
   color: var(--color-text-3);
 }
 
-.composerActions {
-  display: flex;
-  min-height: 32px;
-  min-width: 0;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.composerSettings,
-.topKControl {
-  display: flex;
-  min-width: 0;
-  align-items: center;
-  gap: 8px;
-}
-
-.composerSettings {
-  flex: 1 1 auto;
-  flex-wrap: wrap;
-}
-
-.topKControl {
-  flex: 0 0 auto;
-}
-
 .modelSelect {
   width: 220px;
   max-width: 100%;
@@ -217,9 +115,5 @@
 @media (max-width: 1024px) {
   .threadRoot {
     min-height: 0;
-  }
-
-  .threadContent {
-    padding-inline: 14px;
   }
 }

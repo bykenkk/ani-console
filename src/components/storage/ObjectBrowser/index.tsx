@@ -10,6 +10,7 @@ import {
 } from "@arco-design/web-react";
 import { IconArrowLeft, IconFile, IconFolder } from "@arco-design/web-react/icon";
 import type { ReactNode } from "react";
+import clsx from "clsx";
 import type { StorageBucketObjectEntry } from "@/api/storage/buckets";
 import { DataTable } from "@/components/common";
 import { formatBytes, formatDateTime } from "@/lib/format";
@@ -64,7 +65,11 @@ export default function ObjectBrowser({
         return (
           <button
             type="button"
-            className={canNavigate ? styles.entryButton : styles.entryLabel}
+            className={clsx(
+              "inline-flex min-w-0 items-center gap-2.5 border-0 bg-transparent p-0 text-left text-app-text [font:inherit]!",
+              canNavigate &&
+                "cursor-pointer focus-visible:outline-2! focus-visible:outline-solid! focus-visible:outline-app-primary! focus-visible:outline-offset-3 [&:hover>span]:text-app-primary",
+            )}
             onClick={canNavigate ? () => onNavigate(target) : undefined}
             aria-label={canNavigate ? `进入文件夹 ${entry.name}` : undefined}
           >
@@ -73,7 +78,7 @@ export default function ObjectBrowser({
             ) : (
               <IconFile className={styles.fileIcon} />
             )}
-            <span className={styles.entryName}>{entry.name}</span>
+            <span className="truncate">{entry.name}</span>
           </button>
         );
       },
@@ -101,8 +106,8 @@ export default function ObjectBrowser({
   ];
 
   return (
-    <div className={styles.browser}>
-      <div className={styles.toolbar}>
+    <div className="min-w-0">
+      <div className="mb-3 flex items-center justify-between gap-4">
         <Breadcrumb className={styles.breadcrumb}>
           <Breadcrumb.Item>
             <Button type="text" size="mini" onClick={() => onNavigate("/")}>

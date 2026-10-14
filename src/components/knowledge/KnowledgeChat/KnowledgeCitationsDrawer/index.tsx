@@ -1,7 +1,6 @@
 import { Button, Drawer, Empty, Spin, Typography } from "@arco-design/web-react";
 import type { KBCitation as Citation } from "@/api/knowledge";
 import { formatDateTime } from "@/lib/format";
-import styles from "./index.module.css";
 
 export default function KnowledgeCitationsDrawer({
   visible,
@@ -21,16 +20,19 @@ export default function KnowledgeCitationsDrawer({
   return (
     <Drawer width={560} title="本库全部引用" visible={visible} footer={null} onCancel={onCancel}>
       {loading ? (
-        <div className={styles.state}>
+        <div className="flex min-h-60 flex-col items-center justify-center gap-2">
           <Spin />
         </div>
       ) : error ? (
-        <div className={styles.state} />
+        <div className="flex min-h-60 flex-col items-center justify-center gap-2" />
       ) : citations?.length ? (
-        <div className={styles.list}>
+        <div className="flex flex-col gap-3">
           {citations.map((citation) => (
-            <article key={citation.id} className={styles.item}>
-              <div className={styles.header}>
+            <article
+              key={citation.id}
+              className="rounded-lg border border-solid border-app-border-strong bg-app-surface p-3.5"
+            >
+              <div className="mb-2 flex flex-col gap-0.75">
                 <Typography.Text bold>{citation.file_name}</Typography.Text>
                 <Typography.Text type="secondary">
                   {citation.page ? `第 ${citation.page} 页 · ` : ""}

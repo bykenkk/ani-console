@@ -89,9 +89,9 @@ function ParentChunkSection({ group, index }: { group: ParentChunkGroup; index: 
   const parentLabel = `分段-${String(index + 1).padStart(2, "0")}`;
   const parentName = getChunkName(group.parent) ?? getChunkName(group.children[0]);
   return (
-    <section className={styles.parentSection}>
-      <div className={styles.parentHeading}>
-        <div className={styles.parentTitle}>
+    <section className="overflow-hidden rounded-lg border border-solid border-(--color-neutral-3) bg-app-surface">
+      <div className="flex items-center justify-between gap-3 [@media(max-width:720px)]:flex-col [@media(max-width:720px)]:items-start px-4 py-3.5 [border-bottom:1px_solid_var(--color-neutral-3)]">
+        <div className="flex min-w-0 items-center gap-1.5">
           <Tag color="arcoblue">父分段</Tag>
           <Typography.Text bold>{parentName ?? parentLabel}</Typography.Text>
           <Typography.Text type="secondary">
@@ -117,11 +117,14 @@ function ParentChunkSection({ group, index }: { group: ParentChunkGroup; index: 
           triggerRegion="header"
         >
           <CollapseItem header={`${childCount} 个子分段`} name="children">
-            <div className={styles.childList}>
+            <div className="[border-left:2px_solid_rgb(var(--arcoblue-6))]">
               {group.children.map((child, childIndex) => (
-                <article className={styles.childItem} key={child.id}>
-                  <div className={styles.childHeading}>
-                    <div className={styles.childTitle}>
+                <article
+                  className="bg-app-fill px-4 py-3 [&+article]:[border-top:1px_solid_var(--color-neutral-3)]"
+                  key={child.id}
+                >
+                  <div className="mb-2 flex items-center justify-between gap-3 [@media(max-width:720px)]:flex-col [@media(max-width:720px)]:items-start">
+                    <div className="flex min-w-0 items-baseline gap-2">
                       <Tag color="green">子分段</Tag>
                       <Typography.Text bold>
                         {getChunkName(child) ?? `分段-${childIndex + 1}`}
@@ -141,7 +144,7 @@ function ParentChunkSection({ group, index }: { group: ParentChunkGroup; index: 
           </CollapseItem>
         </Collapse>
       ) : (
-        <div className={styles.noChildren}>
+        <div className="bg-app-fill px-4 py-3 [border-top:1px_solid_var(--color-neutral-3)]">
           <Typography.Text type="secondary">暂无子分段</Typography.Text>
         </div>
       )}
@@ -191,10 +194,13 @@ export default function KnowledgeDocumentChunksDrawer({
           <Spin />
         </div>
       ) : (
-        <div className={styles.content}>
+        <div className="flex flex-col gap-4">
           {groupedChunks.summaries.map((summary) => (
-            <section className={styles.summary} key={summary.id}>
-              <div className={styles.summaryHeading}>
+            <section
+              className="overflow-hidden rounded-lg border border-solid border-(--color-neutral-3) bg-app-surface p-4"
+              key={summary.id}
+            >
+              <div className="mb-3 flex items-center justify-between gap-3 [@media(max-width:720px)]:flex-col [@media(max-width:720px)]:items-start">
                 <Tag color="purple">{CHUNK_TYPE_LABELS.doc_summary}</Tag>
                 <ChunkMeta chunk={summary} />
               </div>

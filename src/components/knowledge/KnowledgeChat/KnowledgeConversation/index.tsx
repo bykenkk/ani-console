@@ -12,6 +12,7 @@ import {
 } from "@assistant-ui/react";
 import { Button, InputNumber, Select, Spin, Typography } from "@arco-design/web-react";
 import { IconCheck, IconCopy, IconSend, IconStop } from "@arco-design/web-react/icon";
+import clsx from "clsx";
 import { useMemo, useRef } from "react";
 import KnowledgeMarkdownText from "../../KnowledgeMarkdownText";
 import KnowledgeSources from "../KnowledgeSources";
@@ -56,7 +57,7 @@ export default function KnowledgeConversation({
   const runtime = useLocalRuntime(adapter, { initialMessages });
 
   return (
-    <div className={styles.conversationPane}>
+    <div className="flex min-h-0 w-full min-w-0 flex-auto overflow-hidden">
       <AssistantRuntimeProvider runtime={runtime}>
         <KnowledgeThread
           mode={mode}
@@ -98,16 +99,16 @@ function KnowledgeThread({
   return (
     <ThreadPrimitive.Root className={styles.threadRoot}>
       <ThreadPrimitive.Viewport className={styles.viewport}>
-        <div className={styles.threadContent}>
+        <div className="mx-auto my-0 box-border flex min-h-full w-[min(100%,760px)] flex-col px-4 pt-4 pb-0 [@media(max-width:1024px)]:px-3.5">
           <AuiIf condition={(state) => state.thread.isEmpty}>
-            <div className={styles.welcome}>
+            <div className="mx-0 my-auto flex flex-col items-center gap-2.5 py-8 text-center">
               <Typography.Title heading={4} className="m-0!">
                 想从知识库中了解什么？
               </Typography.Title>
               <Typography.Text type="secondary">
                 回答将基于已完成解析和索引的文档，并附带检索来源。
               </Typography.Text>
-              <div className={styles.suggestions}>
+              <div className="mt-2.5 flex flex-wrap justify-center gap-2">
                 {["概括知识库的主要内容", "列出最重要的三个结论", "有哪些值得关注的风险？"].map(
                   (prompt) => (
                     <ThreadPrimitive.Suggestion
@@ -124,13 +125,13 @@ function KnowledgeThread({
             </div>
           </AuiIf>
 
-          <div className={styles.messages}>
+          <div className="mb-6 flex min-w-0 flex-1 flex-col gap-6">
             <ThreadPrimitive.Messages>{() => <ThreadMessage />}</ThreadPrimitive.Messages>
           </div>
 
           <ThreadPrimitive.ViewportFooter className={styles.footer}>
             <AuiIf condition={(state) => state.thread.isRunning}>
-              <div className={styles.generating}>
+              <div className="mb-2 flex items-center justify-center gap-2 text-[12px] text-app-text-tertiary">
                 <Spin size={14} /> 正在检索知识库并生成回答…
               </div>
             </AuiIf>
@@ -141,8 +142,13 @@ function KnowledgeThread({
                 rows={1}
                 className={styles.composerInput}
               />
-              <div className={styles.composerActions}>
-                <div className={styles.composerSettings}>
+              <div
+                className={clsx(
+                  styles.composerActions,
+                  "flex min-h-8 min-w-0 items-end justify-between gap-2",
+                )}
+              >
+                <div className="flex min-w-0 flex-auto flex-wrap items-center gap-2">
                   <Select
                     aria-label="问答模式"
                     size="small"
@@ -155,7 +161,12 @@ function KnowledgeThread({
                     ]}
                     onChange={(value) => onModeChange(value as QueryMode)}
                   />
-                  <label className={styles.topKControl}>
+                  <label
+                    className={clsx(
+                      styles.topKControl,
+                      "flex min-w-0 flex-none items-center gap-2",
+                    )}
+                  >
                     <Typography.Text type="secondary">TopK</Typography.Text>
                     <InputNumber
                       size="small"
@@ -239,7 +250,7 @@ function ThreadMessage() {
 function UserMessage() {
   return (
     <MessagePrimitive.Root className={styles.userMessage}>
-      <div className={styles.userBubble}>
+      <div className="max-w-[78%] rounded-xl bg-app-fill-secondary px-3.5 py-2.5 wrap-anywhere whitespace-pre-wrap text-app-text">
         <MessagePrimitive.Parts />
       </div>
     </MessagePrimitive.Root>
@@ -249,7 +260,7 @@ function UserMessage() {
 function AssistantMessage() {
   return (
     <MessagePrimitive.Root className={styles.assistantMessage}>
-      <div className={styles.assistantBubble}>
+      <div className="box-border w-full px-2 py-1 leading-[1.7] wrap-anywhere whitespace-pre-wrap text-app-text">
         <MessagePrimitive.Parts>
           {({ part }) => (part.type === "text" ? <KnowledgeMarkdownText /> : null)}
         </MessagePrimitive.Parts>

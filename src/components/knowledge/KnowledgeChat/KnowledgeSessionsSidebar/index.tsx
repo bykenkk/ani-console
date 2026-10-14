@@ -27,33 +27,45 @@ export default function KnowledgeSessionsSidebar({
   onViewCitations: () => void;
 }) {
   return (
-    <aside className={styles.sidebar} aria-label="问答会话">
+    <aside
+      className="box-border flex min-h-0 w-55 min-w-46 flex-[0_1_220px] flex-col gap-3 bg-app-fill p-3.5 [border-right:1px_solid_var(--color-border-1)] [@media(max-width:1024px)]:w-46 [@media(max-width:1024px)]:basis-46"
+      aria-label="问答会话"
+    >
       <Button type="primary" long icon={<IconPlus />} onClick={onNew}>
         新会话
       </Button>
-      <div className={styles.list}>
+      <div className="flex min-h-0 flex-auto flex-col gap-1.5 overflow-y-auto">
         {!activeSessionId ? (
-          <button type="button" className={clsx(styles.item, styles.itemActive)} onClick={onNew}>
-            <span className={styles.title}>新会话</span>
-            <span className={styles.meta}>尚未提问</span>
+          <button
+            type="button"
+            className="flex w-full shrink-0 cursor-pointer flex-col gap-1 overflow-hidden! rounded-md border border-solid py-2.5 text-left hover:bg-app-fill-secondary px-3 border-(--color-primary-light-3) bg-(--color-primary-light-1) text-(--color-primary-6)"
+            onClick={onNew}
+          >
+            <span className="truncate font-medium">新会话</span>
+            <span className="truncate text-[12px] text-app-text-tertiary">尚未提问</span>
           </button>
         ) : null}
         {loading ? (
-          <div className={styles.state}>
+          <div className="flex min-h-20 flex-col items-center justify-center gap-2">
             <Spin size={18} />
           </div>
         ) : error ? (
-          <div className={styles.state} />
+          <div className="flex min-h-20 flex-col items-center justify-center gap-2" />
         ) : sessions?.length ? (
           sessions.map((session) => (
             <div key={session.id} className={styles.row}>
               <button
                 type="button"
-                className={clsx(styles.item, session.id === activeSessionId && styles.itemActive)}
+                className={clsx(
+                  "flex w-full shrink-0 cursor-pointer flex-col gap-1 overflow-hidden! rounded-md border border-solid py-2.5 text-left hover:bg-app-fill-secondary pr-12 pl-3",
+                  session.id === activeSessionId
+                    ? "border-(--color-primary-light-3) bg-(--color-primary-light-1) text-(--color-primary-6)"
+                    : "border-transparent bg-transparent text-app-text-secondary",
+                )}
                 onClick={() => onSelect(session.id)}
               >
-                <span className={styles.title}>{session.last_query || "新会话"}</span>
-                <span className={styles.meta}>
+                <span className="truncate font-medium">{session.last_query || "新会话"}</span>
+                <span className="truncate text-[12px] text-app-text-tertiary">
                   {session.message_count ?? 0} 条消息 ·{" "}
                   {formatDateTime(session.last_active_at || session.created_at)}
                 </span>

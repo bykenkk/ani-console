@@ -1,14 +1,5 @@
-.form {
-  display: flex;
-  flex-direction: column;
-}
-
 .steps {
   width: min(100%, 640px);
   flex: 0 0 auto;
   margin-inline: auto;
-}
-
-.content {
-  padding-top: 28px;
 }

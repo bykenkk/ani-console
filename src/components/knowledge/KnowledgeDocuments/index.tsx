@@ -198,7 +198,7 @@ export default function KnowledgeDocuments({ kbId, action }: { kbId: string; act
       render: (_, item) => {
         const metadata = metadataEntries(item.custom_metadata);
         return metadata.length ? (
-          <div className={styles.metadataCell}>
+          <div className="flex max-w-60 flex-wrap items-center gap-1">
             {metadata.map(([key, value]) => (
               <Tag key={key} className={styles.metadataTag}>
                 {key}：{value}

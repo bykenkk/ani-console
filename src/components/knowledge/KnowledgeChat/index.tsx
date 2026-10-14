@@ -14,7 +14,6 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import KnowledgeCitationsDrawer from "./KnowledgeCitationsDrawer";
 import KnowledgeConversation from "./KnowledgeConversation";
 import KnowledgeSessionsSidebar from "./KnowledgeSessionsSidebar";
-import styles from "./index.module.css";
 import { toThreadMessage, type QueryMode } from "./knowledgeQueryAdapter";
 
 export default function KnowledgeChat({
@@ -133,8 +132,8 @@ export default function KnowledgeChat({
 
   return (
     <>
-      <div className={styles.panel}>
-        <div className={styles.chatWorkspace}>
+      <div className="flex h-full min-h-0 w-full min-w-0 flex-col gap-3 overflow-hidden [@media(max-width:1024px)]:h-155">
+        <div className="flex min-h-0 min-w-0 flex-auto overflow-hidden rounded-lg border border-solid border-app-border-strong bg-app-surface">
           <KnowledgeSessionsSidebar
             sessions={sessions.data}
             loading={sessions.isLoading}
@@ -149,13 +148,13 @@ export default function KnowledgeChat({
             onDelete={(session) => deleteSession.mutateAsync(session)}
             onViewCitations={() => setCitationsVisible(true)}
           />
-          <div className={styles.conversationArea}>
+          <div className="flex min-h-0 min-w-0 flex-auto flex-col overflow-hidden">
             {activeSessionId && messages.isLoading ? (
-              <div className={styles.conversationState}>
+              <div className="flex min-h-80 flex-auto flex-col items-center justify-center gap-3 p-6">
                 <Spin />
               </div>
             ) : activeSessionId && messages.error ? (
-              <div className={styles.conversationState} />
+              <div className="flex min-h-80 flex-auto flex-col items-center justify-center gap-3 p-6" />
             ) : (
               <KnowledgeConversation
                 key={sessionKey}

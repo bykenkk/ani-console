@@ -122,34 +122,40 @@ export default function TrendCard({
 
   return (
     <section className={clsx(styles.panel, styles.trendPanel)}>
-      <header className={styles.panelHeader}>
-        <h2>{config.title}</h2>
+      <header className="flex flex-none items-center justify-between">
+        <h2 className="m-0! text-[16px]! leading-6 font-bold text-(--home-text)">{config.title}</h2>
         <PeriodSwitch value={range} onChange={setRange} ariaLabel={`${config.title}时间范围`} />
       </header>
       {trendQuery.isLoading ? (
-        <div className={styles.trendState} role="status">
+        <div
+          className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-4 text-(--home-text-secondary)"
+          role="status"
+        >
           <Spin />
           <span>正在加载趋势数据...</span>
         </div>
       ) : trendQuery.isError ? (
-        <div className={styles.trendState} />
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-4 text-(--home-text-secondary)" />
       ) : !hasData ? (
-        <div className={styles.trendState}>
+        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-4 text-(--home-text-secondary)">
           <Empty description="暂无数据" />
         </div>
       ) : (
         <>
-          <div className={styles.trendHeadlines}>
+          <div className="flex flex-[0_0_42px] items-center gap-7 px-4 py-0">
             {current.headlines.map((headline) => (
-              <div key={headline.label} className={styles.trendHeadline}>
-                <span className={styles.legendDot} style={{ background: headline.color }} />
-                <span className={styles.trendHeadlineLabel}>{headline.label}</span>
-                <strong>{headline.value}</strong>
-                <span className={styles.trendHeadlineUnit}>{headline.unit}</span>
+              <div key={headline.label} className="flex items-baseline gap-2 whitespace-nowrap">
+                <span
+                  className="size-2 flex-none self-center rounded-[50%]"
+                  style={{ background: headline.color }}
+                />
+                <span className="text-(--home-text-secondary)">{headline.label}</span>
+                <strong className="text-[24px] leading-8 font-semibold!">{headline.value}</strong>
+                <span className="-ml-1.5 text-(--home-text-secondary)">{headline.unit}</span>
               </div>
             ))}
           </div>
-          <div className={styles.trendChart}>
+          <div className="min-h-0 flex-1">
             <CoreLineBarChart option={option} style={{ width: "100%", height: "100%" }} />
           </div>
         </>
