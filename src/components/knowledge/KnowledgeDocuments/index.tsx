@@ -108,7 +108,7 @@ export default function KnowledgeDocuments({ kbId, action }: { kbId: string; act
         channel: "notification",
         id: "knowledge-document-reparse",
         action: "重新解析文档",
-        successText: "已提交重新解析",
+        successText: "重新解析已提交",
         errorFallback: "重新解析文档失败",
       },
     },

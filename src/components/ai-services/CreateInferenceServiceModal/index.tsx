@@ -258,7 +258,7 @@ export default function CreateInferenceServiceModal({
       feedback: {
         channel: "message",
         action: "创建",
-        successText: "推理服务部署请求已提交",
+        successText: "推理服务部署已提交",
         errorFallback: "请求失败",
       },
     },

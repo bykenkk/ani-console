@@ -33,7 +33,7 @@ export default function CreateVpcModal({
       feedback: {
         channel: "message",
         action: "提交创建",
-        successText: "创建请求已受理，请查看 VPC 状态",
+        successText: "VPC 创建已提交",
         errorFallback: "请求失败",
       },
     },

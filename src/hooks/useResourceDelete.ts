@@ -154,7 +154,7 @@ const resourceDeletion = {
       channel: "notification",
       id: "inference-delete",
       action: "删除",
-      successText: "删除操作已提交",
+      successText: "删除已提交",
       errorFallback: "请求失败",
     },
     title: "删除推理服务",
