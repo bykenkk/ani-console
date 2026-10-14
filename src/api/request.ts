@@ -10,8 +10,7 @@ import { isDevelopmentAuthBypassActive, useAuthStore } from "@/stores/auth";
 
 export const CORE_API_BASE = "/api/v1";
 export const SERVICES_API_BASE = "/api/v1/svc";
-// FIXME: 后端当前路径为 /admin/v1，迁移后改为 /api/v1/admin。
-export const ADMIN_API_BASE = "/admin/v1";
+export const ADMIN_API_BASE = "/api/v1/admin";
 
 export type ApiAuthMode = "required" | "public";
 
@@ -278,7 +277,7 @@ export function servicesRequest<TResponse, TBody = never>(
   return request<TResponse, TBody>(servicesAxios, url, options);
 }
 
-/** Governance tenant endpoints that retain the /admin/v1 transport prefix. */
+/** Governance tenant management endpoints under /api/v1/admin. */
 export function adminRequest<TResponse, TBody = never>(
   url: string,
   options: ApiRequestOptions<TBody>,

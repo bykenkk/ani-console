@@ -1,4 +1,4 @@
-import { adminRequest, coreRequest } from "@/api/request";
+import { coreRequest } from "@/api/request";
 import type {
   VerifyLoginMfaInput,
   VerifyLoginMfaRequest,
@@ -15,7 +15,7 @@ export function verifyLoginMfa(
   input: VerifyLoginMfaInput,
   signal?: AbortSignal,
 ): Promise<PasswordLoginResponse> {
-  return adminRequest<PasswordLoginResponse, VerifyLoginMfaRequest>("/mfa/verify", {
+  return coreRequest<PasswordLoginResponse, VerifyLoginMfaRequest>("/auth/mfa/verify", {
     method: "POST",
     auth: "public",
     data: input,

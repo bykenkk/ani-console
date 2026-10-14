@@ -1,5 +1,5 @@
 import { runIdempotentRequest } from "@/api/idempotency";
-import { adminRequest } from "@/api/request";
+import { coreRequest } from "@/api/request";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
   ModelDevPageParams,
@@ -22,21 +22,21 @@ export function listModelDevExecutions(
   params: ModelDevPageParams = {},
   signal?: AbortSignal,
 ): Promise<ModelDevExecutionListResponse> {
-  return adminRequest<ModelDevExecutionListResponse>("/modeldev/executions", {
+  return coreRequest<ModelDevExecutionListResponse>("/modeldev/executions", {
     method: "GET",
     params,
     signal,
   });
 }
 export function getModelDevExecution(id: string, signal?: AbortSignal): Promise<ModelDevExecution> {
-  return adminRequest<ModelDevExecution>(executionPath(id), { method: "GET", signal });
+  return coreRequest<ModelDevExecution>(executionPath(id), { method: "GET", signal });
 }
 export function createModelDevExecution(
   input: CreateModelDevExecutionInput,
   signal?: AbortSignal,
 ): Promise<ModelDevExecutionAcceptance> {
   return runIdempotentRequest(createScope, input, (data: CreateModelDevExecutionRequest) =>
-    adminRequest<ModelDevExecutionAcceptance, CreateModelDevExecutionRequest>(
+    coreRequest<ModelDevExecutionAcceptance, CreateModelDevExecutionRequest>(
       "/modeldev/executions",
       { method: "POST", data, signal },
     ),
@@ -47,7 +47,7 @@ export function stopModelDevExecution(
   id: string,
   signal?: AbortSignal,
 ): Promise<ModelDevStopAcceptance> {
-  return adminRequest<ModelDevStopAcceptance>(`${executionPath(id)}:stop`, {
+  return coreRequest<ModelDevStopAcceptance>(`${executionPath(id)}:stop`, {
     method: "POST",
     signal,
   });
@@ -58,7 +58,7 @@ export function getModelDevExecutionLogs(
   params: ModelDevLogParams = {},
   signal?: AbortSignal,
 ): Promise<ModelDevExecutionLogs> {
-  return adminRequest<ModelDevExecutionLogs>(`${executionPath(id)}/logs`, {
+  return coreRequest<ModelDevExecutionLogs>(`${executionPath(id)}/logs`, {
     method: "GET",
     params,
     signal,
@@ -69,7 +69,7 @@ export function listModelDevExecutionArtifacts(
   params: ModelDevPageParams = {},
   signal?: AbortSignal,
 ): Promise<ModelDevArtifactListResponse> {
-  return adminRequest<ModelDevArtifactListResponse>(`${executionPath(id)}/artifacts`, {
+  return coreRequest<ModelDevArtifactListResponse>(`${executionPath(id)}/artifacts`, {
     method: "GET",
     params,
     signal,
@@ -80,7 +80,7 @@ export function authorizeModelDevArtifactDownload(
   id: string,
   signal?: AbortSignal,
 ): Promise<ModelDevArtifactDownload> {
-  return adminRequest<ModelDevArtifactDownload>(
+  return coreRequest<ModelDevArtifactDownload>(
     `/modeldev/artifacts/${encodeURIComponent(id)}/content`,
     { method: "GET", signal },
   );
