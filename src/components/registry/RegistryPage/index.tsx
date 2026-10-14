@@ -208,7 +208,7 @@ export default function RegistryPage() {
               <Button onClick={() => setManage(true)}>空间与凭证</Button>
               <Button
                 type="primary"
-                disabled={scope !== "tenant" || space.data?.state !== "available"}
+                disabled={space.data?.state !== "available"}
                 onClick={() => setRegister(true)}
               >
                 登记镜像
