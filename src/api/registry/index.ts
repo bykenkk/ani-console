@@ -1,4 +1,5 @@
 import { coreRequest } from "@/api/request";
+import type { CursorPageParams } from "@/api/types";
 import type {
   RegistryImageListParams,
   RegistryImageListResponse,
@@ -12,7 +13,7 @@ import type {
 const projectPath = (project: string) => `/registry/projects/${encodeURIComponent(project)}`;
 
 export function listRegistryProjects(
-  params: { limit?: number; cursor?: string } = {},
+  params: CursorPageParams = {},
 ): Promise<RegistryProjectListResponse> {
   return coreRequest<RegistryProjectListResponse>("/registry/projects", {
     method: "GET",
@@ -28,7 +29,7 @@ export function listRegistryImages(
 
 export function listRegistryRepositories(
   project: string,
-  params: { limit?: number; cursor?: string } = {},
+  params: CursorPageParams = {},
 ): Promise<RegistryRepositoryListResponse> {
   return coreRequest<RegistryRepositoryListResponse>(`${projectPath(project)}/repositories`, {
     method: "GET",
@@ -39,7 +40,7 @@ export function listRegistryRepositories(
 export function listRegistryArtifacts(
   project: string,
   repository: string,
-  params: { limit?: number; cursor?: string } = {},
+  params: CursorPageParams = {},
 ): Promise<RegistryArtifactListResponse> {
   return coreRequest<RegistryArtifactListResponse>(
     `${projectPath(project)}/repositories/${encodeURIComponent(repository)}/artifacts`,

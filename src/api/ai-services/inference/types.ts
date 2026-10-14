@@ -1,3 +1,5 @@
+import type { CursorPageParams } from "@/api/types";
+
 export interface InferenceServiceAccelerator {
   spec_id: string;
   count_per_replica: number;
@@ -43,9 +45,7 @@ export interface InferenceService {
   updated_at?: string | null;
 }
 
-export interface InferenceServiceListParams {
-  limit?: number;
-  cursor?: string;
+export interface InferenceServiceListParams extends CursorPageParams {
   capability?: "embedding" | "text-generation" | "speech-to-text";
   status?: string;
   model?: string;
@@ -114,9 +114,7 @@ export interface InferenceServiceLog {
   stream?: string | null;
 }
 
-export interface InferenceServiceLogListParams {
-  limit?: number;
-  cursor?: string;
+export interface InferenceServiceLogListParams extends CursorPageParams {
   level?: "debug" | "info" | "warn" | "error";
 }
 

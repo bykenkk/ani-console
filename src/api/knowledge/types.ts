@@ -1,3 +1,5 @@
+import type { CursorPageParams } from "@/api/types";
+
 export interface KnowledgeBase {
   id: string;
   tenant_id?: string;
@@ -14,9 +16,7 @@ export interface KnowledgeBase {
   updated_at?: string | null;
 }
 
-export interface KnowledgeBaseListParams {
-  limit?: number;
-  cursor?: string;
+export interface KnowledgeBaseListParams extends CursorPageParams {
   status?: string;
   name?: string;
   id?: string;
@@ -38,11 +38,6 @@ export interface KBAuditLog {
   error_code?: string | null;
   error_msg?: string | null;
   created_at: string;
-}
-
-export interface KBAuditLogListParams {
-  limit?: number;
-  cursor?: string;
 }
 
 export interface KBAuditLogListResponse {
@@ -79,9 +74,7 @@ export interface KBDocument {
   parsed_at?: string | null;
 }
 
-export interface KBDocumentListParams {
-  limit?: number;
-  cursor?: string;
+export interface KBDocumentListParams extends CursorPageParams {
   parse_status?: string;
 }
 
@@ -141,9 +134,7 @@ export interface KBChunk {
   created_at: string;
 }
 
-export interface KBChunkListParams {
-  limit?: number;
-  cursor?: string;
+export interface KBChunkListParams extends CursorPageParams {
   chunk_type?: "child" | "parent" | "doc_summary";
 }
 

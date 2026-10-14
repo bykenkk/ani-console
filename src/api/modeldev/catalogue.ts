@@ -1,6 +1,6 @@
 import { coreRequest } from "@/api/request";
+import type { CursorPageParams } from "@/api/types";
 import type {
-  ModelDevPageParams,
   ModelDevPresetListResponse,
   ModelDevInputVersionListParams,
   ModelDevInputVersionListResponse,
@@ -8,7 +8,7 @@ import type {
 } from "./types";
 
 export function listModelDevPresets(
-  params: ModelDevPageParams = {},
+  params: CursorPageParams = {},
   signal?: AbortSignal,
 ): Promise<ModelDevPresetListResponse> {
   return coreRequest<ModelDevPresetListResponse>("/modeldev/presets", {

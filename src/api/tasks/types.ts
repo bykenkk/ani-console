@@ -1,3 +1,5 @@
+import type { CursorPageParams } from "@/api/types";
+
 export type AsyncTaskStatus =
   | "pending"
   | "running"
@@ -23,9 +25,7 @@ export interface AsyncTask {
   completed_at?: string | null;
 }
 
-export interface TaskListParams {
-  limit?: number;
-  cursor?: string;
+export interface TaskListParams extends CursorPageParams {
   status?: AsyncTaskStatus;
   task_type?: string;
   resource_type?: string;

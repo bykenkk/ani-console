@@ -4,7 +4,7 @@ import type { QueryErrorNotificationMeta } from "@/vite-env";
 import type { ListPagination } from "@/components/common/DataTable";
 import { useListPagination } from "./useListPagination";
 
-export type CursorPage<T> = { items: T[]; total?: number; next_cursor?: string | null };
+export type CursorPage<T> = { items: T[]; total?: number | string; next_cursor?: string | null };
 type UseCursorPaginatedQueryOptions<T> = {
   queryKey: readonly unknown[];
   queryFn: (input: { cursor?: string; limit: number }) => Promise<CursorPage<T>>;
@@ -51,7 +51,6 @@ export function useCursorPaginatedQuery<T>({
     mode: "cursor",
     page,
     pageSize,
-    // FIXME: 核对各列表 total 契约后，按当前偏移量和 total 判断下一页，移除对 next_cursor 的依赖。
     hasNextPage: Boolean(query.data?.next_cursor),
     disabled: query.isFetching,
     onPageChange: setPage,

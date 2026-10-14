@@ -1,7 +1,5 @@
-export interface ModelDevPageParams {
-  page_size?: number;
-  page_token?: string;
-}
+import type { CursorPageParams } from "@/api/types";
+
 export interface ModelDevParameter {
   name: string;
   type: string;
@@ -27,8 +25,9 @@ export interface ModelDevPreset {
   new_submissions_enabled?: boolean;
 }
 export interface ModelDevPresetListResponse {
-  presets: ModelDevPreset[];
-  next_page_token?: string;
+  items: ModelDevPreset[];
+  total: string;
+  next_cursor?: string | null;
 }
 export interface ModelDevInputVersion {
   input_version_id: string;
@@ -40,12 +39,13 @@ export interface ModelDevInputVersion {
   feature_count?: number;
   created_at?: string;
 }
-export interface ModelDevInputVersionListParams extends ModelDevPageParams {
+export interface ModelDevInputVersionListParams extends CursorPageParams {
   state?: string;
 }
 export interface ModelDevInputVersionListResponse {
-  input_versions: ModelDevInputVersion[];
-  next_page_token?: string;
+  items: ModelDevInputVersion[];
+  total: string;
+  next_cursor?: string | null;
 }
 export interface CreateModelDevExecutionInput {
   name: string;
@@ -89,8 +89,9 @@ export interface ModelDevExecution extends ModelDevExecutionStates {
   observed_at?: string;
 }
 export interface ModelDevExecutionListResponse {
-  executions: ModelDevExecution[];
-  next_page_token?: string;
+  items: ModelDevExecution[];
+  total: string;
+  next_cursor?: string | null;
 }
 export interface ModelDevStopAcceptance {
   operation_id: string;
@@ -120,8 +121,9 @@ export interface ModelDevArtifact {
   verified_at?: string;
 }
 export interface ModelDevArtifactListResponse {
-  artifacts: ModelDevArtifact[];
-  next_page_token?: string;
+  items: ModelDevArtifact[];
+  total: string;
+  next_cursor?: string | null;
 }
 export interface ModelDevArtifactDownload {
   artifact: ModelDevArtifact;

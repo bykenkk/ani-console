@@ -1,8 +1,8 @@
 import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
+import type { CursorPageParams } from "@/api/types";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
-  ModelDevPageParams,
   ModelDevExecutionListResponse,
   ModelDevExecution,
   CreateModelDevExecutionInput,
@@ -19,7 +19,7 @@ const createScope = createIdempotencyScope("modeldev-execution-create", ["POST"]
 const executionPath = (id: string) => `/modeldev/executions/${encodeURIComponent(id)}`;
 
 export function listModelDevExecutions(
-  params: ModelDevPageParams = {},
+  params: CursorPageParams = {},
   signal?: AbortSignal,
 ): Promise<ModelDevExecutionListResponse> {
   return coreRequest<ModelDevExecutionListResponse>("/modeldev/executions", {
@@ -66,7 +66,7 @@ export function getModelDevExecutionLogs(
 }
 export function listModelDevExecutionArtifacts(
   id: string,
-  params: ModelDevPageParams = {},
+  params: CursorPageParams = {},
   signal?: AbortSignal,
 ): Promise<ModelDevArtifactListResponse> {
   return coreRequest<ModelDevArtifactListResponse>(`${executionPath(id)}/artifacts`, {

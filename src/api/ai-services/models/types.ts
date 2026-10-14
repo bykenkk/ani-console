@@ -1,3 +1,5 @@
+import type { CursorPageParams } from "@/api/types";
+
 export type ModelSource = "upload" | "huggingface" | "modelscope" | "builtin";
 export type ModelStatus = "pending" | "downloading" | "ready" | "error" | "deleted";
 
@@ -27,13 +29,11 @@ export interface Model {
   versions?: ModelVersion[];
 }
 
-export interface ModelListParams {
+export interface ModelListParams extends CursorPageParams {
   keyword?: string;
   source?: ModelSource;
   capability?: "text-generation" | "embedding" | "speech-to-text";
   status?: ModelStatus;
-  limit?: number;
-  cursor?: string;
 }
 
 export interface ModelListResponse {

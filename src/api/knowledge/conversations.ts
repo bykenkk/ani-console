@@ -1,5 +1,6 @@
 import { runIdempotentRequest } from "@/api/idempotency";
 import { servicesRequest } from "@/api/request";
+import type { CursorPageParams } from "@/api/types";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
   KBCitationListResponse,
@@ -54,7 +55,7 @@ export function streamKnowledgeBaseQuery(
 
 export function listKnowledgeBaseCitations(
   kbId: string,
-  params: { limit?: number; cursor?: string } = {},
+  params: CursorPageParams = {},
 ): Promise<KBCitationListResponse> {
   return servicesRequest<KBCitationListResponse>(`${knowledgeBasePath(kbId)}/citations`, {
     method: "GET",
@@ -64,7 +65,7 @@ export function listKnowledgeBaseCitations(
 
 export function listKnowledgeBaseSessions(
   kbId: string,
-  params: { limit?: number; cursor?: string } = {},
+  params: CursorPageParams = {},
 ): Promise<KBSessionListResponse> {
   return servicesRequest<KBSessionListResponse>(`${knowledgeBasePath(kbId)}/sessions`, {
     method: "GET",
@@ -75,7 +76,7 @@ export function listKnowledgeBaseSessions(
 export function listKnowledgeBaseSessionMessages(
   kbId: string,
   sessionId: string,
-  params: { limit?: number; cursor?: string } = {},
+  params: CursorPageParams = {},
 ): Promise<KBSessionMessageListResponse> {
   return servicesRequest<KBSessionMessageListResponse>(`${sessionPath(kbId, sessionId)}/messages`, {
     method: "GET",

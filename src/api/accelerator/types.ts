@@ -1,4 +1,4 @@
-/** Tenant-only Accelerator views. All int64/uint64 values remain decimal strings. */
+/** FIXME(backend): 后端明确将 Accelerator 分页迁移至 limit/cursor 后，移除此类型并改用 CursorPageParams，同步 next_page_token 响应字段；当前保留 page_size/page_token，不伪造 total。 */
 export interface AcceleratorPageParams {
   page_size?: number;
   page_token?: string;
