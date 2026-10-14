@@ -42,7 +42,7 @@ export default function CreateVectorStoreModal({
   }, [embeddingModel, modelOptions]);
 
   const create = useMutation({
-    meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
+    meta: { feedback: { channel: "message", action: "创建向量存储", errorFallback: "请求失败" } },
     mutationFn: async (_: undefined) => {
       const trimmedName = name.trim();
       if (!trimmedName) throw new Error("请输入向量存储名称");

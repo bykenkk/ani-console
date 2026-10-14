@@ -41,7 +41,14 @@ export default function AttachVolumeModal({
   }, [instanceId, instanceItems]);
 
   const attach = useMutation({
-    meta: { feedback: { channel: "message", action: "挂载", errorFallback: "请求失败" } },
+    meta: {
+      feedback: {
+        channel: "message",
+        action: "挂载云盘",
+        successText: "挂载云盘已提交",
+        errorFallback: "请求失败",
+      },
+    },
     mutationFn: () => {
       if (!instanceItems.some((item) => item.id === instanceId))
         throw new Error("请选择与卷用途匹配的挂载实例");

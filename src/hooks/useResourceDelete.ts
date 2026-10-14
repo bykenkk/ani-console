@@ -34,7 +34,8 @@ const resourceDeletion = {
     feedback: {
       channel: "notification",
       id: "vpc-delete",
-      action: "删除",
+      action: "删除 VPC",
+      successText: "删除 VPC 已提交",
       errorFallback: "请求失败",
     },
     title: "删除 VPC",
@@ -47,7 +48,8 @@ const resourceDeletion = {
     feedback: {
       channel: "notification",
       id: "subnet-delete",
-      action: "删除",
+      action: "删除子网",
+      successText: "删除子网已提交",
       errorFallback: "请求失败",
     },
     title: "删除子网",
@@ -60,7 +62,7 @@ const resourceDeletion = {
     feedback: {
       channel: "notification",
       id: "security-group-delete",
-      action: "删除",
+      action: "删除安全组",
       errorFallback: "请求失败",
     },
     title: "删除安全组",
@@ -73,7 +75,7 @@ const resourceDeletion = {
     feedback: {
       channel: "notification",
       id: "route-delete",
-      action: "删除",
+      action: "删除路由",
       errorFallback: "请求失败",
     },
     title: "删除路由",
@@ -101,7 +103,7 @@ const resourceDeletion = {
     feedback: {
       channel: "notification",
       id: "volume-delete",
-      action: "删除",
+      action: "删除块存储卷",
       errorFallback: "请求失败",
     },
     title: "删除块存储卷",
@@ -114,7 +116,7 @@ const resourceDeletion = {
     feedback: {
       channel: "notification",
       id: "filesystem-delete",
-      action: "删除",
+      action: "删除文件存储",
       errorFallback: "请求失败",
     },
     title: "删除文件存储",
@@ -127,7 +129,7 @@ const resourceDeletion = {
     feedback: {
       channel: "notification",
       id: "vector-store-delete",
-      action: "删除",
+      action: "删除向量存储",
       errorFallback: "请求失败",
     },
     title: "删除向量存储",
@@ -153,8 +155,8 @@ const resourceDeletion = {
     feedback: {
       channel: "notification",
       id: "inference-delete",
-      action: "删除",
-      successText: "删除已提交",
+      action: "删除推理服务",
+      successText: "删除推理服务已提交",
       errorFallback: "请求失败",
     },
     title: "删除推理服务",
@@ -180,7 +182,7 @@ const resourceDeletion = {
     feedback: {
       channel: "notification",
       id: "k8s-cluster-delete",
-      action: "删除",
+      action: "删除集群",
       errorFallback: "请求失败",
     },
     title: "删除集群",

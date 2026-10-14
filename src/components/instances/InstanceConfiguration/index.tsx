@@ -49,7 +49,7 @@ export default function InstanceConfiguration({
       feedback: {
         channel: "notification",
         id: "secret-unbind",
-        action: "操作",
+        action: "密钥解绑",
         successText: "密钥解绑已提交",
         errorFallback: "操作失败，请稍后重试",
       },

@@ -46,7 +46,7 @@ export function useGpuInstanceActions(onChanged: () => void, onDeleted?: () => v
       feedback: {
         channel: "notification",
         id: "gpu-container-start",
-        action: "操作",
+        action: "启动",
         successText: "启动已提交",
         errorFallback: "操作失败，请稍后重试",
       },
@@ -59,7 +59,7 @@ export function useGpuInstanceActions(onChanged: () => void, onDeleted?: () => v
       feedback: {
         channel: "notification",
         id: "gpu-container-restart",
-        action: "操作",
+        action: "重启",
         successText: "重启已提交",
         errorFallback: "操作失败，请稍后重试",
       },
@@ -72,7 +72,7 @@ export function useGpuInstanceActions(onChanged: () => void, onDeleted?: () => v
       feedback: {
         channel: "notification",
         id: "gpu-container-protection",
-        action: "操作",
+        action: "更新终止保护",
         successText: "终止保护已更新",
         errorFallback: "操作失败，请稍后重试",
       },

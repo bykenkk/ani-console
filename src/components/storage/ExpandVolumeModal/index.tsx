@@ -15,7 +15,7 @@ export default function ExpandVolumeModal({
   const qc = useQueryClient();
   const [sizeGiB, setSizeGiB] = useState(volume.size_gib + 1);
   const expand = useMutation({
-    meta: { feedback: { channel: "message", action: "扩容", errorFallback: "请求失败" } },
+    meta: { feedback: { channel: "message", action: "扩容块存储卷", errorFallback: "请求失败" } },
     mutationFn: async (_: undefined) => {
       if (!volume) throw new Error("块存储卷不存在");
       if (!Number.isInteger(sizeGiB) || sizeGiB <= volume.size_gib)

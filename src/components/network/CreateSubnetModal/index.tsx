@@ -63,7 +63,8 @@ export default function CreateSubnetModal({
     meta: {
       feedback: {
         channel: "message",
-        action: "创建",
+        action: "创建子网",
+        successText: "子网创建已提交",
         errorFallback: "请求失败",
       },
     },

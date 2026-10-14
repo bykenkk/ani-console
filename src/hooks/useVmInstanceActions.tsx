@@ -46,7 +46,7 @@ export function useVmInstanceActions(
       feedback: {
         channel: "notification",
         id: "vm-start",
-        action: "操作",
+        action: "开机",
         successText: "开机已提交",
         errorFallback: "操作失败，请稍后重试",
       },
@@ -62,7 +62,7 @@ export function useVmInstanceActions(
       feedback: {
         channel: "notification",
         id: "vm-restart",
-        action: "操作",
+        action: "重启",
         successText: "重启已提交",
         errorFallback: "操作失败，请稍后重试",
       },
@@ -78,7 +78,7 @@ export function useVmInstanceActions(
       feedback: {
         channel: "notification",
         id: "vm-protection",
-        action: "操作",
+        action: "更新终止保护",
         successText: "终止保护已更新",
         errorFallback: "操作失败，请稍后重试",
       },
@@ -97,7 +97,7 @@ export function useVmInstanceActions(
       feedback: {
         channel: "notification",
         id: "vm-delete",
-        action: "操作",
+        action: "删除",
         successText: "删除已提交",
         errorFallback: "操作失败，请稍后重试",
       },

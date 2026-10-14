@@ -52,7 +52,14 @@ export default function CreateFilesystemMountTargetModal({
   }, [subnets.data?.items, subnetId]);
 
   const create = useMutation({
-    meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
+    meta: {
+      feedback: {
+        channel: "message",
+        action: "创建挂载点",
+        successText: "挂载点创建已提交",
+        errorFallback: "请求失败",
+      },
+    },
     mutationFn: async (_: undefined) => {
       if (!vpcId) throw new Error("请选择 VPC");
       if (!subnetId) throw new Error("请选择子网");

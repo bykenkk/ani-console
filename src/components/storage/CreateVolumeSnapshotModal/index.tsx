@@ -13,7 +13,14 @@ export default function CreateVolumeSnapshotModal({
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const create = useMutation({
-    meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
+    meta: {
+      feedback: {
+        channel: "message",
+        action: "创建云盘快照",
+        successText: "云盘快照创建已提交",
+        errorFallback: "请求失败",
+      },
+    },
     mutationFn: async (_: undefined) => {
       const trimmedName = name.trim();
       if (!trimmedName) throw new Error("请输入快照名称");

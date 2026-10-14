@@ -36,7 +36,7 @@ export default function IssueImageCredentialModal({
         channel: "notification",
         id: reset ? "image-credential-reset" : "image-credential-issue",
         action: reset ? "重置发布凭证" : "签发发布凭证",
-        successText: "请保存本次发布凭证",
+        successDescription: "请保存本次发布凭证",
         errorFallback: "操作失败",
       },
     },

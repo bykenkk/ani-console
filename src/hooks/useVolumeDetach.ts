@@ -14,7 +14,8 @@ export function useVolumeDetach() {
       feedback: {
         channel: "notification",
         id: "volume-detach",
-        action: "卸载",
+        action: "卸载云盘",
+        successText: "卸载云盘已提交",
         errorFallback: "请求失败",
       },
     },

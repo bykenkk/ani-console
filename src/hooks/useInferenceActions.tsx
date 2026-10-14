@@ -5,26 +5,27 @@ import type { RowAction } from "@/components/common";
 import { useResourceDelete } from "@/hooks/useResourceDelete";
 import InferenceScaleModal from "@/components/ai-services/InferenceScaleModal";
 
+type LifecycleVariables = { item: InferenceService; action: "start" | "stop" | "restart" };
+const lifecycleLabels = { start: "启动推理服务", stop: "停止推理服务", restart: "重启推理服务" };
+
 export function useInferenceActions(onDeleted?: () => void) {
   const qc = useQueryClient();
   const [scaleTarget, setScaleTarget] = useState<InferenceService>();
   const lifecycle = useMutation({
     meta: {
-      feedback: {
-        channel: "notification",
-        id: "inference-lifecycle",
-        action: "操作",
-        successText: "生命周期操作已提交",
-        errorFallback: "请求失败",
+      feedback: (variables) => {
+        const action = lifecycleLabels[(variables as LifecycleVariables).action];
+        return {
+          channel: "notification",
+          id: "inference-lifecycle",
+          action,
+          successText: `${action}已提交`,
+          errorFallback: `${action}失败`,
+        };
       },
     },
-    mutationFn: ({
-      item,
-      action,
-    }: {
-      item: InferenceService;
-      action: "start" | "stop" | "restart";
-    }) => applyInferenceServiceLifecycle(item.id, { action }),
+    mutationFn: ({ item, action }: LifecycleVariables) =>
+      applyInferenceServiceLifecycle(item.id, { action }),
     onSuccess: (_, { item }) =>
       Promise.all([
         qc.invalidateQueries({ queryKey: ["inference-service", item.id] }),

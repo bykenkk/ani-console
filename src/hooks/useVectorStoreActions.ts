@@ -14,8 +14,8 @@ export function useVectorStoreActions(onDeleted?: () => void) {
       feedback: {
         channel: "notification",
         id: "vector-index-rebuild",
-        action: "重建",
-        successText: "索引重建已提交",
+        action: "重建索引",
+        successText: "索引已重建",
         errorFallback: "请求失败",
       },
     },

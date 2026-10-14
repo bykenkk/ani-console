@@ -22,7 +22,12 @@ export type MutationFeedbackMeta =
   | (MutationFeedbackBase & {
       channel: "notification";
       id: string;
+      successDescription?: string;
     });
+
+export type MutationFeedback =
+  | MutationFeedbackMeta
+  | ((variables: unknown) => MutationFeedbackMeta);
 
 declare global {
   interface ImportMetaEnv {
@@ -40,7 +45,7 @@ declare module "@tanstack/react-query" {
       errorNotification?: QueryErrorNotificationMeta;
     };
     mutationMeta: {
-      feedback?: MutationFeedbackMeta;
+      feedback?: MutationFeedback;
     };
   }
 }

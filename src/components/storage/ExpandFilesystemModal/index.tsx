@@ -17,7 +17,7 @@ export default function ExpandFilesystemModal({
   const qc = useQueryClient();
   const [sizeGiB, setSizeGiB] = useState(filesystem.size_gib + 1);
   const expand = useMutation({
-    meta: { feedback: { channel: "message", action: "扩容", errorFallback: "请求失败" } },
+    meta: { feedback: { channel: "message", action: "扩容文件存储", errorFallback: "请求失败" } },
     mutationFn: async (_: undefined) => {
       if (!filesystem) throw new Error("文件存储不存在");
       if (!Number.isInteger(sizeGiB) || sizeGiB <= filesystem.size_gib) {

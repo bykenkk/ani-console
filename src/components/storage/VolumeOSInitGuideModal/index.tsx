@@ -25,7 +25,7 @@ export default function VolumeOSInitGuideModal({
     queryFn: () => getVolumeOSInitGuide(volumeId),
   });
   const complete = useMutation({
-    meta: { feedback: { channel: "message", action: "操作", errorFallback: "请求失败" } },
+    meta: { feedback: { channel: "message", action: "初始化确认", errorFallback: "请求失败" } },
     mutationFn: (_: undefined) => completeVolumeOSInit(volumeId, { mode: "done" }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["volume", volumeId] });

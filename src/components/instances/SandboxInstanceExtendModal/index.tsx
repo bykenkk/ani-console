@@ -22,7 +22,8 @@ export default function SandboxInstanceExtendModal({
     meta: {
       feedback: {
         channel: "message",
-        action: "操作",
+        action: "延长会话",
+        successText: "会话已延长",
         errorFallback: "操作失败，请稍后重试",
       },
     },

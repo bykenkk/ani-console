@@ -22,7 +22,7 @@ export default function InstanceVersions({
       feedback: {
         channel: "notification",
         id: "instance-release-rollback",
-        action: "操作",
+        action: "回滚",
         successText: "回滚已提交",
         errorFallback: "操作失败，请稍后重试",
       },

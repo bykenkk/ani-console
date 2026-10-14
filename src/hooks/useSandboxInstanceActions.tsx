@@ -8,6 +8,14 @@ import { useState } from "react";
 
 type Instance = InstanceRecord;
 type LifecycleAction = "pause" | "resume" | "extend" | "touch_idle" | "delete";
+type LifecycleVariables = { instance: Instance; action: LifecycleAction; duration?: string };
+const lifecycleLabels = {
+  pause: "暂停沙箱",
+  resume: "恢复沙箱",
+  extend: "延长会话",
+  touch_idle: "活跃续期",
+  delete: "销毁沙箱",
+};
 
 const TERMINAL_STATES = new Set(["expired", "deleted", "deleting"]);
 const BUSY_STATES = new Set<Instance["state"]>([
@@ -26,22 +34,20 @@ export function useSandboxInstanceActions(onChanged: () => void, onDeleted?: () 
   const [extendTarget, setExtendTarget] = useState<Instance>();
   const lifecycle = useMutation({
     meta: {
-      feedback: {
-        channel: "notification",
-        id: "sandbox-lifecycle",
-        action: "操作",
-        errorFallback: "操作失败，请稍后重试",
+      feedback: (variables) => {
+        const { action } = variables as LifecycleVariables;
+        const label = lifecycleLabels[action];
+        return {
+          channel: "notification",
+          id: "sandbox-lifecycle",
+          action: label,
+          successText:
+            action === "extend" || action === "touch_idle" ? `${label}成功` : `${label}已提交`,
+          errorFallback: `${label}失败，请稍后重试`,
+        };
       },
     },
-    mutationFn: async ({
-      instance,
-      action,
-      duration,
-    }: {
-      instance: Instance;
-      action: LifecycleAction;
-      duration?: string;
-    }) => {
+    mutationFn: async ({ instance, action, duration }: LifecycleVariables) => {
       await applyInstanceLifecycle(instance.id, { action, duration });
     },
     onSuccess: (_, { action }) => {

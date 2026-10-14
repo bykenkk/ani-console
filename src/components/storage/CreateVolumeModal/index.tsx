@@ -51,7 +51,14 @@ export default function CreateVolumeModal({
   }, [instanceItems, mountInstanceId]);
 
   const create = useMutation({
-    meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
+    meta: {
+      feedback: {
+        channel: "message",
+        action: "创建块存储卷",
+        successText: "块存储卷创建已提交",
+        errorFallback: "请求失败",
+      },
+    },
     mutationFn: async ({ name, sizeGiB }: { name: string; sizeGiB: number }) => {
       const trimmedName = name.trim();
       if (!trimmedName) throw new Error("请输入卷名称");

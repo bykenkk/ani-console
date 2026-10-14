@@ -1,5 +1,10 @@
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { closeNotification, showMessage, showNotification } from "@/lib/feedback";
+import type { MutationFeedback } from "@/vite-env";
+
+function resolveFeedback(feedback: MutationFeedback | undefined, variables: unknown) {
+  return typeof feedback === "function" ? feedback(variables) : feedback;
+}
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -20,7 +25,7 @@ export const queryClient = new QueryClient({
   }),
   mutationCache: new MutationCache({
     onMutate: (_variables, mutation) => {
-      const feedback = mutation.meta?.feedback;
+      const feedback = resolveFeedback(mutation.meta?.feedback, _variables);
       if (feedback?.channel !== "notification") return;
       showNotification({
         id: feedback.id,
@@ -29,7 +34,7 @@ export const queryClient = new QueryClient({
       });
     },
     onSuccess: (_data, _variables, _context, mutation) => {
-      const feedback = mutation.meta?.feedback;
+      const feedback = resolveFeedback(mutation.meta?.feedback, _variables);
       if (!feedback) return;
       if (feedback.channel === "message") {
         showMessage({
@@ -42,11 +47,12 @@ export const queryClient = new QueryClient({
         id: feedback.id,
         state: "success",
         action: feedback.action,
-        content: feedback.successText,
+        title: feedback.successText,
+        content: feedback.successDescription,
       });
     },
     onError: (error, _variables, _context, mutation) => {
-      const feedback = mutation.meta?.feedback;
+      const feedback = resolveFeedback(mutation.meta?.feedback, _variables);
       if (!feedback) return;
       const content = {
         error,
