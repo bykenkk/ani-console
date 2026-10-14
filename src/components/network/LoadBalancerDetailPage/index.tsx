@@ -24,7 +24,6 @@ import {
 import { formatDateTime } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
 import { loadBalancerLabel } from "@/lib/load-balancers";
-import LoadBalancerOperation from "./LoadBalancerOperation";
 import LoadBalancerBackends from "./LoadBalancerBackends";
 import LoadBalancerEvents from "./LoadBalancerEvents";
 import LoadBalancerListeners from "./LoadBalancerListeners";
@@ -54,10 +53,6 @@ export default function LoadBalancerDetailPage({
     },
     queryKey: ["network-load-balancer", loadBalancerId],
     queryFn: ({ signal }) => getNetworkLoadBalancer(loadBalancerId, signal),
-    refetchInterval: (query) =>
-      query.state.error || !query.state.data || query.state.data.state === "deleted"
-        ? false
-        : 10000,
   });
   const vpc = useQuery({
     meta: {
@@ -123,16 +118,6 @@ export default function LoadBalancerDetailPage({
       actions={<ResourceActionMenu record={item} actions={actions} />}
       cards={[
         {
-          key: "operation",
-          title: "最近操作",
-          fields: [
-            {
-              label: "操作进度",
-              value: <LoadBalancerOperation operationId={item.last_operation_id} />,
-            },
-          ],
-        },
-        {
           key: "basic",
           title: "基本信息",
           fields: [
@@ -153,18 +138,10 @@ export default function LoadBalancerDetailPage({
             { label: "配置状态", value: loadBalancerLabel(item.configuration_state) },
             { label: "流量健康", value: loadBalancerLabel(item.data_plane_state) },
             {
-              label: "期望版本 / 已应用版本",
-              value: (item.desired_version ?? "-") + " / " + (item.applied_version ?? "-"),
-            },
-            { label: "观测时间", value: item.observed_at ? formatDateTime(item.observed_at) : "-" },
-            {
-              label: "观测数据",
-              value:
-                item.observation_stale === undefined
-                  ? "-"
-                  : item.observation_stale
-                    ? "已过期"
-                    : "有效",
+              label: "流量观测时间",
+              value: item.data_plane_observed_at
+                ? formatDateTime(item.data_plane_observed_at)
+                : "-",
             },
             { label: "创建时间", value: formatDateTime(item.created_at) },
             { label: "更新时间", value: formatDateTime(item.updated_at) },
@@ -187,12 +164,12 @@ export default function LoadBalancerDetailPage({
         {
           key: "listeners",
           label: "监听器",
-          content: <LoadBalancerListeners listener={item.listener} />,
+          content: <LoadBalancerListeners item={item} />,
         },
         {
           key: "backends",
           label: "后端组",
-          content: <LoadBalancerBackends backends={item.backends} />,
+          content: <LoadBalancerBackends item={item} />,
         },
         {
           key: "metrics",

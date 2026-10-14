@@ -1,38 +1,11 @@
-import {
-  Checkbox,
-  Form,
-  Grid,
-  Input,
-  InputNumber,
-  Radio,
-  Select,
-  Space,
-} from "@arco-design/web-react";
+import { Form, Input, InputNumber, Radio, Select } from "@arco-design/web-react";
 import type { FormInstance } from "@arco-design/web-react/es/Form";
 import { useState } from "react";
+import type { NetworkLoadBalancerListener, NetworkLoadBalancerProtocol } from "@/api/network";
 import HealthCheckFields from "./HealthCheckFields";
+import ListenerOptions from "./ListenerOptions";
 
-export type LoadBalancerListenerValues = {
-  name: string;
-  protocol: "http" | "https" | "tcp" | "udp" | "ssl";
-  port: number;
-  target_port: number;
-  sessionPersistence: "disabled" | "source_ip" | "cookie";
-  algorithm: "round_robin" | "least_connections" | "source_ip";
-  healthCheckProtocol: "TCP" | "HTTP" | "HTTPS";
-  interval: number;
-  timeout: number;
-  healthyThreshold: number;
-  unhealthyThreshold: number;
-  healthCheckPort: number;
-  maxConnections: number;
-  clientIp: boolean;
-  compression: boolean;
-  httpsRedirect: boolean;
-  http2: boolean;
-  webSocket: boolean;
-};
-
+export type LoadBalancerListenerValues = NetworkLoadBalancerListener;
 export default function LoadBalancerListenerForm({
   form,
   usedPorts = [],
@@ -42,151 +15,121 @@ export default function LoadBalancerListenerForm({
   usedPorts?: number[];
   initialValues?: LoadBalancerListenerValues;
 }) {
-  const [protocol, setProtocol] = useState(initialValues?.protocol ?? "http");
-  const isHttp = protocol === "http" || protocol === "https";
+  const [protocol, setProtocol] = useState<NetworkLoadBalancerProtocol>(
+    initialValues?.protocol ?? "LOAD_BALANCER_LISTENER_PROTOCOL_HTTP",
+  );
+  const http = [
+    "LOAD_BALANCER_LISTENER_PROTOCOL_HTTP",
+    "LOAD_BALANCER_LISTENER_PROTOCOL_HTTPS",
+  ].includes(protocol);
+  const tls = [
+    "LOAD_BALANCER_LISTENER_PROTOCOL_HTTPS",
+    "LOAD_BALANCER_LISTENER_PROTOCOL_SSL",
+  ].includes(protocol);
+  const udp = protocol === "LOAD_BALANCER_LISTENER_PROTOCOL_UDP";
   return (
     <Form
       form={form}
       layout="vertical"
       initialValues={{
         name: "",
-        protocol: "http",
+        protocol: "LOAD_BALANCER_LISTENER_PROTOCOL_HTTP",
         port: 80,
-        target_port: 80,
-        sessionPersistence: "disabled",
-        algorithm: "round_robin",
-        healthCheckProtocol: "TCP",
-        interval: 5,
-        timeout: 60,
-        healthyThreshold: 2,
-        unhealthyThreshold: 2,
-        healthCheckPort: 0,
-        maxConnections: 20000,
-        clientIp: true,
-        compression: false,
-        httpsRedirect: false,
-        http2: true,
-        webSocket: true,
+        backends: [],
+        algorithm: "LOAD_BALANCER_ALGORITHM_ROUND_ROBIN",
+        health_check: { protocol: "LOAD_BALANCER_HEALTH_CHECK_PROTOCOL_TCP", port: 0 },
+        session_persistence: { mode: "LOAD_BALANCER_SESSION_MODE_DISABLED" },
+        https_redirect_status_code: 0,
         ...initialValues,
       }}
     >
       <Form.Item
         label="名称"
         field="name"
+        rules={[{ required: true, match: /\S/, message: "请输入监听器名称" }]}
+      >
+        <Input maxLength={63} />
+      </Form.Item>
+      <Form.Item label="监听协议" field="protocol" rules={[{ required: true }]}>
+        <Radio.Group
+          type="button"
+          options={["HTTP", "HTTPS", "TCP", "UDP", "SSL"].map((label) => ({
+            label,
+            value: "LOAD_BALANCER_LISTENER_PROTOCOL_" + label,
+          }))}
+          onChange={(value: NetworkLoadBalancerProtocol) => {
+            setProtocol(value);
+            if (value === "LOAD_BALANCER_LISTENER_PROTOCOL_UDP")
+              form.setFieldValue("health_check", {
+                ...form.getFieldsValue().health_check,
+                protocol: "LOAD_BALANCER_HEALTH_CHECK_PROTOCOL_TCP",
+              });
+          }}
+        />
+      </Form.Item>
+      <Form.Item
+        label="监听端口"
+        field="port"
         rules={[
-          { required: true, message: "请输入监听器名称" },
+          { required: true, type: "number", min: 1, max: 65535 },
           {
-            validator: (value, callback) => {
-              if (!value?.trim()) callback("请输入监听器名称");
-            },
+            validator: (value, callback) =>
+              callback(usedPorts.includes(value) ? "该监听端口已存在" : undefined),
           },
         ]}
       >
-        <Input placeholder="请输入名称" maxLength={64} showWordLimit />
+        <InputNumber min={1} max={65535} precision={0} />
       </Form.Item>
-      <Form.Item
-        label="监听协议"
-        field="protocol"
-        rules={[{ required: true, message: "请选择监听协议" }]}
-      >
-        <Radio.Group
-          type="button"
-          onChange={setProtocol}
-          options={["http", "https", "tcp", "udp", "ssl"].map((value) => ({
-            label: value.toUpperCase(),
-            value,
-          }))}
-        />
-      </Form.Item>
-      <Form.Item label="会话保持" field="sessionPersistence" rules={[{ required: true }]}>
-        <Select
-          options={[
-            { label: "停用", value: "disabled" },
-            { label: "源 IP", value: "source_ip" },
-            { label: "Cookie", value: "cookie" },
-          ]}
-        />
-      </Form.Item>
-      <Grid.Row gutter={16}>
-        <Grid.Col span={12}>
+      {tls && (
+        <>
           <Form.Item
-            label="负载均衡端口"
-            field="port"
-            rules={[
-              {
-                required: true,
-                type: "number",
-                min: 1,
-                max: 65535,
-                message: "请输入 1–65535 之间的端口",
-              },
-              {
-                validator: (value, callback) => {
-                  if (!Number.isInteger(value)) callback("端口必须是整数");
-                  else if (usedPorts.includes(value)) callback("该监听端口已存在");
-                },
-              },
-            ]}
+            label="TLS 证书名称"
+            field="certificate_ref.name"
+            rules={[{ required: true, match: /\S/ }]}
           >
-            <InputNumber min={1} max={65535} precision={0} className="w-full" />
+            <Input placeholder="请输入证书名称" />
           </Form.Item>
-        </Grid.Col>
-        <Grid.Col span={12}>
           <Form.Item
-            label="目标端口"
-            field="target_port"
-            rules={[
-              {
-                required: true,
-                type: "number",
-                min: 1,
-                max: 65535,
-                message: "请输入 1–65535 之间的端口",
-              },
-              {
-                validator: (value, callback) => {
-                  if (!Number.isInteger(value)) callback("端口必须是整数");
-                },
-              },
-            ]}
+            label="证书命名空间"
+            field="certificate_ref.namespace"
+            rules={[{ required: true, match: /\S/ }]}
           >
-            <InputNumber min={1} max={65535} precision={0} className="w-full" />
+            <Input />
           </Form.Item>
-        </Grid.Col>
-      </Grid.Row>
-      <Form.Item label="负载均衡算法" field="algorithm" rules={[{ required: true }]}>
-        <Select
-          options={[
-            { label: "轮询", value: "round_robin" },
-            { label: "最少连接", value: "least_connections" },
-            { label: "源 IP 哈希", value: "source_ip" },
-          ]}
-        />
-      </Form.Item>
-      <HealthCheckFields />
-      {isHttp && (
-        <Form.Item label="附加选项">
-          <Space direction="vertical">
-            <Form.Item field="clientIp" triggerPropName="checked" noStyle>
-              <Checkbox disabled>获取客户端 IP（X-Forwarded-For）</Checkbox>
-            </Form.Item>
-            <Form.Item field="compression" triggerPropName="checked" noStyle>
-              <Checkbox>数据压缩（gzip）</Checkbox>
-            </Form.Item>
-            {protocol === "http" && (
-              <Form.Item field="httpsRedirect" triggerPropName="checked" noStyle>
-                <Checkbox>启用 HTTPS 重定向</Checkbox>
-              </Form.Item>
-            )}
-            <Form.Item field="http2" triggerPropName="checked" noStyle>
-              <Checkbox disabled>HTTP2</Checkbox>
-            </Form.Item>
-            <Form.Item field="webSocket" triggerPropName="checked" noStyle>
-              <Checkbox disabled>WebSocket</Checkbox>
-            </Form.Item>
-          </Space>
-        </Form.Item>
+        </>
       )}
+      <Form.Item label="调度算法" field="algorithm" rules={[{ required: true }]}>
+        <Select
+          options={[
+            { label: "轮询", value: "LOAD_BALANCER_ALGORITHM_ROUND_ROBIN" },
+            { label: "最少请求", value: "LOAD_BALANCER_ALGORITHM_LEAST_REQUEST" },
+            { label: "源 IP 哈希", value: "LOAD_BALANCER_ALGORITHM_SOURCE_IP" },
+          ]}
+        />
+      </Form.Item>
+      <ListenerOptions
+        http={http}
+        udp={udp}
+        redirectAllowed={protocol === "LOAD_BALANCER_LISTENER_PROTOCOL_HTTP"}
+      />
+      <Form.Item
+        noStyle
+        shouldUpdate={(prev, next) =>
+          prev.https_redirect_status_code !== next.https_redirect_status_code ||
+          prev.protocol !== next.protocol
+        }
+      >
+        {(values) =>
+          !(
+            values.protocol === "LOAD_BALANCER_LISTENER_PROTOCOL_HTTP" &&
+            values.https_redirect_status_code
+          ) && (
+            <>
+              <HealthCheckFields udp={udp} />
+            </>
+          )
+        }
+      </Form.Item>
     </Form>
   );
 }

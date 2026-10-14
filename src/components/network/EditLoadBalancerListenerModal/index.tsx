@@ -1,3 +1,4 @@
+import { listenerInput } from "@/lib/load-balancers";
 import { Form, Modal } from "@arco-design/web-react";
 import LoadBalancerListenerForm, {
   type LoadBalancerListenerValues,
@@ -25,7 +26,7 @@ export default function EditLoadBalancerListenerModal({
       onCancel={onCancel}
       onOk={async () => {
         const values = await validateForm<LoadBalancerListenerValues>(form);
-        onSave({ ...listener, ...values });
+        onSave(listenerInput({ ...listener, ...values }));
       }}
     >
       <LoadBalancerListenerForm form={form} usedPorts={usedPorts} initialValues={listener} />

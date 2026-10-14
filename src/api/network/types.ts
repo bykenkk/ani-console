@@ -46,6 +46,13 @@ export interface NetworkSubnet {
   dev_profile?: CoreDevProfileInfo;
   created_at: string;
   updated_at: string;
+  description?: string;
+  reason_message?: string;
+  version?: string;
+  observed_at?: string;
+  observation_stale?: boolean;
+  available_ip_range?: string;
+  used_ip_range?: string;
 }
 
 export interface NetworkSubnetListParams {
@@ -185,10 +192,50 @@ export type SaveNetworkSecurityGroupRuleRequest = SaveNetworkSecurityGroupRuleIn
   idempotency_key: string;
 };
 
-export interface NetworkLoadBalancerListener {
-  protocol: "http" | "https" | "tcp";
+export type NetworkLoadBalancerProtocol =
+  | "LOAD_BALANCER_LISTENER_PROTOCOL_HTTP"
+  | "LOAD_BALANCER_LISTENER_PROTOCOL_HTTPS"
+  | "LOAD_BALANCER_LISTENER_PROTOCOL_TCP"
+  | "LOAD_BALANCER_LISTENER_PROTOCOL_UDP"
+  | "LOAD_BALANCER_LISTENER_PROTOCOL_SSL";
+export type NetworkLoadBalancerAlgorithm =
+  | "LOAD_BALANCER_ALGORITHM_ROUND_ROBIN"
+  | "LOAD_BALANCER_ALGORITHM_LEAST_REQUEST"
+  | "LOAD_BALANCER_ALGORITHM_SOURCE_IP";
+export type NetworkLoadBalancerSessionMode =
+  | "LOAD_BALANCER_SESSION_MODE_DISABLED"
+  | "LOAD_BALANCER_SESSION_MODE_COOKIE_TIMEOUT"
+  | "LOAD_BALANCER_SESSION_MODE_COOKIE_SESSION";
+export interface NetworkLoadBalancerHealthCheck {
+  protocol?: "LOAD_BALANCER_HEALTH_CHECK_PROTOCOL_TCP" | "LOAD_BALANCER_HEALTH_CHECK_PROTOCOL_HTTP";
+  interval_seconds?: number;
+  timeout_seconds?: number;
+  unhealthy_threshold?: number;
+  healthy_threshold?: number;
+  port?: number;
+  path?: string;
+  hostname?: string;
+}
+export interface NetworkLoadBalancerBackendInput {
+  id?: string;
+  subnet_id: string;
+  address: string;
   port: number;
-  target_port: number;
+  weight?: number;
+}
+export interface NetworkLoadBalancerListener {
+  id?: string;
+  name: string;
+  protocol: NetworkLoadBalancerProtocol;
+  port: number;
+  backends: NetworkLoadBalancerBackendInput[];
+  health_check?: NetworkLoadBalancerHealthCheck;
+  certificate_ref?: { name: string; namespace: string };
+  algorithm?: NetworkLoadBalancerAlgorithm;
+  session_persistence?: { mode: NetworkLoadBalancerSessionMode; cookie_expiry_seconds?: number };
+  max_connections?: number;
+  gzip_enabled?: boolean;
+  https_redirect_status_code?: number;
 }
 /** Governance read model; int64 values retain their JSON string representation. */
 export interface NetworkLoadBalancer {
@@ -203,6 +250,7 @@ export interface NetworkLoadBalancer {
   private_ip?: string;
   public_address?: string;
   listener?: NetworkLoadBalancerListenerResource;
+  listeners?: NetworkLoadBalancerListenerResource[];
   backends?: NetworkLoadBalancerBackend[];
   health_check?: {
     protocol?: string;
@@ -228,10 +276,12 @@ export interface NetworkLoadBalancer {
   created_at: string;
   updated_at: string;
 }
-export interface NetworkLoadBalancerListenerResource {
+export interface NetworkLoadBalancerListenerResource extends Omit<
+  NetworkLoadBalancerListener,
+  "id" | "backends"
+> {
   id: string;
-  protocol: string;
-  port: number;
+  backends?: NetworkLoadBalancerBackend[];
 }
 export interface NetworkLoadBalancerBackend {
   id: string;
@@ -263,10 +313,17 @@ export interface NetworkLoadBalancerListResponse {
 }
 export interface CreateNetworkLoadBalancerInput {
   name: string;
+  description?: string;
   vpc_id: string;
-  subnet_id?: string | null;
-  scheme?: "internal" | "public";
-  listeners?: NetworkLoadBalancerListener[];
+  subnet_id: string;
+  exposure:
+    | "LOAD_BALANCER_EXPOSURE_PRIVATE"
+    | "LOAD_BALANCER_EXPOSURE_PUBLIC"
+    | "LOAD_BALANCER_EXPOSURE_PUBLIC_PRIVATE";
+  flavor: "small" | "medium" | "large";
+  private_ip: string;
+  public_eip_id?: string;
+  listeners: { items: NetworkLoadBalancerListener[] };
 }
 export type CreateNetworkLoadBalancerRequest = CreateNetworkLoadBalancerInput & {
   idempotency_key: string;
@@ -358,6 +415,7 @@ export interface NetworkOperation {
   kind?: string;
   state: string;
   reason?: string;
+  reason_message?: string;
   created_at?: string;
   updated_at?: string;
   completed_at?: string;

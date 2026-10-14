@@ -1,3 +1,4 @@
+import LoadBalancerPrivateIpField from "../LoadBalancerPrivateIpField";
 import { Form, Grid, Select } from "@arco-design/web-react";
 import type { FormInstance } from "@arco-design/web-react/es/Form";
 import { useQuery } from "@tanstack/react-query";
@@ -9,8 +10,13 @@ import LoadBalancerPublicIpField from "@/components/network/LoadBalancerPublicIp
 
 export default function LoadBalancerNetworkFields({
   form,
+  onAvailabilityChange,
 }: {
-  form: FormInstance<LoadBalancerConfigurationValues>;
+  form: Pick<
+    FormInstance<LoadBalancerConfigurationValues>,
+    "setFieldsValue" | "setFieldValue" | "getFieldValue"
+  >;
+  onAvailabilityChange: (available: boolean) => void;
 }) {
   const [vpcId, setVpcId] = useState<string>();
   const vpcs = useQuery({
@@ -48,7 +54,8 @@ export default function LoadBalancerNetworkFields({
               loading={vpcs.isLoading}
               onChange={(value) => {
                 setVpcId(value);
-                form.setFieldsValue({ subnet_id: undefined, vip: "" });
+                onAvailabilityChange(false);
+                form.setFieldsValue({ subnet_id: undefined, vip: "", listeners: [] });
               }}
               options={(vpcs.data?.items ?? []).map((item) => ({
                 value: item.id,
@@ -68,7 +75,10 @@ export default function LoadBalancerNetworkFields({
               disabled={!vpcId}
               loading={subnets.isLoading}
               allowClear
-              onChange={() => form.setFieldValue("vip", "")}
+              onChange={() => {
+                form.setFieldValue("vip", "");
+                onAvailabilityChange(false);
+              }}
               options={availableSubnets.map((item) => ({
                 value: item.id,
                 label: `${item.name} · ${item.cidr}`,
@@ -79,20 +89,12 @@ export default function LoadBalancerNetworkFields({
       </Grid.Row>
       <Form.Item noStyle shouldUpdate={(previous, next) => previous.subnet_id !== next.subnet_id}>
         {(values) => (
-          <Form.Item
-            label="指定 IP"
-            field="vip"
-            rules={[{ required: true, message: "请选择指定 IP" }]}
-          >
-            <Select
-              placeholder={values.subnet_id ? "请选择指定 IP" : "请先选择子网"}
-              disabled={!values.subnet_id}
-              showSearch
-              allowClear
-              // TODO: 核对并接入子网可选 IP 契约；不可通过 CIDR 推算地址可用性。
-              options={[]}
-            />
-          </Form.Item>
+          <LoadBalancerPrivateIpField
+            key={values.subnet_id ?? "none"}
+            subnetId={values.subnet_id}
+            form={form}
+            onAvailabilityChange={onAvailabilityChange}
+          />
         )}
       </Form.Item>
     </>

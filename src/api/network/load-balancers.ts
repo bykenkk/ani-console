@@ -8,7 +8,6 @@ import type {
   NetworkLoadBalancerListParams,
   NetworkLoadBalancerListResponse,
   NetworkLoadBalancerMutationResponse,
-  NetworkOperation,
 } from "./types";
 
 const createScope = createIdempotencyScope("network-load-balancer-create", ["POST"]);
@@ -28,12 +27,15 @@ export function listNetworkLoadBalancers(
 
 export function createNetworkLoadBalancer(
   submitData: CreateNetworkLoadBalancerInput,
-): Promise<NetworkLoadBalancer> {
+): Promise<NetworkLoadBalancerMutationResponse> {
   return runIdempotentRequest(createScope, submitData, (body) =>
-    coreRequest<NetworkLoadBalancer, CreateNetworkLoadBalancerRequest>("/networks/load-balancers", {
-      method: "POST",
-      data: body,
-    }),
+    coreRequest<NetworkLoadBalancerMutationResponse, CreateNetworkLoadBalancerRequest>(
+      "/networks/load-balancers",
+      {
+        method: "POST",
+        data: body,
+      },
+    ),
   );
 }
 
@@ -53,14 +55,4 @@ export function deleteNetworkLoadBalancer(
   return coreRequest<NetworkLoadBalancerMutationResponse>(loadBalancerPath(loadBalancerId), {
     method: "DELETE",
   });
-}
-
-export function getNetworkLoadBalancerOperation(
-  id: string,
-  signal?: AbortSignal,
-): Promise<NetworkOperation> {
-  return coreRequest<NetworkOperation>(
-    "/networks/load-balancers/operations/" + encodeURIComponent(id),
-    { method: "GET", signal },
-  );
 }

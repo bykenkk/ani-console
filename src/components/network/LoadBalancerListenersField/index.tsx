@@ -56,10 +56,11 @@ export default function LoadBalancerListenersField({
                 title: "协议",
                 dataIndex: "protocol",
                 width: 100,
-                render: (protocol: string) => protocol.toUpperCase(),
+                render: (protocol: string) =>
+                  protocol.replace("LOAD_BALANCER_LISTENER_PROTOCOL_", ""),
               },
               { title: "监听端口", dataIndex: "port", width: 120 },
-              { title: "目标端口", dataIndex: "target_port", width: 120 },
+              { title: "后端数", render: (_, item) => item.backends?.length ?? 0, width: 120 },
             ]}
           />
         )}

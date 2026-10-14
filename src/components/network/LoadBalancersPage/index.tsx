@@ -18,21 +18,26 @@ import {
   StatusBadge,
   ListDataTable,
 } from "@/components/common";
-import { useClientPagination } from "@/hooks/useClientPagination";
-import { isLoadBalancerChanging } from "@/lib/load-balancers";
+import { loadBalancerListeners } from "@/lib/load-balancers";
 import { formatDateTime } from "@/lib/format";
 
 type LoadBalancer = NetworkLoadBalancer;
 type Vpc = NetworkVPC;
 type StatusFilter = "all" | "provisioning" | "available" | "failed";
-type SearchField = "name" | "id";
 
 export default function LoadBalancersPage() {
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
-  const [searchField, setSearchField] = useState<SearchField>("name");
+
   const [searchText, setSearchText] = useState("");
   const [vpcId, setVpcId] = useState("");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [cursors, setCursors] = useState<Array<string | undefined>>([undefined]);
+  const resetPagination = () => {
+    setPage(1);
+    setCursors([undefined]);
+  };
   const loadBalancers = useQuery({
     meta: {
       errorNotification: {
@@ -41,33 +46,43 @@ export default function LoadBalancersPage() {
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-load-balancers", { status, vpcId }],
+    queryKey: [
+      "network-load-balancers",
+      { status, vpcId, name: searchText.trim(), cursor: cursors[page - 1], limit: pageSize },
+    ],
     queryFn: ({ signal }) =>
       listNetworkLoadBalancers(
         {
           vpc_id: vpcId || undefined,
+          name: searchText.trim() || undefined,
+          cursor: cursors[page - 1],
+          limit: pageSize,
           state: status === "all" ? undefined : status,
         },
         signal,
       ),
-    refetchInterval: (query) =>
-      query.state.error
-        ? false
-        : query.state.data?.items.some(isLoadBalancerChanging)
-          ? 5000
-          : false,
   });
-  const { items, pagination, resetPagination } = useClientPagination(
-    (loadBalancers.data?.items ?? []).filter((item) =>
-      String(item[searchField] ?? "")
-        .toLowerCase()
-        .includes(searchText.trim().toLowerCase()),
-    ),
-    JSON.stringify([status, vpcId, searchField, searchText]),
-  );
+  const items = loadBalancers.data?.items ?? [];
+  const pagination = {
+    mode: "cursor" as const,
+    page,
+    pageSize,
+    hasNextPage: !!loadBalancers.data?.next_cursor,
+    disabled: loadBalancers.isFetching,
+    onPageChange: (next: number) => {
+      if (next === page + 1 && loadBalancers.data?.next_cursor) {
+        setCursors([...cursors.slice(0, page), loadBalancers.data.next_cursor]);
+        setPage(next);
+      } else if (next >= 1 && next <= cursors.length) setPage(next);
+    },
+    onPageSizeChange: (size: number) => {
+      setPageSize(size);
+      resetPagination();
+    },
+  };
   const refresh = () => {
     resetPagination();
-    loadBalancers.refetch();
+    if (page === 1) loadBalancers.refetch();
   };
   const vpcs = useQuery({
     meta: {
@@ -86,6 +101,7 @@ export default function LoadBalancersPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 150,
       render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="load-balancer" />,
     },
     {
@@ -100,18 +116,32 @@ export default function LoadBalancersPage() {
       key: "vip",
       title: "私网 IP",
       dataIndex: "private_ip",
+      width: 100,
+      ellipsis: true,
       placeholder: "-",
     },
     {
       key: "listeners",
       title: "监听器",
-      render: (_, item) => (item.listener ? 1 : 0),
+      width: 100,
+      ellipsis: true,
+      render: (_, item) => loadBalancerListeners(item).length,
     },
-    { key: "backends", title: "后端数", render: (_, item) => item.backends?.length ?? 0 },
+    {
+      key: "backends",
+      title: "后端数",
+      width: 100,
+      ellipsis: true,
+      render: (_, item) =>
+        loadBalancerListeners(item).reduce(
+          (count, listener) => count + (listener.backends?.length ?? 0),
+          0,
+        ),
+    },
     {
       key: "createdAt",
       title: "创建时间",
-      width: 150,
+      width: 180,
       render: (_, item) => formatDateTime(item.created_at),
     },
   ];
@@ -134,7 +164,10 @@ export default function LoadBalancersPage() {
         }}
         tabs={{
           value: status,
-          onChange: setStatus,
+          onChange: (value) => {
+            setStatus(value);
+            resetPagination();
+          },
           items: [
             {
               value: "all",
@@ -156,27 +189,24 @@ export default function LoadBalancersPage() {
         }}
         toolbar={{
           search: {
-            fields: [
-              {
-                value: "name",
-                label: "名称",
-              },
-              {
-                value: "id",
-                label: "ID",
-              },
-            ],
-            field: searchField,
+            fields: [{ value: "name", label: "名称" }],
+            field: "name",
             value: searchText,
-            onFieldChange: setSearchField,
-            onChange: setSearchText,
+            onFieldChange: () => {},
+            onChange: (value) => {
+              setSearchText(value);
+              resetPagination();
+            },
           },
           filters: (
             <div className="flex flex-wrap gap-3">
               <Select
                 aria-label="按 VPC 筛选"
                 value={vpcId || undefined}
-                onChange={setVpcId}
+                onChange={(value) => {
+                  setVpcId(value);
+                  resetPagination();
+                }}
                 allowClear
                 placeholder="全部 VPC"
                 loading={vpcs.isLoading}
