@@ -6,9 +6,9 @@ import { authStorage } from "@/lib/storage";
 
 export interface AuthTokens {
   access_token: string;
-  refresh_token: string;
   expires_in?: number;
   token_type?: string;
+  issued_at?: string;
 }
 
 export interface AuthSession {
@@ -20,10 +20,8 @@ interface AuthState {
   tokens: AuthTokens | null;
   username: string | null;
   hasKnownUsername: boolean;
-  developmentBypass: boolean;
   hydrated: boolean;
   setAuthSession: (session: AuthSession | null) => void;
-  setDevelopmentBypass: (enabled: boolean) => void;
   clear: () => void;
   getAccessToken: () => string | null;
   getAccessTokenJti: () => string | null;
@@ -77,32 +75,27 @@ export const useAuthStore = create<AuthState>()(
       tokens: null,
       username: null,
       hasKnownUsername: false,
-      developmentBypass: false,
       hydrated: false,
       setAuthSession: (session) => {
         const username = session?.username?.trim() || null;
         set({
-          tokens: session?.tokens ?? null,
+          tokens: session
+            ? {
+                access_token: session.tokens.access_token,
+                expires_in: session.tokens.expires_in,
+                issued_at: session.tokens.issued_at,
+                token_type: session.tokens.token_type,
+              }
+            : null,
           username,
           hasKnownUsername: username !== null,
-          developmentBypass: false,
         });
       },
-      setDevelopmentBypass: (enabled) =>
-        set(() => {
-          const active = import.meta.env.DEV && enabled;
-          return {
-            developmentBypass: active,
-            username: active ? "admin" : null,
-            hasKnownUsername: active,
-          };
-        }),
       clear: () =>
         set({
           tokens: null,
           username: null,
           hasKnownUsername: false,
-          developmentBypass: false,
         }),
       getAccessToken: () => get().tokens?.access_token ?? null,
       getAccessTokenJti: () => {
@@ -115,11 +108,15 @@ export const useAuthStore = create<AuthState>()(
       name: "ani-console-auth",
       storage: createJSONStorage(() => authStateStorage),
       partialize: (state) => ({
-        tokens: state.tokens,
         username: state.username,
         hasKnownUsername: state.hasKnownUsername,
-        developmentBypass: state.developmentBypass,
       }),
+      // Restore only display metadata; discard old tokens and removed authentication flags.
+      merge: (persisted, current) => {
+        const saved = persisted as { username?: unknown } | undefined;
+        const username = typeof saved?.username === "string" ? saved.username.trim() || null : null;
+        return { ...current, username, hasKnownUsername: username !== null, tokens: null };
+      },
       skipHydration: true,
       onRehydrateStorage: () => () => {
         useAuthStore.setState({ hydrated: true });
@@ -133,9 +130,5 @@ export function isAuthHydrated(): boolean {
 }
 
 export function isAuthenticated(): boolean {
-  return !!useAuthStore.getState().tokens?.access_token || isDevelopmentAuthBypassActive();
-}
-
-export function isDevelopmentAuthBypassActive(): boolean {
-  return import.meta.env.DEV && useAuthStore.getState().developmentBypass;
+  return !!useAuthStore.getState().tokens?.access_token;
 }

@@ -29,7 +29,7 @@ export function exchangeOidcCode(
     runtimeDependencies,
   )
     .then((tokens) => {
-      if (!tokens.access_token || !tokens.refresh_token) {
+      if (!tokens.access_token) {
         throw new Error("登录失败：未返回 access_token");
       }
       return tokens;

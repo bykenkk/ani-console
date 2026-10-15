@@ -1,4 +1,4 @@
-import { coreRequest } from "@/api/request";
+import { coreRequest, initializeCsrfToken, pauseSessionRefresh } from "@/api/request";
 import type {
   AuthTokenPair,
   PasswordLoginInput,
@@ -8,6 +8,7 @@ import type {
 import { parseTokenExpiresIn } from "./token";
 
 export async function passwordLogin(submitData: PasswordLoginInput): Promise<AuthTokenPair> {
+  await pauseSessionRefresh();
   const response = await coreRequest<PasswordLoginResponse, PasswordLoginRequest>(
     "/auth/password/login",
     {
@@ -22,9 +23,9 @@ export async function passwordLogin(submitData: PasswordLoginInput): Promise<Aut
   if (!response.access_token) {
     throw new Error("登录响应缺少 access_token");
   }
+  await initializeCsrfToken();
   return {
     access_token: response.access_token,
-    refresh_token: response.refresh_token ?? "",
     expires_in: parseTokenExpiresIn(response.expires_in) ?? 0,
     issued_at: response.issued_at,
   };

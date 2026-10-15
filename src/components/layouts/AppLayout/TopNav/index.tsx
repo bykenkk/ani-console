@@ -41,10 +41,7 @@ export default function TopNav({
   const [userMenuVisible, setUserMenuVisible] = useState(false);
   const [regionMenuVisible, setRegionMenuVisible] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
-  const clear = useAuthStore((s) => s.clear);
-  const username = useAuthStore(
-    (s) => (s.hasKnownUsername ? s.username : null) ?? (s.developmentBypass ? "admin" : "用户"),
-  );
+  const username = useAuthStore((s) => (s.hasKnownUsername ? s.username : null) ?? "用户");
   const sessionIssuedAt = useAuthStore((s) => {
     if (!s.tokens || !("issued_at" in s.tokens)) return null;
     return typeof s.tokens.issued_at === "string" ? s.tokens.issued_at : null;
@@ -61,12 +58,10 @@ export default function TopNav({
     },
     mutationFn: async () => {
       const jti = useAuthStore.getState().getAccessTokenJti();
-      if (!jti) throw new Error("当前 access token 缺少 jti，无法调用服务端登出");
-      const submitData = { jti };
+      const submitData = jti ? { jti } : {};
       await logoutRequest(submitData);
     },
-    onSettled: () => {
-      clear();
+    onSuccess: () => {
       navigate({ to: "/login" });
     },
   });

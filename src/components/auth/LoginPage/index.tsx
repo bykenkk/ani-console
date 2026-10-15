@@ -11,12 +11,10 @@ import { ApiError } from "@/api/request";
 import BorderBeamPanel from "@/components/common/BorderBeamPanel";
 import { isAuthenticated, useAuthStore } from "@/stores/auth";
 import styles from "./index.module.css";
-import { showMessage } from "@/lib/feedback";
 
 export default function LoginPage({ redirect = "/" }: { redirect?: string }) {
   const navigate = useNavigate();
   const setAuthSession = useAuthStore((state) => state.setAuthSession);
-  const setDevelopmentBypass = useAuthStore((state) => state.setDevelopmentBypass);
 
   useEffect(() => {
     if (isAuthenticated()) {
@@ -50,12 +48,6 @@ export default function LoginPage({ redirect = "/" }: { redirect?: string }) {
       navigate({ to: redirect, replace: true });
     },
   });
-
-  const skipLogin = () => {
-    setDevelopmentBypass(true);
-    showMessage({ type: "info", content: "已进入开发预览模式" });
-    navigate({ to: redirect, replace: true });
-  };
 
   return (
     <main className={styles.page}>
@@ -178,12 +170,6 @@ export default function LoginPage({ redirect = "/" }: { redirect?: string }) {
             </span>
           </div>
         </div>
-
-        {import.meta.env.DEV ? (
-          <Button className={styles.developmentButton} type="text" size="mini" onClick={skipLogin}>
-            跳过登录（开发预览）
-          </Button>
-        ) : null}
       </BorderBeamPanel>
 
       <footer className={styles.footer}>Copyright © 2021-2025 广州常青云科技有限公司</footer>

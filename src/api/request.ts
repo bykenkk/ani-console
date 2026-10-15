@@ -5,8 +5,7 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 import { parseTokenExpiresIn, type TokenExpiresIn } from "@/api/auth/token";
-import { createIdempotencyScope } from "@/lib/idempotency";
-import { isDevelopmentAuthBypassActive, useAuthStore } from "@/stores/auth";
+import { useAuthStore } from "@/stores/auth";
 
 export const CORE_API_BASE = "/api/v1";
 export const SERVICES_API_BASE = "/api/v1/svc";
@@ -30,8 +29,8 @@ type AniRequestConfig<TBody = unknown> = InternalAxiosRequestConfig<TBody> & {
 
 type RefreshAccessTokenResponse = {
   access_token: string;
-  refresh_token?: string;
   expires_in?: TokenExpiresIn;
+  issued_at?: string;
 };
 
 type ApiErrorPayload = {
@@ -101,11 +100,16 @@ const coreAxios = createApiInstance(CORE_API_BASE);
 const servicesAxios = createApiInstance(SERVICES_API_BASE);
 const adminAxios = createApiInstance(ADMIN_API_BASE);
 const refreshAxios = createApiInstance(CORE_API_BASE);
+refreshAxios.defaults.timeout = 15_000;
 
-const refreshScope = createIdempotencyScope("auth-refresh", ["POST"]);
-let refreshRequest:
-  | { refreshToken: string; promise: Promise<RefreshAccessTokenResponse> }
-  | undefined;
+export const AUTH_APPLICATION = "console" as const;
+let csrfToken: string | undefined;
+let csrfRequest: Promise<string> | undefined;
+let refreshRequest: Promise<string> | undefined;
+let refreshTimer: ReturnType<typeof setTimeout> | undefined;
+let refreshDueAt: number | undefined;
+let loggingOut = false;
+let sessionGeneration = 0;
 
 function redirectToLogin(): void {
   if (typeof window === "undefined") return;
@@ -116,7 +120,6 @@ function redirectToLogin(): void {
 
 function expireAuthSession(): void {
   useAuthStore.getState().clear();
-  useAuthStore.persist.clearStorage();
   redirectToLogin();
 }
 
@@ -161,29 +164,158 @@ export function toApiError(error: unknown): ApiError {
   });
 }
 
-async function requestTokenRefresh(refreshToken: string): Promise<RefreshAccessTokenResponse> {
-  const submitData = refreshToken ? { refresh_token: refreshToken } : {};
-  const body = refreshToken ? refreshScope.withKey(submitData, [refreshToken]) : submitData;
+export async function initializeCsrfToken(): Promise<string> {
+  csrfToken = undefined;
+  return getCsrfToken();
+}
+
+function getCsrfToken(): Promise<string> {
+  if (csrfToken) return Promise.resolve(csrfToken);
+  if (csrfRequest) return csrfRequest;
+  const generation = sessionGeneration;
+  const promise = refreshAxios
+    .post<{ csrf_token: string }>("/auth/csrf", { application: AUTH_APPLICATION })
+    .then(({ data }) => {
+      if (!data?.csrf_token) throw new ApiError("认证响应缺少 csrf_token");
+      if (generation !== sessionGeneration) throw new ApiError("登录会话已变更");
+      csrfToken = data.csrf_token;
+      return csrfToken;
+    })
+    .catch((error: unknown) => {
+      throw toApiError(error);
+    })
+    .finally(() => {
+      if (csrfRequest === promise) csrfRequest = undefined;
+    });
+  csrfRequest = promise;
+  return promise;
+}
+
+async function requestTokenRefresh(): Promise<RefreshAccessTokenResponse> {
   try {
-    const response = await refreshAxios.post<RefreshAccessTokenResponse>("/auth/refresh", body);
+    const send = async () =>
+      refreshAxios.post<RefreshAccessTokenResponse>(
+        "/auth/refresh",
+        { application: AUTH_APPLICATION },
+        { headers: { "X-CSRF-Token": await getCsrfToken() } },
+      );
+    let response;
+    try {
+      response = await send();
+    } catch (error) {
+      if (toApiError(error).status !== 403) throw error;
+      csrfToken = undefined;
+      response = await send();
+    }
     if (!response.data?.access_token) {
       throw new ApiError("刷新令牌响应缺少 access_token", { response });
     }
-    if (refreshToken) refreshScope.reset([refreshToken]);
     return response.data;
   } catch (error) {
     throw toApiError(error);
   }
 }
 
-function refreshAccessToken(refreshToken: string): Promise<RefreshAccessTokenResponse> {
-  if (refreshRequest?.refreshToken === refreshToken) return refreshRequest.promise;
-  const promise = requestTokenRefresh(refreshToken).finally(() => {
-    if (refreshRequest?.promise === promise) refreshRequest = undefined;
-  });
-  refreshRequest = { refreshToken, promise };
+function refreshAccessToken(): Promise<string> {
+  if (loggingOut) return Promise.reject(new ApiError("正在退出登录"));
+  if (refreshRequest) return refreshRequest;
+  const generation = sessionGeneration;
+  const promise = requestTokenRefresh()
+    .then((refreshed) => {
+      if (loggingOut || generation !== sessionGeneration) throw new ApiError("登录会话已变更");
+      const authState = useAuthStore.getState();
+      authState.setAuthSession({
+        tokens: {
+          access_token: refreshed.access_token,
+          expires_in: parseTokenExpiresIn(refreshed.expires_in),
+          issued_at: refreshed.issued_at,
+        },
+        username: authState.hasKnownUsername ? authState.username : null,
+      });
+      return refreshed.access_token;
+    })
+    .catch((error: unknown) => {
+      const apiError = toApiError(error);
+      if (
+        !loggingOut &&
+        generation === sessionGeneration &&
+        (apiError.status === 401 || apiError.status === 403)
+      )
+        expireAuthSession();
+      throw apiError;
+    })
+    .finally(() => {
+      if (refreshRequest === promise) refreshRequest = undefined;
+    });
+  refreshRequest = promise;
   return promise;
 }
+
+/** Stop refreshing before logout, then let an already-sent Cookie rotation finish. */
+export async function pauseSessionRefresh(): Promise<void> {
+  loggingOut = true;
+  sessionGeneration += 1;
+  clearTimeout(refreshTimer);
+  csrfToken = undefined;
+  csrfRequest = undefined;
+  await refreshRequest?.catch(() => undefined);
+}
+
+export function resumeSessionRefresh(): void {
+  loggingOut = false;
+  if (!useAuthStore.getState().tokens) return;
+  if (refreshDueAt === undefined) scheduleTokenRefresh();
+  else setRefreshTimer(Math.max(0, refreshDueAt - Date.now()));
+}
+
+function setRefreshTimer(delay: number): void {
+  clearTimeout(refreshTimer);
+  const timeout = Math.min(delay, 2_147_483_647);
+  refreshDueAt = Date.now() + timeout;
+  refreshTimer = setTimeout(scheduleTokenRefreshRetry, timeout);
+}
+
+function scheduleTokenRefresh(): void {
+  clearTimeout(refreshTimer);
+  const state = useAuthStore.getState();
+  if (loggingOut || !state.tokens) return;
+  const lifetime = state.tokens.expires_in;
+  if (!lifetime || !Number.isFinite(lifetime) || lifetime <= 0) return;
+  const delay = Math.max(1000, lifetime * 1000 - Math.min(60_000, lifetime * 100));
+  setRefreshTimer(delay);
+}
+
+function scheduleTokenRefreshRetry(): void {
+  refreshAccessToken().catch(() => {
+    if (!loggingOut && useAuthStore.getState().tokens) {
+      setRefreshTimer(30_000);
+    }
+  });
+}
+
+/** Called after persisted state hydration and before protected routes mount. */
+export async function startAuthSession(): Promise<void> {
+  try {
+    await refreshAccessToken();
+  } catch {
+    // Cookie recovery is optional on the login page; protected routes require a valid session.
+    useAuthStore.getState().clear();
+  }
+}
+
+useAuthStore.subscribe((state, previous) => {
+  if (state.tokens === previous.tokens) return;
+  if (!state.tokens) {
+    sessionGeneration += 1;
+    csrfToken = undefined;
+    csrfRequest = undefined;
+    clearTimeout(refreshTimer);
+    refreshDueAt = undefined;
+    return;
+  }
+  loggingOut = false;
+  scheduleTokenRefresh();
+});
 
 function installAuthInterceptors(instance: AxiosInstance): void {
   instance.interceptors.request.use((config) => {
@@ -202,39 +334,29 @@ function installAuthInterceptors(instance: AxiosInstance): void {
 
       const config = error.config as AniRequestConfig | undefined;
       const isProtected = config?.aniAuth !== "public";
-      const canRefresh =
-        error.response?.status === 401 &&
-        isProtected &&
-        !config?.aniRetried &&
-        !isDevelopmentAuthBypassActive();
+      const canRefresh = error.response?.status === 401 && isProtected && !config?.aniRetried;
 
-      if (!canRefresh || !config) throw toApiError(error);
+      if (!canRefresh || !config) {
+        if (error.response?.status === 401 && isProtected && config?.aniRetried && !loggingOut) {
+          expireAuthSession();
+        }
+        throw toApiError(error);
+      }
 
       const currentAuthState = useAuthStore.getState();
-      const refreshToken = currentAuthState.tokens?.refresh_token ?? "";
       if (!currentAuthState.tokens?.access_token) {
         expireAuthSession();
         throw toApiError(error);
       }
 
       config.aniRetried = true;
-      try {
-        const refreshed = await refreshAccessToken(refreshToken);
-        const authState = useAuthStore.getState();
-        authState.setAuthSession({
-          tokens: {
-            access_token: refreshed.access_token,
-            refresh_token: refreshed.refresh_token ?? refreshToken,
-            expires_in: parseTokenExpiresIn(refreshed.expires_in),
-          },
-          username: authState.hasKnownUsername ? authState.username : null,
-        });
-        config.headers.set("Authorization", `Bearer ${refreshed.access_token}`);
-        return await instance.request(config);
-      } catch {
-        expireAuthSession();
-        throw toApiError(error);
-      }
+      const currentToken = currentAuthState.tokens.access_token;
+      const token =
+        config.headers.get("Authorization") !== `Bearer ${currentToken}`
+          ? currentToken
+          : await refreshAccessToken();
+      config.headers.set("Authorization", `Bearer ${token}`);
+      return instance.request(config);
     },
   );
 }

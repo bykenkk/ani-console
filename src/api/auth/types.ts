@@ -2,7 +2,6 @@ import type { TokenExpiresIn } from "./token";
 
 export interface AuthTokenPair {
   access_token: string;
-  refresh_token: string;
   expires_in: number;
   issued_at?: string;
 }
@@ -17,7 +16,6 @@ export type PasswordLoginInput = PasswordLoginRequest;
 
 export interface PasswordLoginResponse {
   access_token?: string;
-  refresh_token?: string;
   expires_in?: TokenExpiresIn;
   issued_at?: string;
   mfa_required?: boolean;
@@ -38,10 +36,13 @@ export interface LogoutInput {
   jti?: string;
 }
 
-export type LogoutRequest = LogoutInput;
+export interface LogoutRequest extends LogoutInput {
+  application: "console";
+}
 
 export interface RevokeStatusResponse {
   status: "revoked";
+  session_revoked: boolean;
 }
 
 export type TenantUserStatus = "DISABLED" | "NORMAL" | "PENDING" | "LOCKED" | "EXPIRED" | "CLOSED";
