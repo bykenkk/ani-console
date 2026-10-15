@@ -39,7 +39,6 @@ export default function CreateLoadBalancerModal({
       const subnet = await qc.fetchQuery({
         queryKey: ["network-subnet", input.subnet_id],
         queryFn: () => getNetworkSubnet(input.subnet_id),
-        staleTime: 0,
       });
       const reason = subnetIpUnavailableReason(subnet);
       if (reason) throw new Error(reason);

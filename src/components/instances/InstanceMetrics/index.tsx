@@ -72,7 +72,6 @@ export default function InstanceMetrics({
     },
     queryKey: ["instance-metrics", instanceId],
     queryFn: () => getInstanceMetrics(instanceId),
-    refetchInterval: 5_000,
   });
   const gpuTrend = useQuery({
     meta: {
@@ -93,7 +92,6 @@ export default function InstanceMetrics({
         step: "1m",
       });
     },
-    refetchInterval: 5_000,
   });
   const monitoringTrend = useQuery({
     meta: {
@@ -189,7 +187,6 @@ export default function InstanceMetrics({
         }),
       );
     },
-    refetchInterval: 5_000,
   });
   const gpuTrendPoints = useMemo(
     () => gpuTrend.data?.results.flatMap((series) => series.values) ?? [],

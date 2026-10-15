@@ -46,7 +46,6 @@ export default function RegistryPage() {
         fallback: "请求失败，请稍后重试",
       },
     },
-    refetchInterval: (query) => (query.state.data?.state === "provisioning" ? 3000 : false),
   });
   const filters = {
     scope,

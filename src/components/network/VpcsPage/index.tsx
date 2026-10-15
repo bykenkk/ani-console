@@ -37,10 +37,6 @@ export default function VpcsPage() {
         state: status,
         name: searchText.trim() || undefined,
       }),
-    refetchInterval: (data) =>
-      data?.items?.some((vpc) => vpc.state === "provisioning" || vpc.state === "deleting")
-        ? 5000
-        : false,
   });
   const { actions } = useVpcActions(resetPagination);
   const columns: Array<ListColumn<Vpc>> = [

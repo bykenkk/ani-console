@@ -51,7 +51,6 @@ export default function NetworkRouteRelatedResources({
     queryKey: ["instance", "route-next-hop", route.next_hop_id],
     queryFn: () => getInstance(route.next_hop_id),
     enabled: route.next_hop_type === "instance" && Boolean(route.next_hop_id),
-    retry: false,
   });
   const nextHopInstance = instance.data as InstanceRecord | undefined;
   const resources: RelatedResource[] = [

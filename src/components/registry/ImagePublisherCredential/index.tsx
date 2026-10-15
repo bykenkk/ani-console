@@ -26,7 +26,6 @@ export default function ImagePublisherCredential({ available }: { available: boo
         fallback: "请求失败，请稍后重试",
       },
     },
-    refetchInterval: (result) => (result.state.data?.state === "issuing" ? 3000 : false),
   });
   const disable = useMutation({
     mutationFn: (credential: Credential) =>

@@ -11,7 +11,6 @@ type UseCursorPaginatedQueryOptions<T> = {
   initialPageSize?: number;
   enabled?: boolean;
   errorNotification?: QueryErrorNotificationMeta;
-  refetchInterval?: (data: CursorPage<T> | undefined) => number | false;
 };
 
 export function useCursorPaginatedQuery<T>({
@@ -20,7 +19,6 @@ export function useCursorPaginatedQuery<T>({
   initialPageSize = 10,
   enabled = true,
   errorNotification,
-  refetchInterval,
 }: UseCursorPaginatedQueryOptions<T>) {
   const queryClient = useQueryClient();
   const { page, pageSize, setPage, setPageSize, resetPagination } = useListPagination(
@@ -33,7 +31,6 @@ export function useCursorPaginatedQuery<T>({
     enabled,
     meta: { errorNotification },
     queryFn: () => queryFn({ cursor, limit: pageSize }),
-    refetchInterval: refetchInterval ? (query) => refetchInterval(query.state.data) : false,
   });
   // A deletion can empty the last page. Fetch the previous page instead of trapping the user.
   useEffect(() => {

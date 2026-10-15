@@ -42,10 +42,6 @@ export default function VpcDetailPage({
     },
     queryKey: ["network-vpc", vpcId],
     queryFn: () => getNetworkVpc(vpcId),
-    refetchInterval: (query) =>
-      query.state.data?.state === "provisioning" || query.state.data?.state === "deleting"
-        ? 5000
-        : false,
   });
   const { actions } = useVpcActions(goBack);
 

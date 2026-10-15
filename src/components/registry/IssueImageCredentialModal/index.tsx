@@ -23,7 +23,6 @@ export default function IssueImageCredentialModal({
   const client = useQueryClient();
   const reset = action === "reset";
   const mutation = useMutation({
-    gcTime: 0,
     // Keep the secret only in this mounted dialog, never in MutationCache.
     mutationFn: async () => {
       const result = await (reset ? resetImagePublisherCredential : issueImagePublisherCredential)({

@@ -29,8 +29,6 @@ export default function OverviewPage({
     },
     queryKey: ["resource-summaries"],
     queryFn: () => dataSource.getSummaries(),
-    retry: 1,
-    refetchInterval: 30_000,
   });
   const tasksQuery = useQuery({
     meta: {
@@ -42,8 +40,6 @@ export default function OverviewPage({
     },
     queryKey: ["tasks", taskFilter],
     queryFn: () => dataSource.getTasks(taskFilter),
-    retry: 1,
-    refetchInterval: 5_000,
   });
   return (
     <main className={styles.homePage}>

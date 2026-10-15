@@ -71,6 +71,14 @@ export const queryClient = new QueryClient({
     },
   }),
   defaultOptions: {
-    queries: { retry: 1, refetchOnWindowFocus: false },
+    queries: {
+      gcTime: 0,
+      retry: false,
+      retryOnMount: false,
+      refetchOnMount: false,
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+    },
+    mutations: { gcTime: 0 },
   },
 });

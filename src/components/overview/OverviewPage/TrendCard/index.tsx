@@ -50,7 +50,6 @@ export default function TrendCard({
     },
     queryKey: ["home-resource-trend", metric, range],
     queryFn: () => dataSource.getResourceTrend(metric, range),
-    retry: 1,
     staleTime: 60_000,
   });
   const current = trendQuery.data ?? emptyTrend;
