@@ -43,8 +43,8 @@ export default function LoginPage({ redirect = "/" }: { redirect?: string }) {
         throw new Error(getPasswordLoginErrorMessage(error));
       }
     },
-    onSuccess: (tokens, values) => {
-      setAuthSession({ tokens, username: values.username.trim() });
+    onSuccess: (tokens) => {
+      setAuthSession(tokens);
       navigate({ to: redirect, replace: true });
     },
   });

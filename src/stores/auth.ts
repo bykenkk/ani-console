@@ -11,17 +11,10 @@ export interface AuthTokens {
   issued_at?: string;
 }
 
-export interface AuthSession {
-  tokens: AuthTokens;
-  username: string | null;
-}
-
 interface AuthState {
   tokens: AuthTokens | null;
-  username: string | null;
-  hasKnownUsername: boolean;
   hydrated: boolean;
-  setAuthSession: (session: AuthSession | null) => void;
+  setAuthSession: (tokens: AuthTokens | null) => void;
   clear: () => void;
   getAccessToken: () => string | null;
   getAccessTokenJti: () => string | null;
@@ -73,30 +66,9 @@ export const useAuthStore = create<AuthState>()(
   persist(
     (set, get) => ({
       tokens: null,
-      username: null,
-      hasKnownUsername: false,
       hydrated: false,
-      setAuthSession: (session) => {
-        const username = session?.username?.trim() || null;
-        set({
-          tokens: session
-            ? {
-                access_token: session.tokens.access_token,
-                expires_in: session.tokens.expires_in,
-                issued_at: session.tokens.issued_at,
-                token_type: session.tokens.token_type,
-              }
-            : null,
-          username,
-          hasKnownUsername: username !== null,
-        });
-      },
-      clear: () =>
-        set({
-          tokens: null,
-          username: null,
-          hasKnownUsername: false,
-        }),
+      setAuthSession: (tokens) => set({ tokens }),
+      clear: () => set({ tokens: null }),
       getAccessToken: () => get().tokens?.access_token ?? null,
       getAccessTokenJti: () => {
         const token = get().tokens?.access_token;
@@ -108,15 +80,8 @@ export const useAuthStore = create<AuthState>()(
       name: "ani-console-auth",
       storage: createJSONStorage(() => authStateStorage),
       partialize: (state) => ({
-        username: state.username,
-        hasKnownUsername: state.hasKnownUsername,
+        tokens: state.tokens,
       }),
-      // Restore only display metadata; discard old tokens and removed authentication flags.
-      merge: (persisted, current) => {
-        const saved = persisted as { username?: unknown } | undefined;
-        const username = typeof saved?.username === "string" ? saved.username.trim() || null : null;
-        return { ...current, username, hasKnownUsername: username !== null, tokens: null };
-      },
       skipHydration: true,
       onRehydrateStorage: () => () => {
         useAuthStore.setState({ hydrated: true });

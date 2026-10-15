@@ -76,7 +76,7 @@ export default function LoginCallbackPage() {
       try {
         const tokens = await exchangeOidcCode(code, state, redirectUri);
         closeNotification("oidc-login");
-        setAuthSession({ tokens, username: null });
+        setAuthSession(tokens);
         await Promise.allSettled([
           oidcStorage.setItem(doneKey, true),
           oidcStorage.removeItem(PENDING_KEY),

@@ -3,7 +3,6 @@ import { RouterProvider } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { migrateLegacyAuthStorage } from "@/lib/storage";
 import { useAuthStore } from "@/stores/auth";
-import { startAuthSession } from "@/api/request";
 import { queryClient } from "../query-client";
 import { router } from "../router";
 
@@ -16,7 +15,6 @@ async function initializeAuth(): Promise<void> {
     // Hydration can still continue when legacy migration is unavailable.
   }
   await useAuthStore.persist.rehydrate();
-  await startAuthSession();
 }
 
 export function AppRoot() {

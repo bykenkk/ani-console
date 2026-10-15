@@ -21,6 +21,7 @@ import { logout as logoutRequest } from "@/api/auth";
 import brandLogo from "@/assets/brand/wordmark.png";
 import { formatDateTime } from "@/lib/format";
 import { useAuthStore } from "@/stores/auth";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import AboutUsModal from "@/components/layouts/AboutUsModal";
 import KaiwuEntryButton from "@/components/kaiwu/KaiwuEntryButton";
 
@@ -41,11 +42,14 @@ export default function TopNav({
   const [userMenuVisible, setUserMenuVisible] = useState(false);
   const [regionMenuVisible, setRegionMenuVisible] = useState(false);
   const [aboutVisible, setAboutVisible] = useState(false);
-  const username = useAuthStore((s) => (s.hasKnownUsername ? s.username : null) ?? "用户");
-  const sessionIssuedAt = useAuthStore((s) => {
-    if (!s.tokens || !("issued_at" in s.tokens)) return null;
-    return typeof s.tokens.issued_at === "string" ? s.tokens.issued_at : null;
-  });
+  const { data: user } = useCurrentUser();
+  const username = user?.username || "-";
+  const roles = (user?.roleNames?.length ? user.roleNames : user?.roles)?.join("、") || "-";
+  const avatar = user?.avatar ? (
+    <img src={user.avatar} alt="" className="h-full w-full rounded-full object-cover" />
+  ) : (
+    <IconUser />
+  );
 
   const logout = useMutation({
     meta: {
@@ -80,17 +84,17 @@ export default function TopNav({
     <div className="topnav-user-card" role="menu" aria-label="个人中心">
       <div className="topnav-user-card-header">
         <span className="topnav-user-card-avatar" aria-hidden="true">
-          <IconUser />
+          {avatar}
         </span>
         <div className="topnav-user-card-profile">
           <strong>{username}</strong>
           <span className="topnav-user-card-meta">
             <IconTag />
-            <span>console</span>
+            <span>{roles}</span>
           </span>
           <span className="topnav-user-card-meta">
             <IconCalendar />
-            <span>{formatDateTime(sessionIssuedAt)}</span>
+            <span>{formatDateTime(user?.lastLoginAt)}</span>
           </span>
         </div>
       </div>
@@ -224,9 +228,7 @@ export default function TopNav({
               aria-haspopup="menu"
               aria-expanded={userMenuVisible}
             >
-              <span className="topnav-user-avatar">
-                <IconUser />
-              </span>
+              <span className="topnav-user-avatar">{avatar}</span>
               <span className="topnav-user-name">{username}</span>
             </button>
           </Dropdown>

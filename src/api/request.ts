@@ -225,12 +225,9 @@ function refreshAccessToken(): Promise<string> {
       if (loggingOut || generation !== sessionGeneration) throw new ApiError("登录会话已变更");
       const authState = useAuthStore.getState();
       authState.setAuthSession({
-        tokens: {
-          access_token: refreshed.access_token,
-          expires_in: parseTokenExpiresIn(refreshed.expires_in),
-          issued_at: refreshed.issued_at,
-        },
-        username: authState.hasKnownUsername ? authState.username : null,
+        access_token: refreshed.access_token,
+        expires_in: parseTokenExpiresIn(refreshed.expires_in),
+        issued_at: refreshed.issued_at,
       });
       return refreshed.access_token;
     })
@@ -291,16 +288,6 @@ function scheduleTokenRefreshRetry(): void {
       setRefreshTimer(30_000);
     }
   });
-}
-
-/** Called after persisted state hydration and before protected routes mount. */
-export async function startAuthSession(): Promise<void> {
-  try {
-    await refreshAccessToken();
-  } catch {
-    // Cookie recovery is optional on the login page; protected routes require a valid session.
-    useAuthStore.getState().clear();
-  }
 }
 
 useAuthStore.subscribe((state, previous) => {
