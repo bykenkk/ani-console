@@ -46,6 +46,5 @@ export { default as NotFoundPage } from "./NotFoundPage";
 export { default as ResourceId } from "./ResourceId";
 export { default as StatusBadge } from "./StatusBadge";
 export type { StatusBadgeProps, StatusBadgeTone } from "./StatusBadge";
-export { default as StatusTag } from "./StatusTag";
 export { default as WizardSteps } from "./WizardSteps";
 export type { WizardStepsProps } from "./WizardSteps";

@@ -1,7 +1,7 @@
 import { Tag, Tooltip } from "@arco-design/web-react";
 import { IconLoading } from "@arco-design/web-react/icon";
 import clsx from "clsx";
-import type { ReactNode } from "react";
+import { Children, type ReactNode } from "react";
 import styles from "./index.module.css";
 
 export type StatusBadgeTone = "primary" | "success" | "warning" | "danger" | "neutral";
@@ -11,6 +11,7 @@ export interface StatusBadgeProps {
   reason?: string | null;
   message?: string | null;
   children?: ReactNode;
+  title?: string;
   tone?: StatusBadgeTone;
   loading?: boolean;
   className?: string;
@@ -61,6 +62,7 @@ export default function StatusBadge({
   reason,
   message,
   children,
+  title,
   tone,
   loading,
   className,
@@ -68,6 +70,10 @@ export default function StatusBadge({
   const appearance = STATUS_APPEARANCE[status?.toLowerCase() ?? ""];
   const resolvedTone = tone ?? appearance?.tone ?? "neutral";
   const resolvedLoading = loading ?? appearance?.loading ?? false;
+  const content = children ?? (status || "-");
+  const contentTitle = Children.toArray(content)
+    .filter((child) => typeof child === "string" || typeof child === "number")
+    .join("");
   const indicatorIcon = resolvedLoading ? (
     <IconLoading className={styles.loadingIcon} aria-hidden="true" />
   ) : (
@@ -79,10 +85,11 @@ export default function StatusBadge({
       color={TONE_COLOR[resolvedTone]}
       bordered={false}
       className={clsx(styles.indicator, className)}
+      title={title ?? (contentTitle || undefined)}
       icon={indicatorIcon}
       aria-busy={resolvedLoading || undefined}
     >
-      {children ?? (status || "-")}
+      {content}
     </Tag>
   );
   const tooltipReason = reason?.trim();
@@ -98,7 +105,7 @@ export default function StatusBadge({
         </div>
       }
     >
-      <span className="inline-flex">{badge}</span>
+      <span className={styles.tooltipTrigger}>{badge}</span>
     </Tooltip>
   );
 }
