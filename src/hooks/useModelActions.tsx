@@ -1,20 +1,20 @@
-import { useResourceDelete } from "@/hooks/useResourceDelete";
+// FIXME(governance-migration): 收藏、删除未有对应公开模型契约；新增版本的文件上传链路未确认，相关入口保持禁用。
+// TODO(governance-migration): 分别核对收藏/删除契约及版本元数据创建与文件上传流程，部署可用后恢复操作。
 import { useState } from "react";
-import CreateInferenceServiceModal from "@/components/ai-services/CreateInferenceServiceModal";
-import { getLatestModelVersion, type Model } from "@/lib/ai-models";
+import CreateInferenceModal from "@/components/ai-inference/CreateInferenceModal";
+import InferenceOperationModal from "@/components/ai-inference/InferenceOperationModal";
+import type { InferenceAcceptance } from "@/api/inference";
+import type { Model } from "@/api/models";
 import type { RowAction } from "@/components/common";
 
-export function useModelActions(onDeleted: (item: Model) => void) {
+export function useModelActions() {
   const [deployModel, setDeployModel] = useState<Model | null>(null);
-  const remove = useResourceDelete<Model>("model", onDeleted, {
-    isDisabled: (item) => item.status === "deleted",
-  });
-  const deploymentOptions = deployModel ? getModelDeploymentOptions(deployModel) : undefined;
+  const [acceptance, setAcceptance] = useState<InferenceAcceptance>();
   const actions: RowAction<Model>[] = [
     {
       key: "deploy",
       label: "部署",
-      disabled: (item) => !getModelDeploymentOptions(item),
+      disabled: (item) => item.status !== "ready" || !item.versions?.length,
       onClick: setDeployModel,
     },
     {
@@ -35,28 +35,28 @@ export function useModelActions(onDeleted: (item: Model) => void) {
       key: "delete",
       label: "删除",
       intent: "danger",
-      disabled: remove.isDisabled,
-      onClick: (item) => {
-        remove.confirm(item);
-      },
+      disabled: () => true,
+      tooltip: "模型删除暂未开放",
+      onClick: () => undefined,
     },
   ];
   const dialogNode = (
     <>
-      {deploymentOptions && (
-        <CreateInferenceServiceModal {...deploymentOptions} onCancel={() => setDeployModel(null)} />
+      {deployModel && (
+        <CreateInferenceModal
+          initialServiceName={("infer-" + deployModel.name).slice(0, 63)}
+          initialModelId={deployModel.id}
+          onCreated={setAcceptance}
+          onCancel={() => setDeployModel(null)}
+        />
+      )}
+      {acceptance && (
+        <InferenceOperationModal
+          acceptance={acceptance}
+          onCancel={() => setAcceptance(undefined)}
+        />
       )}
     </>
   );
   return { actions, dialogNode };
-}
-
-function getModelDeploymentOptions(model: Model) {
-  const latestVersion = getLatestModelVersion(model);
-  if (model.status !== "ready" || !latestVersion) return undefined;
-  return {
-    initialModelId: model.id,
-    initialModelVersionId: latestVersion.id,
-    initialServiceName: ("infer-" + model.name).slice(0, 63),
-  };
 }

@@ -1,4 +1,6 @@
-import { listInferenceServices } from "@/api/ai-services/inference";
+// FIXME(governance-migration): 向量化模型仍依赖旧 Services 的 embedding + running 筛选，不能用已入库模型列表直接替代。
+// TODO(governance-migration): governance 补齐可调用候选并验证向量化链路后迁移；embedding_model 仍提交 served_model_name。
+import { listInferenceServices } from "@/api/inference/legacy";
 import {
   createVectorStore,
   type VectorMetric,

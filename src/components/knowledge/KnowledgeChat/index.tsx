@@ -1,4 +1,6 @@
-import { listInferenceServices } from "@/api/ai-services/inference";
+// FIXME(governance-migration): 问答模型候选仍从旧 Services 筛选 text-generation + running，与新推理管理列表的数据源不同。
+// TODO(governance-migration): 确认可调用候选与知识库生成路由兼容后迁移；同步问答和 SSE 均保留 served_model_name 语义。
+import { listInferenceServices } from "@/api/inference/legacy";
 import {
   deleteKnowledgeBaseSession,
   listKnowledgeBaseCitations,

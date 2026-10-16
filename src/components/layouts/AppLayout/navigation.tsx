@@ -127,8 +127,8 @@ export const menuItems: readonly MenuItem[] = [
         label: "AI 服务",
         icon: <AliIcon name="tuili" />,
         children: [
-          { key: "/models", label: "模型仓库", icon: <AliIcon name="moxing" /> },
-          { key: "/inference", label: "推理服务", icon: <AliIcon name="tuili" /> },
+          { key: "/ai-models", label: "模型仓库", icon: <AliIcon name="moxing" /> },
+          { key: "/ai-inference", label: "推理服务", icon: <AliIcon name="tuili" /> },
         ],
       },
       {
@@ -219,8 +219,8 @@ const PATH_SUBMENU: { prefix: string; key: string }[] = [
   { prefix: "/filesystems", key: "storage-management" },
   { prefix: "/objects", key: "storage-management" },
   { prefix: "/vector-stores", key: "storage-management" },
-  { prefix: "/models", key: "ai-services" },
-  { prefix: "/inference", key: "ai-services" },
+  { prefix: "/ai-models", key: "ai-services" },
+  { prefix: "/ai-inference", key: "ai-services" },
   { prefix: "/kb", key: "knowledge-services" },
   { prefix: "/vpcs", key: "network-management" },
   { prefix: "/subnets", key: "network-management" },

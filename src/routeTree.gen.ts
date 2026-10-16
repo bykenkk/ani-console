@@ -15,6 +15,10 @@ import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_a
 import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as LoginCallbackRouteImport } from './routes/login.callback'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/_app/index'
+import { Route as AuthenticatedAppAiInferenceIndexRouteImport } from './routes/_authenticated/_app/ai-inference/index'
+import { Route as AuthenticatedAppAiInferenceServiceIdRouteImport } from './routes/_authenticated/_app/ai-inference/$serviceId'
+import { Route as AuthenticatedAppAiModelsIndexRouteImport } from './routes/_authenticated/_app/ai-models/index'
+import { Route as AuthenticatedAppAiModelsModelIdRouteImport } from './routes/_authenticated/_app/ai-models/$modelId'
 import { Route as AuthenticatedAppApiKeysIndexRouteImport } from './routes/_authenticated/_app/api-keys/index'
 import { Route as AuthenticatedAppContainerInstancesIndexRouteImport } from './routes/_authenticated/_app/container-instances/index'
 import { Route as AuthenticatedAppContainerInstancesInstanceIdRouteImport } from './routes/_authenticated/_app/container-instances/$instanceId'
@@ -25,16 +29,12 @@ import { Route as AuthenticatedAppFilesystemsFilesystemIdRouteImport } from './r
 import { Route as AuthenticatedAppGpuInstancesIndexRouteImport } from './routes/_authenticated/_app/gpu-instances/index'
 import { Route as AuthenticatedAppGpuInstancesInstanceIdRouteImport } from './routes/_authenticated/_app/gpu-instances/$instanceId'
 import { Route as AuthenticatedAppGpuInventoryIndexRouteImport } from './routes/_authenticated/_app/gpu-inventory/index'
-import { Route as AuthenticatedAppInferenceIndexRouteImport } from './routes/_authenticated/_app/inference/index'
-import { Route as AuthenticatedAppInferenceServiceIdRouteImport } from './routes/_authenticated/_app/inference/$serviceId'
 import { Route as AuthenticatedAppK8sClustersIndexRouteImport } from './routes/_authenticated/_app/k8s-clusters/index'
 import { Route as AuthenticatedAppK8sClustersClusterIdRouteImport } from './routes/_authenticated/_app/k8s-clusters/$clusterId'
 import { Route as AuthenticatedAppKbIndexRouteImport } from './routes/_authenticated/_app/kb/index'
 import { Route as AuthenticatedAppKbKbIdRouteImport } from './routes/_authenticated/_app/kb/$kbId'
 import { Route as AuthenticatedAppLoadBalancersIndexRouteImport } from './routes/_authenticated/_app/load-balancers/index'
 import { Route as AuthenticatedAppLoadBalancersLoadBalancerIdRouteImport } from './routes/_authenticated/_app/load-balancers/$loadBalancerId'
-import { Route as AuthenticatedAppModelsIndexRouteImport } from './routes/_authenticated/_app/models/index'
-import { Route as AuthenticatedAppModelsModelIdRouteImport } from './routes/_authenticated/_app/models/$modelId'
 import { Route as AuthenticatedAppObjectsIndexRouteImport } from './routes/_authenticated/_app/objects/index'
 import { Route as AuthenticatedAppObjectsBucketIdRouteImport } from './routes/_authenticated/_app/objects/$bucketId'
 import { Route as AuthenticatedAppOverviewComputeIndexRouteImport } from './routes/_authenticated/_app/overview-compute/index'
@@ -90,6 +90,30 @@ const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedAppRoute,
 } as any)
+const AuthenticatedAppAiInferenceIndexRoute =
+  AuthenticatedAppAiInferenceIndexRouteImport.update({
+    id: '/ai-inference/',
+    path: '/ai-inference/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppAiInferenceServiceIdRoute =
+  AuthenticatedAppAiInferenceServiceIdRouteImport.update({
+    id: '/ai-inference/$serviceId',
+    path: '/ai-inference/$serviceId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppAiModelsIndexRoute =
+  AuthenticatedAppAiModelsIndexRouteImport.update({
+    id: '/ai-models/',
+    path: '/ai-models/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppAiModelsModelIdRoute =
+  AuthenticatedAppAiModelsModelIdRouteImport.update({
+    id: '/ai-models/$modelId',
+    path: '/ai-models/$modelId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppApiKeysIndexRoute =
   AuthenticatedAppApiKeysIndexRouteImport.update({
     id: '/api-keys/',
@@ -150,18 +174,6 @@ const AuthenticatedAppGpuInventoryIndexRoute =
     path: '/gpu-inventory/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAppInferenceIndexRoute =
-  AuthenticatedAppInferenceIndexRouteImport.update({
-    id: '/inference/',
-    path: '/inference/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppInferenceServiceIdRoute =
-  AuthenticatedAppInferenceServiceIdRouteImport.update({
-    id: '/inference/$serviceId',
-    path: '/inference/$serviceId',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
 const AuthenticatedAppK8sClustersIndexRoute =
   AuthenticatedAppK8sClustersIndexRouteImport.update({
     id: '/k8s-clusters/',
@@ -194,18 +206,6 @@ const AuthenticatedAppLoadBalancersLoadBalancerIdRoute =
   AuthenticatedAppLoadBalancersLoadBalancerIdRouteImport.update({
     id: '/load-balancers/$loadBalancerId',
     path: '/load-balancers/$loadBalancerId',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppModelsIndexRoute =
-  AuthenticatedAppModelsIndexRouteImport.update({
-    id: '/models/',
-    path: '/models/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppModelsModelIdRoute =
-  AuthenticatedAppModelsModelIdRouteImport.update({
-    id: '/models/$modelId',
-    path: '/models/$modelId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppObjectsIndexRoute =
@@ -370,15 +370,15 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRouteWithChildren
   '/login/callback': typeof LoginCallbackRoute
   '/login/': typeof LoginIndexRoute
+  '/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
+  '/ai-models/$modelId': typeof AuthenticatedAppAiModelsModelIdRoute
   '/container-instances/$instanceId': typeof AuthenticatedAppContainerInstancesInstanceIdRoute
   '/dev/resource': typeof AuthenticatedAppDevResourceRoute
   '/filesystems/$filesystemId': typeof AuthenticatedAppFilesystemsFilesystemIdRoute
   '/gpu-instances/$instanceId': typeof AuthenticatedAppGpuInstancesInstanceIdRoute
-  '/inference/$serviceId': typeof AuthenticatedAppInferenceServiceIdRoute
   '/k8s-clusters/$clusterId': typeof AuthenticatedAppK8sClustersClusterIdRoute
   '/kb/$kbId': typeof AuthenticatedAppKbKbIdRoute
   '/load-balancers/$loadBalancerId': typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
-  '/models/$modelId': typeof AuthenticatedAppModelsModelIdRoute
   '/objects/$bucketId': typeof AuthenticatedAppObjectsBucketIdRouteWithChildren
   '/routes/$routeId': typeof AuthenticatedAppRoutesRouteIdRoute
   '/sandbox-instances/$instanceId': typeof AuthenticatedAppSandboxInstancesInstanceIdRoute
@@ -392,17 +392,17 @@ export interface FileRoutesByFullPath {
   '/gpu-instances/$instanceId/terminal': typeof AuthenticatedGpuInstancesInstanceIdTerminalRoute
   '/sandbox-instances/$instanceId/terminal': typeof AuthenticatedSandboxInstancesInstanceIdTerminalRoute
   '/vm-instances/$instanceId/vnc': typeof AuthenticatedVmInstancesInstanceIdVncRoute
+  '/ai-inference/': typeof AuthenticatedAppAiInferenceIndexRoute
+  '/ai-models/': typeof AuthenticatedAppAiModelsIndexRoute
   '/api-keys/': typeof AuthenticatedAppApiKeysIndexRoute
   '/container-instances/': typeof AuthenticatedAppContainerInstancesIndexRoute
   '/dev/': typeof AuthenticatedAppDevIndexRoute
   '/filesystems/': typeof AuthenticatedAppFilesystemsIndexRoute
   '/gpu-instances/': typeof AuthenticatedAppGpuInstancesIndexRoute
   '/gpu-inventory/': typeof AuthenticatedAppGpuInventoryIndexRoute
-  '/inference/': typeof AuthenticatedAppInferenceIndexRoute
   '/k8s-clusters/': typeof AuthenticatedAppK8sClustersIndexRoute
   '/kb/': typeof AuthenticatedAppKbIndexRoute
   '/load-balancers/': typeof AuthenticatedAppLoadBalancersIndexRoute
-  '/models/': typeof AuthenticatedAppModelsIndexRoute
   '/objects/': typeof AuthenticatedAppObjectsIndexRoute
   '/overview-compute/': typeof AuthenticatedAppOverviewComputeIndexRoute
   '/registry/': typeof AuthenticatedAppRegistryIndexRoute
@@ -421,15 +421,15 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedAppIndexRoute
   '/login/callback': typeof LoginCallbackRoute
   '/login': typeof LoginIndexRoute
+  '/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
+  '/ai-models/$modelId': typeof AuthenticatedAppAiModelsModelIdRoute
   '/container-instances/$instanceId': typeof AuthenticatedAppContainerInstancesInstanceIdRoute
   '/dev/resource': typeof AuthenticatedAppDevResourceRoute
   '/filesystems/$filesystemId': typeof AuthenticatedAppFilesystemsFilesystemIdRoute
   '/gpu-instances/$instanceId': typeof AuthenticatedAppGpuInstancesInstanceIdRoute
-  '/inference/$serviceId': typeof AuthenticatedAppInferenceServiceIdRoute
   '/k8s-clusters/$clusterId': typeof AuthenticatedAppK8sClustersClusterIdRoute
   '/kb/$kbId': typeof AuthenticatedAppKbKbIdRoute
   '/load-balancers/$loadBalancerId': typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
-  '/models/$modelId': typeof AuthenticatedAppModelsModelIdRoute
   '/routes/$routeId': typeof AuthenticatedAppRoutesRouteIdRoute
   '/sandbox-instances/$instanceId': typeof AuthenticatedAppSandboxInstancesInstanceIdRoute
   '/security-groups/$securityGroupId': typeof AuthenticatedAppSecurityGroupsSecurityGroupIdRoute
@@ -442,17 +442,17 @@ export interface FileRoutesByTo {
   '/gpu-instances/$instanceId/terminal': typeof AuthenticatedGpuInstancesInstanceIdTerminalRoute
   '/sandbox-instances/$instanceId/terminal': typeof AuthenticatedSandboxInstancesInstanceIdTerminalRoute
   '/vm-instances/$instanceId/vnc': typeof AuthenticatedVmInstancesInstanceIdVncRoute
+  '/ai-inference': typeof AuthenticatedAppAiInferenceIndexRoute
+  '/ai-models': typeof AuthenticatedAppAiModelsIndexRoute
   '/api-keys': typeof AuthenticatedAppApiKeysIndexRoute
   '/container-instances': typeof AuthenticatedAppContainerInstancesIndexRoute
   '/dev': typeof AuthenticatedAppDevIndexRoute
   '/filesystems': typeof AuthenticatedAppFilesystemsIndexRoute
   '/gpu-instances': typeof AuthenticatedAppGpuInstancesIndexRoute
   '/gpu-inventory': typeof AuthenticatedAppGpuInventoryIndexRoute
-  '/inference': typeof AuthenticatedAppInferenceIndexRoute
   '/k8s-clusters': typeof AuthenticatedAppK8sClustersIndexRoute
   '/kb': typeof AuthenticatedAppKbIndexRoute
   '/load-balancers': typeof AuthenticatedAppLoadBalancersIndexRoute
-  '/models': typeof AuthenticatedAppModelsIndexRoute
   '/objects': typeof AuthenticatedAppObjectsIndexRoute
   '/overview-compute': typeof AuthenticatedAppOverviewComputeIndexRoute
   '/registry': typeof AuthenticatedAppRegistryIndexRoute
@@ -475,15 +475,15 @@ export interface FileRoutesById {
   '/login/callback': typeof LoginCallbackRoute
   '/login/': typeof LoginIndexRoute
   '/_authenticated/_app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/_app/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
+  '/_authenticated/_app/ai-models/$modelId': typeof AuthenticatedAppAiModelsModelIdRoute
   '/_authenticated/_app/container-instances/$instanceId': typeof AuthenticatedAppContainerInstancesInstanceIdRoute
   '/_authenticated/_app/dev/resource': typeof AuthenticatedAppDevResourceRoute
   '/_authenticated/_app/filesystems/$filesystemId': typeof AuthenticatedAppFilesystemsFilesystemIdRoute
   '/_authenticated/_app/gpu-instances/$instanceId': typeof AuthenticatedAppGpuInstancesInstanceIdRoute
-  '/_authenticated/_app/inference/$serviceId': typeof AuthenticatedAppInferenceServiceIdRoute
   '/_authenticated/_app/k8s-clusters/$clusterId': typeof AuthenticatedAppK8sClustersClusterIdRoute
   '/_authenticated/_app/kb/$kbId': typeof AuthenticatedAppKbKbIdRoute
   '/_authenticated/_app/load-balancers/$loadBalancerId': typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
-  '/_authenticated/_app/models/$modelId': typeof AuthenticatedAppModelsModelIdRoute
   '/_authenticated/_app/objects/$bucketId': typeof AuthenticatedAppObjectsBucketIdRouteWithChildren
   '/_authenticated/_app/routes/$routeId': typeof AuthenticatedAppRoutesRouteIdRoute
   '/_authenticated/_app/sandbox-instances/$instanceId': typeof AuthenticatedAppSandboxInstancesInstanceIdRoute
@@ -497,17 +497,17 @@ export interface FileRoutesById {
   '/_authenticated/gpu-instances/$instanceId/terminal': typeof AuthenticatedGpuInstancesInstanceIdTerminalRoute
   '/_authenticated/sandbox-instances/$instanceId/terminal': typeof AuthenticatedSandboxInstancesInstanceIdTerminalRoute
   '/_authenticated/vm-instances/$instanceId/vnc': typeof AuthenticatedVmInstancesInstanceIdVncRoute
+  '/_authenticated/_app/ai-inference/': typeof AuthenticatedAppAiInferenceIndexRoute
+  '/_authenticated/_app/ai-models/': typeof AuthenticatedAppAiModelsIndexRoute
   '/_authenticated/_app/api-keys/': typeof AuthenticatedAppApiKeysIndexRoute
   '/_authenticated/_app/container-instances/': typeof AuthenticatedAppContainerInstancesIndexRoute
   '/_authenticated/_app/dev/': typeof AuthenticatedAppDevIndexRoute
   '/_authenticated/_app/filesystems/': typeof AuthenticatedAppFilesystemsIndexRoute
   '/_authenticated/_app/gpu-instances/': typeof AuthenticatedAppGpuInstancesIndexRoute
   '/_authenticated/_app/gpu-inventory/': typeof AuthenticatedAppGpuInventoryIndexRoute
-  '/_authenticated/_app/inference/': typeof AuthenticatedAppInferenceIndexRoute
   '/_authenticated/_app/k8s-clusters/': typeof AuthenticatedAppK8sClustersIndexRoute
   '/_authenticated/_app/kb/': typeof AuthenticatedAppKbIndexRoute
   '/_authenticated/_app/load-balancers/': typeof AuthenticatedAppLoadBalancersIndexRoute
-  '/_authenticated/_app/models/': typeof AuthenticatedAppModelsIndexRoute
   '/_authenticated/_app/objects/': typeof AuthenticatedAppObjectsIndexRoute
   '/_authenticated/_app/overview-compute/': typeof AuthenticatedAppOverviewComputeIndexRoute
   '/_authenticated/_app/registry/': typeof AuthenticatedAppRegistryIndexRoute
@@ -529,15 +529,15 @@ export interface FileRouteTypes {
     | '/login'
     | '/login/callback'
     | '/login/'
+    | '/ai-inference/$serviceId'
+    | '/ai-models/$modelId'
     | '/container-instances/$instanceId'
     | '/dev/resource'
     | '/filesystems/$filesystemId'
     | '/gpu-instances/$instanceId'
-    | '/inference/$serviceId'
     | '/k8s-clusters/$clusterId'
     | '/kb/$kbId'
     | '/load-balancers/$loadBalancerId'
-    | '/models/$modelId'
     | '/objects/$bucketId'
     | '/routes/$routeId'
     | '/sandbox-instances/$instanceId'
@@ -551,17 +551,17 @@ export interface FileRouteTypes {
     | '/gpu-instances/$instanceId/terminal'
     | '/sandbox-instances/$instanceId/terminal'
     | '/vm-instances/$instanceId/vnc'
+    | '/ai-inference/'
+    | '/ai-models/'
     | '/api-keys/'
     | '/container-instances/'
     | '/dev/'
     | '/filesystems/'
     | '/gpu-instances/'
     | '/gpu-inventory/'
-    | '/inference/'
     | '/k8s-clusters/'
     | '/kb/'
     | '/load-balancers/'
-    | '/models/'
     | '/objects/'
     | '/overview-compute/'
     | '/registry/'
@@ -580,15 +580,15 @@ export interface FileRouteTypes {
     | '/'
     | '/login/callback'
     | '/login'
+    | '/ai-inference/$serviceId'
+    | '/ai-models/$modelId'
     | '/container-instances/$instanceId'
     | '/dev/resource'
     | '/filesystems/$filesystemId'
     | '/gpu-instances/$instanceId'
-    | '/inference/$serviceId'
     | '/k8s-clusters/$clusterId'
     | '/kb/$kbId'
     | '/load-balancers/$loadBalancerId'
-    | '/models/$modelId'
     | '/routes/$routeId'
     | '/sandbox-instances/$instanceId'
     | '/security-groups/$securityGroupId'
@@ -601,17 +601,17 @@ export interface FileRouteTypes {
     | '/gpu-instances/$instanceId/terminal'
     | '/sandbox-instances/$instanceId/terminal'
     | '/vm-instances/$instanceId/vnc'
+    | '/ai-inference'
+    | '/ai-models'
     | '/api-keys'
     | '/container-instances'
     | '/dev'
     | '/filesystems'
     | '/gpu-instances'
     | '/gpu-inventory'
-    | '/inference'
     | '/k8s-clusters'
     | '/kb'
     | '/load-balancers'
-    | '/models'
     | '/objects'
     | '/overview-compute'
     | '/registry'
@@ -633,15 +633,15 @@ export interface FileRouteTypes {
     | '/login/callback'
     | '/login/'
     | '/_authenticated/_app/'
+    | '/_authenticated/_app/ai-inference/$serviceId'
+    | '/_authenticated/_app/ai-models/$modelId'
     | '/_authenticated/_app/container-instances/$instanceId'
     | '/_authenticated/_app/dev/resource'
     | '/_authenticated/_app/filesystems/$filesystemId'
     | '/_authenticated/_app/gpu-instances/$instanceId'
-    | '/_authenticated/_app/inference/$serviceId'
     | '/_authenticated/_app/k8s-clusters/$clusterId'
     | '/_authenticated/_app/kb/$kbId'
     | '/_authenticated/_app/load-balancers/$loadBalancerId'
-    | '/_authenticated/_app/models/$modelId'
     | '/_authenticated/_app/objects/$bucketId'
     | '/_authenticated/_app/routes/$routeId'
     | '/_authenticated/_app/sandbox-instances/$instanceId'
@@ -655,17 +655,17 @@ export interface FileRouteTypes {
     | '/_authenticated/gpu-instances/$instanceId/terminal'
     | '/_authenticated/sandbox-instances/$instanceId/terminal'
     | '/_authenticated/vm-instances/$instanceId/vnc'
+    | '/_authenticated/_app/ai-inference/'
+    | '/_authenticated/_app/ai-models/'
     | '/_authenticated/_app/api-keys/'
     | '/_authenticated/_app/container-instances/'
     | '/_authenticated/_app/dev/'
     | '/_authenticated/_app/filesystems/'
     | '/_authenticated/_app/gpu-instances/'
     | '/_authenticated/_app/gpu-inventory/'
-    | '/_authenticated/_app/inference/'
     | '/_authenticated/_app/k8s-clusters/'
     | '/_authenticated/_app/kb/'
     | '/_authenticated/_app/load-balancers/'
-    | '/_authenticated/_app/models/'
     | '/_authenticated/_app/objects/'
     | '/_authenticated/_app/overview-compute/'
     | '/_authenticated/_app/registry/'
@@ -728,6 +728,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/ai-inference/': {
+      id: '/_authenticated/_app/ai-inference/'
+      path: '/ai-inference'
+      fullPath: '/ai-inference/'
+      preLoaderRoute: typeof AuthenticatedAppAiInferenceIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/ai-inference/$serviceId': {
+      id: '/_authenticated/_app/ai-inference/$serviceId'
+      path: '/ai-inference/$serviceId'
+      fullPath: '/ai-inference/$serviceId'
+      preLoaderRoute: typeof AuthenticatedAppAiInferenceServiceIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/ai-models/': {
+      id: '/_authenticated/_app/ai-models/'
+      path: '/ai-models'
+      fullPath: '/ai-models/'
+      preLoaderRoute: typeof AuthenticatedAppAiModelsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/ai-models/$modelId': {
+      id: '/_authenticated/_app/ai-models/$modelId'
+      path: '/ai-models/$modelId'
+      fullPath: '/ai-models/$modelId'
+      preLoaderRoute: typeof AuthenticatedAppAiModelsModelIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/api-keys/': {
@@ -800,20 +828,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppGpuInventoryIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/_app/inference/': {
-      id: '/_authenticated/_app/inference/'
-      path: '/inference'
-      fullPath: '/inference/'
-      preLoaderRoute: typeof AuthenticatedAppInferenceIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/inference/$serviceId': {
-      id: '/_authenticated/_app/inference/$serviceId'
-      path: '/inference/$serviceId'
-      fullPath: '/inference/$serviceId'
-      preLoaderRoute: typeof AuthenticatedAppInferenceServiceIdRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
     '/_authenticated/_app/k8s-clusters/': {
       id: '/_authenticated/_app/k8s-clusters/'
       path: '/k8s-clusters'
@@ -854,20 +868,6 @@ declare module '@tanstack/react-router' {
       path: '/load-balancers/$loadBalancerId'
       fullPath: '/load-balancers/$loadBalancerId'
       preLoaderRoute: typeof AuthenticatedAppLoadBalancersLoadBalancerIdRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/models/': {
-      id: '/_authenticated/_app/models/'
-      path: '/models'
-      fullPath: '/models/'
-      preLoaderRoute: typeof AuthenticatedAppModelsIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/models/$modelId': {
-      id: '/_authenticated/_app/models/$modelId'
-      path: '/models/$modelId'
-      fullPath: '/models/$modelId'
-      preLoaderRoute: typeof AuthenticatedAppModelsModelIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/objects/': {
@@ -1075,15 +1075,15 @@ const AuthenticatedAppObjectsBucketIdRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+  AuthenticatedAppAiInferenceServiceIdRoute: typeof AuthenticatedAppAiInferenceServiceIdRoute
+  AuthenticatedAppAiModelsModelIdRoute: typeof AuthenticatedAppAiModelsModelIdRoute
   AuthenticatedAppContainerInstancesInstanceIdRoute: typeof AuthenticatedAppContainerInstancesInstanceIdRoute
   AuthenticatedAppDevResourceRoute: typeof AuthenticatedAppDevResourceRoute
   AuthenticatedAppFilesystemsFilesystemIdRoute: typeof AuthenticatedAppFilesystemsFilesystemIdRoute
   AuthenticatedAppGpuInstancesInstanceIdRoute: typeof AuthenticatedAppGpuInstancesInstanceIdRoute
-  AuthenticatedAppInferenceServiceIdRoute: typeof AuthenticatedAppInferenceServiceIdRoute
   AuthenticatedAppK8sClustersClusterIdRoute: typeof AuthenticatedAppK8sClustersClusterIdRoute
   AuthenticatedAppKbKbIdRoute: typeof AuthenticatedAppKbKbIdRoute
   AuthenticatedAppLoadBalancersLoadBalancerIdRoute: typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
-  AuthenticatedAppModelsModelIdRoute: typeof AuthenticatedAppModelsModelIdRoute
   AuthenticatedAppObjectsBucketIdRoute: typeof AuthenticatedAppObjectsBucketIdRouteWithChildren
   AuthenticatedAppRoutesRouteIdRoute: typeof AuthenticatedAppRoutesRouteIdRoute
   AuthenticatedAppSandboxInstancesInstanceIdRoute: typeof AuthenticatedAppSandboxInstancesInstanceIdRoute
@@ -1093,17 +1093,17 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppVmInstancesInstanceIdRoute: typeof AuthenticatedAppVmInstancesInstanceIdRoute
   AuthenticatedAppVolumesVolumeIdRoute: typeof AuthenticatedAppVolumesVolumeIdRoute
   AuthenticatedAppVpcsVpcIdRoute: typeof AuthenticatedAppVpcsVpcIdRoute
+  AuthenticatedAppAiInferenceIndexRoute: typeof AuthenticatedAppAiInferenceIndexRoute
+  AuthenticatedAppAiModelsIndexRoute: typeof AuthenticatedAppAiModelsIndexRoute
   AuthenticatedAppApiKeysIndexRoute: typeof AuthenticatedAppApiKeysIndexRoute
   AuthenticatedAppContainerInstancesIndexRoute: typeof AuthenticatedAppContainerInstancesIndexRoute
   AuthenticatedAppDevIndexRoute: typeof AuthenticatedAppDevIndexRoute
   AuthenticatedAppFilesystemsIndexRoute: typeof AuthenticatedAppFilesystemsIndexRoute
   AuthenticatedAppGpuInstancesIndexRoute: typeof AuthenticatedAppGpuInstancesIndexRoute
   AuthenticatedAppGpuInventoryIndexRoute: typeof AuthenticatedAppGpuInventoryIndexRoute
-  AuthenticatedAppInferenceIndexRoute: typeof AuthenticatedAppInferenceIndexRoute
   AuthenticatedAppK8sClustersIndexRoute: typeof AuthenticatedAppK8sClustersIndexRoute
   AuthenticatedAppKbIndexRoute: typeof AuthenticatedAppKbIndexRoute
   AuthenticatedAppLoadBalancersIndexRoute: typeof AuthenticatedAppLoadBalancersIndexRoute
-  AuthenticatedAppModelsIndexRoute: typeof AuthenticatedAppModelsIndexRoute
   AuthenticatedAppObjectsIndexRoute: typeof AuthenticatedAppObjectsIndexRoute
   AuthenticatedAppOverviewComputeIndexRoute: typeof AuthenticatedAppOverviewComputeIndexRoute
   AuthenticatedAppRegistryIndexRoute: typeof AuthenticatedAppRegistryIndexRoute
@@ -1119,6 +1119,9 @@ interface AuthenticatedAppRouteChildren {
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+  AuthenticatedAppAiInferenceServiceIdRoute:
+    AuthenticatedAppAiInferenceServiceIdRoute,
+  AuthenticatedAppAiModelsModelIdRoute: AuthenticatedAppAiModelsModelIdRoute,
   AuthenticatedAppContainerInstancesInstanceIdRoute:
     AuthenticatedAppContainerInstancesInstanceIdRoute,
   AuthenticatedAppDevResourceRoute: AuthenticatedAppDevResourceRoute,
@@ -1126,14 +1129,11 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
     AuthenticatedAppFilesystemsFilesystemIdRoute,
   AuthenticatedAppGpuInstancesInstanceIdRoute:
     AuthenticatedAppGpuInstancesInstanceIdRoute,
-  AuthenticatedAppInferenceServiceIdRoute:
-    AuthenticatedAppInferenceServiceIdRoute,
   AuthenticatedAppK8sClustersClusterIdRoute:
     AuthenticatedAppK8sClustersClusterIdRoute,
   AuthenticatedAppKbKbIdRoute: AuthenticatedAppKbKbIdRoute,
   AuthenticatedAppLoadBalancersLoadBalancerIdRoute:
     AuthenticatedAppLoadBalancersLoadBalancerIdRoute,
-  AuthenticatedAppModelsModelIdRoute: AuthenticatedAppModelsModelIdRoute,
   AuthenticatedAppObjectsBucketIdRoute:
     AuthenticatedAppObjectsBucketIdRouteWithChildren,
   AuthenticatedAppRoutesRouteIdRoute: AuthenticatedAppRoutesRouteIdRoute,
@@ -1148,6 +1148,8 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
     AuthenticatedAppVmInstancesInstanceIdRoute,
   AuthenticatedAppVolumesVolumeIdRoute: AuthenticatedAppVolumesVolumeIdRoute,
   AuthenticatedAppVpcsVpcIdRoute: AuthenticatedAppVpcsVpcIdRoute,
+  AuthenticatedAppAiInferenceIndexRoute: AuthenticatedAppAiInferenceIndexRoute,
+  AuthenticatedAppAiModelsIndexRoute: AuthenticatedAppAiModelsIndexRoute,
   AuthenticatedAppApiKeysIndexRoute: AuthenticatedAppApiKeysIndexRoute,
   AuthenticatedAppContainerInstancesIndexRoute:
     AuthenticatedAppContainerInstancesIndexRoute,
@@ -1157,12 +1159,10 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
     AuthenticatedAppGpuInstancesIndexRoute,
   AuthenticatedAppGpuInventoryIndexRoute:
     AuthenticatedAppGpuInventoryIndexRoute,
-  AuthenticatedAppInferenceIndexRoute: AuthenticatedAppInferenceIndexRoute,
   AuthenticatedAppK8sClustersIndexRoute: AuthenticatedAppK8sClustersIndexRoute,
   AuthenticatedAppKbIndexRoute: AuthenticatedAppKbIndexRoute,
   AuthenticatedAppLoadBalancersIndexRoute:
     AuthenticatedAppLoadBalancersIndexRoute,
-  AuthenticatedAppModelsIndexRoute: AuthenticatedAppModelsIndexRoute,
   AuthenticatedAppObjectsIndexRoute: AuthenticatedAppObjectsIndexRoute,
   AuthenticatedAppOverviewComputeIndexRoute:
     AuthenticatedAppOverviewComputeIndexRoute,

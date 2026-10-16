@@ -11,8 +11,8 @@ export type HomeRoute =
   | "/k8s-clusters"
   | "/volumes"
   | "/vpcs"
-  | "/models"
-  | "/inference"
+  | "/ai-models"
+  | "/ai-inference"
   | "/kb"
   | "/registry"
   | "/vector-stores";

@@ -52,7 +52,7 @@ export default function CreateKnowledgeBaseModal({
   const modelExtra = (
     <>
       用于知识库问答生成回答。
-      <Link to="/inference" target="_blank" rel="noopener noreferrer">
+      <Link to="/ai-inference" target="_blank" rel="noopener noreferrer">
         打开推理服务
       </Link>
     </>
@@ -94,7 +94,7 @@ export default function CreateKnowledgeBaseModal({
           extra={
             <>
               用于文档向量化和检索。
-              <Link to="/inference" target="_blank" rel="noopener noreferrer">
+              <Link to="/ai-inference" target="_blank" rel="noopener noreferrer">
                 管理模型
               </Link>
             </>

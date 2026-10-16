@@ -1,9 +1,9 @@
-import type { Model, ModelVersion } from "@/api/ai-services/models";
+import type { Model, ModelVersion } from "@/api/models";
 import { compareDateTimesDescending } from "./date";
 
-export type { Model, ModelVersion } from "@/api/ai-services/models";
+export type { Model, ModelVersion } from "@/api/models";
 
-export const MODEL_SOURCE_LABELS: Record<Model["source"], string> = {
+export const MODEL_SOURCE_LABELS: Record<string, string> = {
   upload: "本地上传",
   huggingface: "HuggingFace",
   modelscope: "ModelScope",
@@ -22,6 +22,6 @@ export function formatModelCapabilities(capabilities: string[] | undefined) {
 
 export function getLatestModelVersion(model: Model): ModelVersion | undefined {
   return [...(model.versions ?? [])].sort((left, right) =>
-    compareDateTimesDescending(left.created_at, right.created_at),
+    compareDateTimesDescending(left.created_at ?? "", right.created_at ?? ""),
   )[0];
 }

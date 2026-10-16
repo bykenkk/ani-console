@@ -3,8 +3,8 @@ import { useCallback } from "react";
 import type { ResourceDetailType } from "@/lib/resources";
 
 const resourceListRoutes = {
-  model: "/models",
-  "inference-service": "/inference",
+  model: "/ai-models",
+  "inference-service": "/ai-inference",
   "vm-instance": "/vm-instances",
   "container-instance": "/container-instances",
   "gpu-instance": "/gpu-instances",

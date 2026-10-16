@@ -45,10 +45,10 @@ export function navigateToResourceDetail(
 ): void {
   switch (resource.type) {
     case "model":
-      navigate({ to: "/models/$modelId", params: { modelId: resource.id } });
+      navigate({ to: "/ai-models/$modelId", params: { modelId: resource.id } });
       return;
     case "inference-service":
-      navigate({ to: "/inference/$serviceId", params: { serviceId: resource.id } });
+      navigate({ to: "/ai-inference/$serviceId", params: { serviceId: resource.id } });
       return;
     case "vm-instance":
       navigate({ to: "/vm-instances/$instanceId", params: { instanceId: resource.id } });

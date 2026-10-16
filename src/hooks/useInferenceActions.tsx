@@ -1,68 +1,72 @@
-import { useState } from "react";
+// FIXME(governance-migration): governance 当前未开放旧启停、重启及调整副本接口，不能将新资源 ID 交给 legacy 写接口。
+// TODO(governance-migration): 新后端提供对应命令与操作状态契约后恢复这些入口，沿用异步受理与完成分离的反馈。
+import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { applyInferenceServiceLifecycle, type InferenceService } from "@/api/ai-services/inference";
+import { useState } from "react";
+import {
+  deleteInferenceService,
+  type InferenceService,
+  type InferenceAcceptance,
+} from "@/api/inference";
 import type { RowAction } from "@/components/common";
-import { useResourceDelete } from "@/hooks/useResourceDelete";
-import InferenceScaleModal from "@/components/ai-services/InferenceScaleModal";
-
-type LifecycleVariables = { item: InferenceService; action: "start" | "stop" | "restart" };
-const lifecycleLabels = { start: "启动推理服务", stop: "停止推理服务", restart: "重启推理服务" };
+import InferenceOperationModal from "@/components/ai-inference/InferenceOperationModal";
 
 export function useInferenceActions(onDeleted?: () => void) {
   const qc = useQueryClient();
-  const [scaleTarget, setScaleTarget] = useState<InferenceService>();
-  const lifecycle = useMutation({
+  const [acceptance, setAcceptance] = useState<InferenceAcceptance>();
+  const remove = useMutation({
+    mutationFn: (item: InferenceService) =>
+      deleteInferenceService(item.id, item.gpu ? {} : { expected_generation: item.generation }),
     meta: {
-      feedback: (variables) => {
-        const action = lifecycleLabels[(variables as LifecycleVariables).action];
-        return {
-          channel: "notification",
-          id: "inference-lifecycle",
-          action,
-          successText: `${action}已提交`,
-          errorFallback: `${action}失败`,
-        };
+      feedback: {
+        channel: "notification",
+        id: "inference-delete",
+        action: "删除推理服务",
+        successText: "删除推理服务已提交",
+        errorFallback: "删除失败",
       },
     },
-    mutationFn: ({ item, action }: LifecycleVariables) =>
-      applyInferenceServiceLifecycle(item.id, { action }),
-    onSuccess: (_, { item }) =>
-      Promise.all([
-        qc.invalidateQueries({ queryKey: ["inference-service", item.id] }),
-        qc.invalidateQueries({ queryKey: ["inference-services"] }),
-      ]),
+    onSuccess: async (result, item) => {
+      setAcceptance(result);
+      await qc.invalidateQueries({
+        queryKey: ["governance-inference-service", item.id],
+        refetchType: "none",
+      });
+      await qc.invalidateQueries({ queryKey: ["governance-inference-services"] });
+    },
   });
-  const remove = useResourceDelete<InferenceService>("inference-service", onDeleted);
-  const busy = () => lifecycle.isPending || remove.isPending;
   const actions: RowAction<InferenceService>[] = [
+    ...["启动", "停止", "重启", "调整副本"].map((label) => ({
+      key: label,
+      label,
+      disabled: () => true,
+      tooltip: "当前后端尚未开放此操作",
+      onClick: () => undefined,
+    })),
     {
-      key: "lifecycle",
-      label: (item) => (item.status === "running" ? "停止" : "启动"),
-      widthLabel: "启动",
-      disabled: (item) => busy() || !["running", "stopped"].includes(item.status),
-      onClick: (item) =>
-        lifecycle.mutate({ item, action: item.status === "running" ? "stop" : "start" }),
+      key: "delete",
+      label: "删除",
+      intent: "danger",
+      disabled: () => remove.isPending || Boolean(acceptance),
+      onClick: (item) => {
+        Modal.confirm({
+          title: "删除推理服务",
+          content: `确定删除「${item.name}」？服务将异步停止并清理。`,
+          okButtonProps: { status: "danger" },
+          onOk: () => remove.mutateAsync(item),
+        });
+      },
     },
-    {
-      key: "restart",
-      label: "重启",
-      disabled: (item) => busy() || !["running", "failed"].includes(item.status),
-      onClick: (item) => lifecycle.mutate({ item, action: "restart" }),
-    },
-    {
-      key: "scale",
-      label: "调整副本",
-      disabled: (item) => busy() || item.status !== "running",
-      onClick: setScaleTarget,
-    },
-    { key: "delete", label: "删除", intent: "danger", disabled: busy, onClick: remove.confirm },
   ];
-  const dialogNode = scaleTarget ? (
-    <InferenceScaleModal
-      serviceId={scaleTarget.id}
-      initialReplicas={scaleTarget.replicas}
-      onCancel={() => setScaleTarget(undefined)}
+  const dialogNode = acceptance ? (
+    <InferenceOperationModal
+      acceptance={acceptance}
+      deleting
+      onCancel={() => {
+        setAcceptance(undefined);
+        onDeleted?.();
+      }}
     />
   ) : null;
-  return { actions, dialogNode };
+  return { actions, dialogNode, deletionSubmitted: Boolean(acceptance) };
 }

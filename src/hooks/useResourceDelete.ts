@@ -8,8 +8,9 @@ import { deleteNetworkLoadBalancer } from "@/api/network";
 import { deleteVolume } from "@/api/storage/volumes";
 import { deleteFilesystem } from "@/api/storage/filesystems";
 import { deleteVectorStore } from "@/api/storage/vector-stores";
-import { deleteModel } from "@/api/ai-services/models";
-import { deleteInferenceService } from "@/api/ai-services/inference";
+// FIXME(governance-migration): 此旧删除配置仅适用于 ANI 资源；新推理页已使用 useInferenceActions 的异步治理删除。
+// TODO(governance-migration): 确认无旧调用方后移除此推理删除配置，避免后续页面误用旧接口删除 governance ID。
+import { deleteInferenceService } from "@/api/inference/legacy";
 import { deleteKnowledgeBase } from "@/api/knowledge";
 import { deleteK8sCluster } from "@/api/k8s-clusters";
 import type { MutationFeedbackMeta } from "@/vite-env";
@@ -135,19 +136,6 @@ const resourceDeletion = {
     title: "删除向量存储",
     content: (item) => `确定删除「${item.name}」？其中的向量数据将不可恢复。`,
     remove: deleteVectorStore,
-  },
-  model: {
-    listQueryKey: "models",
-    detailQueryKey: "model",
-    feedback: {
-      channel: "notification",
-      id: "model-delete",
-      action: "删除模型",
-      errorFallback: "删除模型失败",
-    },
-    title: "删除模型",
-    content: (item) => `确定删除「${item.name}」？有关联推理服务时后端将拒绝删除。`,
-    remove: deleteModel,
   },
   "inference-service": {
     listQueryKey: "inference-services",

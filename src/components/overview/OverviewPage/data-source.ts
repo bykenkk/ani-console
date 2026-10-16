@@ -55,7 +55,7 @@ export const homeSummaryPlaceholders: HomeSummaryCard[] = [
     label: "推理服务",
     value: 0,
     icon: "tuili",
-    route: "/inference",
+    route: "/ai-inference",
     statuses: [
       { label: "运行中", value: 0, tone: "success" },
       { label: "异常", value: 0, tone: "danger" },
@@ -67,7 +67,7 @@ export const homeSummaryPlaceholders: HomeSummaryCard[] = [
     label: "模型仓库",
     value: 0,
     icon: "moxing",
-    route: "/models",
+    route: "/ai-models",
     statuses: [
       { label: "可用", value: 0, tone: "success" },
       { label: "失败", value: 0, tone: "danger" },
@@ -178,7 +178,7 @@ function toHomeSummaries(overview: ConsoleOverviewStatistics): HomeSummaryCard[]
       label: "推理服务",
       value: overview.inference_services.total,
       icon: "tuili",
-      route: "/inference",
+      route: "/ai-inference",
       statuses: [
         { label: "运行中", value: inferenceRunning, tone: "success" },
         { label: "异常", value: inferenceFailed, tone: "danger" },
@@ -198,7 +198,7 @@ function toHomeSummaries(overview: ConsoleOverviewStatistics): HomeSummaryCard[]
       label: "模型仓库",
       value: overview.models.total,
       icon: "moxing",
-      route: "/models",
+      route: "/ai-models",
       statuses: [
         { label: "可用", value: modelReady, tone: "success" },
         { label: "失败", value: modelFailed, tone: "danger" },
@@ -227,6 +227,8 @@ function toHomeSummaries(overview: ConsoleOverviewStatistics): HomeSummaryCard[]
   ];
 }
 
+// FIXME(governance-migration): 模型/推理卡片已跳转新页面，统计仍来自既有 overview 聚合，尚未确认与 governance 资源口径一致。
+// TODO(governance-migration): 后端明确概览统计归属及状态映射后核对数量与状态分布，不在前端拼接两套统计。
 async function getSummaries(): Promise<HomeSummaryCard[]> {
   return toHomeSummaries(await getConsoleOverview());
 }
