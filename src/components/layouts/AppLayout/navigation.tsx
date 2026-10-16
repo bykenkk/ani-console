@@ -129,6 +129,7 @@ export const menuItems: readonly MenuItem[] = [
         children: [
           { key: "/ai-models", label: "模型仓库", icon: <AliIcon name="moxing" /> },
           { key: "/ai-inference", label: "推理服务", icon: <AliIcon name="tuili" /> },
+          { key: "/ai-training", label: "模型训练", icon: <AliIcon name="moxing" /> },
         ],
       },
       {
@@ -208,6 +209,7 @@ export function matchSideMenuKey(pathname: string, routeKeys: string[]): string[
 }
 
 const PATH_SUBMENU: { prefix: string; key: string }[] = [
+  { prefix: "/ai-training", key: "ai-services" },
   { prefix: "/overview-compute", key: "compute-management" },
   { prefix: "/container-instances", key: "work-instances" },
   { prefix: "/vm-instances", key: "work-instances" },

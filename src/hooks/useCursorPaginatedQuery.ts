@@ -7,7 +7,10 @@ import { useListPagination } from "./useListPagination";
 export type CursorPage<T> = { items: T[]; total?: number | string; next_cursor?: string | null };
 type UseCursorPaginatedQueryOptions<T> = {
   queryKey: readonly unknown[];
-  queryFn: (input: { cursor?: string; limit: number }) => Promise<CursorPage<T>>;
+  queryFn: (
+    input: { cursor?: string; limit: number },
+    signal: AbortSignal,
+  ) => Promise<CursorPage<T>>;
   initialPageSize?: number;
   enabled?: boolean;
   errorNotification?: QueryErrorNotificationMeta;
@@ -30,7 +33,7 @@ export function useCursorPaginatedQuery<T>({
     queryKey: [...queryKey, { cursor, limit: pageSize }],
     enabled,
     meta: { errorNotification },
-    queryFn: () => queryFn({ cursor, limit: pageSize }),
+    queryFn: ({ signal }) => queryFn({ cursor, limit: pageSize }, signal),
   });
   // A deletion can empty the last page. Fetch the previous page instead of trapping the user.
   useEffect(() => {

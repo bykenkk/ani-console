@@ -1,3 +1,5 @@
+// FIXME(modeldev-integration): 补充说明与当前实现的前缀及列表分页/响应结构不一致，尚未做部署环境联调。
+// TODO(modeldev-integration): 后端确认 /api/v1 + limit/cursor + items/total 的部署口径后验证创建、停止、日志、产物及下载全链路。
 import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
 import type { CursorPageParams } from "@/api/types";

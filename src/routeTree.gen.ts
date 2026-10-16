@@ -19,6 +19,8 @@ import { Route as AuthenticatedAppAiInferenceIndexRouteImport } from './routes/_
 import { Route as AuthenticatedAppAiInferenceServiceIdRouteImport } from './routes/_authenticated/_app/ai-inference/$serviceId'
 import { Route as AuthenticatedAppAiModelsIndexRouteImport } from './routes/_authenticated/_app/ai-models/index'
 import { Route as AuthenticatedAppAiModelsModelIdRouteImport } from './routes/_authenticated/_app/ai-models/$modelId'
+import { Route as AuthenticatedAppAiTrainingIndexRouteImport } from './routes/_authenticated/_app/ai-training/index'
+import { Route as AuthenticatedAppAiTrainingExecutionIdRouteImport } from './routes/_authenticated/_app/ai-training/$executionId'
 import { Route as AuthenticatedAppApiKeysIndexRouteImport } from './routes/_authenticated/_app/api-keys/index'
 import { Route as AuthenticatedAppContainerInstancesIndexRouteImport } from './routes/_authenticated/_app/container-instances/index'
 import { Route as AuthenticatedAppContainerInstancesInstanceIdRouteImport } from './routes/_authenticated/_app/container-instances/$instanceId'
@@ -112,6 +114,18 @@ const AuthenticatedAppAiModelsModelIdRoute =
   AuthenticatedAppAiModelsModelIdRouteImport.update({
     id: '/ai-models/$modelId',
     path: '/ai-models/$modelId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppAiTrainingIndexRoute =
+  AuthenticatedAppAiTrainingIndexRouteImport.update({
+    id: '/ai-training/',
+    path: '/ai-training/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppAiTrainingExecutionIdRoute =
+  AuthenticatedAppAiTrainingExecutionIdRouteImport.update({
+    id: '/ai-training/$executionId',
+    path: '/ai-training/$executionId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppApiKeysIndexRoute =
@@ -372,6 +386,7 @@ export interface FileRoutesByFullPath {
   '/login/': typeof LoginIndexRoute
   '/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
   '/ai-models/$modelId': typeof AuthenticatedAppAiModelsModelIdRoute
+  '/ai-training/$executionId': typeof AuthenticatedAppAiTrainingExecutionIdRoute
   '/container-instances/$instanceId': typeof AuthenticatedAppContainerInstancesInstanceIdRoute
   '/dev/resource': typeof AuthenticatedAppDevResourceRoute
   '/filesystems/$filesystemId': typeof AuthenticatedAppFilesystemsFilesystemIdRoute
@@ -394,6 +409,7 @@ export interface FileRoutesByFullPath {
   '/vm-instances/$instanceId/vnc': typeof AuthenticatedVmInstancesInstanceIdVncRoute
   '/ai-inference/': typeof AuthenticatedAppAiInferenceIndexRoute
   '/ai-models/': typeof AuthenticatedAppAiModelsIndexRoute
+  '/ai-training/': typeof AuthenticatedAppAiTrainingIndexRoute
   '/api-keys/': typeof AuthenticatedAppApiKeysIndexRoute
   '/container-instances/': typeof AuthenticatedAppContainerInstancesIndexRoute
   '/dev/': typeof AuthenticatedAppDevIndexRoute
@@ -423,6 +439,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginIndexRoute
   '/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
   '/ai-models/$modelId': typeof AuthenticatedAppAiModelsModelIdRoute
+  '/ai-training/$executionId': typeof AuthenticatedAppAiTrainingExecutionIdRoute
   '/container-instances/$instanceId': typeof AuthenticatedAppContainerInstancesInstanceIdRoute
   '/dev/resource': typeof AuthenticatedAppDevResourceRoute
   '/filesystems/$filesystemId': typeof AuthenticatedAppFilesystemsFilesystemIdRoute
@@ -444,6 +461,7 @@ export interface FileRoutesByTo {
   '/vm-instances/$instanceId/vnc': typeof AuthenticatedVmInstancesInstanceIdVncRoute
   '/ai-inference': typeof AuthenticatedAppAiInferenceIndexRoute
   '/ai-models': typeof AuthenticatedAppAiModelsIndexRoute
+  '/ai-training': typeof AuthenticatedAppAiTrainingIndexRoute
   '/api-keys': typeof AuthenticatedAppApiKeysIndexRoute
   '/container-instances': typeof AuthenticatedAppContainerInstancesIndexRoute
   '/dev': typeof AuthenticatedAppDevIndexRoute
@@ -477,6 +495,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/_app/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
   '/_authenticated/_app/ai-models/$modelId': typeof AuthenticatedAppAiModelsModelIdRoute
+  '/_authenticated/_app/ai-training/$executionId': typeof AuthenticatedAppAiTrainingExecutionIdRoute
   '/_authenticated/_app/container-instances/$instanceId': typeof AuthenticatedAppContainerInstancesInstanceIdRoute
   '/_authenticated/_app/dev/resource': typeof AuthenticatedAppDevResourceRoute
   '/_authenticated/_app/filesystems/$filesystemId': typeof AuthenticatedAppFilesystemsFilesystemIdRoute
@@ -499,6 +518,7 @@ export interface FileRoutesById {
   '/_authenticated/vm-instances/$instanceId/vnc': typeof AuthenticatedVmInstancesInstanceIdVncRoute
   '/_authenticated/_app/ai-inference/': typeof AuthenticatedAppAiInferenceIndexRoute
   '/_authenticated/_app/ai-models/': typeof AuthenticatedAppAiModelsIndexRoute
+  '/_authenticated/_app/ai-training/': typeof AuthenticatedAppAiTrainingIndexRoute
   '/_authenticated/_app/api-keys/': typeof AuthenticatedAppApiKeysIndexRoute
   '/_authenticated/_app/container-instances/': typeof AuthenticatedAppContainerInstancesIndexRoute
   '/_authenticated/_app/dev/': typeof AuthenticatedAppDevIndexRoute
@@ -531,6 +551,7 @@ export interface FileRouteTypes {
     | '/login/'
     | '/ai-inference/$serviceId'
     | '/ai-models/$modelId'
+    | '/ai-training/$executionId'
     | '/container-instances/$instanceId'
     | '/dev/resource'
     | '/filesystems/$filesystemId'
@@ -553,6 +574,7 @@ export interface FileRouteTypes {
     | '/vm-instances/$instanceId/vnc'
     | '/ai-inference/'
     | '/ai-models/'
+    | '/ai-training/'
     | '/api-keys/'
     | '/container-instances/'
     | '/dev/'
@@ -582,6 +604,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/ai-inference/$serviceId'
     | '/ai-models/$modelId'
+    | '/ai-training/$executionId'
     | '/container-instances/$instanceId'
     | '/dev/resource'
     | '/filesystems/$filesystemId'
@@ -603,6 +626,7 @@ export interface FileRouteTypes {
     | '/vm-instances/$instanceId/vnc'
     | '/ai-inference'
     | '/ai-models'
+    | '/ai-training'
     | '/api-keys'
     | '/container-instances'
     | '/dev'
@@ -635,6 +659,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/'
     | '/_authenticated/_app/ai-inference/$serviceId'
     | '/_authenticated/_app/ai-models/$modelId'
+    | '/_authenticated/_app/ai-training/$executionId'
     | '/_authenticated/_app/container-instances/$instanceId'
     | '/_authenticated/_app/dev/resource'
     | '/_authenticated/_app/filesystems/$filesystemId'
@@ -657,6 +682,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vm-instances/$instanceId/vnc'
     | '/_authenticated/_app/ai-inference/'
     | '/_authenticated/_app/ai-models/'
+    | '/_authenticated/_app/ai-training/'
     | '/_authenticated/_app/api-keys/'
     | '/_authenticated/_app/container-instances/'
     | '/_authenticated/_app/dev/'
@@ -756,6 +782,20 @@ declare module '@tanstack/react-router' {
       path: '/ai-models/$modelId'
       fullPath: '/ai-models/$modelId'
       preLoaderRoute: typeof AuthenticatedAppAiModelsModelIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/ai-training/': {
+      id: '/_authenticated/_app/ai-training/'
+      path: '/ai-training'
+      fullPath: '/ai-training/'
+      preLoaderRoute: typeof AuthenticatedAppAiTrainingIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/ai-training/$executionId': {
+      id: '/_authenticated/_app/ai-training/$executionId'
+      path: '/ai-training/$executionId'
+      fullPath: '/ai-training/$executionId'
+      preLoaderRoute: typeof AuthenticatedAppAiTrainingExecutionIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/api-keys/': {
@@ -1077,6 +1117,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
   AuthenticatedAppAiInferenceServiceIdRoute: typeof AuthenticatedAppAiInferenceServiceIdRoute
   AuthenticatedAppAiModelsModelIdRoute: typeof AuthenticatedAppAiModelsModelIdRoute
+  AuthenticatedAppAiTrainingExecutionIdRoute: typeof AuthenticatedAppAiTrainingExecutionIdRoute
   AuthenticatedAppContainerInstancesInstanceIdRoute: typeof AuthenticatedAppContainerInstancesInstanceIdRoute
   AuthenticatedAppDevResourceRoute: typeof AuthenticatedAppDevResourceRoute
   AuthenticatedAppFilesystemsFilesystemIdRoute: typeof AuthenticatedAppFilesystemsFilesystemIdRoute
@@ -1095,6 +1136,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppVpcsVpcIdRoute: typeof AuthenticatedAppVpcsVpcIdRoute
   AuthenticatedAppAiInferenceIndexRoute: typeof AuthenticatedAppAiInferenceIndexRoute
   AuthenticatedAppAiModelsIndexRoute: typeof AuthenticatedAppAiModelsIndexRoute
+  AuthenticatedAppAiTrainingIndexRoute: typeof AuthenticatedAppAiTrainingIndexRoute
   AuthenticatedAppApiKeysIndexRoute: typeof AuthenticatedAppApiKeysIndexRoute
   AuthenticatedAppContainerInstancesIndexRoute: typeof AuthenticatedAppContainerInstancesIndexRoute
   AuthenticatedAppDevIndexRoute: typeof AuthenticatedAppDevIndexRoute
@@ -1122,6 +1164,8 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppAiInferenceServiceIdRoute:
     AuthenticatedAppAiInferenceServiceIdRoute,
   AuthenticatedAppAiModelsModelIdRoute: AuthenticatedAppAiModelsModelIdRoute,
+  AuthenticatedAppAiTrainingExecutionIdRoute:
+    AuthenticatedAppAiTrainingExecutionIdRoute,
   AuthenticatedAppContainerInstancesInstanceIdRoute:
     AuthenticatedAppContainerInstancesInstanceIdRoute,
   AuthenticatedAppDevResourceRoute: AuthenticatedAppDevResourceRoute,
@@ -1150,6 +1194,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppVpcsVpcIdRoute: AuthenticatedAppVpcsVpcIdRoute,
   AuthenticatedAppAiInferenceIndexRoute: AuthenticatedAppAiInferenceIndexRoute,
   AuthenticatedAppAiModelsIndexRoute: AuthenticatedAppAiModelsIndexRoute,
+  AuthenticatedAppAiTrainingIndexRoute: AuthenticatedAppAiTrainingIndexRoute,
   AuthenticatedAppApiKeysIndexRoute: AuthenticatedAppApiKeysIndexRoute,
   AuthenticatedAppContainerInstancesIndexRoute:
     AuthenticatedAppContainerInstancesIndexRoute,

@@ -9,10 +9,10 @@ export interface ModelDevParameterRule {
   name: string;
   type: string;
   required?: boolean;
-  default_value?: ModelDevParameter;
-  allowed_values?: ModelDevParameter[];
-  minimum?: ModelDevParameter;
-  maximum?: ModelDevParameter;
+  default_value?: ModelDevParameter | null;
+  allowed_values?: ModelDevParameter[] | null;
+  minimum?: ModelDevParameter | null;
+  maximum?: ModelDevParameter | null;
 }
 export interface ModelDevPreset {
   preset_id: string;
@@ -49,6 +49,8 @@ export interface ModelDevInputVersionListResponse {
 }
 export interface CreateModelDevExecutionInput {
   name: string;
+  // FIXME(modeldev-integration): 当前 CPU-P01 仅接受此 kind，交接文档又要求跟随 preset.kind 扩展，二者适用阶段待明确。
+  // TODO(modeldev-integration): 后端开放并确认新 kind 后统一扩展类型、预设可选条件和提交校验，不直接放宽为任意字符串。
   kind: "GENERAL_TRAINING";
   preset_id: string;
   dataset_version_id: string;
