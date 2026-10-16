@@ -55,19 +55,19 @@ export function navigateToResourceDetail(
       navigate({ to: "/ai-inference/$serviceId", params: { serviceId: resource.id } });
       return;
     case "vm-instance":
-      navigate({ to: "/vm-instances/$instanceId", params: { instanceId: resource.id } });
+      navigate({ to: "/vms/$instanceId", params: { instanceId: resource.id } });
       return;
     case "container-instance":
       navigate({
-        to: "/container-instances/$instanceId",
+        to: "/containers/$instanceId",
         params: { instanceId: resource.id },
       });
       return;
     case "gpu-instance":
-      navigate({ to: "/gpu-instances/$instanceId", params: { instanceId: resource.id } });
+      navigate({ to: "/gpu-containers/$instanceId", params: { instanceId: resource.id } });
       return;
     case "sandbox-instance":
-      navigate({ to: "/sandbox-instances/$instanceId", params: { instanceId: resource.id } });
+      navigate({ to: "/sandboxes/$instanceId", params: { instanceId: resource.id } });
       return;
     case "k8s-cluster":
       navigate({ to: "/k8s-clusters/$clusterId", params: { clusterId: resource.id } });

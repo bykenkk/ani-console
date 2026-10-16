@@ -1,7 +1,7 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { ResourcePageFrame } from "@/components/common";
-import GpuContainerCreateModal from "@/components/instances/GpuContainerCreateModal";
+import GpuContainerCreateModal from "@/components/gpu-containers/GpuContainerCreateModal";
 import GpuAdmissionSummary from "./GpuAdmissionSummary";
 import GpuAnomalyList from "./GpuAnomalyList";
 import GpuCapacityMetrics from "./GpuCapacityMetrics";

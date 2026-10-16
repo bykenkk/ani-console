@@ -57,40 +57,29 @@ export const DEFAULT_GPU_INSTANCE_COMPUTE_SPEC = GPU_INSTANCE_COMPUTE_SPECS[0].v
 
 export const INSTANCE_COMPUTE_SPEC_BY_VALUE = INSTANCE_COMPUTE_SPEC_CATALOG;
 
-export function openVmInstanceRemoteWindow(instanceId: string) {
+function openInstanceRemoteWindow(view: "vnc" | "terminal", instanceId: string) {
   const remoteWindow = window.open(
-    `/vm-instances/${encodeURIComponent(instanceId)}/vnc`,
+    `/${view}?instanceId=${encodeURIComponent(instanceId)}`,
     "_blank",
     "popup=yes,width=1280,height=800,noopener,noreferrer",
   );
   remoteWindow?.focus();
 }
 
-export function openContainerInstanceTerminalWindow(instanceId: string) {
-  const remoteWindow = window.open(
-    `/container-instances/${encodeURIComponent(instanceId)}/terminal`,
-    "_blank",
-    "popup=yes,width=1280,height=800,noopener,noreferrer",
-  );
-  remoteWindow?.focus();
+export function openInstanceVncWindow(instanceId: string) {
+  openInstanceRemoteWindow("vnc", instanceId);
 }
 
-export function openGpuInstanceTerminalWindow(instanceId: string) {
-  const remoteWindow = window.open(
-    `/gpu-instances/${encodeURIComponent(instanceId)}/terminal`,
-    "_blank",
-    "popup=yes,width=1280,height=800,noopener,noreferrer",
-  );
-  remoteWindow?.focus();
+export function openInstanceTerminalWindow(instanceId: string) {
+  openInstanceRemoteWindow("terminal", instanceId);
 }
 
-export function openSandboxInstanceTerminalWindow(instanceId: string) {
-  const remoteWindow = window.open(
-    `/sandbox-instances/${encodeURIComponent(instanceId)}/terminal`,
-    "_blank",
-    "popup=yes,width=1280,height=800,noopener,noreferrer",
-  );
-  remoteWindow?.focus();
+export function validateInstanceRemoteSearch(search: Record<string, unknown>): {
+  instanceId: string;
+} {
+  return {
+    instanceId: typeof search.instanceId === "string" ? search.instanceId.trim() : "",
+  };
 }
 
 type NetworkishRecord = Record<string, unknown>;

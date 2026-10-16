@@ -1,20 +1,20 @@
 import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances";
 import type { RowAction } from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
-import { openGpuInstanceTerminalWindow } from "@/lib/instances";
+import { openInstanceTerminalWindow } from "@/lib/instances";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import GpuInstanceAttachFilesystemModal from "@/components/instances/GpuInstanceAttachFilesystemModal";
-import GpuInstanceAttachVolumeModal from "@/components/instances/InstanceAttachVolumeModal";
-import GpuInstanceBindSecretModal from "@/components/instances/GpuInstanceBindSecretModal";
-import GpuInstanceChangeSecurityGroupsModal from "@/components/instances/GpuInstanceChangeSecurityGroupsModal";
-import GpuInstanceDeleteModal from "@/components/instances/GpuInstanceDeleteModal";
-import GpuInstanceDetachVolumeModal from "@/components/instances/InstanceDetachVolumeModal";
-import GpuInstanceResizeModal from "@/components/instances/GpuInstanceResizeModal";
-import GpuInstanceRollbackModal from "@/components/instances/GpuInstanceRollbackModal";
-import GpuInstanceScaleModal from "@/components/instances/GpuInstanceScaleModal";
-import GpuInstanceStopModal from "@/components/instances/GpuInstanceStopModal";
-import GpuInstanceUpdateImageModal from "@/components/instances/GpuInstanceUpdateImageModal";
+import GpuContainerAttachFilesystemModal from "@/components/gpu-containers/GpuContainerAttachFilesystemModal";
+import InstanceAttachVolumeModal from "@/components/instances/InstanceAttachVolumeModal";
+import GpuContainerBindSecretModal from "@/components/gpu-containers/GpuContainerBindSecretModal";
+import GpuContainerChangeSecurityGroupsModal from "@/components/gpu-containers/GpuContainerChangeSecurityGroupsModal";
+import GpuContainerDeleteModal from "@/components/gpu-containers/GpuContainerDeleteModal";
+import InstanceDetachVolumeModal from "@/components/instances/InstanceDetachVolumeModal";
+import GpuContainerResizeModal from "@/components/gpu-containers/GpuContainerResizeModal";
+import GpuContainerRollbackModal from "@/components/gpu-containers/GpuContainerRollbackModal";
+import GpuContainerScaleModal from "@/components/gpu-containers/GpuContainerScaleModal";
+import GpuContainerStopModal from "@/components/gpu-containers/GpuContainerStopModal";
+import GpuContainerUpdateImageModal from "@/components/gpu-containers/GpuContainerUpdateImageModal";
 
 type Instance = InstanceRecord;
 type DialogAction =
@@ -160,7 +160,7 @@ export function useGpuInstanceActions(onChanged: () => void, onDeleted?: () => v
       key: "terminal",
       label: "远程终端",
       disabled: (instance) => !running(instance) || instance.access?.exec_available === false,
-      onClick: (instance) => openGpuInstanceTerminalWindow(instance.id),
+      onClick: (instance) => openInstanceTerminalWindow(instance.id),
     },
     {
       key: "delete",
@@ -179,51 +179,59 @@ export function useGpuInstanceActions(onChanged: () => void, onDeleted?: () => v
   };
   const dialogNode = dialog ? (
     dialog.action === "stop" ? (
-      <GpuInstanceStopModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
+      <GpuContainerStopModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
     ) : dialog.action === "delete" ? (
-      <GpuInstanceDeleteModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
+      <GpuContainerDeleteModal
+        instance={dialog.instance}
+        onCancel={close}
+        onSubmitted={submitted}
+      />
     ) : dialog.action === "scale" ? (
-      <GpuInstanceScaleModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
+      <GpuContainerScaleModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
     ) : dialog.action === "update_image" ? (
-      <GpuInstanceUpdateImageModal
+      <GpuContainerUpdateImageModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}
       />
     ) : dialog.action === "resize" ? (
-      <GpuInstanceResizeModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
+      <GpuContainerResizeModal
+        instance={dialog.instance}
+        onCancel={close}
+        onSubmitted={submitted}
+      />
     ) : dialog.action === "rollback" ? (
-      <GpuInstanceRollbackModal
+      <GpuContainerRollbackModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}
       />
     ) : dialog.action === "attach_volume" ? (
-      <GpuInstanceAttachVolumeModal
+      <InstanceAttachVolumeModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}
       />
     ) : dialog.action === "detach_volume" ? (
-      <GpuInstanceDetachVolumeModal
+      <InstanceDetachVolumeModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}
       />
     ) : dialog.action === "attach_filesystem" ? (
-      <GpuInstanceAttachFilesystemModal
+      <GpuContainerAttachFilesystemModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}
       />
     ) : dialog.action === "bind_secret" ? (
-      <GpuInstanceBindSecretModal
+      <GpuContainerBindSecretModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}
       />
     ) : (
-      <GpuInstanceChangeSecurityGroupsModal
+      <GpuContainerChangeSecurityGroupsModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}

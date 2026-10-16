@@ -13,9 +13,9 @@ type Instance = InstanceRecord;
 const STORAGE_CLASS_OPTIONS = [{ value: "ani-block", label: "SSD云盘" }];
 
 const INSTANCE_ROUTE: Record<string, string> = {
-  vm: "/vm-instances",
-  container: "/container-instances",
-  gpu_container: "/gpu-instances",
+  vm: "/vms",
+  container: "/containers",
+  gpu_container: "/gpu-containers",
 };
 
 export default function CreateVolumeModal({

@@ -43,7 +43,7 @@ export const homeSummaryPlaceholders: HomeSummaryCard[] = [
     label: "实例总数",
     value: 0,
     icon: "yunzhuji",
-    route: "/vm-instances",
+    route: "/vms",
     statuses: [
       { label: "运行中", value: 0, tone: "success" },
       { label: "异常", value: 0, tone: "danger" },
@@ -88,24 +88,24 @@ export const homeSummaryPlaceholders: HomeSummaryCard[] = [
 ];
 
 export const homeQuickCreateItems: HomeShortcut[] = [
-  { id: "create-vm", name: "创建云主机", icon: "yunzhuji", route: "/vm-instances" },
+  { id: "create-vm", name: "创建云主机", icon: "yunzhuji", route: "/vms" },
   {
     id: "create-container",
     name: "创建容器实例",
     icon: "rongqishili",
-    route: "/container-instances",
+    route: "/containers",
   },
   {
     id: "create-gpu",
     name: "创建 GPU 容器",
     icon: "GPUrongqishili",
-    route: "/gpu-instances",
+    route: "/gpu-containers",
   },
   {
     id: "create-sandbox",
     name: "创建沙箱",
     icon: "Sandbox",
-    route: "/sandbox-instances",
+    route: "/sandboxes",
   },
   // {
   //   id: "create-k8s",
@@ -162,7 +162,7 @@ function toHomeSummaries(overview: ConsoleOverviewStatistics): HomeSummaryCard[]
       label: "实例总数",
       value: overview.instances.total,
       icon: "yunzhuji",
-      route: "/vm-instances",
+      route: "/vms",
       statuses: [
         { label: "运行中", value: instanceRunning, tone: "success" },
         { label: "异常", value: instanceFailed, tone: "danger" },

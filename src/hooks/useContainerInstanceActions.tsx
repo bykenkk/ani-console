@@ -1,20 +1,20 @@
 import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances";
 import type { RowAction } from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
-import { openContainerInstanceTerminalWindow } from "@/lib/instances";
+import { openInstanceTerminalWindow } from "@/lib/instances";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import ContainerInstanceAttachFilesystemModal from "@/components/instances/ContainerInstanceAttachFilesystemModal";
-import ContainerInstanceAttachVolumeModal from "@/components/instances/InstanceAttachVolumeModal";
-import ContainerInstanceBindSecretModal from "@/components/instances/ContainerInstanceBindSecretModal";
-import ContainerInstanceChangeSecurityGroupsModal from "@/components/instances/ContainerInstanceChangeSecurityGroupsModal";
-import ContainerInstanceDeleteModal from "@/components/instances/ContainerInstanceDeleteModal";
-import ContainerInstanceDetachVolumeModal from "@/components/instances/InstanceDetachVolumeModal";
-import ContainerInstanceResizeModal from "@/components/instances/ContainerInstanceResizeModal";
-import ContainerInstanceRollbackModal from "@/components/instances/ContainerInstanceRollbackModal";
-import ContainerInstanceScaleModal from "@/components/instances/ContainerInstanceScaleModal";
-import ContainerInstanceStopModal from "@/components/instances/ContainerInstanceStopModal";
-import ContainerInstanceUpdateImageModal from "@/components/instances/ContainerInstanceUpdateImageModal";
+import ContainerAttachFilesystemModal from "@/components/containers/ContainerAttachFilesystemModal";
+import InstanceAttachVolumeModal from "@/components/instances/InstanceAttachVolumeModal";
+import ContainerBindSecretModal from "@/components/containers/ContainerBindSecretModal";
+import ContainerChangeSecurityGroupsModal from "@/components/containers/ContainerChangeSecurityGroupsModal";
+import ContainerDeleteModal from "@/components/containers/ContainerDeleteModal";
+import InstanceDetachVolumeModal from "@/components/instances/InstanceDetachVolumeModal";
+import ContainerResizeModal from "@/components/containers/ContainerResizeModal";
+import ContainerRollbackModal from "@/components/containers/ContainerRollbackModal";
+import ContainerScaleModal from "@/components/containers/ContainerScaleModal";
+import ContainerStopModal from "@/components/containers/ContainerStopModal";
+import ContainerUpdateImageModal from "@/components/containers/ContainerUpdateImageModal";
 
 type Instance = InstanceRecord;
 type DialogAction =
@@ -201,7 +201,7 @@ export function useContainerInstanceActions<
       key: "terminal",
       label: "远程终端",
       disabled: (row) => !running(record(row)) || record(row).access?.exec_available === false,
-      onClick: (row) => openContainerInstanceTerminalWindow(record(row).id),
+      onClick: (row) => openInstanceTerminalWindow(record(row).id),
     },
     {
       key: "delete",
@@ -220,67 +220,47 @@ export function useContainerInstanceActions<
   };
   const dialogNode = dialog ? (
     dialog.action === "stop" ? (
-      <ContainerInstanceStopModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
+      <ContainerStopModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
     ) : dialog.action === "delete" ? (
-      <ContainerInstanceDeleteModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
+      <ContainerDeleteModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
     ) : dialog.action === "scale" ? (
-      <ContainerInstanceScaleModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
+      <ContainerScaleModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
     ) : dialog.action === "update_image" ? (
-      <ContainerInstanceUpdateImageModal
+      <ContainerUpdateImageModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}
       />
     ) : dialog.action === "resize" ? (
-      <ContainerInstanceResizeModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
+      <ContainerResizeModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
     ) : dialog.action === "rollback" ? (
-      <ContainerInstanceRollbackModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
+      <ContainerRollbackModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
     ) : dialog.action === "attach_volume" ? (
-      <ContainerInstanceAttachVolumeModal
+      <InstanceAttachVolumeModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}
       />
     ) : dialog.action === "detach_volume" ? (
-      <ContainerInstanceDetachVolumeModal
+      <InstanceDetachVolumeModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}
       />
     ) : dialog.action === "attach_filesystem" ? (
-      <ContainerInstanceAttachFilesystemModal
+      <ContainerAttachFilesystemModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}
       />
     ) : dialog.action === "bind_secret" ? (
-      <ContainerInstanceBindSecretModal
+      <ContainerBindSecretModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}
       />
     ) : (
-      <ContainerInstanceChangeSecurityGroupsModal
+      <ContainerChangeSecurityGroupsModal
         instance={dialog.instance}
         onCancel={close}
         onSubmitted={submitted}

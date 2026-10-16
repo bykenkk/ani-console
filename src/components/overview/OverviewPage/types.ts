@@ -4,10 +4,10 @@ export type HomeTaskStatus = "done" | "failed" | "current";
 export type HomeTaskFilter = "done" | "current";
 export type HomeRoute =
   | "/overview-compute"
-  | "/vm-instances"
-  | "/container-instances"
-  | "/gpu-instances"
-  | "/sandbox-instances"
+  | "/vms"
+  | "/containers"
+  | "/gpu-containers"
+  | "/sandboxes"
   | "/k8s-clusters"
   | "/volumes"
   | "/vpcs"

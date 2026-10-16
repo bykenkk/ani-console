@@ -1,7 +1,7 @@
 import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances";
 import type { RowAction } from "@/components/common";
-import SandboxInstanceExtendModal from "@/components/instances/SandboxInstanceExtendModal";
-import { openSandboxInstanceTerminalWindow } from "@/lib/instances";
+import SandboxExtendModal from "@/components/sandboxes/SandboxExtendModal";
+import { openInstanceTerminalWindow } from "@/lib/instances";
 import { Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
@@ -89,7 +89,7 @@ export function useSandboxInstanceActions(onChanged: () => void, onDeleted?: () 
       key: "terminal",
       label: "远程终端",
       disabled: (instance) => !running(instance) || instance.access?.exec_available === false,
-      onClick: (instance) => openSandboxInstanceTerminalWindow(instance.id),
+      onClick: (instance) => openInstanceTerminalWindow(instance.id),
     },
     {
       key: "delete",
@@ -108,7 +108,7 @@ export function useSandboxInstanceActions(onChanged: () => void, onDeleted?: () 
   ];
 
   const dialogNode = extendTarget ? (
-    <SandboxInstanceExtendModal
+    <SandboxExtendModal
       instance={extendTarget}
       onCancel={() => setExtendTarget(undefined)}
       onSubmitted={() => {

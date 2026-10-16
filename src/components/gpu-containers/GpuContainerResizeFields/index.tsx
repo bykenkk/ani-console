@@ -1,0 +1,91 @@
+import type { InstanceRecord } from "@/api/instances";
+import { getGpuSpecAvailability } from "@/api/gpu-inventory";
+import { Form, Select, Typography } from "@arco-design/web-react";
+import { useQuery } from "@tanstack/react-query";
+import { StatusBadge } from "@/components/common";
+import InstanceComputeSpecSelect from "@/components/instances/InstanceComputeSpecSelect";
+import { GPU_INSTANCE_COMPUTE_SPECS } from "@/lib/instances";
+import { currentCpuMemorySpec, currentGpuSpecValue } from "./helpers";
+
+type Instance = InstanceRecord;
+
+export default function GpuContainerResizeFields({
+  instance,
+  enabled,
+}: {
+  instance: Instance;
+  enabled: boolean;
+}) {
+  const gpuSpecs = useQuery({
+    meta: {
+      errorNotification: {
+        id: "gpu-specs",
+        action: "GPU 规格加载",
+        fallback: "请求失败，请稍后重试",
+      },
+    },
+    queryKey: ["gpu-specs", "availability", "resize", instance.id],
+    enabled,
+    queryFn: getGpuSpecAvailability,
+  });
+  const currentCpuSpec = currentCpuMemorySpec(instance);
+  const currentGpuValue = currentGpuSpecValue(instance);
+  const currentGpuLabel = instance.compute?.gpu_type ?? instance.compute?.spec_id ?? "-";
+  const cpuOptions = GPU_INSTANCE_COMPUTE_SPECS.some((option) => option.value === currentCpuSpec)
+    ? GPU_INSTANCE_COMPUTE_SPECS.map((option) => ({
+        label: `${option.value}${option.value === currentCpuSpec ? "（当前）" : ""}`,
+        value: option.value,
+      }))
+    : [
+        { label: `${currentCpuSpec}（当前）`, value: currentCpuSpec },
+        ...GPU_INSTANCE_COMPUTE_SPECS.map((option) => ({
+          label: option.value,
+          value: option.value,
+        })),
+      ];
+  const apiGpuOptions = (gpuSpecs.data?.items ?? []).map((spec) => ({
+    label: `${spec.spec_id}${spec.spec_id === currentGpuValue ? "（当前）" : ""}`,
+    value: spec.spec_id,
+    disabled:
+      spec.spec_id !== currentGpuValue &&
+      (spec.status !== "available" || spec.available_count <= 0),
+  }));
+  const gpuOptions = apiGpuOptions.some((option) => option.value === currentGpuValue)
+    ? apiGpuOptions
+    : [
+        {
+          label: `${currentGpuLabel}（当前）`,
+          value: currentGpuValue,
+          disabled: false,
+        },
+        ...apiGpuOptions,
+      ];
+
+  return (
+    <>
+      <Typography.Paragraph className="mb-4!">
+        当前 <StatusBadge status={instance.state} reason={instance.reason} /> ·{" "}
+        <Typography.Text bold>
+          {currentGpuLabel} · {currentCpuSpec}
+        </Typography.Text>
+        。变配只改单副本规格，不改副本数（改副本请用扩缩容）。须先停止。
+      </Typography.Paragraph>
+      <Form.Item
+        field="gpu_spec_id"
+        label="GPU 规格"
+        rules={[{ required: true, message: "请选择 GPU 规格" }]}
+      >
+        <Select loading={gpuSpecs.isLoading} options={gpuOptions} placeholder="请选择 GPU 规格" />
+      </Form.Item>
+      <InstanceComputeSpecSelect
+        field="cpu_memory_spec"
+        profile="gpu"
+        placeholder="请选择 CPU / 内存"
+        options={cpuOptions}
+      />
+      <Typography.Paragraph type="secondary" className="mb-0!">
+        提交后写入生命周期任务，实例保持已停止；启动后按新规格调度。
+      </Typography.Paragraph>
+    </>
+  );
+}

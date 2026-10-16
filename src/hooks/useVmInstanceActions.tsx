@@ -1,18 +1,18 @@
 import type { InstanceLifecycleRequest, InstanceRecord } from "@/api/instances";
 import { applyInstanceLifecycle } from "@/api/instances";
 import type { RowAction } from "@/components/common";
-import { openVmInstanceRemoteWindow } from "@/lib/instances";
+import { openInstanceVncWindow } from "@/lib/instances";
 import { Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import VmInstanceAttachFilesystemModal from "@/components/instances/VmInstanceAttachFilesystemModal";
-import VmInstanceAttachVolumeModal from "@/components/instances/InstanceAttachVolumeModal";
-import VmInstanceChangeSecurityGroupsModal from "@/components/instances/VmInstanceChangeSecurityGroupsModal";
-import VmInstanceDetachVolumeModal from "@/components/instances/InstanceDetachVolumeModal";
-import VmInstanceRebuildModal from "@/components/instances/VmInstanceRebuildModal";
-import VmInstanceResizeModal from "@/components/instances/VmInstanceResizeModal";
-import VmInstanceSnapshotModal from "@/components/instances/VmInstanceSnapshotModal";
-import VmInstanceStopModal from "@/components/instances/VmInstanceStopModal";
+import VmAttachFilesystemModal from "@/components/vms/VmAttachFilesystemModal";
+import InstanceAttachVolumeModal from "@/components/instances/InstanceAttachVolumeModal";
+import VmChangeSecurityGroupsModal from "@/components/vms/VmChangeSecurityGroupsModal";
+import InstanceDetachVolumeModal from "@/components/instances/InstanceDetachVolumeModal";
+import VmRebuildModal from "@/components/vms/VmRebuildModal";
+import VmResizeModal from "@/components/vms/VmResizeModal";
+import VmSnapshotModal from "@/components/vms/VmSnapshotModal";
+import VmStopModal from "@/components/vms/VmStopModal";
 
 type VmInstance = InstanceRecord;
 type LifecycleAction = InstanceLifecycleRequest["action"];
@@ -214,7 +214,7 @@ export function useVmInstanceActions(
       key: "console",
       label: "打开控制台",
       disabled: (instance) => !isRunning(instance) || instance.access?.console_available === false,
-      onClick: (instance) => openVmInstanceRemoteWindow(instance.id),
+      onClick: (instance) => openInstanceVncWindow(instance.id),
     },
     {
       key: "delete",
@@ -240,49 +240,49 @@ export function useVmInstanceActions(
   };
   const dialogNode = dialog ? (
     dialog.action === "stop" ? (
-      <VmInstanceStopModal
+      <VmStopModal
         instance={dialog.instance}
         onCancel={closeDialog}
         onSubmitted={onDialogSubmitted}
       />
     ) : dialog.action === "rebuild" ? (
-      <VmInstanceRebuildModal
+      <VmRebuildModal
         instance={dialog.instance}
         onCancel={closeDialog}
         onSubmitted={onDialogSubmitted}
       />
     ) : dialog.action === "resize" ? (
-      <VmInstanceResizeModal
+      <VmResizeModal
         instance={dialog.instance}
         onCancel={closeDialog}
         onSubmitted={onDialogSubmitted}
       />
     ) : dialog.action === "snapshot" ? (
-      <VmInstanceSnapshotModal
+      <VmSnapshotModal
         instance={dialog.instance}
         onCancel={closeDialog}
         onSubmitted={onDialogSubmitted}
       />
     ) : dialog.action === "attach_volume" ? (
-      <VmInstanceAttachVolumeModal
+      <InstanceAttachVolumeModal
         instance={dialog.instance}
         onCancel={closeDialog}
         onSubmitted={onDialogSubmitted}
       />
     ) : dialog.action === "detach_volume" ? (
-      <VmInstanceDetachVolumeModal
+      <InstanceDetachVolumeModal
         instance={dialog.instance}
         onCancel={closeDialog}
         onSubmitted={onDialogSubmitted}
       />
     ) : dialog.action === "attach_filesystem" ? (
-      <VmInstanceAttachFilesystemModal
+      <VmAttachFilesystemModal
         instance={dialog.instance}
         onCancel={closeDialog}
         onSubmitted={onDialogSubmitted}
       />
     ) : (
-      <VmInstanceChangeSecurityGroupsModal
+      <VmChangeSecurityGroupsModal
         instance={dialog.instance}
         onCancel={closeDialog}
         onSubmitted={onDialogSubmitted}
