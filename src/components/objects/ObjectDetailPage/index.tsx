@@ -13,7 +13,7 @@ import {
   ResourceId,
   StatusBadge,
 } from "@/components/common";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 
 import { formatBytes, formatDateTime } from "@/lib/format";
 

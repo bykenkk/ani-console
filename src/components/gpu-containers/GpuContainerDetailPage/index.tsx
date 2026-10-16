@@ -15,7 +15,7 @@ import InstanceLogs from "@/components/instances/InstanceLogs";
 import InstanceVersions from "@/components/instances/InstanceVersions";
 import { useGpuInstanceActions } from "@/hooks/useGpuInstanceActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
 import InstanceConfiguration from "@/components/instances/InstanceConfiguration";

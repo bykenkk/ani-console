@@ -8,7 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getNetworkRoute, getNetworkVpc, type NetworkRoute, type NetworkVPC } from "@/api/network";
 
 import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 import NetworkRouteRelatedResources from "./NetworkRouteRelatedResources";
 

@@ -15,7 +15,7 @@ import { VOLUME_MODE_LABELS } from "@/lib/volumes";
 import { useQuery } from "@tanstack/react-query";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 
 import { formatDateTime } from "@/lib/format";
 import VolumeAutoSnapshot from "@/components/volumes/VolumeAutoSnapshot";

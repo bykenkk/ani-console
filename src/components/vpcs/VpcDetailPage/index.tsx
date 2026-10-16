@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getNetworkVpc, type NetworkVPC } from "@/api/network";
 
 import { formatDateTime } from "@/lib/format";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import VpcRelatedResources from "./VpcRelatedResources";
 import VpcRoutes from "./VpcRoutes";
 import VpcSubnets from "./VpcSubnets";

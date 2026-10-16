@@ -20,7 +20,7 @@ import InstanceStorage from "@/components/instances/InstanceStorage";
 import InstanceVersions from "@/components/instances/InstanceVersions";
 import { useContainerInstanceActions } from "@/hooks/useContainerInstanceActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
 import { getInstanceDisplayIp, getInstanceNetworkValue } from "@/lib/instances";

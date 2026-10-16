@@ -14,7 +14,7 @@ import {
   ResourceId,
   StatusBadge,
 } from "@/components/common";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import VectorStoreWorkbench from "@/components/vector-stores/VectorStoreWorkbench";
 import { formatDateTime } from "@/lib/format";
 import VectorStoreRelatedResources from "./VectorStoreRelatedResources";

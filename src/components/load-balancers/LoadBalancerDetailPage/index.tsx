@@ -22,7 +22,7 @@ import {
 } from "@/api/network";
 
 import { formatDateTime } from "@/lib/format";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { loadBalancerLabel } from "@/lib/load-balancers";
 import LoadBalancerBackends from "./LoadBalancerBackends";
 import LoadBalancerEvents from "./LoadBalancerEvents";

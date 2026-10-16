@@ -18,7 +18,7 @@ import InstanceStorage from "@/components/instances/InstanceStorage";
 import { useVmInstanceActions } from "@/hooks/useVmInstanceActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
 import { openInstanceVncWindow } from "@/lib/instances";

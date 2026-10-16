@@ -7,7 +7,7 @@ import { Empty } from "@arco-design/web-react";
 import { getModelDevExecution } from "@/api/modeldev";
 import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { useTrainingTaskActions } from "@/hooks/useTrainingTaskActions";
 import { withId } from "@/lib/id";
 import TrainingTaskLogs from "./TrainingTaskLogs";

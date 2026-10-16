@@ -9,7 +9,7 @@ import { getBucket, type StorageBucketRecord } from "@/api/storage/buckets";
 
 import BucketAclEditor from "@/components/objects/BucketAclEditor";
 
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 import BucketAccess from "./BucketAccess";

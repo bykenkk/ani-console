@@ -19,7 +19,7 @@ import KnowledgeDocuments from "@/components/knowledge/KnowledgeDocuments";
 import KnowledgeDocumentUploadButton from "@/components/knowledge/KnowledgeDocumentUploadButton";
 import KnowledgePermissions from "@/components/knowledge/KnowledgePermissions";
 import KnowledgeBaseAuditLogs from "@/components/knowledge/KnowledgeBaseAuditLogs";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 
 export default function KnowledgeBaseDetailPage({

@@ -15,7 +15,7 @@ import InstanceLogs from "@/components/instances/InstanceLogs";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceOperations from "@/components/instances/InstanceOperations";
 import SandboxActions from "@/components/sandboxes/SandboxActions";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { getSandboxProviderLabel } from "@/lib/instances";
 import SandboxAccess from "./SandboxAccess";

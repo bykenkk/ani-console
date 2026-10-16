@@ -3,7 +3,7 @@ import { Button, Card, Result, Spin, Typography } from "@arco-design/web-react";
 import { useEffect, useState } from "react";
 import { exchangeOidcCode } from "@/api/auth";
 import { ApiError } from "@/api/request";
-import AuthCenterLayout from "@/components/layouts/AuthCenterLayout";
+import AuthCenterLayout from "@/layouts/AuthCenterLayout";
 import { closeNotification, showNotification } from "@/lib/feedback";
 import { oidcStorage } from "@/lib/storage";
 import { isAuthenticated, useAuthStore } from "@/stores/auth";
