@@ -22,7 +22,7 @@ import brandLogo from "@/assets/brand/wordmark.png";
 import { formatDateTime } from "@/lib/format";
 import { useAuthStore } from "@/stores/auth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import AboutUsModal from "@/layouts/AboutUsModal";
+import AboutUsModal from "./AboutUsModal";
 import KaiwuEntryButton from "./KaiwuEntryButton";
 
 const MOCK_REGION = { value: "guangzhou-a", label: "广州-A" };
