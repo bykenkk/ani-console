@@ -23,7 +23,7 @@ import { formatDateTime } from "@/lib/format";
 import { useAuthStore } from "@/stores/auth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import AboutUsModal from "@/components/layouts/AboutUsModal";
-import KaiwuEntryButton from "@/components/kaiwu/KaiwuEntryButton";
+import KaiwuEntryButton from "./KaiwuEntryButton";
 
 const MOCK_REGION = { value: "guangzhou-a", label: "广州-A" };
 
