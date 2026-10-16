@@ -111,16 +111,8 @@ let refreshDueAt: number | undefined;
 let loggingOut = false;
 let sessionGeneration = 0;
 
-function redirectToLogin(): void {
-  if (typeof window === "undefined") return;
-  const current = `${window.location.pathname}${window.location.search}${window.location.hash}`;
-  if (window.location.pathname.startsWith("/login")) return;
-  window.location.assign(`/login?redirect=${encodeURIComponent(current)}`);
-}
-
 function expireAuthSession(): void {
   useAuthStore.getState().clear();
-  redirectToLogin();
 }
 
 function payloadRecord(value: unknown): ApiErrorPayload | undefined {

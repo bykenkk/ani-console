@@ -65,9 +65,6 @@ export default function TopNav({
       const submitData = jti ? { jti } : {};
       await logoutRequest(submitData);
     },
-    onSuccess: () => {
-      navigate({ to: "/login" });
-    },
   });
 
   const confirmLogout = () => {

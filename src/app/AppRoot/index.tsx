@@ -1,6 +1,7 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { showNotification } from "@/lib/feedback";
 import { migrateLegacyAuthStorage } from "@/lib/storage";
 import { useAuthStore } from "@/stores/auth";
 import { queryClient } from "../query-client";
@@ -19,6 +20,22 @@ async function initializeAuth(): Promise<void> {
 
 export function AppRoot() {
   const [authReady, setAuthReady] = useState(false);
+
+  useEffect(() => {
+    return useAuthStore.subscribe((state, previous) => {
+      if (!previous.tokens?.access_token || state.tokens?.access_token) return;
+
+      // Clearing the session re-runs the parent auth guard, including on full-screen routes.
+      router.invalidate().catch((error: unknown) => {
+        showNotification({
+          id: "auth-session",
+          state: "error",
+          action: "更新登录状态",
+          content: { error, fallback: "请刷新页面后重试" },
+        });
+      });
+    });
+  }, []);
 
   useEffect(() => {
     let active = true;

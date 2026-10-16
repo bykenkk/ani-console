@@ -11,55 +11,56 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_app'
 import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as LoginCallbackRouteImport } from './routes/login.callback'
-import { Route as AuthenticatedApiKeysIndexRouteImport } from './routes/_authenticated/api-keys/index'
-import { Route as AuthenticatedContainerInstancesIndexRouteImport } from './routes/_authenticated/container-instances/index'
-import { Route as AuthenticatedContainerInstancesInstanceIdRouteImport } from './routes/_authenticated/container-instances/$instanceId'
-import { Route as AuthenticatedDevIndexRouteImport } from './routes/_authenticated/dev/index'
-import { Route as AuthenticatedDevResourceRouteImport } from './routes/_authenticated/dev/resource'
-import { Route as AuthenticatedFilesystemsIndexRouteImport } from './routes/_authenticated/filesystems/index'
-import { Route as AuthenticatedFilesystemsFilesystemIdRouteImport } from './routes/_authenticated/filesystems/$filesystemId'
-import { Route as AuthenticatedGpuInstancesIndexRouteImport } from './routes/_authenticated/gpu-instances/index'
-import { Route as AuthenticatedGpuInstancesInstanceIdRouteImport } from './routes/_authenticated/gpu-instances/$instanceId'
-import { Route as AuthenticatedGpuInventoryIndexRouteImport } from './routes/_authenticated/gpu-inventory/index'
-import { Route as AuthenticatedInferenceIndexRouteImport } from './routes/_authenticated/inference/index'
-import { Route as AuthenticatedInferenceServiceIdRouteImport } from './routes/_authenticated/inference/$serviceId'
-import { Route as AuthenticatedK8sClustersIndexRouteImport } from './routes/_authenticated/k8s-clusters/index'
-import { Route as AuthenticatedK8sClustersClusterIdRouteImport } from './routes/_authenticated/k8s-clusters/$clusterId'
-import { Route as AuthenticatedKbIndexRouteImport } from './routes/_authenticated/kb/index'
-import { Route as AuthenticatedKbKbIdRouteImport } from './routes/_authenticated/kb/$kbId'
-import { Route as AuthenticatedLoadBalancersIndexRouteImport } from './routes/_authenticated/load-balancers/index'
-import { Route as AuthenticatedLoadBalancersLoadBalancerIdRouteImport } from './routes/_authenticated/load-balancers/$loadBalancerId'
-import { Route as AuthenticatedModelsIndexRouteImport } from './routes/_authenticated/models/index'
-import { Route as AuthenticatedModelsModelIdRouteImport } from './routes/_authenticated/models/$modelId'
-import { Route as AuthenticatedObjectsIndexRouteImport } from './routes/_authenticated/objects/index'
-import { Route as AuthenticatedObjectsBucketIdRouteImport } from './routes/_authenticated/objects/$bucketId'
-import { Route as AuthenticatedOverviewComputeIndexRouteImport } from './routes/_authenticated/overview-compute/index'
-import { Route as AuthenticatedRegistryIndexRouteImport } from './routes/_authenticated/registry/index'
-import { Route as AuthenticatedRoutesIndexRouteImport } from './routes/_authenticated/routes/index'
-import { Route as AuthenticatedRoutesRouteIdRouteImport } from './routes/_authenticated/routes/$routeId'
-import { Route as AuthenticatedSandboxInstancesIndexRouteImport } from './routes/_authenticated/sandbox-instances/index'
-import { Route as AuthenticatedSandboxInstancesInstanceIdRouteImport } from './routes/_authenticated/sandbox-instances/$instanceId'
-import { Route as AuthenticatedSecurityGroupsIndexRouteImport } from './routes/_authenticated/security-groups/index'
-import { Route as AuthenticatedSecurityGroupsSecurityGroupIdRouteImport } from './routes/_authenticated/security-groups/$securityGroupId'
-import { Route as AuthenticatedSubnetsIndexRouteImport } from './routes/_authenticated/subnets/index'
-import { Route as AuthenticatedSubnetsSubnetIdRouteImport } from './routes/_authenticated/subnets/$subnetId'
-import { Route as AuthenticatedVectorStoresIndexRouteImport } from './routes/_authenticated/vector-stores/index'
-import { Route as AuthenticatedVectorStoresVectorStoreIdRouteImport } from './routes/_authenticated/vector-stores/$vectorStoreId'
-import { Route as AuthenticatedVmInstancesIndexRouteImport } from './routes/_authenticated/vm-instances/index'
-import { Route as AuthenticatedVmInstancesInstanceIdRouteImport } from './routes/_authenticated/vm-instances/$instanceId'
-import { Route as AuthenticatedVolumesIndexRouteImport } from './routes/_authenticated/volumes/index'
-import { Route as AuthenticatedVolumesVolumeIdRouteImport } from './routes/_authenticated/volumes/$volumeId'
-import { Route as AuthenticatedVpcsIndexRouteImport } from './routes/_authenticated/vpcs/index'
-import { Route as AuthenticatedVpcsVpcIdRouteImport } from './routes/_authenticated/vpcs/$vpcId'
-import { Route as ContainerInstancesInstanceIdTerminalRouteImport } from './routes/container-instances.$instanceId.terminal'
-import { Route as GpuInstancesInstanceIdTerminalRouteImport } from './routes/gpu-instances.$instanceId.terminal'
-import { Route as SandboxInstancesInstanceIdTerminalRouteImport } from './routes/sandbox-instances.$instanceId.terminal'
-import { Route as VmInstancesInstanceIdVncRouteImport } from './routes/vm-instances.$instanceId.vnc'
-import { Route as AuthenticatedObjectsBucketIdIndexRouteImport } from './routes/_authenticated/objects/$bucketId/index'
-import { Route as AuthenticatedObjectsBucketIdObjectIdRouteImport } from './routes/_authenticated/objects/$bucketId/$objectId'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/_app/index'
+import { Route as AuthenticatedAppApiKeysIndexRouteImport } from './routes/_authenticated/_app/api-keys/index'
+import { Route as AuthenticatedAppContainerInstancesIndexRouteImport } from './routes/_authenticated/_app/container-instances/index'
+import { Route as AuthenticatedAppContainerInstancesInstanceIdRouteImport } from './routes/_authenticated/_app/container-instances/$instanceId'
+import { Route as AuthenticatedAppDevIndexRouteImport } from './routes/_authenticated/_app/dev/index'
+import { Route as AuthenticatedAppDevResourceRouteImport } from './routes/_authenticated/_app/dev/resource'
+import { Route as AuthenticatedAppFilesystemsIndexRouteImport } from './routes/_authenticated/_app/filesystems/index'
+import { Route as AuthenticatedAppFilesystemsFilesystemIdRouteImport } from './routes/_authenticated/_app/filesystems/$filesystemId'
+import { Route as AuthenticatedAppGpuInstancesIndexRouteImport } from './routes/_authenticated/_app/gpu-instances/index'
+import { Route as AuthenticatedAppGpuInstancesInstanceIdRouteImport } from './routes/_authenticated/_app/gpu-instances/$instanceId'
+import { Route as AuthenticatedAppGpuInventoryIndexRouteImport } from './routes/_authenticated/_app/gpu-inventory/index'
+import { Route as AuthenticatedAppInferenceIndexRouteImport } from './routes/_authenticated/_app/inference/index'
+import { Route as AuthenticatedAppInferenceServiceIdRouteImport } from './routes/_authenticated/_app/inference/$serviceId'
+import { Route as AuthenticatedAppK8sClustersIndexRouteImport } from './routes/_authenticated/_app/k8s-clusters/index'
+import { Route as AuthenticatedAppK8sClustersClusterIdRouteImport } from './routes/_authenticated/_app/k8s-clusters/$clusterId'
+import { Route as AuthenticatedAppKbIndexRouteImport } from './routes/_authenticated/_app/kb/index'
+import { Route as AuthenticatedAppKbKbIdRouteImport } from './routes/_authenticated/_app/kb/$kbId'
+import { Route as AuthenticatedAppLoadBalancersIndexRouteImport } from './routes/_authenticated/_app/load-balancers/index'
+import { Route as AuthenticatedAppLoadBalancersLoadBalancerIdRouteImport } from './routes/_authenticated/_app/load-balancers/$loadBalancerId'
+import { Route as AuthenticatedAppModelsIndexRouteImport } from './routes/_authenticated/_app/models/index'
+import { Route as AuthenticatedAppModelsModelIdRouteImport } from './routes/_authenticated/_app/models/$modelId'
+import { Route as AuthenticatedAppObjectsIndexRouteImport } from './routes/_authenticated/_app/objects/index'
+import { Route as AuthenticatedAppObjectsBucketIdRouteImport } from './routes/_authenticated/_app/objects/$bucketId'
+import { Route as AuthenticatedAppOverviewComputeIndexRouteImport } from './routes/_authenticated/_app/overview-compute/index'
+import { Route as AuthenticatedAppRegistryIndexRouteImport } from './routes/_authenticated/_app/registry/index'
+import { Route as AuthenticatedAppRoutesIndexRouteImport } from './routes/_authenticated/_app/routes/index'
+import { Route as AuthenticatedAppRoutesRouteIdRouteImport } from './routes/_authenticated/_app/routes/$routeId'
+import { Route as AuthenticatedAppSandboxInstancesIndexRouteImport } from './routes/_authenticated/_app/sandbox-instances/index'
+import { Route as AuthenticatedAppSandboxInstancesInstanceIdRouteImport } from './routes/_authenticated/_app/sandbox-instances/$instanceId'
+import { Route as AuthenticatedAppSecurityGroupsIndexRouteImport } from './routes/_authenticated/_app/security-groups/index'
+import { Route as AuthenticatedAppSecurityGroupsSecurityGroupIdRouteImport } from './routes/_authenticated/_app/security-groups/$securityGroupId'
+import { Route as AuthenticatedAppSubnetsIndexRouteImport } from './routes/_authenticated/_app/subnets/index'
+import { Route as AuthenticatedAppSubnetsSubnetIdRouteImport } from './routes/_authenticated/_app/subnets/$subnetId'
+import { Route as AuthenticatedAppVectorStoresIndexRouteImport } from './routes/_authenticated/_app/vector-stores/index'
+import { Route as AuthenticatedAppVectorStoresVectorStoreIdRouteImport } from './routes/_authenticated/_app/vector-stores/$vectorStoreId'
+import { Route as AuthenticatedAppVmInstancesIndexRouteImport } from './routes/_authenticated/_app/vm-instances/index'
+import { Route as AuthenticatedAppVmInstancesInstanceIdRouteImport } from './routes/_authenticated/_app/vm-instances/$instanceId'
+import { Route as AuthenticatedAppVolumesIndexRouteImport } from './routes/_authenticated/_app/volumes/index'
+import { Route as AuthenticatedAppVolumesVolumeIdRouteImport } from './routes/_authenticated/_app/volumes/$volumeId'
+import { Route as AuthenticatedAppVpcsIndexRouteImport } from './routes/_authenticated/_app/vpcs/index'
+import { Route as AuthenticatedAppVpcsVpcIdRouteImport } from './routes/_authenticated/_app/vpcs/$vpcId'
+import { Route as AuthenticatedContainerInstancesInstanceIdTerminalRouteImport } from './routes/_authenticated/container-instances.$instanceId.terminal'
+import { Route as AuthenticatedGpuInstancesInstanceIdTerminalRouteImport } from './routes/_authenticated/gpu-instances.$instanceId.terminal'
+import { Route as AuthenticatedSandboxInstancesInstanceIdTerminalRouteImport } from './routes/_authenticated/sandbox-instances.$instanceId.terminal'
+import { Route as AuthenticatedVmInstancesInstanceIdVncRouteImport } from './routes/_authenticated/vm-instances.$instanceId.vnc'
+import { Route as AuthenticatedAppObjectsBucketIdIndexRouteImport } from './routes/_authenticated/_app/objects/$bucketId/index'
+import { Route as AuthenticatedAppObjectsBucketIdObjectIdRouteImport } from './routes/_authenticated/_app/objects/$bucketId/$objectId'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -70,9 +71,8 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
@@ -85,433 +85,442 @@ const LoginCallbackRoute = LoginCallbackRouteImport.update({
   path: '/callback',
   getParentRoute: () => LoginRoute,
 } as any)
-const AuthenticatedApiKeysIndexRoute =
-  AuthenticatedApiKeysIndexRouteImport.update({
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppApiKeysIndexRoute =
+  AuthenticatedAppApiKeysIndexRouteImport.update({
     id: '/api-keys/',
     path: '/api-keys/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedContainerInstancesIndexRoute =
-  AuthenticatedContainerInstancesIndexRouteImport.update({
+const AuthenticatedAppContainerInstancesIndexRoute =
+  AuthenticatedAppContainerInstancesIndexRouteImport.update({
     id: '/container-instances/',
     path: '/container-instances/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedContainerInstancesInstanceIdRoute =
-  AuthenticatedContainerInstancesInstanceIdRouteImport.update({
+const AuthenticatedAppContainerInstancesInstanceIdRoute =
+  AuthenticatedAppContainerInstancesInstanceIdRouteImport.update({
     id: '/container-instances/$instanceId',
     path: '/container-instances/$instanceId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedDevIndexRoute = AuthenticatedDevIndexRouteImport.update({
-  id: '/dev/',
-  path: '/dev/',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedDevResourceRoute =
-  AuthenticatedDevResourceRouteImport.update({
+const AuthenticatedAppDevIndexRoute =
+  AuthenticatedAppDevIndexRouteImport.update({
+    id: '/dev/',
+    path: '/dev/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppDevResourceRoute =
+  AuthenticatedAppDevResourceRouteImport.update({
     id: '/dev/resource',
     path: '/dev/resource',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedFilesystemsIndexRoute =
-  AuthenticatedFilesystemsIndexRouteImport.update({
+const AuthenticatedAppFilesystemsIndexRoute =
+  AuthenticatedAppFilesystemsIndexRouteImport.update({
     id: '/filesystems/',
     path: '/filesystems/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedFilesystemsFilesystemIdRoute =
-  AuthenticatedFilesystemsFilesystemIdRouteImport.update({
+const AuthenticatedAppFilesystemsFilesystemIdRoute =
+  AuthenticatedAppFilesystemsFilesystemIdRouteImport.update({
     id: '/filesystems/$filesystemId',
     path: '/filesystems/$filesystemId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedGpuInstancesIndexRoute =
-  AuthenticatedGpuInstancesIndexRouteImport.update({
+const AuthenticatedAppGpuInstancesIndexRoute =
+  AuthenticatedAppGpuInstancesIndexRouteImport.update({
     id: '/gpu-instances/',
     path: '/gpu-instances/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedGpuInstancesInstanceIdRoute =
-  AuthenticatedGpuInstancesInstanceIdRouteImport.update({
+const AuthenticatedAppGpuInstancesInstanceIdRoute =
+  AuthenticatedAppGpuInstancesInstanceIdRouteImport.update({
     id: '/gpu-instances/$instanceId',
     path: '/gpu-instances/$instanceId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedGpuInventoryIndexRoute =
-  AuthenticatedGpuInventoryIndexRouteImport.update({
+const AuthenticatedAppGpuInventoryIndexRoute =
+  AuthenticatedAppGpuInventoryIndexRouteImport.update({
     id: '/gpu-inventory/',
     path: '/gpu-inventory/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedInferenceIndexRoute =
-  AuthenticatedInferenceIndexRouteImport.update({
+const AuthenticatedAppInferenceIndexRoute =
+  AuthenticatedAppInferenceIndexRouteImport.update({
     id: '/inference/',
     path: '/inference/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedInferenceServiceIdRoute =
-  AuthenticatedInferenceServiceIdRouteImport.update({
+const AuthenticatedAppInferenceServiceIdRoute =
+  AuthenticatedAppInferenceServiceIdRouteImport.update({
     id: '/inference/$serviceId',
     path: '/inference/$serviceId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedK8sClustersIndexRoute =
-  AuthenticatedK8sClustersIndexRouteImport.update({
+const AuthenticatedAppK8sClustersIndexRoute =
+  AuthenticatedAppK8sClustersIndexRouteImport.update({
     id: '/k8s-clusters/',
     path: '/k8s-clusters/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedK8sClustersClusterIdRoute =
-  AuthenticatedK8sClustersClusterIdRouteImport.update({
+const AuthenticatedAppK8sClustersClusterIdRoute =
+  AuthenticatedAppK8sClustersClusterIdRouteImport.update({
     id: '/k8s-clusters/$clusterId',
     path: '/k8s-clusters/$clusterId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedKbIndexRoute = AuthenticatedKbIndexRouteImport.update({
+const AuthenticatedAppKbIndexRoute = AuthenticatedAppKbIndexRouteImport.update({
   id: '/kb/',
   path: '/kb/',
-  getParentRoute: () => AuthenticatedRoute,
+  getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const AuthenticatedKbKbIdRoute = AuthenticatedKbKbIdRouteImport.update({
+const AuthenticatedAppKbKbIdRoute = AuthenticatedAppKbKbIdRouteImport.update({
   id: '/kb/$kbId',
   path: '/kb/$kbId',
-  getParentRoute: () => AuthenticatedRoute,
+  getParentRoute: () => AuthenticatedAppRoute,
 } as any)
-const AuthenticatedLoadBalancersIndexRoute =
-  AuthenticatedLoadBalancersIndexRouteImport.update({
+const AuthenticatedAppLoadBalancersIndexRoute =
+  AuthenticatedAppLoadBalancersIndexRouteImport.update({
     id: '/load-balancers/',
     path: '/load-balancers/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedLoadBalancersLoadBalancerIdRoute =
-  AuthenticatedLoadBalancersLoadBalancerIdRouteImport.update({
+const AuthenticatedAppLoadBalancersLoadBalancerIdRoute =
+  AuthenticatedAppLoadBalancersLoadBalancerIdRouteImport.update({
     id: '/load-balancers/$loadBalancerId',
     path: '/load-balancers/$loadBalancerId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedModelsIndexRoute =
-  AuthenticatedModelsIndexRouteImport.update({
+const AuthenticatedAppModelsIndexRoute =
+  AuthenticatedAppModelsIndexRouteImport.update({
     id: '/models/',
     path: '/models/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedModelsModelIdRoute =
-  AuthenticatedModelsModelIdRouteImport.update({
+const AuthenticatedAppModelsModelIdRoute =
+  AuthenticatedAppModelsModelIdRouteImport.update({
     id: '/models/$modelId',
     path: '/models/$modelId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedObjectsIndexRoute =
-  AuthenticatedObjectsIndexRouteImport.update({
+const AuthenticatedAppObjectsIndexRoute =
+  AuthenticatedAppObjectsIndexRouteImport.update({
     id: '/objects/',
     path: '/objects/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedObjectsBucketIdRoute =
-  AuthenticatedObjectsBucketIdRouteImport.update({
+const AuthenticatedAppObjectsBucketIdRoute =
+  AuthenticatedAppObjectsBucketIdRouteImport.update({
     id: '/objects/$bucketId',
     path: '/objects/$bucketId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedOverviewComputeIndexRoute =
-  AuthenticatedOverviewComputeIndexRouteImport.update({
+const AuthenticatedAppOverviewComputeIndexRoute =
+  AuthenticatedAppOverviewComputeIndexRouteImport.update({
     id: '/overview-compute/',
     path: '/overview-compute/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedRegistryIndexRoute =
-  AuthenticatedRegistryIndexRouteImport.update({
+const AuthenticatedAppRegistryIndexRoute =
+  AuthenticatedAppRegistryIndexRouteImport.update({
     id: '/registry/',
     path: '/registry/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedRoutesIndexRoute =
-  AuthenticatedRoutesIndexRouteImport.update({
+const AuthenticatedAppRoutesIndexRoute =
+  AuthenticatedAppRoutesIndexRouteImport.update({
     id: '/routes/',
     path: '/routes/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedRoutesRouteIdRoute =
-  AuthenticatedRoutesRouteIdRouteImport.update({
+const AuthenticatedAppRoutesRouteIdRoute =
+  AuthenticatedAppRoutesRouteIdRouteImport.update({
     id: '/routes/$routeId',
     path: '/routes/$routeId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedSandboxInstancesIndexRoute =
-  AuthenticatedSandboxInstancesIndexRouteImport.update({
+const AuthenticatedAppSandboxInstancesIndexRoute =
+  AuthenticatedAppSandboxInstancesIndexRouteImport.update({
     id: '/sandbox-instances/',
     path: '/sandbox-instances/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedSandboxInstancesInstanceIdRoute =
-  AuthenticatedSandboxInstancesInstanceIdRouteImport.update({
+const AuthenticatedAppSandboxInstancesInstanceIdRoute =
+  AuthenticatedAppSandboxInstancesInstanceIdRouteImport.update({
     id: '/sandbox-instances/$instanceId',
     path: '/sandbox-instances/$instanceId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedSecurityGroupsIndexRoute =
-  AuthenticatedSecurityGroupsIndexRouteImport.update({
+const AuthenticatedAppSecurityGroupsIndexRoute =
+  AuthenticatedAppSecurityGroupsIndexRouteImport.update({
     id: '/security-groups/',
     path: '/security-groups/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedSecurityGroupsSecurityGroupIdRoute =
-  AuthenticatedSecurityGroupsSecurityGroupIdRouteImport.update({
+const AuthenticatedAppSecurityGroupsSecurityGroupIdRoute =
+  AuthenticatedAppSecurityGroupsSecurityGroupIdRouteImport.update({
     id: '/security-groups/$securityGroupId',
     path: '/security-groups/$securityGroupId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedSubnetsIndexRoute =
-  AuthenticatedSubnetsIndexRouteImport.update({
+const AuthenticatedAppSubnetsIndexRoute =
+  AuthenticatedAppSubnetsIndexRouteImport.update({
     id: '/subnets/',
     path: '/subnets/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedSubnetsSubnetIdRoute =
-  AuthenticatedSubnetsSubnetIdRouteImport.update({
+const AuthenticatedAppSubnetsSubnetIdRoute =
+  AuthenticatedAppSubnetsSubnetIdRouteImport.update({
     id: '/subnets/$subnetId',
     path: '/subnets/$subnetId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedVectorStoresIndexRoute =
-  AuthenticatedVectorStoresIndexRouteImport.update({
+const AuthenticatedAppVectorStoresIndexRoute =
+  AuthenticatedAppVectorStoresIndexRouteImport.update({
     id: '/vector-stores/',
     path: '/vector-stores/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedVectorStoresVectorStoreIdRoute =
-  AuthenticatedVectorStoresVectorStoreIdRouteImport.update({
+const AuthenticatedAppVectorStoresVectorStoreIdRoute =
+  AuthenticatedAppVectorStoresVectorStoreIdRouteImport.update({
     id: '/vector-stores/$vectorStoreId',
     path: '/vector-stores/$vectorStoreId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedVmInstancesIndexRoute =
-  AuthenticatedVmInstancesIndexRouteImport.update({
+const AuthenticatedAppVmInstancesIndexRoute =
+  AuthenticatedAppVmInstancesIndexRouteImport.update({
     id: '/vm-instances/',
     path: '/vm-instances/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedVmInstancesInstanceIdRoute =
-  AuthenticatedVmInstancesInstanceIdRouteImport.update({
+const AuthenticatedAppVmInstancesInstanceIdRoute =
+  AuthenticatedAppVmInstancesInstanceIdRouteImport.update({
     id: '/vm-instances/$instanceId',
     path: '/vm-instances/$instanceId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedVolumesIndexRoute =
-  AuthenticatedVolumesIndexRouteImport.update({
+const AuthenticatedAppVolumesIndexRoute =
+  AuthenticatedAppVolumesIndexRouteImport.update({
     id: '/volumes/',
     path: '/volumes/',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedVolumesVolumeIdRoute =
-  AuthenticatedVolumesVolumeIdRouteImport.update({
+const AuthenticatedAppVolumesVolumeIdRoute =
+  AuthenticatedAppVolumesVolumeIdRouteImport.update({
     id: '/volumes/$volumeId',
     path: '/volumes/$volumeId',
-    getParentRoute: () => AuthenticatedRoute,
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedVpcsIndexRoute = AuthenticatedVpcsIndexRouteImport.update({
-  id: '/vpcs/',
-  path: '/vpcs/',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedVpcsVpcIdRoute = AuthenticatedVpcsVpcIdRouteImport.update({
-  id: '/vpcs/$vpcId',
-  path: '/vpcs/$vpcId',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const ContainerInstancesInstanceIdTerminalRoute =
-  ContainerInstancesInstanceIdTerminalRouteImport.update({
+const AuthenticatedAppVpcsIndexRoute =
+  AuthenticatedAppVpcsIndexRouteImport.update({
+    id: '/vpcs/',
+    path: '/vpcs/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppVpcsVpcIdRoute =
+  AuthenticatedAppVpcsVpcIdRouteImport.update({
+    id: '/vpcs/$vpcId',
+    path: '/vpcs/$vpcId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedContainerInstancesInstanceIdTerminalRoute =
+  AuthenticatedContainerInstancesInstanceIdTerminalRouteImport.update({
     id: '/container-instances/$instanceId/terminal',
     path: '/container-instances/$instanceId/terminal',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const GpuInstancesInstanceIdTerminalRoute =
-  GpuInstancesInstanceIdTerminalRouteImport.update({
+const AuthenticatedGpuInstancesInstanceIdTerminalRoute =
+  AuthenticatedGpuInstancesInstanceIdTerminalRouteImport.update({
     id: '/gpu-instances/$instanceId/terminal',
     path: '/gpu-instances/$instanceId/terminal',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const SandboxInstancesInstanceIdTerminalRoute =
-  SandboxInstancesInstanceIdTerminalRouteImport.update({
+const AuthenticatedSandboxInstancesInstanceIdTerminalRoute =
+  AuthenticatedSandboxInstancesInstanceIdTerminalRouteImport.update({
     id: '/sandbox-instances/$instanceId/terminal',
     path: '/sandbox-instances/$instanceId/terminal',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const VmInstancesInstanceIdVncRoute =
-  VmInstancesInstanceIdVncRouteImport.update({
+const AuthenticatedVmInstancesInstanceIdVncRoute =
+  AuthenticatedVmInstancesInstanceIdVncRouteImport.update({
     id: '/vm-instances/$instanceId/vnc',
     path: '/vm-instances/$instanceId/vnc',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedObjectsBucketIdIndexRoute =
-  AuthenticatedObjectsBucketIdIndexRouteImport.update({
+const AuthenticatedAppObjectsBucketIdIndexRoute =
+  AuthenticatedAppObjectsBucketIdIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthenticatedObjectsBucketIdRoute,
+    getParentRoute: () => AuthenticatedAppObjectsBucketIdRoute,
   } as any)
-const AuthenticatedObjectsBucketIdObjectIdRoute =
-  AuthenticatedObjectsBucketIdObjectIdRouteImport.update({
+const AuthenticatedAppObjectsBucketIdObjectIdRoute =
+  AuthenticatedAppObjectsBucketIdObjectIdRouteImport.update({
     id: '/$objectId',
     path: '/$objectId',
-    getParentRoute: () => AuthenticatedObjectsBucketIdRoute,
+    getParentRoute: () => AuthenticatedAppObjectsBucketIdRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthenticatedIndexRoute
+  '/': typeof AuthenticatedAppIndexRoute
   '/login': typeof LoginRouteWithChildren
   '/login/callback': typeof LoginCallbackRoute
   '/login/': typeof LoginIndexRoute
-  '/container-instances/$instanceId': typeof AuthenticatedContainerInstancesInstanceIdRoute
-  '/dev/resource': typeof AuthenticatedDevResourceRoute
-  '/filesystems/$filesystemId': typeof AuthenticatedFilesystemsFilesystemIdRoute
-  '/gpu-instances/$instanceId': typeof AuthenticatedGpuInstancesInstanceIdRoute
-  '/inference/$serviceId': typeof AuthenticatedInferenceServiceIdRoute
-  '/k8s-clusters/$clusterId': typeof AuthenticatedK8sClustersClusterIdRoute
-  '/kb/$kbId': typeof AuthenticatedKbKbIdRoute
-  '/load-balancers/$loadBalancerId': typeof AuthenticatedLoadBalancersLoadBalancerIdRoute
-  '/models/$modelId': typeof AuthenticatedModelsModelIdRoute
-  '/objects/$bucketId': typeof AuthenticatedObjectsBucketIdRouteWithChildren
-  '/routes/$routeId': typeof AuthenticatedRoutesRouteIdRoute
-  '/sandbox-instances/$instanceId': typeof AuthenticatedSandboxInstancesInstanceIdRoute
-  '/security-groups/$securityGroupId': typeof AuthenticatedSecurityGroupsSecurityGroupIdRoute
-  '/subnets/$subnetId': typeof AuthenticatedSubnetsSubnetIdRoute
-  '/vector-stores/$vectorStoreId': typeof AuthenticatedVectorStoresVectorStoreIdRoute
-  '/vm-instances/$instanceId': typeof AuthenticatedVmInstancesInstanceIdRoute
-  '/volumes/$volumeId': typeof AuthenticatedVolumesVolumeIdRoute
-  '/vpcs/$vpcId': typeof AuthenticatedVpcsVpcIdRoute
-  '/container-instances/$instanceId/terminal': typeof ContainerInstancesInstanceIdTerminalRoute
-  '/gpu-instances/$instanceId/terminal': typeof GpuInstancesInstanceIdTerminalRoute
-  '/sandbox-instances/$instanceId/terminal': typeof SandboxInstancesInstanceIdTerminalRoute
-  '/vm-instances/$instanceId/vnc': typeof VmInstancesInstanceIdVncRoute
-  '/api-keys/': typeof AuthenticatedApiKeysIndexRoute
-  '/container-instances/': typeof AuthenticatedContainerInstancesIndexRoute
-  '/dev/': typeof AuthenticatedDevIndexRoute
-  '/filesystems/': typeof AuthenticatedFilesystemsIndexRoute
-  '/gpu-instances/': typeof AuthenticatedGpuInstancesIndexRoute
-  '/gpu-inventory/': typeof AuthenticatedGpuInventoryIndexRoute
-  '/inference/': typeof AuthenticatedInferenceIndexRoute
-  '/k8s-clusters/': typeof AuthenticatedK8sClustersIndexRoute
-  '/kb/': typeof AuthenticatedKbIndexRoute
-  '/load-balancers/': typeof AuthenticatedLoadBalancersIndexRoute
-  '/models/': typeof AuthenticatedModelsIndexRoute
-  '/objects/': typeof AuthenticatedObjectsIndexRoute
-  '/overview-compute/': typeof AuthenticatedOverviewComputeIndexRoute
-  '/registry/': typeof AuthenticatedRegistryIndexRoute
-  '/routes/': typeof AuthenticatedRoutesIndexRoute
-  '/sandbox-instances/': typeof AuthenticatedSandboxInstancesIndexRoute
-  '/security-groups/': typeof AuthenticatedSecurityGroupsIndexRoute
-  '/subnets/': typeof AuthenticatedSubnetsIndexRoute
-  '/vector-stores/': typeof AuthenticatedVectorStoresIndexRoute
-  '/vm-instances/': typeof AuthenticatedVmInstancesIndexRoute
-  '/volumes/': typeof AuthenticatedVolumesIndexRoute
-  '/vpcs/': typeof AuthenticatedVpcsIndexRoute
-  '/objects/$bucketId/$objectId': typeof AuthenticatedObjectsBucketIdObjectIdRoute
-  '/objects/$bucketId/': typeof AuthenticatedObjectsBucketIdIndexRoute
+  '/container-instances/$instanceId': typeof AuthenticatedAppContainerInstancesInstanceIdRoute
+  '/dev/resource': typeof AuthenticatedAppDevResourceRoute
+  '/filesystems/$filesystemId': typeof AuthenticatedAppFilesystemsFilesystemIdRoute
+  '/gpu-instances/$instanceId': typeof AuthenticatedAppGpuInstancesInstanceIdRoute
+  '/inference/$serviceId': typeof AuthenticatedAppInferenceServiceIdRoute
+  '/k8s-clusters/$clusterId': typeof AuthenticatedAppK8sClustersClusterIdRoute
+  '/kb/$kbId': typeof AuthenticatedAppKbKbIdRoute
+  '/load-balancers/$loadBalancerId': typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
+  '/models/$modelId': typeof AuthenticatedAppModelsModelIdRoute
+  '/objects/$bucketId': typeof AuthenticatedAppObjectsBucketIdRouteWithChildren
+  '/routes/$routeId': typeof AuthenticatedAppRoutesRouteIdRoute
+  '/sandbox-instances/$instanceId': typeof AuthenticatedAppSandboxInstancesInstanceIdRoute
+  '/security-groups/$securityGroupId': typeof AuthenticatedAppSecurityGroupsSecurityGroupIdRoute
+  '/subnets/$subnetId': typeof AuthenticatedAppSubnetsSubnetIdRoute
+  '/vector-stores/$vectorStoreId': typeof AuthenticatedAppVectorStoresVectorStoreIdRoute
+  '/vm-instances/$instanceId': typeof AuthenticatedAppVmInstancesInstanceIdRoute
+  '/volumes/$volumeId': typeof AuthenticatedAppVolumesVolumeIdRoute
+  '/vpcs/$vpcId': typeof AuthenticatedAppVpcsVpcIdRoute
+  '/container-instances/$instanceId/terminal': typeof AuthenticatedContainerInstancesInstanceIdTerminalRoute
+  '/gpu-instances/$instanceId/terminal': typeof AuthenticatedGpuInstancesInstanceIdTerminalRoute
+  '/sandbox-instances/$instanceId/terminal': typeof AuthenticatedSandboxInstancesInstanceIdTerminalRoute
+  '/vm-instances/$instanceId/vnc': typeof AuthenticatedVmInstancesInstanceIdVncRoute
+  '/api-keys/': typeof AuthenticatedAppApiKeysIndexRoute
+  '/container-instances/': typeof AuthenticatedAppContainerInstancesIndexRoute
+  '/dev/': typeof AuthenticatedAppDevIndexRoute
+  '/filesystems/': typeof AuthenticatedAppFilesystemsIndexRoute
+  '/gpu-instances/': typeof AuthenticatedAppGpuInstancesIndexRoute
+  '/gpu-inventory/': typeof AuthenticatedAppGpuInventoryIndexRoute
+  '/inference/': typeof AuthenticatedAppInferenceIndexRoute
+  '/k8s-clusters/': typeof AuthenticatedAppK8sClustersIndexRoute
+  '/kb/': typeof AuthenticatedAppKbIndexRoute
+  '/load-balancers/': typeof AuthenticatedAppLoadBalancersIndexRoute
+  '/models/': typeof AuthenticatedAppModelsIndexRoute
+  '/objects/': typeof AuthenticatedAppObjectsIndexRoute
+  '/overview-compute/': typeof AuthenticatedAppOverviewComputeIndexRoute
+  '/registry/': typeof AuthenticatedAppRegistryIndexRoute
+  '/routes/': typeof AuthenticatedAppRoutesIndexRoute
+  '/sandbox-instances/': typeof AuthenticatedAppSandboxInstancesIndexRoute
+  '/security-groups/': typeof AuthenticatedAppSecurityGroupsIndexRoute
+  '/subnets/': typeof AuthenticatedAppSubnetsIndexRoute
+  '/vector-stores/': typeof AuthenticatedAppVectorStoresIndexRoute
+  '/vm-instances/': typeof AuthenticatedAppVmInstancesIndexRoute
+  '/volumes/': typeof AuthenticatedAppVolumesIndexRoute
+  '/vpcs/': typeof AuthenticatedAppVpcsIndexRoute
+  '/objects/$bucketId/$objectId': typeof AuthenticatedAppObjectsBucketIdObjectIdRoute
+  '/objects/$bucketId/': typeof AuthenticatedAppObjectsBucketIdIndexRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof AuthenticatedAppIndexRoute
   '/login/callback': typeof LoginCallbackRoute
-  '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginIndexRoute
-  '/container-instances/$instanceId': typeof AuthenticatedContainerInstancesInstanceIdRoute
-  '/dev/resource': typeof AuthenticatedDevResourceRoute
-  '/filesystems/$filesystemId': typeof AuthenticatedFilesystemsFilesystemIdRoute
-  '/gpu-instances/$instanceId': typeof AuthenticatedGpuInstancesInstanceIdRoute
-  '/inference/$serviceId': typeof AuthenticatedInferenceServiceIdRoute
-  '/k8s-clusters/$clusterId': typeof AuthenticatedK8sClustersClusterIdRoute
-  '/kb/$kbId': typeof AuthenticatedKbKbIdRoute
-  '/load-balancers/$loadBalancerId': typeof AuthenticatedLoadBalancersLoadBalancerIdRoute
-  '/models/$modelId': typeof AuthenticatedModelsModelIdRoute
-  '/routes/$routeId': typeof AuthenticatedRoutesRouteIdRoute
-  '/sandbox-instances/$instanceId': typeof AuthenticatedSandboxInstancesInstanceIdRoute
-  '/security-groups/$securityGroupId': typeof AuthenticatedSecurityGroupsSecurityGroupIdRoute
-  '/subnets/$subnetId': typeof AuthenticatedSubnetsSubnetIdRoute
-  '/vector-stores/$vectorStoreId': typeof AuthenticatedVectorStoresVectorStoreIdRoute
-  '/vm-instances/$instanceId': typeof AuthenticatedVmInstancesInstanceIdRoute
-  '/volumes/$volumeId': typeof AuthenticatedVolumesVolumeIdRoute
-  '/vpcs/$vpcId': typeof AuthenticatedVpcsVpcIdRoute
-  '/container-instances/$instanceId/terminal': typeof ContainerInstancesInstanceIdTerminalRoute
-  '/gpu-instances/$instanceId/terminal': typeof GpuInstancesInstanceIdTerminalRoute
-  '/sandbox-instances/$instanceId/terminal': typeof SandboxInstancesInstanceIdTerminalRoute
-  '/vm-instances/$instanceId/vnc': typeof VmInstancesInstanceIdVncRoute
-  '/api-keys': typeof AuthenticatedApiKeysIndexRoute
-  '/container-instances': typeof AuthenticatedContainerInstancesIndexRoute
-  '/dev': typeof AuthenticatedDevIndexRoute
-  '/filesystems': typeof AuthenticatedFilesystemsIndexRoute
-  '/gpu-instances': typeof AuthenticatedGpuInstancesIndexRoute
-  '/gpu-inventory': typeof AuthenticatedGpuInventoryIndexRoute
-  '/inference': typeof AuthenticatedInferenceIndexRoute
-  '/k8s-clusters': typeof AuthenticatedK8sClustersIndexRoute
-  '/kb': typeof AuthenticatedKbIndexRoute
-  '/load-balancers': typeof AuthenticatedLoadBalancersIndexRoute
-  '/models': typeof AuthenticatedModelsIndexRoute
-  '/objects': typeof AuthenticatedObjectsIndexRoute
-  '/overview-compute': typeof AuthenticatedOverviewComputeIndexRoute
-  '/registry': typeof AuthenticatedRegistryIndexRoute
-  '/routes': typeof AuthenticatedRoutesIndexRoute
-  '/sandbox-instances': typeof AuthenticatedSandboxInstancesIndexRoute
-  '/security-groups': typeof AuthenticatedSecurityGroupsIndexRoute
-  '/subnets': typeof AuthenticatedSubnetsIndexRoute
-  '/vector-stores': typeof AuthenticatedVectorStoresIndexRoute
-  '/vm-instances': typeof AuthenticatedVmInstancesIndexRoute
-  '/volumes': typeof AuthenticatedVolumesIndexRoute
-  '/vpcs': typeof AuthenticatedVpcsIndexRoute
-  '/objects/$bucketId/$objectId': typeof AuthenticatedObjectsBucketIdObjectIdRoute
-  '/objects/$bucketId': typeof AuthenticatedObjectsBucketIdIndexRoute
+  '/container-instances/$instanceId': typeof AuthenticatedAppContainerInstancesInstanceIdRoute
+  '/dev/resource': typeof AuthenticatedAppDevResourceRoute
+  '/filesystems/$filesystemId': typeof AuthenticatedAppFilesystemsFilesystemIdRoute
+  '/gpu-instances/$instanceId': typeof AuthenticatedAppGpuInstancesInstanceIdRoute
+  '/inference/$serviceId': typeof AuthenticatedAppInferenceServiceIdRoute
+  '/k8s-clusters/$clusterId': typeof AuthenticatedAppK8sClustersClusterIdRoute
+  '/kb/$kbId': typeof AuthenticatedAppKbKbIdRoute
+  '/load-balancers/$loadBalancerId': typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
+  '/models/$modelId': typeof AuthenticatedAppModelsModelIdRoute
+  '/routes/$routeId': typeof AuthenticatedAppRoutesRouteIdRoute
+  '/sandbox-instances/$instanceId': typeof AuthenticatedAppSandboxInstancesInstanceIdRoute
+  '/security-groups/$securityGroupId': typeof AuthenticatedAppSecurityGroupsSecurityGroupIdRoute
+  '/subnets/$subnetId': typeof AuthenticatedAppSubnetsSubnetIdRoute
+  '/vector-stores/$vectorStoreId': typeof AuthenticatedAppVectorStoresVectorStoreIdRoute
+  '/vm-instances/$instanceId': typeof AuthenticatedAppVmInstancesInstanceIdRoute
+  '/volumes/$volumeId': typeof AuthenticatedAppVolumesVolumeIdRoute
+  '/vpcs/$vpcId': typeof AuthenticatedAppVpcsVpcIdRoute
+  '/container-instances/$instanceId/terminal': typeof AuthenticatedContainerInstancesInstanceIdTerminalRoute
+  '/gpu-instances/$instanceId/terminal': typeof AuthenticatedGpuInstancesInstanceIdTerminalRoute
+  '/sandbox-instances/$instanceId/terminal': typeof AuthenticatedSandboxInstancesInstanceIdTerminalRoute
+  '/vm-instances/$instanceId/vnc': typeof AuthenticatedVmInstancesInstanceIdVncRoute
+  '/api-keys': typeof AuthenticatedAppApiKeysIndexRoute
+  '/container-instances': typeof AuthenticatedAppContainerInstancesIndexRoute
+  '/dev': typeof AuthenticatedAppDevIndexRoute
+  '/filesystems': typeof AuthenticatedAppFilesystemsIndexRoute
+  '/gpu-instances': typeof AuthenticatedAppGpuInstancesIndexRoute
+  '/gpu-inventory': typeof AuthenticatedAppGpuInventoryIndexRoute
+  '/inference': typeof AuthenticatedAppInferenceIndexRoute
+  '/k8s-clusters': typeof AuthenticatedAppK8sClustersIndexRoute
+  '/kb': typeof AuthenticatedAppKbIndexRoute
+  '/load-balancers': typeof AuthenticatedAppLoadBalancersIndexRoute
+  '/models': typeof AuthenticatedAppModelsIndexRoute
+  '/objects': typeof AuthenticatedAppObjectsIndexRoute
+  '/overview-compute': typeof AuthenticatedAppOverviewComputeIndexRoute
+  '/registry': typeof AuthenticatedAppRegistryIndexRoute
+  '/routes': typeof AuthenticatedAppRoutesIndexRoute
+  '/sandbox-instances': typeof AuthenticatedAppSandboxInstancesIndexRoute
+  '/security-groups': typeof AuthenticatedAppSecurityGroupsIndexRoute
+  '/subnets': typeof AuthenticatedAppSubnetsIndexRoute
+  '/vector-stores': typeof AuthenticatedAppVectorStoresIndexRoute
+  '/vm-instances': typeof AuthenticatedAppVmInstancesIndexRoute
+  '/volumes': typeof AuthenticatedAppVolumesIndexRoute
+  '/vpcs': typeof AuthenticatedAppVpcsIndexRoute
+  '/objects/$bucketId/$objectId': typeof AuthenticatedAppObjectsBucketIdObjectIdRoute
+  '/objects/$bucketId': typeof AuthenticatedAppObjectsBucketIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRouteWithChildren
+  '/_authenticated/_app': typeof AuthenticatedAppRouteWithChildren
   '/login/callback': typeof LoginCallbackRoute
-  '/_authenticated/': typeof AuthenticatedIndexRoute
   '/login/': typeof LoginIndexRoute
-  '/_authenticated/container-instances/$instanceId': typeof AuthenticatedContainerInstancesInstanceIdRoute
-  '/_authenticated/dev/resource': typeof AuthenticatedDevResourceRoute
-  '/_authenticated/filesystems/$filesystemId': typeof AuthenticatedFilesystemsFilesystemIdRoute
-  '/_authenticated/gpu-instances/$instanceId': typeof AuthenticatedGpuInstancesInstanceIdRoute
-  '/_authenticated/inference/$serviceId': typeof AuthenticatedInferenceServiceIdRoute
-  '/_authenticated/k8s-clusters/$clusterId': typeof AuthenticatedK8sClustersClusterIdRoute
-  '/_authenticated/kb/$kbId': typeof AuthenticatedKbKbIdRoute
-  '/_authenticated/load-balancers/$loadBalancerId': typeof AuthenticatedLoadBalancersLoadBalancerIdRoute
-  '/_authenticated/models/$modelId': typeof AuthenticatedModelsModelIdRoute
-  '/_authenticated/objects/$bucketId': typeof AuthenticatedObjectsBucketIdRouteWithChildren
-  '/_authenticated/routes/$routeId': typeof AuthenticatedRoutesRouteIdRoute
-  '/_authenticated/sandbox-instances/$instanceId': typeof AuthenticatedSandboxInstancesInstanceIdRoute
-  '/_authenticated/security-groups/$securityGroupId': typeof AuthenticatedSecurityGroupsSecurityGroupIdRoute
-  '/_authenticated/subnets/$subnetId': typeof AuthenticatedSubnetsSubnetIdRoute
-  '/_authenticated/vector-stores/$vectorStoreId': typeof AuthenticatedVectorStoresVectorStoreIdRoute
-  '/_authenticated/vm-instances/$instanceId': typeof AuthenticatedVmInstancesInstanceIdRoute
-  '/_authenticated/volumes/$volumeId': typeof AuthenticatedVolumesVolumeIdRoute
-  '/_authenticated/vpcs/$vpcId': typeof AuthenticatedVpcsVpcIdRoute
-  '/container-instances/$instanceId/terminal': typeof ContainerInstancesInstanceIdTerminalRoute
-  '/gpu-instances/$instanceId/terminal': typeof GpuInstancesInstanceIdTerminalRoute
-  '/sandbox-instances/$instanceId/terminal': typeof SandboxInstancesInstanceIdTerminalRoute
-  '/vm-instances/$instanceId/vnc': typeof VmInstancesInstanceIdVncRoute
-  '/_authenticated/api-keys/': typeof AuthenticatedApiKeysIndexRoute
-  '/_authenticated/container-instances/': typeof AuthenticatedContainerInstancesIndexRoute
-  '/_authenticated/dev/': typeof AuthenticatedDevIndexRoute
-  '/_authenticated/filesystems/': typeof AuthenticatedFilesystemsIndexRoute
-  '/_authenticated/gpu-instances/': typeof AuthenticatedGpuInstancesIndexRoute
-  '/_authenticated/gpu-inventory/': typeof AuthenticatedGpuInventoryIndexRoute
-  '/_authenticated/inference/': typeof AuthenticatedInferenceIndexRoute
-  '/_authenticated/k8s-clusters/': typeof AuthenticatedK8sClustersIndexRoute
-  '/_authenticated/kb/': typeof AuthenticatedKbIndexRoute
-  '/_authenticated/load-balancers/': typeof AuthenticatedLoadBalancersIndexRoute
-  '/_authenticated/models/': typeof AuthenticatedModelsIndexRoute
-  '/_authenticated/objects/': typeof AuthenticatedObjectsIndexRoute
-  '/_authenticated/overview-compute/': typeof AuthenticatedOverviewComputeIndexRoute
-  '/_authenticated/registry/': typeof AuthenticatedRegistryIndexRoute
-  '/_authenticated/routes/': typeof AuthenticatedRoutesIndexRoute
-  '/_authenticated/sandbox-instances/': typeof AuthenticatedSandboxInstancesIndexRoute
-  '/_authenticated/security-groups/': typeof AuthenticatedSecurityGroupsIndexRoute
-  '/_authenticated/subnets/': typeof AuthenticatedSubnetsIndexRoute
-  '/_authenticated/vector-stores/': typeof AuthenticatedVectorStoresIndexRoute
-  '/_authenticated/vm-instances/': typeof AuthenticatedVmInstancesIndexRoute
-  '/_authenticated/volumes/': typeof AuthenticatedVolumesIndexRoute
-  '/_authenticated/vpcs/': typeof AuthenticatedVpcsIndexRoute
-  '/_authenticated/objects/$bucketId/$objectId': typeof AuthenticatedObjectsBucketIdObjectIdRoute
-  '/_authenticated/objects/$bucketId/': typeof AuthenticatedObjectsBucketIdIndexRoute
+  '/_authenticated/_app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/_app/container-instances/$instanceId': typeof AuthenticatedAppContainerInstancesInstanceIdRoute
+  '/_authenticated/_app/dev/resource': typeof AuthenticatedAppDevResourceRoute
+  '/_authenticated/_app/filesystems/$filesystemId': typeof AuthenticatedAppFilesystemsFilesystemIdRoute
+  '/_authenticated/_app/gpu-instances/$instanceId': typeof AuthenticatedAppGpuInstancesInstanceIdRoute
+  '/_authenticated/_app/inference/$serviceId': typeof AuthenticatedAppInferenceServiceIdRoute
+  '/_authenticated/_app/k8s-clusters/$clusterId': typeof AuthenticatedAppK8sClustersClusterIdRoute
+  '/_authenticated/_app/kb/$kbId': typeof AuthenticatedAppKbKbIdRoute
+  '/_authenticated/_app/load-balancers/$loadBalancerId': typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
+  '/_authenticated/_app/models/$modelId': typeof AuthenticatedAppModelsModelIdRoute
+  '/_authenticated/_app/objects/$bucketId': typeof AuthenticatedAppObjectsBucketIdRouteWithChildren
+  '/_authenticated/_app/routes/$routeId': typeof AuthenticatedAppRoutesRouteIdRoute
+  '/_authenticated/_app/sandbox-instances/$instanceId': typeof AuthenticatedAppSandboxInstancesInstanceIdRoute
+  '/_authenticated/_app/security-groups/$securityGroupId': typeof AuthenticatedAppSecurityGroupsSecurityGroupIdRoute
+  '/_authenticated/_app/subnets/$subnetId': typeof AuthenticatedAppSubnetsSubnetIdRoute
+  '/_authenticated/_app/vector-stores/$vectorStoreId': typeof AuthenticatedAppVectorStoresVectorStoreIdRoute
+  '/_authenticated/_app/vm-instances/$instanceId': typeof AuthenticatedAppVmInstancesInstanceIdRoute
+  '/_authenticated/_app/volumes/$volumeId': typeof AuthenticatedAppVolumesVolumeIdRoute
+  '/_authenticated/_app/vpcs/$vpcId': typeof AuthenticatedAppVpcsVpcIdRoute
+  '/_authenticated/container-instances/$instanceId/terminal': typeof AuthenticatedContainerInstancesInstanceIdTerminalRoute
+  '/_authenticated/gpu-instances/$instanceId/terminal': typeof AuthenticatedGpuInstancesInstanceIdTerminalRoute
+  '/_authenticated/sandbox-instances/$instanceId/terminal': typeof AuthenticatedSandboxInstancesInstanceIdTerminalRoute
+  '/_authenticated/vm-instances/$instanceId/vnc': typeof AuthenticatedVmInstancesInstanceIdVncRoute
+  '/_authenticated/_app/api-keys/': typeof AuthenticatedAppApiKeysIndexRoute
+  '/_authenticated/_app/container-instances/': typeof AuthenticatedAppContainerInstancesIndexRoute
+  '/_authenticated/_app/dev/': typeof AuthenticatedAppDevIndexRoute
+  '/_authenticated/_app/filesystems/': typeof AuthenticatedAppFilesystemsIndexRoute
+  '/_authenticated/_app/gpu-instances/': typeof AuthenticatedAppGpuInstancesIndexRoute
+  '/_authenticated/_app/gpu-inventory/': typeof AuthenticatedAppGpuInventoryIndexRoute
+  '/_authenticated/_app/inference/': typeof AuthenticatedAppInferenceIndexRoute
+  '/_authenticated/_app/k8s-clusters/': typeof AuthenticatedAppK8sClustersIndexRoute
+  '/_authenticated/_app/kb/': typeof AuthenticatedAppKbIndexRoute
+  '/_authenticated/_app/load-balancers/': typeof AuthenticatedAppLoadBalancersIndexRoute
+  '/_authenticated/_app/models/': typeof AuthenticatedAppModelsIndexRoute
+  '/_authenticated/_app/objects/': typeof AuthenticatedAppObjectsIndexRoute
+  '/_authenticated/_app/overview-compute/': typeof AuthenticatedAppOverviewComputeIndexRoute
+  '/_authenticated/_app/registry/': typeof AuthenticatedAppRegistryIndexRoute
+  '/_authenticated/_app/routes/': typeof AuthenticatedAppRoutesIndexRoute
+  '/_authenticated/_app/sandbox-instances/': typeof AuthenticatedAppSandboxInstancesIndexRoute
+  '/_authenticated/_app/security-groups/': typeof AuthenticatedAppSecurityGroupsIndexRoute
+  '/_authenticated/_app/subnets/': typeof AuthenticatedAppSubnetsIndexRoute
+  '/_authenticated/_app/vector-stores/': typeof AuthenticatedAppVectorStoresIndexRoute
+  '/_authenticated/_app/vm-instances/': typeof AuthenticatedAppVmInstancesIndexRoute
+  '/_authenticated/_app/volumes/': typeof AuthenticatedAppVolumesIndexRoute
+  '/_authenticated/_app/vpcs/': typeof AuthenticatedAppVpcsIndexRoute
+  '/_authenticated/_app/objects/$bucketId/$objectId': typeof AuthenticatedAppObjectsBucketIdObjectIdRoute
+  '/_authenticated/_app/objects/$bucketId/': typeof AuthenticatedAppObjectsBucketIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -568,8 +577,8 @@ export interface FileRouteTypes {
     | '/objects/$bucketId/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/login/callback'
     | '/'
+    | '/login/callback'
     | '/login'
     | '/container-instances/$instanceId'
     | '/dev/resource'
@@ -620,64 +629,61 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/_authenticated/_app'
     | '/login/callback'
-    | '/_authenticated/'
     | '/login/'
-    | '/_authenticated/container-instances/$instanceId'
-    | '/_authenticated/dev/resource'
-    | '/_authenticated/filesystems/$filesystemId'
-    | '/_authenticated/gpu-instances/$instanceId'
-    | '/_authenticated/inference/$serviceId'
-    | '/_authenticated/k8s-clusters/$clusterId'
-    | '/_authenticated/kb/$kbId'
-    | '/_authenticated/load-balancers/$loadBalancerId'
-    | '/_authenticated/models/$modelId'
-    | '/_authenticated/objects/$bucketId'
-    | '/_authenticated/routes/$routeId'
-    | '/_authenticated/sandbox-instances/$instanceId'
-    | '/_authenticated/security-groups/$securityGroupId'
-    | '/_authenticated/subnets/$subnetId'
-    | '/_authenticated/vector-stores/$vectorStoreId'
-    | '/_authenticated/vm-instances/$instanceId'
-    | '/_authenticated/volumes/$volumeId'
-    | '/_authenticated/vpcs/$vpcId'
-    | '/container-instances/$instanceId/terminal'
-    | '/gpu-instances/$instanceId/terminal'
-    | '/sandbox-instances/$instanceId/terminal'
-    | '/vm-instances/$instanceId/vnc'
-    | '/_authenticated/api-keys/'
-    | '/_authenticated/container-instances/'
-    | '/_authenticated/dev/'
-    | '/_authenticated/filesystems/'
-    | '/_authenticated/gpu-instances/'
-    | '/_authenticated/gpu-inventory/'
-    | '/_authenticated/inference/'
-    | '/_authenticated/k8s-clusters/'
-    | '/_authenticated/kb/'
-    | '/_authenticated/load-balancers/'
-    | '/_authenticated/models/'
-    | '/_authenticated/objects/'
-    | '/_authenticated/overview-compute/'
-    | '/_authenticated/registry/'
-    | '/_authenticated/routes/'
-    | '/_authenticated/sandbox-instances/'
-    | '/_authenticated/security-groups/'
-    | '/_authenticated/subnets/'
-    | '/_authenticated/vector-stores/'
-    | '/_authenticated/vm-instances/'
-    | '/_authenticated/volumes/'
-    | '/_authenticated/vpcs/'
-    | '/_authenticated/objects/$bucketId/$objectId'
-    | '/_authenticated/objects/$bucketId/'
+    | '/_authenticated/_app/'
+    | '/_authenticated/_app/container-instances/$instanceId'
+    | '/_authenticated/_app/dev/resource'
+    | '/_authenticated/_app/filesystems/$filesystemId'
+    | '/_authenticated/_app/gpu-instances/$instanceId'
+    | '/_authenticated/_app/inference/$serviceId'
+    | '/_authenticated/_app/k8s-clusters/$clusterId'
+    | '/_authenticated/_app/kb/$kbId'
+    | '/_authenticated/_app/load-balancers/$loadBalancerId'
+    | '/_authenticated/_app/models/$modelId'
+    | '/_authenticated/_app/objects/$bucketId'
+    | '/_authenticated/_app/routes/$routeId'
+    | '/_authenticated/_app/sandbox-instances/$instanceId'
+    | '/_authenticated/_app/security-groups/$securityGroupId'
+    | '/_authenticated/_app/subnets/$subnetId'
+    | '/_authenticated/_app/vector-stores/$vectorStoreId'
+    | '/_authenticated/_app/vm-instances/$instanceId'
+    | '/_authenticated/_app/volumes/$volumeId'
+    | '/_authenticated/_app/vpcs/$vpcId'
+    | '/_authenticated/container-instances/$instanceId/terminal'
+    | '/_authenticated/gpu-instances/$instanceId/terminal'
+    | '/_authenticated/sandbox-instances/$instanceId/terminal'
+    | '/_authenticated/vm-instances/$instanceId/vnc'
+    | '/_authenticated/_app/api-keys/'
+    | '/_authenticated/_app/container-instances/'
+    | '/_authenticated/_app/dev/'
+    | '/_authenticated/_app/filesystems/'
+    | '/_authenticated/_app/gpu-instances/'
+    | '/_authenticated/_app/gpu-inventory/'
+    | '/_authenticated/_app/inference/'
+    | '/_authenticated/_app/k8s-clusters/'
+    | '/_authenticated/_app/kb/'
+    | '/_authenticated/_app/load-balancers/'
+    | '/_authenticated/_app/models/'
+    | '/_authenticated/_app/objects/'
+    | '/_authenticated/_app/overview-compute/'
+    | '/_authenticated/_app/registry/'
+    | '/_authenticated/_app/routes/'
+    | '/_authenticated/_app/sandbox-instances/'
+    | '/_authenticated/_app/security-groups/'
+    | '/_authenticated/_app/subnets/'
+    | '/_authenticated/_app/vector-stores/'
+    | '/_authenticated/_app/vm-instances/'
+    | '/_authenticated/_app/volumes/'
+    | '/_authenticated/_app/vpcs/'
+    | '/_authenticated/_app/objects/$bucketId/$objectId'
+    | '/_authenticated/_app/objects/$bucketId/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRouteWithChildren
-  ContainerInstancesInstanceIdTerminalRoute: typeof ContainerInstancesInstanceIdTerminalRoute
-  GpuInstancesInstanceIdTerminalRoute: typeof GpuInstancesInstanceIdTerminalRoute
-  SandboxInstancesInstanceIdTerminalRoute: typeof SandboxInstancesInstanceIdTerminalRoute
-  VmInstancesInstanceIdVncRoute: typeof VmInstancesInstanceIdVncRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -696,11 +702,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/': {
-      id: '/_authenticated/'
-      path: '/'
+    '/_authenticated/_app': {
+      id: '/_authenticated/_app'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      preLoaderRoute: typeof AuthenticatedAppRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/login/': {
@@ -717,448 +723,484 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginCallbackRouteImport
       parentRoute: typeof LoginRoute
     }
-    '/_authenticated/api-keys/': {
-      id: '/_authenticated/api-keys/'
+    '/_authenticated/_app/': {
+      id: '/_authenticated/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/api-keys/': {
+      id: '/_authenticated/_app/api-keys/'
       path: '/api-keys'
       fullPath: '/api-keys/'
-      preLoaderRoute: typeof AuthenticatedApiKeysIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppApiKeysIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/container-instances/': {
-      id: '/_authenticated/container-instances/'
+    '/_authenticated/_app/container-instances/': {
+      id: '/_authenticated/_app/container-instances/'
       path: '/container-instances'
       fullPath: '/container-instances/'
-      preLoaderRoute: typeof AuthenticatedContainerInstancesIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppContainerInstancesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/container-instances/$instanceId': {
-      id: '/_authenticated/container-instances/$instanceId'
+    '/_authenticated/_app/container-instances/$instanceId': {
+      id: '/_authenticated/_app/container-instances/$instanceId'
       path: '/container-instances/$instanceId'
       fullPath: '/container-instances/$instanceId'
-      preLoaderRoute: typeof AuthenticatedContainerInstancesInstanceIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppContainerInstancesInstanceIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/dev/': {
-      id: '/_authenticated/dev/'
+    '/_authenticated/_app/dev/': {
+      id: '/_authenticated/_app/dev/'
       path: '/dev'
       fullPath: '/dev/'
-      preLoaderRoute: typeof AuthenticatedDevIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppDevIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/dev/resource': {
-      id: '/_authenticated/dev/resource'
+    '/_authenticated/_app/dev/resource': {
+      id: '/_authenticated/_app/dev/resource'
       path: '/dev/resource'
       fullPath: '/dev/resource'
-      preLoaderRoute: typeof AuthenticatedDevResourceRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppDevResourceRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/filesystems/': {
-      id: '/_authenticated/filesystems/'
+    '/_authenticated/_app/filesystems/': {
+      id: '/_authenticated/_app/filesystems/'
       path: '/filesystems'
       fullPath: '/filesystems/'
-      preLoaderRoute: typeof AuthenticatedFilesystemsIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppFilesystemsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/filesystems/$filesystemId': {
-      id: '/_authenticated/filesystems/$filesystemId'
+    '/_authenticated/_app/filesystems/$filesystemId': {
+      id: '/_authenticated/_app/filesystems/$filesystemId'
       path: '/filesystems/$filesystemId'
       fullPath: '/filesystems/$filesystemId'
-      preLoaderRoute: typeof AuthenticatedFilesystemsFilesystemIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppFilesystemsFilesystemIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/gpu-instances/': {
-      id: '/_authenticated/gpu-instances/'
+    '/_authenticated/_app/gpu-instances/': {
+      id: '/_authenticated/_app/gpu-instances/'
       path: '/gpu-instances'
       fullPath: '/gpu-instances/'
-      preLoaderRoute: typeof AuthenticatedGpuInstancesIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppGpuInstancesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/gpu-instances/$instanceId': {
-      id: '/_authenticated/gpu-instances/$instanceId'
+    '/_authenticated/_app/gpu-instances/$instanceId': {
+      id: '/_authenticated/_app/gpu-instances/$instanceId'
       path: '/gpu-instances/$instanceId'
       fullPath: '/gpu-instances/$instanceId'
-      preLoaderRoute: typeof AuthenticatedGpuInstancesInstanceIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppGpuInstancesInstanceIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/gpu-inventory/': {
-      id: '/_authenticated/gpu-inventory/'
+    '/_authenticated/_app/gpu-inventory/': {
+      id: '/_authenticated/_app/gpu-inventory/'
       path: '/gpu-inventory'
       fullPath: '/gpu-inventory/'
-      preLoaderRoute: typeof AuthenticatedGpuInventoryIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppGpuInventoryIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/inference/': {
-      id: '/_authenticated/inference/'
+    '/_authenticated/_app/inference/': {
+      id: '/_authenticated/_app/inference/'
       path: '/inference'
       fullPath: '/inference/'
-      preLoaderRoute: typeof AuthenticatedInferenceIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppInferenceIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/inference/$serviceId': {
-      id: '/_authenticated/inference/$serviceId'
+    '/_authenticated/_app/inference/$serviceId': {
+      id: '/_authenticated/_app/inference/$serviceId'
       path: '/inference/$serviceId'
       fullPath: '/inference/$serviceId'
-      preLoaderRoute: typeof AuthenticatedInferenceServiceIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppInferenceServiceIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/k8s-clusters/': {
-      id: '/_authenticated/k8s-clusters/'
+    '/_authenticated/_app/k8s-clusters/': {
+      id: '/_authenticated/_app/k8s-clusters/'
       path: '/k8s-clusters'
       fullPath: '/k8s-clusters/'
-      preLoaderRoute: typeof AuthenticatedK8sClustersIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppK8sClustersIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/k8s-clusters/$clusterId': {
-      id: '/_authenticated/k8s-clusters/$clusterId'
+    '/_authenticated/_app/k8s-clusters/$clusterId': {
+      id: '/_authenticated/_app/k8s-clusters/$clusterId'
       path: '/k8s-clusters/$clusterId'
       fullPath: '/k8s-clusters/$clusterId'
-      preLoaderRoute: typeof AuthenticatedK8sClustersClusterIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppK8sClustersClusterIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/kb/': {
-      id: '/_authenticated/kb/'
+    '/_authenticated/_app/kb/': {
+      id: '/_authenticated/_app/kb/'
       path: '/kb'
       fullPath: '/kb/'
-      preLoaderRoute: typeof AuthenticatedKbIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppKbIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/kb/$kbId': {
-      id: '/_authenticated/kb/$kbId'
+    '/_authenticated/_app/kb/$kbId': {
+      id: '/_authenticated/_app/kb/$kbId'
       path: '/kb/$kbId'
       fullPath: '/kb/$kbId'
-      preLoaderRoute: typeof AuthenticatedKbKbIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppKbKbIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/load-balancers/': {
-      id: '/_authenticated/load-balancers/'
+    '/_authenticated/_app/load-balancers/': {
+      id: '/_authenticated/_app/load-balancers/'
       path: '/load-balancers'
       fullPath: '/load-balancers/'
-      preLoaderRoute: typeof AuthenticatedLoadBalancersIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppLoadBalancersIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/load-balancers/$loadBalancerId': {
-      id: '/_authenticated/load-balancers/$loadBalancerId'
+    '/_authenticated/_app/load-balancers/$loadBalancerId': {
+      id: '/_authenticated/_app/load-balancers/$loadBalancerId'
       path: '/load-balancers/$loadBalancerId'
       fullPath: '/load-balancers/$loadBalancerId'
-      preLoaderRoute: typeof AuthenticatedLoadBalancersLoadBalancerIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppLoadBalancersLoadBalancerIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/models/': {
-      id: '/_authenticated/models/'
+    '/_authenticated/_app/models/': {
+      id: '/_authenticated/_app/models/'
       path: '/models'
       fullPath: '/models/'
-      preLoaderRoute: typeof AuthenticatedModelsIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppModelsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/models/$modelId': {
-      id: '/_authenticated/models/$modelId'
+    '/_authenticated/_app/models/$modelId': {
+      id: '/_authenticated/_app/models/$modelId'
       path: '/models/$modelId'
       fullPath: '/models/$modelId'
-      preLoaderRoute: typeof AuthenticatedModelsModelIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppModelsModelIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/objects/': {
-      id: '/_authenticated/objects/'
+    '/_authenticated/_app/objects/': {
+      id: '/_authenticated/_app/objects/'
       path: '/objects'
       fullPath: '/objects/'
-      preLoaderRoute: typeof AuthenticatedObjectsIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppObjectsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/objects/$bucketId': {
-      id: '/_authenticated/objects/$bucketId'
+    '/_authenticated/_app/objects/$bucketId': {
+      id: '/_authenticated/_app/objects/$bucketId'
       path: '/objects/$bucketId'
       fullPath: '/objects/$bucketId'
-      preLoaderRoute: typeof AuthenticatedObjectsBucketIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppObjectsBucketIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/overview-compute/': {
-      id: '/_authenticated/overview-compute/'
+    '/_authenticated/_app/overview-compute/': {
+      id: '/_authenticated/_app/overview-compute/'
       path: '/overview-compute'
       fullPath: '/overview-compute/'
-      preLoaderRoute: typeof AuthenticatedOverviewComputeIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppOverviewComputeIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/registry/': {
-      id: '/_authenticated/registry/'
+    '/_authenticated/_app/registry/': {
+      id: '/_authenticated/_app/registry/'
       path: '/registry'
       fullPath: '/registry/'
-      preLoaderRoute: typeof AuthenticatedRegistryIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppRegistryIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/routes/': {
-      id: '/_authenticated/routes/'
+    '/_authenticated/_app/routes/': {
+      id: '/_authenticated/_app/routes/'
       path: '/routes'
       fullPath: '/routes/'
-      preLoaderRoute: typeof AuthenticatedRoutesIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppRoutesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/routes/$routeId': {
-      id: '/_authenticated/routes/$routeId'
+    '/_authenticated/_app/routes/$routeId': {
+      id: '/_authenticated/_app/routes/$routeId'
       path: '/routes/$routeId'
       fullPath: '/routes/$routeId'
-      preLoaderRoute: typeof AuthenticatedRoutesRouteIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppRoutesRouteIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/sandbox-instances/': {
-      id: '/_authenticated/sandbox-instances/'
+    '/_authenticated/_app/sandbox-instances/': {
+      id: '/_authenticated/_app/sandbox-instances/'
       path: '/sandbox-instances'
       fullPath: '/sandbox-instances/'
-      preLoaderRoute: typeof AuthenticatedSandboxInstancesIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppSandboxInstancesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/sandbox-instances/$instanceId': {
-      id: '/_authenticated/sandbox-instances/$instanceId'
+    '/_authenticated/_app/sandbox-instances/$instanceId': {
+      id: '/_authenticated/_app/sandbox-instances/$instanceId'
       path: '/sandbox-instances/$instanceId'
       fullPath: '/sandbox-instances/$instanceId'
-      preLoaderRoute: typeof AuthenticatedSandboxInstancesInstanceIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppSandboxInstancesInstanceIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/security-groups/': {
-      id: '/_authenticated/security-groups/'
+    '/_authenticated/_app/security-groups/': {
+      id: '/_authenticated/_app/security-groups/'
       path: '/security-groups'
       fullPath: '/security-groups/'
-      preLoaderRoute: typeof AuthenticatedSecurityGroupsIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppSecurityGroupsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/security-groups/$securityGroupId': {
-      id: '/_authenticated/security-groups/$securityGroupId'
+    '/_authenticated/_app/security-groups/$securityGroupId': {
+      id: '/_authenticated/_app/security-groups/$securityGroupId'
       path: '/security-groups/$securityGroupId'
       fullPath: '/security-groups/$securityGroupId'
-      preLoaderRoute: typeof AuthenticatedSecurityGroupsSecurityGroupIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppSecurityGroupsSecurityGroupIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/subnets/': {
-      id: '/_authenticated/subnets/'
+    '/_authenticated/_app/subnets/': {
+      id: '/_authenticated/_app/subnets/'
       path: '/subnets'
       fullPath: '/subnets/'
-      preLoaderRoute: typeof AuthenticatedSubnetsIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppSubnetsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/subnets/$subnetId': {
-      id: '/_authenticated/subnets/$subnetId'
+    '/_authenticated/_app/subnets/$subnetId': {
+      id: '/_authenticated/_app/subnets/$subnetId'
       path: '/subnets/$subnetId'
       fullPath: '/subnets/$subnetId'
-      preLoaderRoute: typeof AuthenticatedSubnetsSubnetIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppSubnetsSubnetIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/vector-stores/': {
-      id: '/_authenticated/vector-stores/'
+    '/_authenticated/_app/vector-stores/': {
+      id: '/_authenticated/_app/vector-stores/'
       path: '/vector-stores'
       fullPath: '/vector-stores/'
-      preLoaderRoute: typeof AuthenticatedVectorStoresIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppVectorStoresIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/vector-stores/$vectorStoreId': {
-      id: '/_authenticated/vector-stores/$vectorStoreId'
+    '/_authenticated/_app/vector-stores/$vectorStoreId': {
+      id: '/_authenticated/_app/vector-stores/$vectorStoreId'
       path: '/vector-stores/$vectorStoreId'
       fullPath: '/vector-stores/$vectorStoreId'
-      preLoaderRoute: typeof AuthenticatedVectorStoresVectorStoreIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppVectorStoresVectorStoreIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/vm-instances/': {
-      id: '/_authenticated/vm-instances/'
+    '/_authenticated/_app/vm-instances/': {
+      id: '/_authenticated/_app/vm-instances/'
       path: '/vm-instances'
       fullPath: '/vm-instances/'
-      preLoaderRoute: typeof AuthenticatedVmInstancesIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppVmInstancesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/vm-instances/$instanceId': {
-      id: '/_authenticated/vm-instances/$instanceId'
+    '/_authenticated/_app/vm-instances/$instanceId': {
+      id: '/_authenticated/_app/vm-instances/$instanceId'
       path: '/vm-instances/$instanceId'
       fullPath: '/vm-instances/$instanceId'
-      preLoaderRoute: typeof AuthenticatedVmInstancesInstanceIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppVmInstancesInstanceIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/volumes/': {
-      id: '/_authenticated/volumes/'
+    '/_authenticated/_app/volumes/': {
+      id: '/_authenticated/_app/volumes/'
       path: '/volumes'
       fullPath: '/volumes/'
-      preLoaderRoute: typeof AuthenticatedVolumesIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppVolumesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/volumes/$volumeId': {
-      id: '/_authenticated/volumes/$volumeId'
+    '/_authenticated/_app/volumes/$volumeId': {
+      id: '/_authenticated/_app/volumes/$volumeId'
       path: '/volumes/$volumeId'
       fullPath: '/volumes/$volumeId'
-      preLoaderRoute: typeof AuthenticatedVolumesVolumeIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppVolumesVolumeIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/vpcs/': {
-      id: '/_authenticated/vpcs/'
+    '/_authenticated/_app/vpcs/': {
+      id: '/_authenticated/_app/vpcs/'
       path: '/vpcs'
       fullPath: '/vpcs/'
-      preLoaderRoute: typeof AuthenticatedVpcsIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppVpcsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/vpcs/$vpcId': {
-      id: '/_authenticated/vpcs/$vpcId'
+    '/_authenticated/_app/vpcs/$vpcId': {
+      id: '/_authenticated/_app/vpcs/$vpcId'
       path: '/vpcs/$vpcId'
       fullPath: '/vpcs/$vpcId'
-      preLoaderRoute: typeof AuthenticatedVpcsVpcIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
+      preLoaderRoute: typeof AuthenticatedAppVpcsVpcIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/container-instances/$instanceId/terminal': {
-      id: '/container-instances/$instanceId/terminal'
+    '/_authenticated/container-instances/$instanceId/terminal': {
+      id: '/_authenticated/container-instances/$instanceId/terminal'
       path: '/container-instances/$instanceId/terminal'
       fullPath: '/container-instances/$instanceId/terminal'
-      preLoaderRoute: typeof ContainerInstancesInstanceIdTerminalRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedContainerInstancesInstanceIdTerminalRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/gpu-instances/$instanceId/terminal': {
-      id: '/gpu-instances/$instanceId/terminal'
+    '/_authenticated/gpu-instances/$instanceId/terminal': {
+      id: '/_authenticated/gpu-instances/$instanceId/terminal'
       path: '/gpu-instances/$instanceId/terminal'
       fullPath: '/gpu-instances/$instanceId/terminal'
-      preLoaderRoute: typeof GpuInstancesInstanceIdTerminalRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedGpuInstancesInstanceIdTerminalRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/sandbox-instances/$instanceId/terminal': {
-      id: '/sandbox-instances/$instanceId/terminal'
+    '/_authenticated/sandbox-instances/$instanceId/terminal': {
+      id: '/_authenticated/sandbox-instances/$instanceId/terminal'
       path: '/sandbox-instances/$instanceId/terminal'
       fullPath: '/sandbox-instances/$instanceId/terminal'
-      preLoaderRoute: typeof SandboxInstancesInstanceIdTerminalRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedSandboxInstancesInstanceIdTerminalRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/vm-instances/$instanceId/vnc': {
-      id: '/vm-instances/$instanceId/vnc'
+    '/_authenticated/vm-instances/$instanceId/vnc': {
+      id: '/_authenticated/vm-instances/$instanceId/vnc'
       path: '/vm-instances/$instanceId/vnc'
       fullPath: '/vm-instances/$instanceId/vnc'
-      preLoaderRoute: typeof VmInstancesInstanceIdVncRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedVmInstancesInstanceIdVncRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/objects/$bucketId/': {
-      id: '/_authenticated/objects/$bucketId/'
+    '/_authenticated/_app/objects/$bucketId/': {
+      id: '/_authenticated/_app/objects/$bucketId/'
       path: '/'
       fullPath: '/objects/$bucketId/'
-      preLoaderRoute: typeof AuthenticatedObjectsBucketIdIndexRouteImport
-      parentRoute: typeof AuthenticatedObjectsBucketIdRoute
+      preLoaderRoute: typeof AuthenticatedAppObjectsBucketIdIndexRouteImport
+      parentRoute: typeof AuthenticatedAppObjectsBucketIdRoute
     }
-    '/_authenticated/objects/$bucketId/$objectId': {
-      id: '/_authenticated/objects/$bucketId/$objectId'
+    '/_authenticated/_app/objects/$bucketId/$objectId': {
+      id: '/_authenticated/_app/objects/$bucketId/$objectId'
       path: '/$objectId'
       fullPath: '/objects/$bucketId/$objectId'
-      preLoaderRoute: typeof AuthenticatedObjectsBucketIdObjectIdRouteImport
-      parentRoute: typeof AuthenticatedObjectsBucketIdRoute
+      preLoaderRoute: typeof AuthenticatedAppObjectsBucketIdObjectIdRouteImport
+      parentRoute: typeof AuthenticatedAppObjectsBucketIdRoute
     }
   }
 }
 
-interface AuthenticatedObjectsBucketIdRouteChildren {
-  AuthenticatedObjectsBucketIdObjectIdRoute: typeof AuthenticatedObjectsBucketIdObjectIdRoute
-  AuthenticatedObjectsBucketIdIndexRoute: typeof AuthenticatedObjectsBucketIdIndexRoute
+interface AuthenticatedAppObjectsBucketIdRouteChildren {
+  AuthenticatedAppObjectsBucketIdObjectIdRoute: typeof AuthenticatedAppObjectsBucketIdObjectIdRoute
+  AuthenticatedAppObjectsBucketIdIndexRoute: typeof AuthenticatedAppObjectsBucketIdIndexRoute
 }
 
-const AuthenticatedObjectsBucketIdRouteChildren: AuthenticatedObjectsBucketIdRouteChildren =
+const AuthenticatedAppObjectsBucketIdRouteChildren: AuthenticatedAppObjectsBucketIdRouteChildren =
   {
-    AuthenticatedObjectsBucketIdObjectIdRoute:
-      AuthenticatedObjectsBucketIdObjectIdRoute,
-    AuthenticatedObjectsBucketIdIndexRoute:
-      AuthenticatedObjectsBucketIdIndexRoute,
+    AuthenticatedAppObjectsBucketIdObjectIdRoute:
+      AuthenticatedAppObjectsBucketIdObjectIdRoute,
+    AuthenticatedAppObjectsBucketIdIndexRoute:
+      AuthenticatedAppObjectsBucketIdIndexRoute,
   }
 
-const AuthenticatedObjectsBucketIdRouteWithChildren =
-  AuthenticatedObjectsBucketIdRoute._addFileChildren(
-    AuthenticatedObjectsBucketIdRouteChildren,
+const AuthenticatedAppObjectsBucketIdRouteWithChildren =
+  AuthenticatedAppObjectsBucketIdRoute._addFileChildren(
+    AuthenticatedAppObjectsBucketIdRouteChildren,
   )
 
+interface AuthenticatedAppRouteChildren {
+  AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+  AuthenticatedAppContainerInstancesInstanceIdRoute: typeof AuthenticatedAppContainerInstancesInstanceIdRoute
+  AuthenticatedAppDevResourceRoute: typeof AuthenticatedAppDevResourceRoute
+  AuthenticatedAppFilesystemsFilesystemIdRoute: typeof AuthenticatedAppFilesystemsFilesystemIdRoute
+  AuthenticatedAppGpuInstancesInstanceIdRoute: typeof AuthenticatedAppGpuInstancesInstanceIdRoute
+  AuthenticatedAppInferenceServiceIdRoute: typeof AuthenticatedAppInferenceServiceIdRoute
+  AuthenticatedAppK8sClustersClusterIdRoute: typeof AuthenticatedAppK8sClustersClusterIdRoute
+  AuthenticatedAppKbKbIdRoute: typeof AuthenticatedAppKbKbIdRoute
+  AuthenticatedAppLoadBalancersLoadBalancerIdRoute: typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
+  AuthenticatedAppModelsModelIdRoute: typeof AuthenticatedAppModelsModelIdRoute
+  AuthenticatedAppObjectsBucketIdRoute: typeof AuthenticatedAppObjectsBucketIdRouteWithChildren
+  AuthenticatedAppRoutesRouteIdRoute: typeof AuthenticatedAppRoutesRouteIdRoute
+  AuthenticatedAppSandboxInstancesInstanceIdRoute: typeof AuthenticatedAppSandboxInstancesInstanceIdRoute
+  AuthenticatedAppSecurityGroupsSecurityGroupIdRoute: typeof AuthenticatedAppSecurityGroupsSecurityGroupIdRoute
+  AuthenticatedAppSubnetsSubnetIdRoute: typeof AuthenticatedAppSubnetsSubnetIdRoute
+  AuthenticatedAppVectorStoresVectorStoreIdRoute: typeof AuthenticatedAppVectorStoresVectorStoreIdRoute
+  AuthenticatedAppVmInstancesInstanceIdRoute: typeof AuthenticatedAppVmInstancesInstanceIdRoute
+  AuthenticatedAppVolumesVolumeIdRoute: typeof AuthenticatedAppVolumesVolumeIdRoute
+  AuthenticatedAppVpcsVpcIdRoute: typeof AuthenticatedAppVpcsVpcIdRoute
+  AuthenticatedAppApiKeysIndexRoute: typeof AuthenticatedAppApiKeysIndexRoute
+  AuthenticatedAppContainerInstancesIndexRoute: typeof AuthenticatedAppContainerInstancesIndexRoute
+  AuthenticatedAppDevIndexRoute: typeof AuthenticatedAppDevIndexRoute
+  AuthenticatedAppFilesystemsIndexRoute: typeof AuthenticatedAppFilesystemsIndexRoute
+  AuthenticatedAppGpuInstancesIndexRoute: typeof AuthenticatedAppGpuInstancesIndexRoute
+  AuthenticatedAppGpuInventoryIndexRoute: typeof AuthenticatedAppGpuInventoryIndexRoute
+  AuthenticatedAppInferenceIndexRoute: typeof AuthenticatedAppInferenceIndexRoute
+  AuthenticatedAppK8sClustersIndexRoute: typeof AuthenticatedAppK8sClustersIndexRoute
+  AuthenticatedAppKbIndexRoute: typeof AuthenticatedAppKbIndexRoute
+  AuthenticatedAppLoadBalancersIndexRoute: typeof AuthenticatedAppLoadBalancersIndexRoute
+  AuthenticatedAppModelsIndexRoute: typeof AuthenticatedAppModelsIndexRoute
+  AuthenticatedAppObjectsIndexRoute: typeof AuthenticatedAppObjectsIndexRoute
+  AuthenticatedAppOverviewComputeIndexRoute: typeof AuthenticatedAppOverviewComputeIndexRoute
+  AuthenticatedAppRegistryIndexRoute: typeof AuthenticatedAppRegistryIndexRoute
+  AuthenticatedAppRoutesIndexRoute: typeof AuthenticatedAppRoutesIndexRoute
+  AuthenticatedAppSandboxInstancesIndexRoute: typeof AuthenticatedAppSandboxInstancesIndexRoute
+  AuthenticatedAppSecurityGroupsIndexRoute: typeof AuthenticatedAppSecurityGroupsIndexRoute
+  AuthenticatedAppSubnetsIndexRoute: typeof AuthenticatedAppSubnetsIndexRoute
+  AuthenticatedAppVectorStoresIndexRoute: typeof AuthenticatedAppVectorStoresIndexRoute
+  AuthenticatedAppVmInstancesIndexRoute: typeof AuthenticatedAppVmInstancesIndexRoute
+  AuthenticatedAppVolumesIndexRoute: typeof AuthenticatedAppVolumesIndexRoute
+  AuthenticatedAppVpcsIndexRoute: typeof AuthenticatedAppVpcsIndexRoute
+}
+
+const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
+  AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+  AuthenticatedAppContainerInstancesInstanceIdRoute:
+    AuthenticatedAppContainerInstancesInstanceIdRoute,
+  AuthenticatedAppDevResourceRoute: AuthenticatedAppDevResourceRoute,
+  AuthenticatedAppFilesystemsFilesystemIdRoute:
+    AuthenticatedAppFilesystemsFilesystemIdRoute,
+  AuthenticatedAppGpuInstancesInstanceIdRoute:
+    AuthenticatedAppGpuInstancesInstanceIdRoute,
+  AuthenticatedAppInferenceServiceIdRoute:
+    AuthenticatedAppInferenceServiceIdRoute,
+  AuthenticatedAppK8sClustersClusterIdRoute:
+    AuthenticatedAppK8sClustersClusterIdRoute,
+  AuthenticatedAppKbKbIdRoute: AuthenticatedAppKbKbIdRoute,
+  AuthenticatedAppLoadBalancersLoadBalancerIdRoute:
+    AuthenticatedAppLoadBalancersLoadBalancerIdRoute,
+  AuthenticatedAppModelsModelIdRoute: AuthenticatedAppModelsModelIdRoute,
+  AuthenticatedAppObjectsBucketIdRoute:
+    AuthenticatedAppObjectsBucketIdRouteWithChildren,
+  AuthenticatedAppRoutesRouteIdRoute: AuthenticatedAppRoutesRouteIdRoute,
+  AuthenticatedAppSandboxInstancesInstanceIdRoute:
+    AuthenticatedAppSandboxInstancesInstanceIdRoute,
+  AuthenticatedAppSecurityGroupsSecurityGroupIdRoute:
+    AuthenticatedAppSecurityGroupsSecurityGroupIdRoute,
+  AuthenticatedAppSubnetsSubnetIdRoute: AuthenticatedAppSubnetsSubnetIdRoute,
+  AuthenticatedAppVectorStoresVectorStoreIdRoute:
+    AuthenticatedAppVectorStoresVectorStoreIdRoute,
+  AuthenticatedAppVmInstancesInstanceIdRoute:
+    AuthenticatedAppVmInstancesInstanceIdRoute,
+  AuthenticatedAppVolumesVolumeIdRoute: AuthenticatedAppVolumesVolumeIdRoute,
+  AuthenticatedAppVpcsVpcIdRoute: AuthenticatedAppVpcsVpcIdRoute,
+  AuthenticatedAppApiKeysIndexRoute: AuthenticatedAppApiKeysIndexRoute,
+  AuthenticatedAppContainerInstancesIndexRoute:
+    AuthenticatedAppContainerInstancesIndexRoute,
+  AuthenticatedAppDevIndexRoute: AuthenticatedAppDevIndexRoute,
+  AuthenticatedAppFilesystemsIndexRoute: AuthenticatedAppFilesystemsIndexRoute,
+  AuthenticatedAppGpuInstancesIndexRoute:
+    AuthenticatedAppGpuInstancesIndexRoute,
+  AuthenticatedAppGpuInventoryIndexRoute:
+    AuthenticatedAppGpuInventoryIndexRoute,
+  AuthenticatedAppInferenceIndexRoute: AuthenticatedAppInferenceIndexRoute,
+  AuthenticatedAppK8sClustersIndexRoute: AuthenticatedAppK8sClustersIndexRoute,
+  AuthenticatedAppKbIndexRoute: AuthenticatedAppKbIndexRoute,
+  AuthenticatedAppLoadBalancersIndexRoute:
+    AuthenticatedAppLoadBalancersIndexRoute,
+  AuthenticatedAppModelsIndexRoute: AuthenticatedAppModelsIndexRoute,
+  AuthenticatedAppObjectsIndexRoute: AuthenticatedAppObjectsIndexRoute,
+  AuthenticatedAppOverviewComputeIndexRoute:
+    AuthenticatedAppOverviewComputeIndexRoute,
+  AuthenticatedAppRegistryIndexRoute: AuthenticatedAppRegistryIndexRoute,
+  AuthenticatedAppRoutesIndexRoute: AuthenticatedAppRoutesIndexRoute,
+  AuthenticatedAppSandboxInstancesIndexRoute:
+    AuthenticatedAppSandboxInstancesIndexRoute,
+  AuthenticatedAppSecurityGroupsIndexRoute:
+    AuthenticatedAppSecurityGroupsIndexRoute,
+  AuthenticatedAppSubnetsIndexRoute: AuthenticatedAppSubnetsIndexRoute,
+  AuthenticatedAppVectorStoresIndexRoute:
+    AuthenticatedAppVectorStoresIndexRoute,
+  AuthenticatedAppVmInstancesIndexRoute: AuthenticatedAppVmInstancesIndexRoute,
+  AuthenticatedAppVolumesIndexRoute: AuthenticatedAppVolumesIndexRoute,
+  AuthenticatedAppVpcsIndexRoute: AuthenticatedAppVpcsIndexRoute,
+}
+
+const AuthenticatedAppRouteWithChildren =
+  AuthenticatedAppRoute._addFileChildren(AuthenticatedAppRouteChildren)
+
 interface AuthenticatedRouteChildren {
-  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
-  AuthenticatedContainerInstancesInstanceIdRoute: typeof AuthenticatedContainerInstancesInstanceIdRoute
-  AuthenticatedDevResourceRoute: typeof AuthenticatedDevResourceRoute
-  AuthenticatedFilesystemsFilesystemIdRoute: typeof AuthenticatedFilesystemsFilesystemIdRoute
-  AuthenticatedGpuInstancesInstanceIdRoute: typeof AuthenticatedGpuInstancesInstanceIdRoute
-  AuthenticatedInferenceServiceIdRoute: typeof AuthenticatedInferenceServiceIdRoute
-  AuthenticatedK8sClustersClusterIdRoute: typeof AuthenticatedK8sClustersClusterIdRoute
-  AuthenticatedKbKbIdRoute: typeof AuthenticatedKbKbIdRoute
-  AuthenticatedLoadBalancersLoadBalancerIdRoute: typeof AuthenticatedLoadBalancersLoadBalancerIdRoute
-  AuthenticatedModelsModelIdRoute: typeof AuthenticatedModelsModelIdRoute
-  AuthenticatedObjectsBucketIdRoute: typeof AuthenticatedObjectsBucketIdRouteWithChildren
-  AuthenticatedRoutesRouteIdRoute: typeof AuthenticatedRoutesRouteIdRoute
-  AuthenticatedSandboxInstancesInstanceIdRoute: typeof AuthenticatedSandboxInstancesInstanceIdRoute
-  AuthenticatedSecurityGroupsSecurityGroupIdRoute: typeof AuthenticatedSecurityGroupsSecurityGroupIdRoute
-  AuthenticatedSubnetsSubnetIdRoute: typeof AuthenticatedSubnetsSubnetIdRoute
-  AuthenticatedVectorStoresVectorStoreIdRoute: typeof AuthenticatedVectorStoresVectorStoreIdRoute
-  AuthenticatedVmInstancesInstanceIdRoute: typeof AuthenticatedVmInstancesInstanceIdRoute
-  AuthenticatedVolumesVolumeIdRoute: typeof AuthenticatedVolumesVolumeIdRoute
-  AuthenticatedVpcsVpcIdRoute: typeof AuthenticatedVpcsVpcIdRoute
-  AuthenticatedApiKeysIndexRoute: typeof AuthenticatedApiKeysIndexRoute
-  AuthenticatedContainerInstancesIndexRoute: typeof AuthenticatedContainerInstancesIndexRoute
-  AuthenticatedDevIndexRoute: typeof AuthenticatedDevIndexRoute
-  AuthenticatedFilesystemsIndexRoute: typeof AuthenticatedFilesystemsIndexRoute
-  AuthenticatedGpuInstancesIndexRoute: typeof AuthenticatedGpuInstancesIndexRoute
-  AuthenticatedGpuInventoryIndexRoute: typeof AuthenticatedGpuInventoryIndexRoute
-  AuthenticatedInferenceIndexRoute: typeof AuthenticatedInferenceIndexRoute
-  AuthenticatedK8sClustersIndexRoute: typeof AuthenticatedK8sClustersIndexRoute
-  AuthenticatedKbIndexRoute: typeof AuthenticatedKbIndexRoute
-  AuthenticatedLoadBalancersIndexRoute: typeof AuthenticatedLoadBalancersIndexRoute
-  AuthenticatedModelsIndexRoute: typeof AuthenticatedModelsIndexRoute
-  AuthenticatedObjectsIndexRoute: typeof AuthenticatedObjectsIndexRoute
-  AuthenticatedOverviewComputeIndexRoute: typeof AuthenticatedOverviewComputeIndexRoute
-  AuthenticatedRegistryIndexRoute: typeof AuthenticatedRegistryIndexRoute
-  AuthenticatedRoutesIndexRoute: typeof AuthenticatedRoutesIndexRoute
-  AuthenticatedSandboxInstancesIndexRoute: typeof AuthenticatedSandboxInstancesIndexRoute
-  AuthenticatedSecurityGroupsIndexRoute: typeof AuthenticatedSecurityGroupsIndexRoute
-  AuthenticatedSubnetsIndexRoute: typeof AuthenticatedSubnetsIndexRoute
-  AuthenticatedVectorStoresIndexRoute: typeof AuthenticatedVectorStoresIndexRoute
-  AuthenticatedVmInstancesIndexRoute: typeof AuthenticatedVmInstancesIndexRoute
-  AuthenticatedVolumesIndexRoute: typeof AuthenticatedVolumesIndexRoute
-  AuthenticatedVpcsIndexRoute: typeof AuthenticatedVpcsIndexRoute
+  AuthenticatedAppRoute: typeof AuthenticatedAppRouteWithChildren
+  AuthenticatedContainerInstancesInstanceIdTerminalRoute: typeof AuthenticatedContainerInstancesInstanceIdTerminalRoute
+  AuthenticatedGpuInstancesInstanceIdTerminalRoute: typeof AuthenticatedGpuInstancesInstanceIdTerminalRoute
+  AuthenticatedSandboxInstancesInstanceIdTerminalRoute: typeof AuthenticatedSandboxInstancesInstanceIdTerminalRoute
+  AuthenticatedVmInstancesInstanceIdVncRoute: typeof AuthenticatedVmInstancesInstanceIdVncRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
-  AuthenticatedContainerInstancesInstanceIdRoute:
-    AuthenticatedContainerInstancesInstanceIdRoute,
-  AuthenticatedDevResourceRoute: AuthenticatedDevResourceRoute,
-  AuthenticatedFilesystemsFilesystemIdRoute:
-    AuthenticatedFilesystemsFilesystemIdRoute,
-  AuthenticatedGpuInstancesInstanceIdRoute:
-    AuthenticatedGpuInstancesInstanceIdRoute,
-  AuthenticatedInferenceServiceIdRoute: AuthenticatedInferenceServiceIdRoute,
-  AuthenticatedK8sClustersClusterIdRoute:
-    AuthenticatedK8sClustersClusterIdRoute,
-  AuthenticatedKbKbIdRoute: AuthenticatedKbKbIdRoute,
-  AuthenticatedLoadBalancersLoadBalancerIdRoute:
-    AuthenticatedLoadBalancersLoadBalancerIdRoute,
-  AuthenticatedModelsModelIdRoute: AuthenticatedModelsModelIdRoute,
-  AuthenticatedObjectsBucketIdRoute:
-    AuthenticatedObjectsBucketIdRouteWithChildren,
-  AuthenticatedRoutesRouteIdRoute: AuthenticatedRoutesRouteIdRoute,
-  AuthenticatedSandboxInstancesInstanceIdRoute:
-    AuthenticatedSandboxInstancesInstanceIdRoute,
-  AuthenticatedSecurityGroupsSecurityGroupIdRoute:
-    AuthenticatedSecurityGroupsSecurityGroupIdRoute,
-  AuthenticatedSubnetsSubnetIdRoute: AuthenticatedSubnetsSubnetIdRoute,
-  AuthenticatedVectorStoresVectorStoreIdRoute:
-    AuthenticatedVectorStoresVectorStoreIdRoute,
-  AuthenticatedVmInstancesInstanceIdRoute:
-    AuthenticatedVmInstancesInstanceIdRoute,
-  AuthenticatedVolumesVolumeIdRoute: AuthenticatedVolumesVolumeIdRoute,
-  AuthenticatedVpcsVpcIdRoute: AuthenticatedVpcsVpcIdRoute,
-  AuthenticatedApiKeysIndexRoute: AuthenticatedApiKeysIndexRoute,
-  AuthenticatedContainerInstancesIndexRoute:
-    AuthenticatedContainerInstancesIndexRoute,
-  AuthenticatedDevIndexRoute: AuthenticatedDevIndexRoute,
-  AuthenticatedFilesystemsIndexRoute: AuthenticatedFilesystemsIndexRoute,
-  AuthenticatedGpuInstancesIndexRoute: AuthenticatedGpuInstancesIndexRoute,
-  AuthenticatedGpuInventoryIndexRoute: AuthenticatedGpuInventoryIndexRoute,
-  AuthenticatedInferenceIndexRoute: AuthenticatedInferenceIndexRoute,
-  AuthenticatedK8sClustersIndexRoute: AuthenticatedK8sClustersIndexRoute,
-  AuthenticatedKbIndexRoute: AuthenticatedKbIndexRoute,
-  AuthenticatedLoadBalancersIndexRoute: AuthenticatedLoadBalancersIndexRoute,
-  AuthenticatedModelsIndexRoute: AuthenticatedModelsIndexRoute,
-  AuthenticatedObjectsIndexRoute: AuthenticatedObjectsIndexRoute,
-  AuthenticatedOverviewComputeIndexRoute:
-    AuthenticatedOverviewComputeIndexRoute,
-  AuthenticatedRegistryIndexRoute: AuthenticatedRegistryIndexRoute,
-  AuthenticatedRoutesIndexRoute: AuthenticatedRoutesIndexRoute,
-  AuthenticatedSandboxInstancesIndexRoute:
-    AuthenticatedSandboxInstancesIndexRoute,
-  AuthenticatedSecurityGroupsIndexRoute: AuthenticatedSecurityGroupsIndexRoute,
-  AuthenticatedSubnetsIndexRoute: AuthenticatedSubnetsIndexRoute,
-  AuthenticatedVectorStoresIndexRoute: AuthenticatedVectorStoresIndexRoute,
-  AuthenticatedVmInstancesIndexRoute: AuthenticatedVmInstancesIndexRoute,
-  AuthenticatedVolumesIndexRoute: AuthenticatedVolumesIndexRoute,
-  AuthenticatedVpcsIndexRoute: AuthenticatedVpcsIndexRoute,
+  AuthenticatedAppRoute: AuthenticatedAppRouteWithChildren,
+  AuthenticatedContainerInstancesInstanceIdTerminalRoute:
+    AuthenticatedContainerInstancesInstanceIdTerminalRoute,
+  AuthenticatedGpuInstancesInstanceIdTerminalRoute:
+    AuthenticatedGpuInstancesInstanceIdTerminalRoute,
+  AuthenticatedSandboxInstancesInstanceIdTerminalRoute:
+    AuthenticatedSandboxInstancesInstanceIdTerminalRoute,
+  AuthenticatedVmInstancesInstanceIdVncRoute:
+    AuthenticatedVmInstancesInstanceIdVncRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
@@ -1180,12 +1222,6 @@ const LoginRouteWithChildren = LoginRoute._addFileChildren(LoginRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRouteWithChildren,
-  ContainerInstancesInstanceIdTerminalRoute:
-    ContainerInstancesInstanceIdTerminalRoute,
-  GpuInstancesInstanceIdTerminalRoute: GpuInstancesInstanceIdTerminalRoute,
-  SandboxInstancesInstanceIdTerminalRoute:
-    SandboxInstancesInstanceIdTerminalRoute,
-  VmInstancesInstanceIdVncRoute: VmInstancesInstanceIdVncRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
