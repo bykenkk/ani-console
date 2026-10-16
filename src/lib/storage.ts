@@ -8,12 +8,6 @@ export const authStorage = localforage.createInstance({
   driver: driverOrder,
 });
 
-export const oidcStorage = localforage.createInstance({
-  name: "ani-console",
-  storeName: "oidc",
-  driver: driverOrder,
-});
-
 const LEGACY_AUTH_KEY = "ani-console-auth";
 
 export async function migrateLegacyAuthStorage(): Promise<void> {

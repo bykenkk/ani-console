@@ -22,16 +22,6 @@ export interface PasswordLoginResponse {
   mfa_operation_id?: string;
 }
 
-export interface CompleteOidcLoginInput {
-  state: string;
-  code: string;
-  redirect_uri: string;
-}
-
-export interface CompleteOidcLoginRequest extends CompleteOidcLoginInput {
-  idempotency_key: string;
-}
-
 export interface LogoutInput {
   jti?: string;
 }
