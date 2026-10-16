@@ -1,4 +1,4 @@
-import SecurityGroupDetailPage from "@/components/network/SecurityGroupDetailPage";
+import SecurityGroupDetailPage from "@/components/security-groups/SecurityGroupDetailPage";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/_app/security-groups/$securityGroupId")({

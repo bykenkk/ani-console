@@ -1,8 +1,8 @@
 import { useResourceDelete } from "@/hooks/useResourceDelete";
 import { useState } from "react";
 import { type StorageFilesystem } from "@/api/storage/filesystems";
-import CreateFilesystemMountTargetModal from "@/components/storage/CreateFilesystemMountTargetModal";
-import ExpandFilesystemModal from "@/components/storage/ExpandFilesystemModal";
+import CreateFilesystemMountTargetModal from "@/components/filesystems/CreateFilesystemMountTargetModal";
+import ExpandFilesystemModal from "@/components/filesystems/ExpandFilesystemModal";
 import type { RowAction } from "@/components/common";
 type Filesystem = StorageFilesystem;
 export function useFilesystemActions(onDeleted?: (item: Filesystem) => void) {
