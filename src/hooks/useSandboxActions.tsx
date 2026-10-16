@@ -30,7 +30,7 @@ function sessionState(instance: Instance) {
   return instance.sandbox?.session_state ?? instance.state;
 }
 
-export function useSandboxInstanceActions(onChanged: () => void, onDeleted?: () => void) {
+export function useSandboxActions(onChanged: () => void, onDeleted?: () => void) {
   const [extendTarget, setExtendTarget] = useState<Instance>();
   const lifecycle = useMutation({
     meta: {

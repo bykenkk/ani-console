@@ -36,10 +36,7 @@ const BUSY_STATES = new Set<VmInstance["state"]>([
   "deleting",
 ]);
 
-export function useVmInstanceActions(
-  onChanged?: (operationId: string) => void,
-  onDeleted?: () => void,
-) {
+export function useVmActions(onChanged?: (operationId: string) => void, onDeleted?: () => void) {
   const [dialog, setDialog] = useState<DialogState>();
   const start = useMutation({
     meta: {

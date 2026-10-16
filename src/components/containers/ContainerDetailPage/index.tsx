@@ -18,7 +18,7 @@ import InstanceConfiguration from "@/components/instances/InstanceConfiguration"
 import InstanceNetwork from "@/components/instances/InstanceNetwork";
 import InstanceStorage from "@/components/instances/InstanceStorage";
 import InstanceVersions from "@/components/instances/InstanceVersions";
-import { useContainerInstanceActions } from "@/hooks/useContainerInstanceActions";
+import { useContainerActions } from "@/hooks/useContainerActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
@@ -53,7 +53,7 @@ export default function ContainerDetailPage({
     query.refetch();
     qc.invalidateQueries({ queryKey: ["container-instances"] });
   };
-  const { actions, dialogNode } = useContainerInstanceActions(refreshInstance, goBack);
+  const { actions, dialogNode } = useContainerActions(refreshInstance, goBack);
   const primaryAction = actions.find((action) => action.key === "terminal");
   if (!query.data) return <DetailPagePlaceholder loading={query.isLoading} />;
 

@@ -13,7 +13,7 @@ import {
 } from "@/components/common";
 import InstanceLogs from "@/components/instances/InstanceLogs";
 import InstanceVersions from "@/components/instances/InstanceVersions";
-import { useGpuInstanceActions } from "@/hooks/useGpuInstanceActions";
+import { useGpuContainerActions } from "@/hooks/useGpuContainerActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
@@ -62,7 +62,7 @@ export default function GpuContainerDetailPage({
     detail.refetch();
     queryClient.invalidateQueries({ queryKey: ["gpu-instances"] });
   };
-  const { actions, dialogNode } = useGpuInstanceActions(refreshInstance, goBack);
+  const { actions, dialogNode } = useGpuContainerActions(refreshInstance, goBack);
   const primaryAction = actions.find((action) => action.key === "terminal");
   if (!detail.data) {
     return <DetailPagePlaceholder loading={detail.isLoading} />;

@@ -11,7 +11,7 @@ import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
 import ContainerCreateModal from "@/components/containers/ContainerCreateModal";
 import { containerInstanceDataSource } from "./data-source";
-import { useContainerInstanceActions } from "@/hooks/useContainerInstanceActions";
+import { useContainerActions } from "@/hooks/useContainerActions";
 import type {
   ContainerInstance,
   ContainerInstanceDataSource,
@@ -69,7 +69,7 @@ export default function ContainersPage({
     queryFn: ({ cursor, limit }) =>
       dataSource.list({ status, searchField, keyword, cursor, pageSize: limit }),
   });
-  const { dialogNode, actions } = useContainerInstanceActions<ContainerInstance>(refresh);
+  const { dialogNode, actions } = useContainerActions<ContainerInstance>(refresh);
 
   const allColumns: Array<ListColumn<ContainerInstance>> = [
     {

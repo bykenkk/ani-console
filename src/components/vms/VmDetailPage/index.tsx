@@ -15,7 +15,7 @@ import InstanceLogs from "@/components/instances/InstanceLogs";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceOperations from "@/components/instances/InstanceOperations";
 import InstanceStorage from "@/components/instances/InstanceStorage";
-import { useVmInstanceActions } from "@/hooks/useVmInstanceActions";
+import { useVmActions } from "@/hooks/useVmActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
@@ -73,7 +73,7 @@ export default function VmDetailPage({
   const refreshDetail = () => {
     detail.refetch();
   };
-  const { actions, dialogNode } = useVmInstanceActions(refreshDetail, goBack);
+  const { actions, dialogNode } = useVmActions(refreshDetail, goBack);
   const primaryAction = actions.find((action) => action.key === "console");
   if (!detail.data) {
     return <DetailPagePlaceholder loading={detail.isLoading} />;

@@ -39,7 +39,7 @@ const BUSY_STATES = new Set<Instance["state"]>([
   "deleting",
 ]);
 
-export function useGpuInstanceActions(onChanged: () => void, onDeleted?: () => void) {
+export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => void) {
   const [dialog, setDialog] = useState<DialogState>();
   const start = useMutation({
     meta: {

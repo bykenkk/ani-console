@@ -12,7 +12,7 @@ import {
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
-import { useGpuInstanceActions } from "@/hooks/useGpuInstanceActions";
+import { useGpuContainerActions } from "@/hooks/useGpuContainerActions";
 
 type Instance = InstanceRecord;
 type StatusFilter = "all" | FilterableInstanceState;
@@ -43,7 +43,7 @@ export default function GpuContainersPage() {
       return listInstances(listQuery);
     },
   });
-  const { dialogNode, actions } = useGpuInstanceActions(refresh);
+  const { dialogNode, actions } = useGpuContainerActions(refresh);
 
   const tabs = [
     { value: "all" as const, label: "全部" },

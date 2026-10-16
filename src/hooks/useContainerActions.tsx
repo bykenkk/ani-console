@@ -39,7 +39,7 @@ const BUSY_STATES = new Set<Instance["state"]>([
   "deleting",
 ]);
 
-export function useContainerInstanceActions<
+export function useContainerActions<
   T extends InstanceRecord | { record: InstanceRecord } = InstanceRecord,
 >(onChanged: () => void, onDeleted?: () => void) {
   const [dialog, setDialog] = useState<DialogState>();

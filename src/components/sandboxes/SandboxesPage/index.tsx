@@ -11,7 +11,7 @@ import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
 import SandboxCreateModal from "@/components/sandboxes/SandboxCreateModal";
-import { useSandboxInstanceActions } from "@/hooks/useSandboxInstanceActions";
+import { useSandboxActions } from "@/hooks/useSandboxActions";
 
 type SandboxInstance = InstanceRecord;
 type SandboxStatus = "all" | FilterableInstanceState;
@@ -47,7 +47,7 @@ export default function SandboxesPage() {
       });
     },
   });
-  const { dialogNode, actions } = useSandboxInstanceActions(refresh);
+  const { dialogNode, actions } = useSandboxActions(refresh);
 
   const statusTabs = [
     { value: "all" as const, label: "全部" },
