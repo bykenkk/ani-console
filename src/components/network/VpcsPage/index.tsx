@@ -51,13 +51,26 @@ export default function VpcsPage() {
       width: 120,
       render: (_, vpc) => <StatusBadge status={vpc.state} reason={vpc.reason} />,
     },
-    { key: "cidr", title: "CIDR", dataIndex: "cidr" },
-    { key: "subnets", title: "子网数", dataIndex: "subnet_count", placeholder: "-" },
-
+    {
+      key: "cidr",
+      title: "CIDR",
+      width: 150,
+      ellipsis: true,
+      dataIndex: "cidr",
+      placeholder: "-",
+    },
+    {
+      key: "subnets",
+      title: "子网数",
+      width: 100,
+      ellipsis: true,
+      dataIndex: "subnet_count",
+      placeholder: "-",
+    },
     {
       key: "createdAt",
       title: "创建时间",
-      width: 150,
+      width: 180,
       render: (_, vpc) => formatDateTime(vpc.created_at),
     },
   ];
