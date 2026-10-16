@@ -20,11 +20,18 @@
   flex-shrink: 0;
 }
 
+.toolbarFilters {
+  min-width: 0;
+  max-width: 100%;
+  flex-wrap: wrap;
+}
+
 .toolbarTools {
   margin-left: auto;
 }
 
 .toolbarIconButton {
+  box-sizing: border-box;
   display: inline-flex;
   flex: 0 0 32px;
   align-items: center;
@@ -64,9 +71,12 @@
 }
 
 .searchControl {
+  box-sizing: border-box;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   width: 320px;
+  max-width: 100%;
   height: 32px;
   overflow: hidden;
   border: 1px solid var(--list-border);
@@ -80,6 +90,7 @@
 }
 
 .searchField {
+  box-sizing: border-box;
   flex: 0 0 90px;
   width: 90px;
   height: 100%;
@@ -94,6 +105,7 @@
 }
 
 .searchInput {
+  box-sizing: border-box;
   flex: 1;
   min-width: 0;
   height: 100%;

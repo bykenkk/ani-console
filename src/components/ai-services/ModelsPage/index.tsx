@@ -163,7 +163,7 @@ export default function ModelsPage() {
             onChange: setSearchText,
           },
           filters: (
-            <Space wrap>
+            <Space>
               <Select
                 value={source}
                 onChange={setSource}

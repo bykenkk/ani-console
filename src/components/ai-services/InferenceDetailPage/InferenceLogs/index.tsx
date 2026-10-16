@@ -36,7 +36,7 @@ export default function InferenceLogs({ serviceId }: { serviceId: string }) {
         header={{
           title: "推理日志",
           extra: (
-            <Space wrap>
+            <Space>
               <Select
                 size="small"
                 value={level}
