@@ -17,6 +17,22 @@
 - `src/lib/`、`src/hooks/`：共享逻辑。
 - 禁止新增 `src/pages/`。
 
+### 废弃接口组织
+
+新增或调整迁移领域时，新旧接口按以下格式组织；旧接口在迁移完成前保留：
+
+```text
+src/api/<domain>/
+  index.ts               # 新接口公开入口
+  types.ts               # 新接口类型
+  legacy.ts              # 旧接口统一公开入口，本身就是旧接口的 index
+  types-legacy.ts        # 保留的旧接口类型
+  <resource>-legacy.ts   # 旧资源请求模块，按需拆分，由 legacy.ts 汇总导出
+```
+
+- 少量旧请求可以直接实现在 `legacy.ts`；旧资源较多时拆入 `<resource>-legacy.ts`，不要增加 `index-legacy.ts`、`legacy/index.ts` 或额外的 `index/legacy` 层级。
+- 新调用从 `@/api/<domain>` 导入，旧调用及旧类型从 `@/api/<domain>/legacy` 导入；调用方不得绕过该入口直接依赖资源级 `-legacy` 文件，新 `index.ts` 不转导出旧接口或旧接口命名空间。
+
 ## 开发参考内容
 
 - `src/components/dev/`、`src/routes/**/dev/` 及其他明确限定为仅开发环境可达的内容，只用于开发阶段的效果参考、交互试验和实现验证，不代表正式产品功能。
