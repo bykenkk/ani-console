@@ -48,7 +48,6 @@ export default function EditImageRegistrationModal({
       visible
       title="编辑镜像登记"
       onCancel={onCancel}
-      maskClosable={!mutation.isPending}
       escToExit={!mutation.isPending}
       closable={!mutation.isPending}
       cancelButtonProps={{ disabled: mutation.isPending }}

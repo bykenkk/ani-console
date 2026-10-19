@@ -122,7 +122,6 @@ export default function CreateInferenceModal({
       onOk={submit}
       confirmLoading={create.isPending}
       cancelButtonProps={{ disabled: create.isPending }}
-      maskClosable={false}
       closable={!create.isPending}
       escToExit={!create.isPending}
       style={{ width: 720, maxWidth: "calc(100vw - 48px)" }}

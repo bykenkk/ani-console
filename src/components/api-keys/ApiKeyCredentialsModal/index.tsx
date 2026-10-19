@@ -15,7 +15,6 @@ export function ApiKeyCredentialsModal({
       visible
       title="请妥善保存 API Key"
       closable={false}
-      maskClosable={false}
       escToExit={false}
       onCancel={onCancel}
       footer={

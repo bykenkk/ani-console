@@ -14,6 +14,14 @@ const COMPONENT_CONFIG = {
   },
   Modal: {
     maskClosable: false,
+    getChildrenPopupContainer: (node) => {
+      // 挂到正文外、焦点范围内，避免子弹出层被正文滚动区域裁切。
+      const content = node.closest(".arco-modal")?.querySelector(".arco-modal-content");
+      return content?.parentElement ?? node.ownerDocument.body;
+    },
+  },
+  Trigger: {
+    updateOnScroll: true,
   },
   Select: {
     triggerProps: {

@@ -82,7 +82,6 @@ export default function CreateLoadBalancerModal({
       okText="创建"
       okButtonProps={{ disabled: !available }}
       confirmLoading={create.isPending}
-      maskClosable={!create.isPending}
       closable={!create.isPending}
       cancelButtonProps={{ disabled: create.isPending }}
       onOk={async () => {

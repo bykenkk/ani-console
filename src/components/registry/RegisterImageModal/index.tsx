@@ -40,7 +40,6 @@ export default function RegisterImageModal({
       visible
       title="登记镜像"
       onCancel={onCancel}
-      maskClosable={!mutation.isPending}
       escToExit={!mutation.isPending}
       closable={!mutation.isPending}
       cancelButtonProps={{ disabled: mutation.isPending }}
