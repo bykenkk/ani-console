@@ -31,6 +31,7 @@ export interface Model {
   model_id?: string;
   versions?: ModelVersion[];
 }
+// TODO(pagination-migration): governance 模型/版本列表仍使用 page.limit/page.cursor，保留嵌套游标契约；待后端改造后迁移 PageParams。
 export interface ModelPageParams {
   limit?: number;
   /** Return the server cursor unchanged; it is not a page offset. */

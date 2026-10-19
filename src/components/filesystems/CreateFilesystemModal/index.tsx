@@ -12,6 +12,9 @@ import {
   createFilesystemMountTarget,
   type StorageFilesystem,
 } from "@/api/storage/filesystems";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type Filesystem = StorageFilesystem;
 type FilesystemProtocol = "nfs";
@@ -41,8 +44,8 @@ export default function CreateFilesystemModal({
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "filesystem-create"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "filesystem-create", "options"],
+    queryFn: () => listVpcOptions({}),
   });
   const subnets = useQuery({
     meta: {

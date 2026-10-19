@@ -1,3 +1,5 @@
+import type { PageParams } from "@/api/types";
+
 export interface AccessKey {
   id?: number;
   name?: string;
@@ -8,11 +10,7 @@ export interface AccessKey {
   role_id?: number;
   created_at?: string;
 }
-/** FIXME(backend): 后端统一支持 limit/cursor 后，移除此旧分页类型并改用 CursorPageParams；当前保留 page/pageSize，返回 items/total。 */
-export interface AccessKeyListParams {
-  page?: number;
-  pageSize?: number;
-}
+export type AccessKeyListParams = PageParams;
 export interface AccessKeyListResponse {
   items: AccessKey[];
   total: string;

@@ -8,6 +8,9 @@ import {
   type NetworkSecurityGroupRule,
   type NetworkVPC,
 } from "@/api/network";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type SecurityGroupRule = NetworkSecurityGroupRule;
 type Vpc = NetworkVPC;
@@ -65,8 +68,8 @@ export default function CreateSecurityGroupModal({
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "security-group-create"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "security-group-create", "options"],
+    queryFn: () => listVpcOptions({}),
   });
 
   const create = useMutation({

@@ -7,6 +7,9 @@ import { listNetworkSubnets, listNetworkVpcs } from "@/api/network";
 
 import type { LoadBalancerConfigurationValues } from "@/components/load-balancers/CreateLoadBalancerModal";
 import LoadBalancerPublicIpField from "@/components/load-balancers/LoadBalancerPublicIpField";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 
 export default function LoadBalancerNetworkFields({
   form,
@@ -20,8 +23,8 @@ export default function LoadBalancerNetworkFields({
 }) {
   const [vpcId, setVpcId] = useState<string>();
   const vpcs = useQuery({
-    queryKey: ["network-vpcs", "load-balancer-create"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "load-balancer-create", "options"],
+    queryFn: () => listVpcOptions({}),
     meta: {
       errorNotification: { id: "vpcs", action: "VPC 列表加载", fallback: "请求失败，请稍后重试" },
     },

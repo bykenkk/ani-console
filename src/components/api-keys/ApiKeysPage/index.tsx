@@ -40,8 +40,11 @@ export function ApiKeysPage() {
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["api-keys"],
-    queryFn: ({ signal }) => listApiKeys({}, signal),
+    queryKey: ["api-keys", { page, pageSize }],
+    queryFn: async ({ signal }) => {
+      const data = await listApiKeys({ page, pageSize }, signal);
+      return { ...data, total: Number(data.total) };
+    },
   });
   const toggleStatus = useMutation({
     meta: {
@@ -87,6 +90,8 @@ export function ApiKeysPage() {
     },
   });
 
+  // FIXME(api-key-filters): 分页已走后端 page/pageSize；原状态、有效期和关键字筛选目前仅作用于当前页，不能代表全量筛选。
+  // TODO(api-key-filters): 核对并接入后端筛选表达式后迁移原筛选；保留入口，不遍历分页凑全量。
   const filteredItems = useMemo(() => {
     const keyword = searchText.trim().toLowerCase();
     return (apiKeys.data?.items ?? []).filter((item) => {
@@ -101,7 +106,6 @@ export function ApiKeysPage() {
       return candidate.toLowerCase().includes(keyword);
     });
   }, [apiKeys.data?.items, expiration, searchField, searchText, status]);
-  const pageItems = filteredItems.slice((page - 1) * pageSize, page * pageSize);
   const columns: Array<ListColumn<ApiKeyRecord>> = [
     {
       key: "name",
@@ -226,7 +230,7 @@ export function ApiKeysPage() {
         }}
       >
         <ListDataTable
-          data={pageItems}
+          data={filteredItems}
           columns={columns}
           rowActions={[
             {
@@ -285,9 +289,11 @@ export function ApiKeysPage() {
           }
           tableLabel="API Key 列表"
           pagination={{
+            mode: "total",
             page,
             pageSize,
-            total: filteredItems.length,
+            total: apiKeys.data?.total ?? 0,
+            disabled: apiKeys.isFetching,
             onPageChange: setPage,
             onPageSizeChange: (nextPageSize) => {
               setPageSize(nextPageSize);

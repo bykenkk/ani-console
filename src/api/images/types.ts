@@ -130,6 +130,7 @@ export interface ImageRegistration {
   updatedAt?: string;
   unregisteredAt?: string;
 }
+// TODO(pagination-migration): governance ListImagesRequest 仍使用 limit/cursor，保留过渡请求；后端支持 page/pageSize 后再接 PageParams。
 export interface ImageRegistrationListParams extends CursorPageParams {
   /** platform reads the shared catalogue; it does not grant platform writes. */
   scope: ImageRegistrationScope;

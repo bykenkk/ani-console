@@ -29,6 +29,9 @@ import { validateForm } from "@/lib/form";
 import { withId } from "@/lib/id";
 import { optionalIpv4WithinCidrError, subnetFixedOctets, suggestGatewayIp } from "@/lib/validators";
 import styles from "./index.module.css";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type SecurityGroup = NetworkSecurityGroup;
 type Filesystem = StorageFilesystem;
@@ -201,8 +204,8 @@ export default function VmCreateModal({
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "vm-create"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "vm-create", "options"],
+    queryFn: () => listVpcOptions({}),
   });
   const subnets = useQuery({
     meta: {

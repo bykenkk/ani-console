@@ -78,6 +78,7 @@ export interface RegistryImage {
   dev_profile?: CoreDevProfileInfo;
 }
 
+// TODO(pagination-migration): ANI RegistryImageListRequest 仍使用 limit/cursor，保留过渡请求；待后端分页改造后迁移 PageParams。
 export interface RegistryImageListParams extends CursorPageParams {
   keyword?: string;
   project?: string;

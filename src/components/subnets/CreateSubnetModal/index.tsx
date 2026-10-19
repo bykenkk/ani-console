@@ -14,6 +14,9 @@ import {
   suggestGatewayIp,
   suggestSubnetCidr,
 } from "@/lib/validators";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type Vpc = NetworkVPC;
 
@@ -37,8 +40,8 @@ export default function CreateSubnetModal({
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "subnet-page"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "subnet-page", "options"],
+    queryFn: () => listVpcOptions({}),
   });
   const selectedVpc = ((vpcs.data?.items ?? []) as Vpc[]).find((vpc) => vpc.id === vpcId);
   const selectedVpcCidr = selectedVpc?.cidr ?? "";

@@ -26,6 +26,9 @@ import styles from "./index.module.css";
 import { validateForm } from "@/lib/form";
 import { showMessage } from "@/lib/feedback";
 import { withId } from "@/lib/id";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 
 const STEP_TITLES = ["基本信息", "资源配置", "摘要信息"];
 
@@ -47,8 +50,8 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "select"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "select", "options"],
+    queryFn: () => listVpcOptions({}),
   });
   const subnets = useQuery({
     meta: {
@@ -59,6 +62,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       },
     },
     queryKey: ["network-subnets", "select", values.vpc_id],
+    // TODO(instance-option-pagination): 子网选项仍沿用后端 limit/cursor 过渡契约，待分页改造完成后改为 page=1、pageSize=100；不增加翻页入口。
     queryFn: () => listNetworkSubnets({ vpc_id: values.vpc_id || undefined }),
     enabled: !!values.vpc_id,
   });
@@ -71,6 +75,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       },
     },
     queryKey: ["network-security-groups", "select"],
+    // TODO(instance-option-pagination): 安全组选项仍沿用后端 limit/cursor 过渡契约，待分页改造完成后改为 page=1、pageSize=100；不增加翻页入口。
     queryFn: () => listNetworkSecurityGroups(),
   });
   const filesystems = useQuery({
@@ -82,6 +87,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       },
     },
     queryKey: ["filesystems", "select"],
+    // TODO(instance-option-pagination): 文件存储选项仍沿用后端 limit/cursor 过渡契约，待分页改造完成后改为 page=1、pageSize=100；不增加翻页入口。
     queryFn: () => listFilesystems(),
   });
   const volumes = useQuery({
@@ -93,6 +99,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       },
     },
     queryKey: ["volumes", "gpu-container-create", "filesystem"],
+    // TODO(instance-option-pagination): 云盘选项仍沿用后端 limit/cursor 过渡契约，待分页改造完成后改为 page=1、pageSize=100；不增加翻页入口。
     queryFn: () => listVolumes({ in_use: false, volume_mode: "filesystem" }),
   });
   const images = useQuery({
@@ -104,6 +111,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       },
     },
     queryKey: ["registry-images", "gpu-create"],
+    // TODO(instance-option-pagination): 仓库镜像选项仍沿用后端 limit/cursor 过渡契约，待分页改造完成后改为 page=1、pageSize=100；不增加翻页入口。
     queryFn: async () => (await listRegistryImages({ purpose: "gpu" })).items,
   });
   const gpuSpecAvailability = useQuery({

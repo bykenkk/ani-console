@@ -22,6 +22,9 @@ import {
 import { formatDateTime } from "@/lib/format";
 import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { navigateToResourceDetail } from "@/lib/resources";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
 type SubnetStatusFilter = "all" | Subnet["state"];
@@ -44,8 +47,8 @@ export default function SubnetsPage() {
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "subnet-page"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "subnet-page", "options"],
+    queryFn: () => listVpcOptions({}),
   });
   const {
     query: subnets,

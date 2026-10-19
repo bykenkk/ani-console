@@ -39,6 +39,7 @@ export interface ModelDevInputVersion {
   feature_count?: number;
   created_at?: string;
 }
+// TODO(pagination-migration): governance 输入版本列表仍使用 limit/cursor，待后端分页及交接契约统一后迁移 PageParams。
 export interface ModelDevInputVersionListParams extends CursorPageParams {
   state?: string;
 }

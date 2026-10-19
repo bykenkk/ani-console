@@ -24,6 +24,7 @@ export default function InstanceRegistryImageSelect({
     },
     queryKey: ["registry-images", "instance-select", purpose],
     enabled,
+    // TODO(instance-option-pagination): 更新镜像选项仍沿用后端 limit/cursor 过渡契约，待分页改造完成后改为 page=1、pageSize=100；保留 purpose，不增加翻页入口。
     queryFn: () => listRegistryImages({ purpose }).then((data) => data.items),
   });
   return (

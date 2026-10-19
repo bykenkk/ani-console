@@ -20,6 +20,9 @@ import {
 } from "@/components/common";
 import { loadBalancerListeners } from "@/lib/load-balancers";
 import { formatDateTime } from "@/lib/format";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type LoadBalancer = NetworkLoadBalancer;
 type Vpc = NetworkVPC;
@@ -64,7 +67,8 @@ export default function LoadBalancersPage() {
   });
   const items = loadBalancers.data?.items ?? [];
   const pagination = {
-    mode: "cursor" as const,
+    // TODO(pagination-migration): 后端改为 page/pageSize 后移除此临时游标配置。
+    mode: "legacy-cursor" as const,
     page,
     pageSize,
     hasNextPage: !!loadBalancers.data?.next_cursor,
@@ -92,8 +96,8 @@ export default function LoadBalancersPage() {
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "load-balancer-list"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "load-balancer-list", "options"],
+    queryFn: () => listVpcOptions({}),
   });
   const { actions } = useLoadBalancerActions(resetPagination);
 

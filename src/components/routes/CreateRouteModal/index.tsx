@@ -10,6 +10,9 @@ import {
 
 import { Ipv4CidrInput } from "@/components/common";
 import { ipv4CidrError, requireIpv4Cidr } from "@/lib/validators";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type Vpc = NetworkVPC;
 
@@ -36,8 +39,8 @@ export default function CreateRouteModal({
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "route-create"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "route-create", "options"],
+    queryFn: () => listVpcOptions({}),
   });
   const cidrError = ipv4CidrError(destinationCidr, "目标网段");
 

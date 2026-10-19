@@ -53,7 +53,9 @@ export default function ModelRelatedResources({ model }: { model: Model }) {
     versionIds.has(service.model_version_id),
   );
   const pagination: ListPagination = {
-    mode: "cursor",
+    // FIXME(pagination-migration): governance 已下线推理管理路由，当前调用等待后端重新发布契约。
+    // TODO(pagination-migration): 后端恢复并支持 page/pageSize 后移除此临时 token 分页配置。
+    mode: "legacy-cursor",
     page,
     pageSize,
     disabled: relatedServices.isFetching || versions.some((query) => query.isFetching),

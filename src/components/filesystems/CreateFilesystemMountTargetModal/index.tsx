@@ -8,6 +8,9 @@ import { createFilesystemMountTarget } from "@/api/storage/filesystems";
 import { Alert, Form, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
@@ -30,8 +33,8 @@ export default function CreateFilesystemMountTargetModal({
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "filesystem-mount-target-create"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "filesystem-mount-target-create", "options"],
+    queryFn: () => listVpcOptions({}),
   });
   const subnets = useQuery({
     meta: {

@@ -1,11 +1,14 @@
 import { listTenantRoles } from "@/api/members";
 import { Form, Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
+import { withFirst100 } from "@/api/pagination";
+
+const listRoleOptions = withFirst100(listTenantRoles);
 
 export function ApiKeyRoleField() {
   const roles = useQuery({
-    queryKey: ["tenant-roles"],
-    queryFn: ({ signal }) => listTenantRoles({}, signal),
+    queryKey: ["tenant-roles", "options"],
+    queryFn: ({ signal }) => listRoleOptions({}, signal),
     meta: {
       errorNotification: {
         id: "tenant-roles",

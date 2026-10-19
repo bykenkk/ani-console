@@ -1,11 +1,9 @@
 import { withId } from "@/lib/id";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { Button } from "@arco-design/web-react";
 import { listKnowledgeBaseAuditLogs, type KBAuditLog } from "@/api/knowledge";
 import { DataTable, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
-
-const PAGE_SIZE = 20;
 
 const ACTION_LABELS: Record<string, string> = {
   "kb.create": "创建知识库",
@@ -23,26 +21,22 @@ const ACTION_LABELS: Record<string, string> = {
 };
 
 export default function KnowledgeBaseAuditLogs({ kbId }: { kbId: string }) {
-  const logs = useInfiniteQuery({
-    meta: {
-      errorNotification: {
-        id: withId("knowledge-audit", kbId),
-        action: "操作记录加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
+  // TODO(pagination-migration): 后端仍仅支持 limit/cursor；支持 page/pageSize 后移除临时游标兼容。
+  const {
+    query: logs,
+    items,
+    pagination,
+    refresh,
+  } = useCursorPaginatedQuery({
     queryKey: ["knowledge-base-audit-logs", kbId],
-    initialPageParam: "0",
-    queryFn: ({ pageParam }) =>
-      listKnowledgeBaseAuditLogs(kbId, {
-        limit: PAGE_SIZE,
-        cursor: pageParam === "0" ? undefined : pageParam,
-      }),
-    // FIXME: 后端补齐 total 契约后，按已加载条数与 total 判断是否继续，移除对 next_cursor 的依赖。
-    getNextPageParam: (lastPage, pages) =>
-      lastPage.next_cursor ? String(pages.length * PAGE_SIZE) : undefined,
+    queryFn: (params) => listKnowledgeBaseAuditLogs(kbId, params),
+    initialPageSize: 20,
+    errorNotification: {
+      id: withId("knowledge-audit", kbId),
+      action: "操作记录加载",
+      fallback: "请求失败，请稍后重试",
+    },
   });
-  const items = logs.data?.pages.flatMap((page) => page.items) ?? [];
 
   return (
     <div>
@@ -50,20 +44,14 @@ export default function KnowledgeBaseAuditLogs({ kbId }: { kbId: string }) {
         header={{
           title: "操作记录",
           extra: (
-            <Button
-              size="small"
-              loading={logs.isFetching && !logs.isFetchingNextPage}
-              onClick={() => {
-                logs.refetch();
-              }}
-            >
+            <Button size="small" loading={logs.isFetching} onClick={refresh}>
               刷新
             </Button>
           ),
         }}
         data={items}
         loading={logs.isPending}
-        pagination={false}
+        pagination={pagination}
         tableLabel="知识库操作记录列表"
         columns={[
           {
@@ -94,20 +82,6 @@ export default function KnowledgeBaseAuditLogs({ kbId }: { kbId: string }) {
           },
         ]}
       />
-
-      {logs.hasNextPage ? (
-        <div className="mt-4 flex justify-center">
-          <Button
-            loading={logs.isFetchingNextPage}
-            disabled={logs.isFetching}
-            onClick={() => {
-              logs.fetchNextPage();
-            }}
-          >
-            加载更多
-          </Button>
-        </div>
-      ) : null}
     </div>
   );
 }

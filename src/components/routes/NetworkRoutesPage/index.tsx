@@ -15,6 +15,9 @@ import CreateRouteModal from "@/components/routes/CreateRouteModal";
 import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
 import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { navigateToResourceDetail } from "@/lib/resources";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type Vpc = NetworkVPC;
 type SearchField = "description" | "id";
@@ -62,8 +65,8 @@ export default function NetworkRoutesPage() {
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "route-list"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "route-list", "options"],
+    queryFn: () => listVpcOptions({}),
   });
   const { actions } = useNetworkRouteActions(resetPagination);
 

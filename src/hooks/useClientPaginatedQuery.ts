@@ -13,8 +13,8 @@ type UseClientPaginatedQueryOptions<T> = {
   errorNotification?: QueryErrorNotificationMeta;
 };
 
-/** Transitional pagination for endpoints returning the full collection.
- * Replace with useCursorPaginatedQuery when the endpoint gains server pagination.
+/** 仅用于后端明确返回完整集合的接口，不用于对服务端当前页再次切片。
+ * TODO(pagination-migration): 后端提供 page/pageSize 后逐项改为服务端分页，再移除此过渡 Hook。
  */
 export function useClientPaginatedQuery<T>({
   queryKey,

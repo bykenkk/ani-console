@@ -1,5 +1,4 @@
-// FIXME(modeldev-integration): 任务分页复用了按页码生成数字 cursor 的公共 Hook，尚未原样保存后端 next_cursor。
-// TODO(modeldev-integration): 确认训练游标契约后改为服务端游标链；不能把不透明 token 当作 offset 计算。
+// TODO(pagination-migration): 已通过公共 Hook 原样回传 next_cursor；后端提供 page/pageSize 后移除临时游标分页兼容。
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { listModelDevExecutions, type ModelDevExecution } from "@/api/modeldev";

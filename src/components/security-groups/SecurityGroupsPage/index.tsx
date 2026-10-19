@@ -22,6 +22,9 @@ import {
 import { formatDateTime } from "@/lib/format";
 import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { navigateToResourceDetail } from "@/lib/resources";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type SecurityGroup = NetworkSecurityGroup;
 type Vpc = NetworkVPC;
@@ -66,8 +69,8 @@ export default function SecurityGroupsPage() {
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "security-group-create"],
-    queryFn: () => listNetworkVpcs(),
+    queryKey: ["network-vpcs", "security-group-create", "options"],
+    queryFn: () => listVpcOptions({}),
   });
 
   const { actions } = useSecurityGroupActions(resetPagination, resetPagination);

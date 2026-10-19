@@ -1,5 +1,7 @@
 import { useClientPagination } from "@/hooks/useClientPagination";
 import { listInstances, type InstanceRecord } from "@/api/instances";
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+
 import {
   listNetworkLoadBalancers,
   listNetworkRoutes,
@@ -57,27 +59,25 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
     queryKey: ["network-security-groups", "vpc-related", vpcId],
     queryFn: () => listNetworkSecurityGroups({ vpc_id: vpcId }),
   });
-  const loadBalancers = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("vpc-load-balancers", vpcId),
-        action: "负载均衡加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
+  // TODO(pagination-migration): 负载均衡仅支持 limit/cursor，暂独立分页；后端提供统一关联页码契约后移除此兼容。
+  const { query: loadBalancers, pagination: loadBalancerPagination } = useCursorPaginatedQuery({
     queryKey: ["network-load-balancers", "vpc", vpcId],
-    queryFn: ({ signal }) => listNetworkLoadBalancers({ vpc_id: vpcId }, signal),
-  });
-  const instances = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("vpc-instances", vpcId),
-        action: "关联实例加载",
-        fallback: "请求失败，请稍后重试",
-      },
+    queryFn: (params, signal) => listNetworkLoadBalancers({ ...params, vpc_id: vpcId }, signal),
+    errorNotification: {
+      id: withId("vpc-load-balancers", vpcId),
+      action: "负载均衡加载",
+      fallback: "请求失败，请稍后重试",
     },
+  });
+  // TODO(pagination-migration): legacy 实例列表暂用 limit/cursor；新关联契约支持 page/pageSize 后移除此兼容。
+  const { query: instances, pagination: instancePagination } = useCursorPaginatedQuery({
     queryKey: ["instances", "vpc", vpcId],
-    queryFn: () => listInstances({ vpc_id: vpcId }),
+    queryFn: (params) => listInstances({ ...params, vpc_id: vpcId }),
+    errorNotification: {
+      id: withId("vpc-instances", vpcId),
+      action: "关联实例加载",
+      fallback: "请求失败，请稍后重试",
+    },
   });
   const resources: RelatedResource[] = [
     ...((subnets.data?.items ?? []) as NetworkSubnet[]).map((item) => ({
@@ -116,10 +116,13 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
       group: "算力" as const,
     })),
   ];
-  const networkResources = resources.filter((resource) => resource.group === "网络");
+  // 完整集合的旧网络列表保留本地分页，不与负载均衡的服务端当前页混算总数。
+  const networkResources = resources.filter(
+    (resource) => resource.group === "网络" && resource.kind !== "负载均衡",
+  );
+  const loadBalancerResources = resources.filter((resource) => resource.kind === "负载均衡");
   const computeResources = resources.filter((resource) => resource.group === "算力");
   const networkPage = useClientPagination(networkResources, vpcId);
-  const computePage = useClientPagination(computeResources, vpcId);
   const loading =
     subnets.isLoading ||
     routes.isLoading ||
@@ -154,14 +157,26 @@ export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
       </section>
       <section>
         <DataTable<RelatedResource>
+          header={{ title: "负载均衡关联" }}
+          columns={columns}
+          data={loadBalancerResources}
+          loading={loadBalancers.isLoading}
+          pagination={loadBalancerPagination}
+          tableLabel="VPC 负载均衡关联资源"
+        />
+      </section>
+      <section>
+        <DataTable<RelatedResource>
           header={{
             title: "算力关联",
-            extra: <Typography.Text type="secondary">{computeResources.length} 个</Typography.Text>,
+            extra: (
+              <Typography.Text type="secondary">共 {instances.data?.total ?? 0} 个</Typography.Text>
+            ),
           }}
           columns={columns}
-          data={computePage.items}
+          data={computeResources}
           loading={loading}
-          pagination={computePage.pagination}
+          pagination={instancePagination}
           tableLabel="VPC 算力关联资源"
         />
       </section>

@@ -1,5 +1,5 @@
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
-import { useQueryClient } from "@tanstack/react-query";
+import { useListPagination } from "@/hooks/useListPagination";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVpcActions } from "@/hooks/useVpcActions";
 import { useState } from "react";
 import { listNetworkVpcs, type NetworkVPC, type NetworkResourceStateFilter } from "@/api/network";
@@ -21,23 +21,28 @@ export default function VpcsPage() {
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<VpcStatusFilter>("");
   const [searchText, setSearchText] = useState("");
-  const {
-    query: vpcs,
-    items,
-    pagination,
-    resetPagination,
-    refresh,
-  } = useCursorPaginatedQuery<NetworkVPC>({
-    errorNotification: { id: "vpcs", action: "VPC 列表加载", fallback: "请求失败，请稍后重试" },
-    queryKey: ["network-vpcs", { status, name: searchText.trim() }],
-    queryFn: ({ cursor, limit }) =>
-      listNetworkVpcs({
-        limit,
-        cursor,
+  const paging = useListPagination(JSON.stringify({ status, name: searchText.trim() }), 10);
+  const { resetPagination } = paging;
+  const vpcs = useQuery({
+    meta: {
+      errorNotification: { id: "vpcs", action: "VPC 列表加载", fallback: "请求失败，请稍后重试" },
+    },
+    queryKey: [
+      "network-vpcs",
+      { page: paging.page, pageSize: paging.pageSize, status, name: searchText.trim() },
+    ],
+    queryFn: async () => {
+      const data = await listNetworkVpcs({
+        page: paging.page,
+        pageSize: paging.pageSize,
         state: status,
         name: searchText.trim() || undefined,
-      }),
+      });
+      return { ...data, total: Number(data.total) };
+    },
   });
+  const items = vpcs.data?.items ?? [];
+  const refresh = () => vpcs.refetch();
   const { actions } = useVpcActions(resetPagination);
   const columns: Array<ListColumn<Vpc>> = [
     {
@@ -128,7 +133,15 @@ export default function VpcsPage() {
           loading={vpcs.isFetching}
           rowActions={actions}
           tableLabel="VPC 列表"
-          pagination={pagination}
+          pagination={{
+            mode: "total",
+            page: paging.page,
+            pageSize: paging.pageSize,
+            total: vpcs.data?.total ?? 0,
+            disabled: vpcs.isFetching,
+            onPageChange: paging.setPage,
+            onPageSizeChange: paging.setPageSize,
+          }}
         />
       </ListPageFrame>
       {createVisible && (

@@ -8,20 +8,18 @@ import type {
   NetworkVPCCidrPresetsResponse,
   NetworkVPCListParams,
   NetworkVPCListResponse,
-  NetworkVPCListWireResponse,
 } from "./types";
 
 const createScope = createIdempotencyScope("network-vpc-create", ["POST"]);
 const vpcPath = (vpcId: string) => `/networks/vpcs/${encodeURIComponent(vpcId)}`;
 
-export async function listNetworkVpcs(
+export function listNetworkVpcs(
   params: NetworkVPCListParams = {},
 ): Promise<NetworkVPCListResponse> {
-  const response = await coreRequest<NetworkVPCListWireResponse>("/networks/vpcs", {
+  return coreRequest<NetworkVPCListResponse>("/networks/vpcs", {
     method: "GET",
     params,
   });
-  return { ...response, total: Number(response.total) };
 }
 
 export function createNetworkVpc(submitData: CreateNetworkVPCInput): Promise<void> {

@@ -30,6 +30,7 @@ export default function GpuContainerChangeSecurityGroupsModal({
       },
     },
     queryKey: ["network-security-groups", "gpu-instance-change-security-groups", vpcId],
+    // TODO(instance-option-pagination): 安全组选项仍沿用后端 limit/cursor 过渡契约，待分页改造完成后改为 page=1、pageSize=100；保留 VPC 筛选，不增加翻页入口。
     queryFn: () =>
       listNetworkSecurityGroups({
         vpc_id: vpcId || undefined,

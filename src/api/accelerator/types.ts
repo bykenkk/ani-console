@@ -1,4 +1,4 @@
-/** FIXME(backend): 后端明确将 Accelerator 分页迁移至 limit/cursor 后，移除此类型并改用 CursorPageParams，同步 next_page_token 响应字段；当前保留 page_size/page_token，不伪造 total。 */
+/** TODO(pagination-migration): 后端完成 page/pageSize 契约后对齐 PageParams；当前保留 page_size/page_token 与 next_page_token，不伪造 total，也不迁回 cursor/limit。 */
 export interface AcceleratorPageParams {
   page_size?: number;
   page_token?: string;

@@ -71,6 +71,7 @@ export interface StorageBucketObjectEntry {
   storage_class?: StorageBucketClass | null;
 }
 
+// TODO(pagination-migration): ANI StorageBucketObjectListRequest 仍使用 limit/cursor，保留过渡请求；待后端改造后迁移 PageParams。
 export interface StorageBucketObjectListParams extends CursorPageParams {
   prefix?: string;
 }
