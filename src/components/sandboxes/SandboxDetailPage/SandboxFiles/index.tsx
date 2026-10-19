@@ -1,6 +1,6 @@
+import { listSandboxFiles, type SandboxFile, deleteSandboxFile } from "@/api/instances/legacy";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
-import { listSandboxFiles, type SandboxFile, deleteSandboxFile } from "@/api/instances";
 import { Button, Input, Space, Tag, Tooltip, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";

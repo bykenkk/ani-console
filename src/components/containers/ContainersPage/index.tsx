@@ -1,184 +1,137 @@
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { listInstances, type InstanceRecord, type ObservedState } from "@/api/instances";
 import {
   ListPageFrame,
   ResourceNameId,
-  type ListColumn,
   StatusBadge,
   ListDataTable,
+  type ListColumn,
 } from "@/components/common";
-import { formatDateTime } from "@/lib/format";
-import { getImageDisplayName } from "@/lib/render";
-import ContainerCreateModal from "@/components/containers/ContainerCreateModal";
-import { containerInstanceDataSource } from "./data-source";
+import { useListPagination } from "@/hooks/useListPagination";
 import { useContainerActions } from "@/hooks/useContainerActions";
-import type {
-  ContainerInstance,
-  ContainerInstanceDataSource,
-  ContainerInstanceSearchField,
-  ContainerInstanceStatusFilter,
-} from "./types";
+import ContainerCreateModal from "@/components/containers/ContainerCreateModal";
+import { formatDateTime } from "@/lib/format";
 
-const COLUMN_LABELS = {
-  name: "名称",
-  kind: "类型",
-  status: "状态",
-  image: "镜像",
-  cpuMemory: "规格",
-  replicas: "副本",
-  rolloutStatus: "发布",
-  node: "节点",
-  endpoint: "访问地址",
-  createdAt: "创建时间",
-};
-
-function useDebouncedValue<T>(value: T, delay: number) {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => setDebouncedValue(value), delay);
-    return () => window.clearTimeout(timer);
-  }, [delay, value]);
-
-  return debouncedValue;
-}
-
-export default function ContainersPage({
-  dataSource = containerInstanceDataSource,
-}: {
-  dataSource?: ContainerInstanceDataSource;
-}) {
-  const [status, setStatus] = useState<ContainerInstanceStatusFilter>("all");
-  const [searchField, setSearchField] = useState<ContainerInstanceSearchField>("name");
+type StatusFilter = "all" | Exclude<ObservedState, "deleted">;
+export default function ContainersPage() {
+  const [status, setStatus] = useState<StatusFilter>("all");
+  const [searchField, setSearchField] = useState<"name" | "id">("name");
   const [searchText, setSearchText] = useState("");
-  const keyword = useDebouncedValue(searchText, 200);
   const [createVisible, setCreateVisible] = useState(false);
-
-  const {
-    query,
-    refresh,
-    items: pageItems,
-    pagination,
-  } = useCursorPaginatedQuery<ContainerInstance>({
-    errorNotification: {
-      id: "containers",
-      action: "容器实例加载",
-      fallback: "请求失败，请稍后重试",
+  const keyword = searchText.trim();
+  const observedState = status === "all" ? undefined : status;
+  // FIXME(governance-instance-filter): 新列表没有 ID 搜索契约，对应选项保留但禁用，不回退旧列表。
+  // TODO(governance-instance-filter): 后端提供 ID 查询后启用选项；状态仅使用新 observedState，不恢复旧扩展状态。
+  const canQuery = searchField === "name";
+  const paging = useListPagination(JSON.stringify({ status, searchField, keyword }), 10);
+  const query = useQuery({
+    queryKey: [
+      "governance-instances",
+      "cpu",
+      { page: paging.page, pageSize: paging.pageSize, observedState, keyword },
+    ],
+    enabled: canQuery,
+    meta: {
+      errorNotification: {
+        id: "container-instances",
+        action: "容器列表加载",
+        fallback: "请求失败，请稍后重试",
+      },
     },
-    queryKey: ["container-instances", { status, searchField, keyword }],
-    queryFn: ({ cursor, limit }) =>
-      dataSource.list({ status, searchField, keyword, cursor, pageSize: limit }),
+    queryFn: async ({ signal }) => {
+      const data = await listInstances(
+        {
+          page: paging.page,
+          pageSize: paging.pageSize,
+          instance_kind: "container",
+          compute_type: "cpu",
+          observedState,
+          name: keyword || undefined,
+        },
+        signal,
+      );
+      return { ...data, total: Number(data.total) };
+    },
   });
-  const { dialogNode, actions } = useContainerActions<ContainerInstance>(refresh);
-
-  const allColumns: Array<ListColumn<ContainerInstance>> = [
+  const { page, setPage } = paging;
+  useEffect(() => {
+    if (canQuery && query.isSuccess && !query.isFetching && !query.data.items.length && page > 1) {
+      setPage(page - 1);
+    }
+  }, [canQuery, query.isSuccess, query.isFetching, query.data, page, setPage]);
+  const { actions, dialogNode } = useContainerActions(paging.resetPagination);
+  const columns: ListColumn<InstanceRecord>[] = [
     {
       key: "name",
-      title: COLUMN_LABELS.name,
+      title: "名称 / ID",
+      width: 260,
       render: (_, row) => <ResourceNameId name={row.name} id={row.id} type="container-instance" />,
     },
     {
-      key: "status",
-      title: COLUMN_LABELS.status,
+      key: "state",
+      title: "状态",
       width: 120,
-      render: (_, row) => <StatusBadge status={row.status} reason={row.record.reason} />,
+      render: (_, row) => <StatusBadge status={row.observedState} reason={row.reason} />,
     },
     {
-      key: "image",
-      title: COLUMN_LABELS.image,
-      width: 100,
+      key: "preset",
+      title: "规格",
+      width: 180,
       ellipsis: true,
-      render: (_, row) => getImageDisplayName(row.record.image),
+      render: (_, row) => row.preset_name || row.preset_code || row.presetId,
     },
     {
-      key: "cpuMemory",
-      title: COLUMN_LABELS.cpuMemory,
-      dataIndex: "cpuMemory",
-      width: 100,
+      key: "compute",
+      title: "CPU / 内存",
+      width: 160,
+      render: (_, row) => [row.cpu, row.memory].filter(Boolean).join(" / ") || "-",
     },
+
+    { key: "image", title: "镜像 ID", dataIndex: "imageId", width: 220, ellipsis: true },
+    // FIXME(governance-instance-columns): 新列表缺少副本、发布、节点、访问地址和保护字段，原列保留空占位，不补拉旧列表。
+    // TODO(governance-instance-columns): 契约补齐后逐列接入，不能用 observedState/Pod IP 等替代旧字段。
+    { key: "replicas", title: "副本", width: 80, placeholder: "-" },
+    { key: "rollout", title: "发布", width: 120, placeholder: "-" },
+    { key: "node", title: "节点", width: 140, placeholder: "-" },
+    { key: "endpoint", title: "访问地址", width: 160, placeholder: "-" },
+    { key: "protection", title: "终止保护", width: 120, placeholder: "-" },
     {
-      key: "replicas",
-      title: COLUMN_LABELS.replicas,
-      dataIndex: "replicas",
-      width: 80,
-    },
-    {
-      key: "rolloutStatus",
-      title: COLUMN_LABELS.rolloutStatus,
-      width: 120,
-      render: (_, row) => <StatusBadge status={row.rolloutStatus} />,
-    },
-    {
-      key: "node",
-      title: COLUMN_LABELS.node,
-      dataIndex: "node",
-      width: 120,
-      ellipsis: true,
-    },
-    {
-      key: "endpoint",
-      title: COLUMN_LABELS.endpoint,
-      dataIndex: "endpoint",
-      placeholder: "-",
-      width: 120,
-    },
-    {
-      key: "protection",
-      title: "终止保护",
-      width: 100,
-      render: (_, row) => (row.record.termination_protection ? "已开启" : "未开启"),
-    },
-    {
-      key: "createdAt",
-      title: COLUMN_LABELS.createdAt,
-      width: 150,
+      key: "created",
+      title: "创建时间",
+      width: 180,
       render: (_, row) => formatDateTime(row.createdAt),
     },
   ];
-
-  const statusTabs = [
+  const tabs = [
     { value: "all" as const, label: "全部" },
     { value: "pending" as const, label: "等待中" },
-    { value: "provisioning" as const, label: "配置中" },
-    { value: "starting" as const, label: "启动中" },
     { value: "running" as const, label: "运行中" },
-    { value: "stopping" as const, label: "停止中" },
     { value: "stopped" as const, label: "已停止" },
-    { value: "failed" as const, label: "异常" },
   ];
   return (
     <>
       <ListPageFrame
         header={{
           iconClassName: "icon-rongqishili",
-          title: "容器实例",
+          title: "容器",
           subtitle: "当前租户权限范围内的资源与操作",
           actions: [
             {
               key: "create",
-              label: "创建容器实例",
+              label: "创建容器",
               iconClassName: "icon-add-1",
               variant: "primary",
               onClick: () => setCreateVisible(true),
             },
           ],
         }}
-        tabs={{
-          items: statusTabs,
-          value: status,
-          onChange: setStatus,
-        }}
+        tabs={{ items: tabs, value: status, onChange: setStatus }}
         toolbar={{
           search: {
             fields: [
-              {
-                value: "name",
-                label: "名称",
-              },
-              {
-                value: "id",
-                label: "ID",
-              },
+              { value: "name", label: "名称" },
+              { value: "id", label: "ID", disabled: true },
             ],
             field: searchField,
             value: searchText,
@@ -188,23 +141,35 @@ export default function ContainersPage({
           refresh: {
             label: "刷新",
             spinning: query.isFetching,
-            onClick: refresh,
+            disabled: !canQuery,
+            onClick: () => query.refetch(),
           },
         }}
       >
         <ListDataTable
-          data={pageItems}
-          columns={allColumns}
+          data={canQuery ? (query.data?.items ?? []) : []}
+          columns={columns}
           rowActions={actions}
-          loading={query.isFetching}
-          tableLabel="容器实例列表"
-          pagination={pagination}
+          loading={canQuery && query.isFetching}
+          tableLabel="容器列表"
+          pagination={{
+            mode: "total",
+            page: paging.page,
+            pageSize: paging.pageSize,
+            total: canQuery ? (query.data?.total ?? 0) : 0,
+            onPageChange: paging.setPage,
+            onPageSizeChange: paging.setPageSize,
+            disabled: !canQuery || query.isFetching,
+          }}
         />
       </ListPageFrame>
       {createVisible && (
         <ContainerCreateModal
           onCancel={() => setCreateVisible(false)}
-          onCreated={() => setCreateVisible(false)}
+          onCreated={() => {
+            setCreateVisible(false);
+            paging.resetPagination();
+          }}
         />
       )}
       {dialogNode}

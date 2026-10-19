@@ -1,5 +1,5 @@
+import { getInstance, type InstanceRecord } from "@/api/instances/legacy";
 import { withId } from "@/lib/id";
-import { getInstance, type InstanceRecord } from "@/api/instances";
 import { Button, Empty, Space, Tooltip } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import {

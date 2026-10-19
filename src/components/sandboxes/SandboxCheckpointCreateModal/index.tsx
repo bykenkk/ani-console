@@ -1,4 +1,4 @@
-import { createSandboxCheckpoint } from "@/api/instances";
+import { createSandboxCheckpoint } from "@/api/instances/legacy";
 import { Form, Input, Modal, Switch } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";

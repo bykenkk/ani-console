@@ -1,5 +1,8 @@
+import { listInstanceOperations, type InstanceOperation } from "@/api/instances/legacy";
+import { Button } from "@arco-design/web-react";
+import { useQuery } from "@tanstack/react-query";
+import { getInstanceOperation } from "@/api/instances";
 import { withId } from "@/lib/id";
-import { listInstanceOperations, type InstanceOperation } from "@/api/instances";
 import { DataTable, StatusBadge } from "@/components/common";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
@@ -27,7 +30,24 @@ const OPERATION_LABELS: Record<string, string> = {
   console_session: "终端会话",
 };
 
-export default function InstanceOperations({ instanceId }: { instanceId: string }) {
+export default function InstanceOperations({
+  instanceId,
+  operationId,
+}: {
+  instanceId: string;
+  operationId?: string;
+}) {
+  const current = useQuery({
+    queryKey: ["governance-instance-operation", operationId],
+    enabled: Boolean(operationId),
+    queryFn: ({ signal }) => getInstanceOperation(operationId!, signal),
+    meta: {
+      errorNotification: { id: withId("instance-operation", operationId), action: "操作状态加载" },
+    },
+  });
+  // FIXME(governance-instance-operations): 新契约仅支持单次操作查询，不等价于原操作历史及详情。
+  // TODO(governance-instance-operations): 原历史组件与调用保留，待历史查询能力就绪后迁移。
+
   const {
     query,
     items: pageItems,
@@ -45,33 +65,58 @@ export default function InstanceOperations({ instanceId }: { instanceId: string 
     },
   });
   return (
-    <DataTable<InstanceOperation>
-      data={pageItems}
-      loading={query.isFetching}
-      pagination={pagination}
-      columns={[
-        {
-          title: "操作时间",
-          width: 180,
-          render: (_, operation) => formatDateTime(operation.created_at),
-        },
-        {
-          title: "操作",
-          width: 140,
-          render: (_, operation) => OPERATION_LABELS[operation.operation] ?? operation.operation,
-        },
-        {
-          title: "状态",
-          width: 120,
-          render: (_, operation) => (
-            <StatusBadge
-              status={operation.status}
-              reason={operation.failure_reason}
-              message={operation.failure_message}
-            />
-          ),
-        },
-      ]}
-    />
+    <div className="flex flex-col gap-3">
+      {operationId && (
+        <DataTable
+          data={current.data ? [current.data] : []}
+          loading={current.isFetching}
+          pagination={false}
+          header={{
+            title: "最近操作",
+            extra: (
+              <Button loading={current.isFetching} onClick={() => current.refetch()}>
+                刷新
+              </Button>
+            ),
+          }}
+          columns={[
+            { title: "操作 ID", dataIndex: "id" },
+            { title: "操作", dataIndex: "action" },
+            {
+              title: "状态",
+              render: (_, row) => <StatusBadge status={row.state} reason={row.reason} />,
+            },
+          ]}
+        />
+      )}
+      <DataTable<InstanceOperation>
+        data={pageItems}
+        loading={query.isFetching}
+        pagination={pagination}
+        columns={[
+          {
+            title: "操作时间",
+            width: 180,
+            render: (_, operation) => formatDateTime(operation.created_at),
+          },
+          {
+            title: "操作",
+            width: 140,
+            render: (_, operation) => OPERATION_LABELS[operation.operation] ?? operation.operation,
+          },
+          {
+            title: "状态",
+            width: 120,
+            render: (_, operation) => (
+              <StatusBadge
+                status={operation.status}
+                reason={operation.failure_reason}
+                message={operation.failure_message}
+              />
+            ),
+          },
+        ]}
+      />
+    </div>
   );
 }

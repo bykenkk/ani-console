@@ -1,9 +1,9 @@
+import { createInstanceConsoleSession } from "@/api/instances/legacy";
 import { StatusBadge, type StatusBadgeTone } from "@/components/common";
 import { useEffect, useRef, useState } from "react";
 import RFB from "@novnc/novnc/lib/rfb";
 import { Button, Radio, Spin } from "@arco-design/web-react";
 import clsx from "clsx";
-import { createInstanceConsoleSession } from "@/api/instances";
 import { resolveWebSocketUrl } from "@/lib/browser";
 import { isDateTimeExpired } from "@/lib/date";
 import { closeNotification, showNotification } from "@/lib/feedback";

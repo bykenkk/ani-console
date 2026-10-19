@@ -1,7 +1,8 @@
+// FIXME(governance-migration): 密钥绑定未对齐，保留原弹窗、入口、参数和 legacy 调用。
+// TODO(governance-migration): 待等价契约可用后迁移密钥绑定，不混用新创建/启停接口替代。
+import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
 import { listSecrets } from "@/api/secrets";
-import { applyInstanceLifecycle } from "@/api/instances";
 import type { Secret } from "@/api/secrets";
-import type { InstanceRecord } from "@/api/instances";
 import { Form, Input, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";

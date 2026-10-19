@@ -91,7 +91,7 @@ export const homeQuickCreateItems: HomeShortcut[] = [
   { id: "create-vm", name: "创建云主机", icon: "yunzhuji", route: "/vms" },
   {
     id: "create-container",
-    name: "创建容器实例",
+    name: "创建容器",
     icon: "rongqishili",
     route: "/containers",
   },

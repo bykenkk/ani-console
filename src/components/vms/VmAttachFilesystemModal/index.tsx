@@ -1,5 +1,4 @@
-import type { InstanceRecord } from "@/api/instances";
-import { applyInstanceLifecycle } from "@/api/instances";
+import { type InstanceRecord, applyInstanceLifecycle } from "@/api/instances/legacy";
 import type { StorageFilesystem } from "@/api/storage/filesystems";
 import { listFilesystemMountTargets, listFilesystems } from "@/api/storage/filesystems";
 import { withId } from "@/lib/id";

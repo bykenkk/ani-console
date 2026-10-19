@@ -43,13 +43,13 @@ export const menuItems: readonly MenuItem[] = [
           { key: "/vms", label: "云主机", icon: <AliIcon name="yunzhuji" /> },
           {
             key: "/containers",
-            label: "容器实例",
+            label: "容器",
             icon: <AliIcon name="rongqishili" />,
           },
-          { key: "/gpu-containers", label: "GPU 实例", icon: <AliIcon name="GPU" /> },
+          { key: "/gpu-containers", label: "GPU 容器", icon: <AliIcon name="GPU" /> },
           {
             key: "/sandboxes",
-            label: "沙箱实例",
+            label: "沙箱",
             icon: <IconCodeSandbox />,
           },
         ],

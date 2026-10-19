@@ -1,4 +1,4 @@
-import { applyInstanceLifecycle, listInstances, type InstanceRecord } from "@/api/instances";
+import { applyInstanceLifecycle, listInstances, type InstanceRecord } from "@/api/instances/legacy";
 import { withId } from "@/lib/id";
 import type { StorageVolume } from "@/api/storage/volumes";
 import { canMountVolumeMode, VOLUME_MODE_LABELS } from "@/lib/volumes";

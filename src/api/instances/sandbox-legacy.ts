@@ -1,9 +1,11 @@
+// FIXME(governance-migration): 沙箱专属能力未纳入本次 CPU/GPU 迁移，保留原入口和调用。
+// TODO(governance-migration): 单独核对沙箱契约后再迁移，不随公共组件变更隐藏功能。
 import type { CursorPageParams } from "@/api/types";
 import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type { AsyncTask } from "@/api/tasks";
-import { instancePath } from "./records";
+import { instancePath } from "./records-legacy";
 import type {
   CreateInstanceResponse,
   SandboxCheckpoint,
@@ -11,7 +13,7 @@ import type {
   SandboxPort,
   SandboxTemplate,
   SandboxTokenResponse,
-} from "./types";
+} from "./types-legacy";
 
 const tokenScope = createIdempotencyScope("sandbox-token", ["POST"]);
 const portScope = createIdempotencyScope("sandbox-port", ["POST"]);

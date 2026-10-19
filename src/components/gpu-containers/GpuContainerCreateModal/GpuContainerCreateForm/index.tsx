@@ -1,3 +1,5 @@
+// FIXME(governance-migration): 原组件/适配保留供未对齐能力复核，不能作为 governance 契约使用。
+// TODO(governance-migration): 后端覆盖原字段后逐项对接，避免删除未支持的能力。
 import { Button, Form, Input, Modal, Space } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -195,7 +197,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
 
   return (
     <Modal
-      title="创建 GPU 容器实例"
+      title="创建 GPU 容器"
       visible
       onCancel={onCancel}
       unmountOnExit

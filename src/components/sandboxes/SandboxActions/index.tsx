@@ -1,5 +1,5 @@
+import { type InstanceRecord } from "@/api/instances/legacy";
 import { Button, Space } from "@arco-design/web-react";
-import type { InstanceRecord } from "@/api/instances";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { useSandboxActions } from "@/hooks/useSandboxActions";
 

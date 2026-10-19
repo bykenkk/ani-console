@@ -1,5 +1,5 @@
+import { createInstance } from "@/api/instances/legacy";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createInstance } from "@/api/instances";
 
 import SandboxCreateForm from "./SandboxCreateForm";
 import { buildCreateRequest, type FormValues, type SandboxTemplate } from "./types";

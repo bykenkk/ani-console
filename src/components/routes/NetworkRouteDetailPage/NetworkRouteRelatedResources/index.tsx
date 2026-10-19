@@ -1,4 +1,6 @@
-import { getInstance, type InstanceRecord } from "@/api/instances";
+// FIXME(governance-instance-associations): 路由关联实例仍依赖旧详情的 kind、网络字段和资源跳转，保留原组件、入口和 legacy 调用。
+// TODO(governance-instance-associations): 等新关联契约齐备后逐项迁移，不影响沙箱、虚拟机等未迁移实例。
+import { getInstance, type InstanceRecord } from "@/api/instances/legacy";
 import type { NetworkRoute, NetworkVPC } from "@/api/network";
 import { StatusBadge } from "@/components/common";
 import { withId } from "@/lib/id";

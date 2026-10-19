@@ -1,5 +1,7 @@
+// FIXME(governance-instance-associations): 子网关联实例仍依赖旧 subnet_id 筛选、kind 及 cursor/limit 分页，保留原组件、入口和 legacy 调用。
+// TODO(governance-instance-associations): 等新关联契约齐备后逐项迁移，不影响沙箱、虚拟机等未迁移实例。
+import { listInstances } from "@/api/instances/legacy";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
-import { listInstances } from "@/api/instances";
 import { DataTable, StatusBadge, type ListColumn } from "@/components/common";
 import { withId } from "@/lib/id";
 import { Tag } from "@arco-design/web-react";

@@ -1,5 +1,8 @@
+// FIXME(governance-migration): 当前镜像 ID/摘要已可读取新详情，发布修订与历史仍保留旧字段，不以单次操作状态替代。
+// TODO(governance-migration): 等发布历史契约齐备后迁移。
+import { type InstanceRecord } from "@/api/instances/legacy";
+import type { InstanceRecord as CurrentInstanceRecord } from "@/api/instances";
 import type { RowAction } from "@/components/common";
-import type { InstanceRecord } from "@/api/instances";
 import { Descriptions, Space, Tooltip, Typography } from "@arco-design/web-react";
 import type { ReactNode } from "react";
 import { DataTable, ImageNameText, StatusBadge } from "@/components/common";
@@ -11,16 +14,20 @@ type Release = NonNullable<NonNullable<Instance["container"]>["history"]>[number
 
 export default function InstanceReleases({
   instance,
+  currentImage,
+  loading = false,
   actions,
   versionLayout = false,
   revisionActions,
 }: {
-  instance: Instance;
+  instance?: Instance;
+  currentImage?: Pick<CurrentInstanceRecord, "imageId" | "imageDigest">;
+  loading?: boolean;
   actions?: ReactNode;
   versionLayout?: boolean;
   revisionActions?: RowAction<Release>[];
 }) {
-  const releases = instance.container?.history ?? [];
+  const releases = instance?.container?.history ?? [];
   const rolloutLabels: Record<string, string> = {
     pending: "待发布",
     progressing: "发布中",
@@ -28,8 +35,8 @@ export default function InstanceReleases({
     degraded: "异常",
     rolled_back: "已回滚",
   };
-  const rolloutStatus = instance.container?.rollout_status;
-  const currentRevision = instance.container?.revision;
+  const rolloutStatus = instance?.container?.rollout_status;
+  const currentRevision = instance?.container?.revision;
   const currentRelease = releases.find((release) => release.revision === currentRevision);
 
   if (versionLayout) {
@@ -46,11 +53,16 @@ export default function InstanceReleases({
             column={1}
             labelStyle={{ width: "120px" }}
             data={[
-              { label: "镜像", value: <ImageNameText image={instance.image} /> },
+              ...(currentImage
+                ? [
+                    { label: "镜像 ID", value: currentImage.imageId || "-" },
+                    { label: "镜像摘要", value: currentImage.imageDigest || "-" },
+                  ]
+                : [{ label: "镜像", value: <ImageNameText image={instance?.image} /> }]),
               { label: "版本", value: currentRevision ?? "-" },
               {
                 label: "更新时间",
-                value: formatDateTime(currentRelease?.created_at ?? instance.updated_at),
+                value: formatDateTime(currentRelease?.created_at ?? instance?.updated_at),
               },
             ]}
           />
@@ -60,6 +72,7 @@ export default function InstanceReleases({
           <DataTable<Release>
             header={{ title: "版本记录" }}
             data={releases}
+            loading={loading}
             rowKey="revision"
             pagination={false}
             rowActions={revisionActions}
@@ -108,7 +121,7 @@ export default function InstanceReleases({
         data={[
           {
             label: "当前修订",
-            value: instance.container?.revision ?? "-",
+            value: instance?.container?.revision ?? "-",
           },
           {
             label: "发布状态",
@@ -116,16 +129,17 @@ export default function InstanceReleases({
           },
           {
             label: "就绪副本",
-            value: instance.container
+            value: instance?.container
               ? `${instance.container.ready_replicas} / ${instance.container.replicas}`
               : "-",
           },
-          { label: "镜像", value: <ImageNameText image={instance.image} /> },
+          { label: "镜像", value: <ImageNameText image={instance?.image} /> },
         ]}
       />
       <DataTable<Release>
         header={{ title: "发布历史", extra: actions, className: "mb-0" }}
         data={releases}
+        loading={loading}
         rowKey="revision"
         pagination={false}
         columns={[

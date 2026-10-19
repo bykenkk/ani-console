@@ -1,8 +1,23 @@
-import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances";
+import { showMessage } from "@/lib/feedback";
+import {
+  getInstance as getLegacyInstance,
+  applyInstanceLifecycle,
+  type InstanceRecord,
+} from "@/api/instances/legacy";
+// FIXME(governance-instance-actions): 未对齐的操作、组件和旧调用保留，已对齐的启停删除使用新契约。
+// TODO(governance-instance-actions): 后端覆盖重启、变配、网络/存储、镜像、密钥和保护后逐项迁移。
+import {
+  getInstance,
+  startInstance,
+  type InstanceRecord as GovernanceInstance,
+  type InstanceAcceptance,
+} from "@/api/instances";
+import InstanceOperationModal from "@/components/instances/InstanceOperationModal";
+import { withId } from "@/lib/id";
 import type { RowAction } from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
 import { openInstanceTerminalWindow } from "@/lib/instances";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import GpuContainerAttachFilesystemModal from "@/components/gpu-containers/GpuContainerAttachFilesystemModal";
 import InstanceAttachVolumeModal from "@/components/instances/InstanceAttachVolumeModal";
@@ -40,6 +55,23 @@ const BUSY_STATES = new Set<Instance["state"]>([
 ]);
 
 export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => void) {
+  const qc = useQueryClient();
+  const [commandDialog, setCommandDialog] = useState<{
+    action: "stop" | "delete";
+    instance: GovernanceInstance;
+  }>();
+  const [acceptance, setAcceptance] = useState<InstanceAcceptance>();
+  const [loadingLegacy, setLoadingLegacy] = useState(false);
+  const refresh = async () => {
+    onChanged();
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["governance-instances"] }),
+      qc.invalidateQueries({ queryKey: ["legacy-instances"] }),
+      qc.invalidateQueries({ queryKey: ["governance-instance"] }),
+      qc.invalidateQueries({ queryKey: ["governance-instance-runtime"] }),
+      qc.invalidateQueries({ queryKey: ["legacy-instance"] }),
+    ]);
+  };
   const [dialog, setDialog] = useState<DialogState>();
   const start = useMutation({
     meta: {
@@ -51,8 +83,14 @@ export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => 
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: (instance: Instance) => applyInstanceLifecycle(instance.id, { action: "start" }),
-    onSuccess: onChanged,
+    mutationFn: async (instance: { id: string; version?: string }) =>
+      startInstance(instance.id, {
+        expected_version: instance.version ?? (await getInstance(instance.id)).version,
+      }),
+    onSuccess: async (result) => {
+      setAcceptance(result);
+      await refresh();
+    },
   });
   const restart = useMutation({
     meta: {
@@ -65,7 +103,7 @@ export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => 
       },
     },
     mutationFn: (instance: Instance) => applyInstanceLifecycle(instance.id, { action: "restart" }),
-    onSuccess: onChanged,
+    onSuccess: refresh,
   });
   const protection = useMutation({
     meta: {
@@ -79,7 +117,7 @@ export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => 
     },
     mutationFn: ({ instance, enabled }: { instance: Instance; enabled: boolean }) =>
       applyInstanceLifecycle(instance.id, { action: "set_termination_protection", enabled }),
-    onSuccess: onChanged,
+    onSuccess: refresh,
   });
 
   const pending = (instance: Instance) =>
@@ -172,72 +210,234 @@ export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => 
   ];
 
   const close = () => setDialog(undefined);
-  const submitted = () => {
+  const submitted = async (result?: InstanceAcceptance | string) => {
+    if (result && typeof result !== "string") {
+      setAcceptance(result);
+      onChanged();
+      close();
+      setCommandDialog(undefined);
+      return;
+    }
     close();
-    if (dialog?.action === "delete" && onDeleted) onDeleted();
-    else onChanged();
+    await refresh();
   };
-  const dialogNode = dialog ? (
-    dialog.action === "stop" ? (
-      <GpuContainerStopModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
-    ) : dialog.action === "delete" ? (
-      <GpuContainerDeleteModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
-    ) : dialog.action === "scale" ? (
-      <GpuContainerScaleModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
-    ) : dialog.action === "update_image" ? (
-      <GpuContainerUpdateImageModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
-    ) : dialog.action === "resize" ? (
-      <GpuContainerResizeModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
-    ) : dialog.action === "rollback" ? (
-      <GpuContainerRollbackModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
-    ) : dialog.action === "attach_volume" ? (
-      <InstanceAttachVolumeModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
-    ) : dialog.action === "detach_volume" ? (
-      <InstanceDetachVolumeModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
-    ) : dialog.action === "attach_filesystem" ? (
-      <GpuContainerAttachFilesystemModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
-    ) : dialog.action === "bind_secret" ? (
-      <GpuContainerBindSecretModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
-    ) : (
-      <GpuContainerChangeSecurityGroupsModal
-        instance={dialog.instance}
-        onCancel={close}
-        onSubmitted={submitted}
-      />
-    )
-  ) : null;
+  const deleteSubmitted = () => {
+    close();
+    setCommandDialog(undefined);
+    onChanged();
+    onDeleted?.();
+  };
+  const governanceActions: RowAction<GovernanceInstance>[] = actions.map((action) => ({
+    key: action.key,
+    intent: action.intent,
+    label: (instance) => {
+      if (action.key === "lifecycle") return instance.observedState === "stopped" ? "启动" : "停止";
+      if (typeof action.label === "string") return action.label;
+      const original = qc.getQueryData<Instance>(["legacy-instance", instance.id]);
+      return original ? action.label(original) : "终止保护";
+    },
+    tooltip: (instance) => {
+      const original = qc.getQueryData<Instance>(["legacy-instance", instance.id]);
+      if (
+        original?.termination_protection &&
+        (action.key === "delete" ||
+          (action.key === "lifecycle" && instance.observedState === "running"))
+      ) {
+        return "已开启终止保护，请先关闭后再操作";
+      }
+      return typeof action.tooltip === "function"
+        ? original
+          ? action.tooltip(original)
+          : undefined
+        : action.tooltip;
+    },
+    widthLabel: action.widthLabel ?? (typeof action.label === "string" ? action.label : "终止保护"),
+    disabled: (instance) => {
+      if (
+        start.isPending ||
+        restart.isPending ||
+        protection.isPending ||
+        loadingLegacy ||
+        dialog ||
+        commandDialog ||
+        instance.observedState === "deleted" ||
+        instance.desiredState === "deleted"
+      )
+        return true;
+      // FIXME(governance-instance-actions): 终止保护及各旧操作的限制尚无新字段，保留已知旧状态的判断。
+      // TODO(governance-instance-actions): 对齐保护等契约后再移除旧状态与操作条件，不能仅按 observedState 推断。
+      const original = qc.getQueryData<Instance>(["legacy-instance", instance.id]);
+      if (
+        original?.termination_protection &&
+        (action.key === "delete" ||
+          (action.key === "lifecycle" && instance.observedState === "running"))
+      )
+        return true;
+      if (
+        original &&
+        !["lifecycle", "delete", "terminal"].includes(action.key) &&
+        action.disabled?.(original)
+      )
+        return true;
+      if (action.key === "load-balancer") return true;
+      if (action.key === "lifecycle")
+        return (
+          !["running", "stopped"].includes(instance.observedState) ||
+          instance.desiredState !== instance.observedState
+        );
+      if (action.key === "terminal" || action.key === "restart")
+        return instance.observedState !== "running";
+      if (action.key === "resize" || action.key === "rollback")
+        return instance.observedState !== "stopped";
+      return false;
+    },
+    loading: (instance) => {
+      if (action.key === "lifecycle") return start.isPending && start.variables?.id === instance.id;
+      const original = qc.getQueryData<Instance>(["legacy-instance", instance.id]);
+      return original ? (action.loading?.(original) ?? false) : false;
+    },
+    onClick: async (instance) => {
+      if (action.key === "lifecycle") {
+        if (instance.observedState === "stopped") return start.mutateAsync(instance);
+        setCommandDialog({ action: "stop", instance });
+        return;
+      }
+      if (action.key === "delete") {
+        setCommandDialog({ action: "delete", instance });
+        return;
+      }
+      if (action.key === "terminal") return openInstanceTerminalWindow(instance.id);
+      setLoadingLegacy(true);
+      try {
+        const legacy = await qc.fetchQuery({
+          queryKey: ["legacy-instance", instance.id],
+          queryFn: () => getLegacyInstance(instance.id),
+          staleTime: 0,
+          meta: {
+            errorNotification: {
+              id: withId("legacy-instance", instance.id),
+              action: "实例操作信息加载",
+            },
+          },
+        });
+        if (action.disabled?.(legacy)) {
+          const tooltip =
+            typeof action.tooltip === "function" ? action.tooltip(legacy) : action.tooltip;
+          showMessage({
+            type: "warning",
+            content: tooltip || "当前实例状态不支持此操作，请刷新后重试",
+          });
+          return;
+        }
+        return await action.onClick(legacy);
+      } finally {
+        setLoadingLegacy(false);
+      }
+    },
+  }));
+  const dialogNode = (
+    <>
+      {dialog?.action === "stop" && (
+        <GpuContainerStopModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={submitted}
+        />
+      )}
+      {dialog?.action === "delete" && (
+        <GpuContainerDeleteModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={deleteSubmitted}
+        />
+      )}
+      {dialog?.action === "scale" && (
+        <GpuContainerScaleModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={submitted}
+        />
+      )}
+      {dialog?.action === "update_image" && (
+        <GpuContainerUpdateImageModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={submitted}
+        />
+      )}
+      {dialog?.action === "resize" && (
+        <GpuContainerResizeModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={submitted}
+        />
+      )}
+      {dialog?.action === "rollback" && (
+        <GpuContainerRollbackModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={submitted}
+        />
+      )}
+      {dialog?.action === "attach_volume" && (
+        <InstanceAttachVolumeModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={submitted}
+        />
+      )}
+      {dialog?.action === "detach_volume" && (
+        <InstanceDetachVolumeModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={submitted}
+        />
+      )}
+      {dialog?.action === "attach_filesystem" && (
+        <GpuContainerAttachFilesystemModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={submitted}
+        />
+      )}
+      {dialog?.action === "bind_secret" && (
+        <GpuContainerBindSecretModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={submitted}
+        />
+      )}
+      {dialog?.action === "change_security_groups" && (
+        <GpuContainerChangeSecurityGroupsModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={submitted}
+        />
+      )}
+      {commandDialog?.action === "stop" && (
+        <GpuContainerStopModal
+          instance={commandDialog.instance}
+          onCancel={() => setCommandDialog(undefined)}
+          onSubmitted={submitted}
+        />
+      )}
+      {commandDialog?.action === "delete" && (
+        <GpuContainerDeleteModal
+          instance={commandDialog.instance}
+          onCancel={() => setCommandDialog(undefined)}
+          onSubmitted={deleteSubmitted}
+        />
+      )}
+      {acceptance && (
+        <InstanceOperationModal
+          acceptance={acceptance}
+          onCancel={() => {
+            setAcceptance(undefined);
+          }}
+        />
+      )}
+    </>
+  );
 
-  return { dialogNode, actions };
+  return { dialogNode, actions: governanceActions, legacyActions: actions };
 }

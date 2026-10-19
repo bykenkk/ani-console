@@ -1,5 +1,7 @@
+// FIXME(governance-instance-associations): VPC 关联实例仍依赖旧 vpc_id 筛选、kind 及列表响应，保留原组件、入口和 legacy 调用。
+// TODO(governance-instance-associations): 等新关联契约齐备后逐项迁移，不影响沙箱、虚拟机等未迁移实例。
+import { listInstances, type InstanceRecord } from "@/api/instances/legacy";
 import { useClientPagination } from "@/hooks/useClientPagination";
-import { listInstances, type InstanceRecord } from "@/api/instances";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 
 import {

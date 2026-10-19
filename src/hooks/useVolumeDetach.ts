@@ -1,4 +1,4 @@
-import { applyInstanceLifecycle } from "@/api/instances";
+import { applyInstanceLifecycle } from "@/api/instances/legacy";
 import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 type DetachTarget = {

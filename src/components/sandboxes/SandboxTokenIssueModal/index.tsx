@@ -2,7 +2,7 @@ import {
   createSandboxToken,
   type InstanceRecord,
   type SandboxTokenResponse,
-} from "@/api/instances";
+} from "@/api/instances/legacy";
 import {
   Alert,
   Button,

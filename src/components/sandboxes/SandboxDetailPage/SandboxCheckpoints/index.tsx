@@ -1,9 +1,9 @@
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import {
   listSandboxCheckpoints,
   type SandboxCheckpoint,
   restoreSandboxCheckpoint,
-} from "@/api/instances";
+} from "@/api/instances/legacy";
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";

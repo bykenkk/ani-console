@@ -1,7 +1,8 @@
+// FIXME(governance-migration): 安全组变更未对齐，保留原弹窗、入口、参数和 legacy 调用。
+// TODO(governance-migration): 待等价契约可用后迁移安全组变更，不混用新创建/启停接口替代。
+import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
 import { listNetworkSecurityGroups } from "@/api/network";
-import { applyInstanceLifecycle } from "@/api/instances";
 import type { NetworkSecurityGroup } from "@/api/network";
-import type { InstanceRecord } from "@/api/instances";
 import { Form, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 

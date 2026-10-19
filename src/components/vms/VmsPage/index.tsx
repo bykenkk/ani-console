@@ -1,4 +1,8 @@
-import { listInstances, type FilterableInstanceState, type InstanceRecord } from "@/api/instances";
+import {
+  listInstances,
+  type FilterableInstanceState,
+  type InstanceRecord,
+} from "@/api/instances/legacy";
 import { useState } from "react";
 import {
   ResourceNameId,

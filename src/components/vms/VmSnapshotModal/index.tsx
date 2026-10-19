@@ -1,5 +1,4 @@
-import { applyInstanceLifecycle } from "@/api/instances";
-import type { InstanceRecord } from "@/api/instances";
+import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
 import { Checkbox, Form, Input, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 

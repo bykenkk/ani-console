@@ -1,3 +1,5 @@
+// FIXME(governance-migration): 网络配置等旧详情字段未对齐，VM/沙箱列表仍依赖旧 kind 与筛选参数。
+// TODO(governance-migration): 未迁移实例逐项核对后迁移；CPU/GPU 列表统一走新接口，缺失查询暂时禁用。
 import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
 import { createIdempotencyScope } from "@/lib/idempotency";
@@ -8,7 +10,7 @@ import type {
   InstanceListParams,
   InstanceListResponse,
   InstanceRecord,
-} from "./types";
+} from "./types-legacy";
 
 const createScope = createIdempotencyScope("instance-create", ["POST"]);
 export const instancePath = (instanceId: string) => `/instances/${encodeURIComponent(instanceId)}`;

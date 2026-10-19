@@ -1,4 +1,4 @@
-import type { SandboxInstanceStatus } from "@/api/instances";
+import { type SandboxInstanceStatus } from "@/api/instances/legacy";
 import { DataTable } from "@/components/common";
 import { Descriptions, Space, Tag, Typography } from "@arco-design/web-react";
 import { sandboxEgressLabel } from "../utils";

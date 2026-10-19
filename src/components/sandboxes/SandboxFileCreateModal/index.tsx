@@ -1,4 +1,4 @@
-import { writeSandboxFile } from "@/api/instances";
+import { writeSandboxFile } from "@/api/instances/legacy";
 import { Checkbox, Form, Input, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";

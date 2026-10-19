@@ -1,49 +1,57 @@
-import { applyInstanceLifecycle } from "@/api/instances";
-import type { InstanceRecord } from "@/api/instances";
 import { Modal } from "@arco-design/web-react";
-import { useMutation } from "@tanstack/react-query";
-
-type Instance = InstanceRecord;
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { getInstance, deleteInstance } from "@/api/instances";
+import { withId } from "@/lib/id";
 export default function GpuContainerDeleteModal({
   instance,
   onCancel,
   onSubmitted,
 }: {
-  instance: Instance;
+  instance: { id: string; name: string; version?: string };
   onCancel: () => void;
   onSubmitted: () => void;
 }) {
+  const qc = useQueryClient();
   const mutation = useMutation({
+    mutationFn: async () => {
+      const version = instance.version ?? (await getInstance(instance.id)).version;
+      return deleteInstance(instance.id, { expected_version: version });
+    },
     meta: {
       feedback: {
-        channel: "message",
-        action: "操作",
+        channel: "notification",
+        id: withId("instance-command", "delete", instance.id),
+        action: "删除",
         successText: "删除已提交",
-        errorFallback: "操作失败，请稍后重试",
+        errorFallback: "删除失败，请刷新后重试",
       },
     },
-    mutationFn: async () => {
-      const submitData = { action: "delete" as const };
-      await applyInstanceLifecycle(instance.id, submitData);
-    },
-    onSuccess: () => {
+    // TODO(container-task): 删除任务跟踪后续统一接入，当前仅提交请求并提示。
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["governance-instances"] }),
+        qc.invalidateQueries({ queryKey: ["legacy-instances"] }),
+        qc.invalidateQueries({
+          queryKey: ["governance-instance", instance.id],
+          refetchType: "none",
+        }),
+        qc.invalidateQueries({ queryKey: ["legacy-instance", instance.id], refetchType: "none" }),
+      ]);
       onSubmitted();
     },
   });
   return (
     <Modal
-      title="删除 GPU 容器实例"
       visible
+      title="删除 GPU 容器"
       confirmLoading={mutation.isPending}
       okButtonProps={{ status: "danger" }}
+      onOk={() => mutation.mutateAsync()}
       onCancel={() => {
-        onCancel();
+        if (!mutation.isPending) onCancel();
       }}
-      onOk={() => mutation.mutate()}
-      unmountOnExit
     >
-      确定删除「{instance.name}」？删除后无法恢复。
+      确认删除“{instance.name}”？实例及工作空间数据将被清理，无法恢复。
     </Modal>
   );
 }

@@ -1,5 +1,6 @@
-import { applyInstanceLifecycle } from "@/api/instances";
-import type { InstanceRecord } from "@/api/instances";
+// FIXME(governance-migration): NFS 挂载未对齐，保留原弹窗、入口、参数和 legacy 调用。
+// TODO(governance-migration): 待等价契约可用后迁移NFS 挂载，不混用新创建/启停接口替代。
+import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
 import { Checkbox, Form, Input, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 

@@ -1,12 +1,14 @@
+// FIXME(governance-migration): 自定义命令/容器、VNC 等访问契约尚未对齐，保留原调用。
+// TODO(governance-migration): 公共标准终端已迁移；其余访问能力待等价契约后迁移。
 import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
 import { createIdempotencyScope } from "@/lib/idempotency";
-import { instancePath } from "./records";
+import { instancePath } from "./records-legacy";
 import type {
   CreateInstanceExecSessionInput,
   InstanceConsoleSession,
   InstanceExecSession,
-} from "./types";
+} from "./types-legacy";
 
 const execScope = createIdempotencyScope("instance-exec-session", ["POST"]);
 const consoleScope = createIdempotencyScope("instance-console-session", ["POST"]);

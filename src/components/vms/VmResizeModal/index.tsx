@@ -1,5 +1,4 @@
-import type { InstanceRecord } from "@/api/instances";
-import { applyInstanceLifecycle } from "@/api/instances";
+import { type InstanceRecord, applyInstanceLifecycle } from "@/api/instances/legacy";
 import InstanceComputeSpecSelect from "@/components/instances/InstanceComputeSpecSelect";
 import { CPU_INSTANCE_COMPUTE_SPECS } from "@/lib/instances";
 import { Form, Modal } from "@arco-design/web-react";

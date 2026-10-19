@@ -1,4 +1,4 @@
-import { createInstance } from "@/api/instances";
+import { createInstance } from "@/api/instances/legacy";
 import type { NetworkSecurityGroup } from "@/api/network";
 import { listNetworkSecurityGroups, listNetworkSubnets, listNetworkVpcs } from "@/api/network";
 import { listRegistryImages } from "@/api/registry";

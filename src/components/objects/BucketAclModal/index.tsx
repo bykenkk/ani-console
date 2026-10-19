@@ -1,6 +1,6 @@
+import { Modal } from "@arco-design/web-react";
 import type { StorageBucketRecord } from "@/api/storage/buckets";
 import BucketAclEditor from "@/components/objects/BucketAclEditor";
-import { Modal } from "@arco-design/web-react";
 
 type BucketAclModalProps = {
   bucket: StorageBucketRecord;

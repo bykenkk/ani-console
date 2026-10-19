@@ -2,7 +2,7 @@ import {
   type InstanceRecord,
   type SandboxInstanceStatus,
   deleteSandboxPort,
-} from "@/api/instances";
+} from "@/api/instances/legacy";
 import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 import { Button, Space, Typography, Modal } from "@arco-design/web-react";
 import { copyToClipboard } from "@/lib/clipboard";

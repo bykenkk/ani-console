@@ -1,4 +1,4 @@
-import { createSandboxPort, type InstanceRecord } from "@/api/instances";
+import { createSandboxPort, type InstanceRecord } from "@/api/instances/legacy";
 import { Form, Input, InputNumber, Modal, Select } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";

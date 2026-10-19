@@ -1,5 +1,6 @@
-import type { InstanceRecord } from "@/api/instances";
-import { applyInstanceLifecycle } from "@/api/instances";
+// FIXME(governance-migration): 发布回滚未对齐，保留原弹窗、入口、参数和 legacy 调用。
+// TODO(governance-migration): 待等价契约可用后迁移发布回滚，不混用新创建/启停接口替代。
+import { type InstanceRecord, applyInstanceLifecycle } from "@/api/instances/legacy";
 import { Form, Modal, Select, Tooltip } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 

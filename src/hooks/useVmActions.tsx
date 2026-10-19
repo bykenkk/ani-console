@@ -1,8 +1,11 @@
-import type { InstanceLifecycleRequest, InstanceRecord } from "@/api/instances";
-import { applyInstanceLifecycle } from "@/api/instances";
+import { Modal } from "@arco-design/web-react";
+import {
+  type InstanceLifecycleRequest,
+  type InstanceRecord,
+  applyInstanceLifecycle,
+} from "@/api/instances/legacy";
 import type { RowAction } from "@/components/common";
 import { openInstanceVncWindow } from "@/lib/instances";
-import { Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import VmAttachFilesystemModal from "@/components/vms/VmAttachFilesystemModal";

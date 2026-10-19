@@ -1,3 +1,5 @@
+import { createInstanceExecSession } from "@/api/instances";
+// TODO(governance-instance-exec): 后续联调验证会话创建、WebSocket 连接、输入输出、窗口缩放和重连。
 import { StatusBadge, type StatusBadgeTone } from "@/components/common";
 import { useEffect, useRef, useState } from "react";
 import { Button, Space } from "@arco-design/web-react";
@@ -5,7 +7,6 @@ import { FitAddon } from "@xterm/addon-fit";
 import { Terminal } from "@xterm/xterm";
 import clsx from "clsx";
 import "@xterm/xterm/css/xterm.css";
-import { createInstanceExecSession } from "@/api/instances";
 import { ApiError } from "@/api/request";
 import { resolveWebSocketUrl } from "@/lib/browser";
 import styles from "./index.module.css";
@@ -94,14 +95,10 @@ function writeGatewayMessage(term: Terminal, raw: string, onError: (message: str
 
 export default function InstanceTerminal({
   instanceId,
-  container,
-  command = ["/bin/sh"],
   height = "100%",
   className,
 }: {
   instanceId: string;
-  container?: string;
-  command?: string[];
   height?: number | string;
   className?: string;
 }) {
@@ -109,7 +106,6 @@ export default function InstanceTerminal({
   const socketRef = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<TerminalStatus>("connecting");
   const [connectSeq, setConnectSeq] = useState(0);
-  const commandSignature = JSON.stringify(command);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -199,9 +195,6 @@ export default function InstanceTerminal({
 
       try {
         const submitData = {
-          container: container?.trim() || null,
-          command: JSON.parse(commandSignature) as string[],
-          tty: true,
           rows: term.rows,
           cols: term.cols,
         };
@@ -213,13 +206,13 @@ export default function InstanceTerminal({
             getSessionError(error, error instanceof ApiError ? (error.status ?? 0) : 0),
           );
         }
-        if (!data.ws_url) throw new Error("终端连接地址为空");
+        if (!data.wsUrl) throw new Error("终端连接地址为空");
         if (disposed) return;
 
         if (typeof WebSocket === "undefined") {
           throw new Error("当前浏览器不支持 WebSocket 终端");
         }
-        const socket = new WebSocket(resolveWebSocketUrl(data.ws_url), TERMINAL_SUBPROTOCOL);
+        const socket = new WebSocket(resolveWebSocketUrl(data.wsUrl), TERMINAL_SUBPROTOCOL);
         socket.binaryType = "arraybuffer";
         socketRef.current = socket;
 
@@ -290,7 +283,7 @@ export default function InstanceTerminal({
         socket.close(1000, "terminal tab closed");
       term.dispose();
     };
-  }, [commandSignature, connectSeq, container, instanceId]);
+  }, [connectSeq, instanceId]);
 
   const meta = STATUS_META[status];
 

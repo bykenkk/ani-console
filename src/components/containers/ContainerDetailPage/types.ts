@@ -1,4 +1,4 @@
-import type { InstanceLifecycleRequest, InstanceRecord } from "@/api/instances";
+import { type InstanceLifecycleRequest, type InstanceRecord } from "@/api/instances/legacy";
 import type { ReactNode } from "react";
 
 export type ContainerDetailPowerAction = "start" | "stop" | "restart" | "delete";

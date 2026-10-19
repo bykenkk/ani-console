@@ -1,7 +1,7 @@
+import { listInstances, type InstanceRecord } from "@/api/instances/legacy";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Form, Input, InputNumber, Modal, Select, Switch } from "@arco-design/web-react";
 import { useEffect, useState } from "react";
-import { listInstances, type InstanceRecord } from "@/api/instances";
 import { createVolume, type StorageVolume, type StorageVolumeMode } from "@/api/storage/volumes";
 import { canMountVolumeMode } from "@/lib/volumes";
 import { validateForm } from "@/lib/form";
