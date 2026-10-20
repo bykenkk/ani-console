@@ -1,5 +1,6 @@
-// FIXME(governance-migration): 新列表仅支持 page_size/page_token，返回 services；不等价于旧 capability/status 筛选及 items 响应。
-// TODO(governance-migration): 后端明确能力筛选与可调用状态契约后扩展列表接入，不自行将 running 映射到 phase/health。
+// Governance owns the public inference list. The filters are forwarded to the
+// inference owner; the API, rather than the Console, decides whether a service
+// is callable.
 import { coreRequest } from "@/api/request";
 import { runIdempotentRequest } from "@/api/idempotency";
 import { createIdempotencyScope } from "@/lib/idempotency";
@@ -28,7 +29,10 @@ export function listInferenceServices(params: InferenceListParams = {}, signal?:
   });
 }
 export function getInferenceService(id: string, signal?: AbortSignal) {
-  return coreRequest<InferenceService>(servicePath(id), { method: "GET", signal });
+  return coreRequest<InferenceService>(servicePath(id), {
+    method: "GET",
+    signal,
+  });
 }
 export function createInferenceService(input: CreateInferenceInput) {
   return runIdempotentRequest(createScope, input, (data) =>

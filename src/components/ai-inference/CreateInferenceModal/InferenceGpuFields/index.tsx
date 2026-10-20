@@ -78,7 +78,7 @@ export default function InferenceGpuFields({
           <Form.Item
             field="gpu_cluster_id"
             label="GPU 集群 ID"
-            rules={[{ required: true, match: /\S/, message: "请输入 GPU 集群 ID" }]}
+            rules={[{ type: "string", required: true, match: /\S/, message: "请输入 GPU 集群 ID" }]}
           >
             <Input
               placeholder="请输入 Accelerator 集群 ID"
@@ -96,7 +96,9 @@ export default function InferenceGpuFields({
           <Form.Item
             field="gpu_pool_id"
             label="GPU 资源池 ID"
-            rules={[{ required: true, match: /\S/, message: "请输入 GPU 资源池 ID" }]}
+            rules={[
+              { type: "string", required: true, match: /\S/, message: "请输入 GPU 资源池 ID" },
+            ]}
           >
             <Input placeholder="请输入该集群内的资源池 ID" onChange={setPoolId} />
           </Form.Item>

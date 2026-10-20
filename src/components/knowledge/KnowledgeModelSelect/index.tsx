@@ -1,9 +1,7 @@
-// FIXME(governance-migration): 建库的 embedding/text-generation 候选仍来自旧 Services 的 capability + running 筛选。
-// TODO(governance-migration): governance 提供等价可调用候选并确认推理网关兼容后迁移；提交值继续使用 served_model_name。
 import { Select, Space, Typography } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
-import { listInferenceServices, type InferenceServiceListParams } from "@/api/inference/legacy";
+import { listInferenceServices, type InferenceListParams } from "@/api/inference";
 import { withId } from "@/lib/id";
 
 export default function KnowledgeModelSelect({
@@ -12,14 +10,14 @@ export default function KnowledgeModelSelect({
   onChange,
   required = false,
 }: {
-  capability: NonNullable<InferenceServiceListParams["capability"]>;
+  capability: NonNullable<InferenceListParams["capability"]>;
   value?: string;
   onChange?: (value: string | undefined) => void;
   required?: boolean;
 }) {
   const models = useQuery({
     queryKey: ["inference-services", "model-options", capability, "running"],
-    queryFn: () => listInferenceServices({ capability, status: "running" }),
+    queryFn: ({ signal }) => listInferenceServices({ capability, status: "running" }, signal),
     meta: {
       errorNotification: {
         id: withId("inference-models", capability),

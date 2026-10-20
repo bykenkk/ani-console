@@ -1,6 +1,4 @@
-// FIXME(governance-migration): 问答模型候选仍从旧 Services 筛选 text-generation + running，与新推理管理列表的数据源不同。
-// TODO(governance-migration): 确认可调用候选与知识库生成路由兼容后迁移；同步问答和 SSE 均保留 served_model_name 语义。
-import { listInferenceServices } from "@/api/inference/legacy";
+import { listInferenceServices } from "@/api/inference";
 import {
   deleteKnowledgeBaseSession,
   listKnowledgeBaseCitations,
@@ -43,7 +41,8 @@ export default function KnowledgeChat({
       },
     },
     queryKey: ["inference-services", "model-options", "text-generation", "running"],
-    queryFn: () => listInferenceServices({ capability: "text-generation", status: "running" }),
+    queryFn: ({ signal }) =>
+      listInferenceServices({ capability: "text-generation", status: "running" }, signal),
   });
   const inferenceModelOptions = useMemo(
     () =>
@@ -63,7 +62,12 @@ export default function KnowledgeChat({
     }
   }, [inferenceModelOptions, inferenceModels.data, inferenceServiceName]);
   const sessions = useQuery({
-    meta: { errorNotification: { id: withId("knowledge-sessions", kbId), action: "会话列表加载" } },
+    meta: {
+      errorNotification: {
+        id: withId("knowledge-sessions", kbId),
+        action: "会话列表加载",
+      },
+    },
     queryKey: ["knowledge-base-sessions", kbId],
     queryFn: async () => (await listKnowledgeBaseSessions(kbId)).items,
   });
@@ -81,7 +85,10 @@ export default function KnowledgeChat({
   });
   const citations = useQuery({
     meta: {
-      errorNotification: { id: withId("knowledge-citations", kbId), action: "引用记录加载" },
+      errorNotification: {
+        id: withId("knowledge-citations", kbId),
+        action: "引用记录加载",
+      },
     },
     queryKey: ["knowledge-base-citations", kbId],
     enabled: citationsVisible,

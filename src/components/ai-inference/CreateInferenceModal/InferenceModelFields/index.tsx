@@ -20,37 +20,34 @@ export default function InferenceModelFields({
   onVersionChange: (version?: ModelVersion, modelName?: string) => void;
 }) {
   const [modelId, setModelId] = useState(initialModelId ?? "");
-  const [cursor, setCursor] = useState<string>();
-  const [previous, setPrevious] = useState<(string | undefined)[]>([]);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const models = useQuery({
-    queryKey: ["governance-models", "inference-options", cursor],
-    queryFn: ({ signal }) => listModels({ status: "ready", cursor }, signal),
+    queryKey: ["governance-models", "inference-options", page, pageSize],
+    queryFn: ({ signal }) => listModels({ page, pageSize }, signal),
     meta: { errorNotification: { id: "inference-models", action: "模型列表加载" } },
   });
   return (
     <>
       <Form.Item
         label="模型"
-        required
         extra={
-          (previous.length > 0 || models.data?.meta?.next_cursor) && (
+          (page > 1 || page * pageSize < Number(models.data?.total ?? 0)) && (
             <Space>
               <Button
                 size="mini"
-                disabled={models.isFetching || !previous.length}
+                disabled={models.isFetching || page === 1}
                 onClick={() => {
-                  setCursor(previous[previous.length - 1]);
-                  setPrevious((current) => current.slice(0, -1));
+                  setPage((current) => Math.max(1, current - 1));
                 }}
               >
                 上一页模型
               </Button>
               <Button
                 size="mini"
-                disabled={models.isFetching || !models.data?.meta?.next_cursor}
+                disabled={models.isFetching || page * pageSize >= Number(models.data?.total ?? 0)}
                 onClick={() => {
-                  setPrevious((current) => [...current, cursor]);
-                  setCursor(models.data!.meta!.next_cursor);
+                  setPage((current) => current + 1);
                 }}
               >
                 下一页模型
@@ -65,16 +62,17 @@ export default function InferenceModelFields({
           showSearch
           placeholder="请选择已就绪的模型"
           options={[
-            ...(modelId && !models.data?.models?.some((item) => item.id === modelId)
+            ...(modelId && !models.data?.items?.some((item) => item.id === modelId)
               ? [{ value: modelId, label: modelId }]
               : []),
-            ...(models.data?.models ?? []).map((item) => ({
+            ...(models.data?.items ?? []).map((item) => ({
               value: item.id,
               label: item.display_name || item.name,
             })),
           ]}
           onChange={(id) => {
             setModelId(id);
+            setPage(1);
             onVersionChange();
           }}
         />
@@ -100,8 +98,8 @@ function InferenceVersionFields({
 }) {
   const [selectedId, setSelectedId] = useState(initialVersionId ?? "");
   const [appliedId, setAppliedId] = useState("");
-  const [cursor, setCursor] = useState<string>();
-  const [previous, setPrevious] = useState<(string | undefined)[]>([]);
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
   const [chosenVersion, setChosenVersion] = useState<ModelVersion>();
   const model = useQuery({
     queryKey: ["governance-model", modelId],
@@ -110,9 +108,9 @@ function InferenceVersionFields({
     meta: { errorNotification: { id: withId("inference-model", modelId), action: "模型详情加载" } },
   });
   const versions = useQuery({
-    queryKey: ["governance-model-versions", modelId, cursor],
+    queryKey: ["governance-model-versions", modelId, page, pageSize],
     enabled: Boolean(modelId),
-    queryFn: ({ signal }) => listModelVersions(modelId, { cursor }, signal),
+    queryFn: ({ signal }) => listModelVersions(modelId, { page, pageSize }, signal),
     meta: {
       errorNotification: { id: withId("inference-versions", modelId), action: "模型版本加载" },
     },
@@ -128,7 +126,7 @@ function InferenceVersionFields({
       },
     },
   });
-  const items = [...(versions.data?.versions ?? [])];
+  const items = [...(versions.data?.items ?? [])];
   if (chosenVersion && !items.some((item) => item.id === chosenVersion.id))
     items.push(chosenVersion);
   const initialVersion = initial.data?.version;
@@ -141,9 +139,7 @@ function InferenceVersionFields({
   const selected = items.find((item) => item.id === selectedId);
   useEffect(() => {
     if (selectedId || !versions.data) return;
-    const firstReady = versions.data.versions?.find(
-      (item) => item.status.toLowerCase() === "ready",
-    );
+    const firstReady = versions.data.items?.find((item) => item.status.toLowerCase() === "ready");
     if (firstReady) setSelectedId(firstReady.id);
   }, [selectedId, versions.data]);
   useEffect(() => {
@@ -156,26 +152,24 @@ function InferenceVersionFields({
     <Form.Item
       field="model_version_id"
       label="模型版本"
-      rules={[{ required: true, message: "请选择已就绪的模型版本" }]}
+      rules={[{ type: "string", required: true, message: "请选择已就绪的模型版本" }]}
       extra={
-        (previous.length > 0 || versions.data?.meta?.next_cursor) && (
+        (page > 1 || page * pageSize < Number(versions.data?.total ?? 0)) && (
           <Space>
             <Button
               size="mini"
-              disabled={versions.isFetching || !previous.length}
+              disabled={versions.isFetching || page === 1}
               onClick={() => {
-                setCursor(previous[previous.length - 1]);
-                setPrevious((current) => current.slice(0, -1));
+                setPage((current) => Math.max(1, current - 1));
               }}
             >
               上一页版本
             </Button>
             <Button
               size="mini"
-              disabled={versions.isFetching || !versions.data?.meta?.next_cursor}
+              disabled={versions.isFetching || page * pageSize >= Number(versions.data?.total ?? 0)}
               onClick={() => {
-                setPrevious((current) => [...current, cursor]);
-                setCursor(versions.data!.meta!.next_cursor);
+                setPage((current) => current + 1);
               }}
             >
               下一页版本

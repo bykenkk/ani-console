@@ -61,12 +61,14 @@ export interface InferenceService {
   applied_generation?: string;
 }
 export interface InferenceListParams {
-  page_size?: number;
-  page_token?: string;
+  page?: number;
+  pageSize?: number;
+  status?: string;
+  capability?: "embedding" | "text-generation" | "speech-to-text";
 }
 export interface InferenceListResponse {
-  services: InferenceService[];
-  next_page_token?: string;
+  items: InferenceService[];
+  total: number | string;
 }
 export interface InferenceOperation {
   id: string;

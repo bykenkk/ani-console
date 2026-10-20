@@ -2,7 +2,7 @@ import { useModelActions } from "@/hooks/useModelActions";
 
 import { Select, Space, Tag } from "@arco-design/web-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { listModels } from "@/api/models";
 import type { ListPagination } from "@/components/common/DataTable";
 
@@ -44,19 +44,13 @@ export default function ModelsPage() {
     capability: capability === "all" ? undefined : capability,
     status: getApiStatus(status),
   };
-  const scope = JSON.stringify(filters);
-  const [paging, setPaging] = useState({
-    scope,
-    page: 1,
-    pageSize: 10,
-    cursors: [undefined] as (string | undefined)[],
-  });
-  // A filter change starts a new cursor chain before the next query runs.
-  const current =
-    paging.scope === scope ? paging : { ...paging, scope, page: 1, cursors: [undefined] };
-  if (paging.scope !== scope) setPaging(current);
-  const { page, pageSize, cursors } = current;
-  const params = { ...filters, limit: pageSize, cursor: cursors[page - 1] };
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  useEffect(
+    () => setPage(1),
+    [filters.capability, filters.keyword, filters.source, filters.status],
+  );
+  const params = { ...filters, page, pageSize };
   const models = useQuery({
     queryKey: ["governance-models", params],
     queryFn: ({ signal }) => listModels(params, signal),
@@ -68,29 +62,23 @@ export default function ModelsPage() {
       },
     },
   });
-  const items = models.data?.models ?? [];
+  const items = models.data?.items ?? [];
+  const total = Number(models.data?.total ?? items.length);
   const pagination: ListPagination = {
-    mode: "cursor",
+    mode: "total",
     page,
     pageSize,
     disabled: models.isFetching,
-    hasNextPage: Boolean(models.data?.meta?.next_cursor),
-    onPageChange: (next) => {
-      const nextCursor = models.data?.meta?.next_cursor;
-      if (next === page + 1 && nextCursor) {
-        setPaging({ ...current, page: next, cursors: [...cursors.slice(0, page), nextCursor] });
-      } else if (next >= 1 && next < page) {
-        setPaging({ ...current, page: next });
-      }
-    },
+    total: Number.isFinite(total) ? total : items.length,
+    onPageChange: setPage,
     onPageSizeChange: (size) => {
-      setPaging({ ...current, page: 1, pageSize: size, cursors: [undefined] });
+      setPageSize(size);
+      setPage(1);
     },
   };
   const refresh = () => {
-    qc.invalidateQueries({ queryKey: ["governance-models"], refetchType: "none" });
-    setPaging({ ...current, page: 1, cursors: [undefined] });
-    if (page === 1) models.refetch();
+    void qc.invalidateQueries({ queryKey: ["governance-models"] });
+    setPage(1);
   };
   const { actions, dialogNode } = useModelActions();
 

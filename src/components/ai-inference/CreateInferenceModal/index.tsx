@@ -8,7 +8,6 @@ import {
   type InferenceGpuSelection,
 } from "@/api/inference";
 import { getModelVersion, type ModelVersion } from "@/api/models";
-import { validateForm } from "@/lib/form";
 import { showMessage } from "@/lib/feedback";
 import InferenceModelFields from "./InferenceModelFields";
 import InferenceGpuFields from "./InferenceGpuFields";
@@ -79,7 +78,23 @@ export default function CreateInferenceModal({
     if (submitting.current) return;
     submitting.current = true;
     try {
-      const values = await validateForm<CreateValues>(form);
+      let values: CreateValues;
+      try {
+        values = await form.validate();
+      } catch (error) {
+        const fieldErrors = form.getFieldsError();
+        const firstError = Object.values(fieldErrors)
+          .flat()
+          .find((item) => typeof item?.message === "string");
+        showMessage({
+          type: "error",
+          content:
+            typeof firstError?.message === "string"
+              ? firstError.message
+              : "请检查并修正表单中的错误项",
+        });
+        throw error;
+      }
       if (
         !version ||
         values.model_version_id !== version.id ||
@@ -112,7 +127,7 @@ export default function CreateInferenceModal({
       submitting.current = false;
     }
   };
-  const required = (message: string) => [{ required: true, match: /\S/, message }];
+  const required = (message: string) => [{ type: "string", required: true, match: /\S/, message }];
   return (
     <Modal
       visible
@@ -180,7 +195,11 @@ export default function CreateInferenceModal({
             <Input placeholder="例如 32Gi" />
           </Form.Item>
         </div>
-        <Form.Item field="runtime_mode" label="运行模式" rules={[{ required: true }]}>
+        <Form.Item
+          field="runtime_mode"
+          label="运行模式"
+          rules={[{ type: "string", required: true }]}
+        >
           <Select
             options={[
               { value: "RUNTIME_MODE_DEPLOYMENT", label: "Deployment" },
@@ -192,7 +211,7 @@ export default function CreateInferenceModal({
         <Form.Item
           field="replicas"
           label={distributed ? "副本组数" : "副本数"}
-          rules={[{ required: true, type: "integer", min: 1, message: "请输入大于 0 的整数" }]}
+          rules={[{ required: true, type: "number", min: 1, message: "请输入大于 0 的整数" }]}
         >
           <InputNumber
             min={1}
@@ -205,7 +224,7 @@ export default function CreateInferenceModal({
           <Form.Item
             field="worker_replicas"
             label="每组 Worker 数"
-            rules={[{ required: true, type: "integer", min: 1, message: "请输入大于 0 的整数" }]}
+            rules={[{ required: true, type: "number", min: 1, message: "请输入大于 0 的整数" }]}
           >
             <InputNumber
               min={1}

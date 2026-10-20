@@ -25,39 +25,36 @@ export default function InferencePage() {
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [tokens, setTokens] = useState<(string | undefined)[]>([undefined]);
   const query = useQuery({
-    queryKey: [
-      "governance-inference-services",
-      { page_size: pageSize, page_token: tokens[page - 1] },
-    ],
-    queryFn: ({ signal }) =>
-      listInferenceServices({ page_size: pageSize, page_token: tokens[page - 1] }, signal),
-    meta: { errorNotification: { id: "inference-services", action: "推理服务列表加载" } },
+    queryKey: ["governance-inference-services", { page, pageSize }],
+    queryFn: ({ signal }) => listInferenceServices({ page, pageSize }, signal),
+    meta: {
+      errorNotification: {
+        id: "inference-services",
+        action: "推理服务列表加载",
+      },
+    },
   });
-  const items = query.data?.services ?? [];
+  const items = query.data?.items ?? [];
+  const total = Number(query.data?.total ?? items.length);
   const pagination: ListPagination = {
-    mode: "cursor",
+    mode: "total",
     page,
     pageSize,
     disabled: query.isFetching,
-    hasNextPage: Boolean(query.data?.next_page_token),
-    onPageChange: (next) => {
-      if (next === page + 1 && query.data?.next_page_token) {
-        setTokens((current) => [...current.slice(0, page), query.data!.next_page_token]);
-        setPage(next);
-      } else if (next >= 1 && next < page) setPage(next);
-    },
+    total: Number.isFinite(total) ? total : items.length,
+    onPageChange: setPage,
     onPageSizeChange: (size) => {
       setPageSize(size);
       setPage(1);
-      setTokens([undefined]);
     },
   };
   const refresh = () => {
-    qc.invalidateQueries({ queryKey: ["governance-inference-services"], refetchType: "none" });
+    qc.invalidateQueries({
+      queryKey: ["governance-inference-services"],
+      refetchType: "none",
+    });
     setPage(1);
-    setTokens([undefined]);
     if (page === 1) query.refetch();
   };
   const columns: ListColumn<InferenceService>[] = [
@@ -67,8 +64,14 @@ export default function InferencePage() {
         <ResourceNameId name={item.name} id={item.id} type="inference-service" />
       ),
     },
-    { title: "运行阶段", render: (_, item) => <StatusBadge status={item.phase} /> },
-    { title: "调用健康", render: (_, item) => <StatusBadge status={item.health} /> },
+    {
+      title: "运行阶段",
+      render: (_, item) => <StatusBadge status={item.phase} />,
+    },
+    {
+      title: "调用健康",
+      render: (_, item) => <StatusBadge status={item.health} />,
+    },
     { title: "服务模型名", dataIndex: "served_model_name", ellipsis: true },
     { title: "模型版本", dataIndex: "model_version_id", ellipsis: true },
     { title: "启动命令", dataIndex: "command", ellipsis: true },
@@ -79,7 +82,11 @@ export default function InferencePage() {
         item.gpu ? `${item.gpu.profile_id} · v${item.gpu.profile_version}` : "CPU",
       ellipsis: true,
     },
-    { title: "观测时间", render: (_, item) => formatDateTime(item.observed_at), width: 170 },
+    {
+      title: "观测时间",
+      render: (_, item) => formatDateTime(item.observed_at),
+      width: 170,
+    },
   ];
   return (
     <>

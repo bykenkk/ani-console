@@ -1,6 +1,4 @@
-// FIXME(governance-migration): 向量化模型仍依赖旧 Services 的 embedding + running 筛选，不能用已入库模型列表直接替代。
-// TODO(governance-migration): governance 补齐可调用候选并验证向量化链路后迁移；embedding_model 仍提交 served_model_name。
-import { listInferenceServices } from "@/api/inference/legacy";
+import { listInferenceServices } from "@/api/inference";
 import {
   createVectorStore,
   type VectorMetric,
@@ -32,7 +30,8 @@ export default function CreateVectorStoreModal({
       },
     },
     queryKey: ["inference-services", "model-options", "embedding", "running"],
-    queryFn: () => listInferenceServices({ capability: "embedding", status: "running" }),
+    queryFn: ({ signal }) =>
+      listInferenceServices({ capability: "embedding", status: "running" }, signal),
   });
   const modelOptions = useMemo(
     () => (models.data?.items ?? []).map((item) => item.served_model_name),
@@ -44,7 +43,13 @@ export default function CreateVectorStoreModal({
   }, [embeddingModel, modelOptions]);
 
   const create = useMutation({
-    meta: { feedback: { channel: "message", action: "创建向量存储", errorFallback: "请求失败" } },
+    meta: {
+      feedback: {
+        channel: "message",
+        action: "创建向量存储",
+        errorFallback: "请求失败",
+      },
+    },
     mutationFn: async (_: undefined) => {
       const trimmedName = name.trim();
       if (!trimmedName) throw new Error("请输入向量存储名称");

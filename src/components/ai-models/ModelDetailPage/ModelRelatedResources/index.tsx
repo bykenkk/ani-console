@@ -1,5 +1,5 @@
-// FIXME(governance-migration): 新推理列表没有 model_version_id 筛选，只能在当前服务页关联模型，空页不代表没有关联资源。
-// TODO(governance-migration): 后端提供模型关联服务筛选后改为服务端筛选分页，移除逐版本查询及当前页过滤。
+// The public list has no model_version_id filter. Resolve only the current
+// service page's versions and keep the existing page-by-page behavior.
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { listInferenceServices, type InferenceService } from "@/api/inference";
@@ -12,8 +12,7 @@ import { withId } from "@/lib/id";
 export default function ModelRelatedResources({ model }: { model: Model }) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [tokens, setTokens] = useState<(string | undefined)[]>([undefined]);
-  const params = { page_size: pageSize, page_token: tokens[page - 1] };
+  const params = { page, pageSize };
   const relatedServices = useQuery({
     meta: {
       errorNotification: {
@@ -29,7 +28,7 @@ export default function ModelRelatedResources({ model }: { model: Model }) {
   // Resolve only this service page's versions; never traverse model/version pages.
   const unresolvedIds = [
     ...new Set(
-      (relatedServices.data?.services ?? [])
+      (relatedServices.data?.items ?? [])
         .map((service) => service.model_version_id)
         .filter((id) => id && !versionIds.has(id)),
     ),
@@ -49,26 +48,20 @@ export default function ModelRelatedResources({ model }: { model: Model }) {
   for (const version of versions) {
     if (version.data?.model.id === model.id) versionIds.add(version.data.version.id);
   }
-  const services = (relatedServices.data?.services ?? []).filter((service) =>
+  const services = (relatedServices.data?.items ?? []).filter((service) =>
     versionIds.has(service.model_version_id),
   );
+  const total = Number(relatedServices.data?.total ?? services.length);
   const pagination: ListPagination = {
-    mode: "cursor",
+    mode: "total",
     page,
     pageSize,
     disabled: relatedServices.isFetching || versions.some((query) => query.isFetching),
-    hasNextPage: Boolean(relatedServices.data?.next_page_token),
-    onPageChange: (next) => {
-      const token = relatedServices.data?.next_page_token;
-      if (next === page + 1 && token) {
-        setTokens([...tokens.slice(0, page), token]);
-        setPage(next);
-      } else if (next >= 1 && next < page) setPage(next);
-    },
+    total: Number.isFinite(total) ? total : services.length,
+    onPageChange: setPage,
     onPageSizeChange: (size) => {
       setPageSize(size);
       setPage(1);
-      setTokens([undefined]);
     },
   };
 
@@ -92,8 +85,15 @@ export default function ModelRelatedResources({ model }: { model: Model }) {
             width: 120,
             render: (_, service) => <StatusBadge status={service.phase} />,
           },
-          { title: "调用健康", render: (_, service) => <StatusBadge status={service.health} /> },
-          { title: "服务模型名", dataIndex: "served_model_name", ellipsis: true },
+          {
+            title: "调用健康",
+            render: (_, service) => <StatusBadge status={service.health} />,
+          },
+          {
+            title: "服务模型名",
+            dataIndex: "served_model_name",
+            ellipsis: true,
+          },
           {
             title: "副本",
             width: 120,
