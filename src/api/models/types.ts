@@ -1,3 +1,5 @@
+import type { PageParams } from "@/api/types";
+
 export interface ModelVersion {
   id: string;
   model_id: string;
@@ -15,6 +17,8 @@ export interface ModelVersion {
   storage_path?: string;
   created_at?: string;
 }
+export type ModelFormat = "safetensors" | "gguf" | "pytorch";
+export type ModelCapability = "text-generation" | "embedding" | "speech-to-text";
 export interface Model {
   id: string;
   name: string;
@@ -31,12 +35,9 @@ export interface Model {
   model_id?: string;
   versions?: ModelVersion[];
 }
-// TODO(pagination-migration): governance 模型/版本列表仍使用 page.limit/page.cursor，保留嵌套游标契约；待后端改造后迁移 PageParams。
-export interface ModelPageParams {
-  limit?: number;
-  /** Return the server cursor unchanged; it is not a page offset. */
-  cursor?: string;
-}
+// FIXME(model-contract): 当前索引为游标分页；用户确认本次保留原分支页码契约。
+// TODO(model-contract): 目标版本确认后核对分页与响应类型并联调。
+export type ModelPageParams = PageParams;
 export interface ModelListParams extends ModelPageParams {
   keyword?: string;
   source?: string;
@@ -44,12 +45,12 @@ export interface ModelListParams extends ModelPageParams {
   status?: string;
 }
 export interface ModelListResponse {
-  models: Model[];
-  meta?: { next_cursor?: string; has_more?: boolean };
+  items: Model[];
+  total: number | string;
 }
 export interface ModelVersionListResponse {
-  versions: ModelVersion[];
-  meta?: { next_cursor?: string; has_more?: boolean };
+  items: ModelVersion[];
+  total: number | string;
 }
 export interface ModelVersionResponse {
   model: Model;
@@ -58,11 +59,105 @@ export interface ModelVersionResponse {
 export interface ImportModelInput {
   source: "huggingface" | "modelscope";
   repo_id: string;
-  revision?: string;
+  revision: string;
   webhook_url?: string;
-  model_id?: string;
-  model_version_id?: string;
+  model_id: string;
+  model_version_id: string;
 }
 export interface ImportModelRequest {
   data: ImportModelInput & { idempotency_key: string };
+}
+
+export interface ImportModelBundleModelInput {
+  name: string;
+  display_name?: string;
+  description?: string;
+  capabilities: ModelCapability[];
+  external_model_id?: string;
+}
+
+export interface ImportModelBundleVersionInput {
+  version: string;
+  format: ModelFormat;
+  engine_type: string;
+  engine_image: string;
+  startup_command: string;
+}
+
+export interface ImportModelBundleSourceInput {
+  provider: ImportModelInput["source"];
+  repo_id: string;
+  revision: string;
+}
+
+export interface ImportModelBundleInput {
+  model: ImportModelBundleModelInput;
+  version: ImportModelBundleVersionInput;
+  source: ImportModelBundleSourceInput;
+}
+
+export interface ImportModelBundleRequest {
+  data: ImportModelBundleInput & { idempotency_key: string };
+}
+
+export interface ImportModelBundleResponse {
+  model: Model;
+  version: ModelVersion;
+  task: ImportTask;
+}
+export interface ExternalModelCandidate {
+  source: "huggingface" | "modelscope";
+  repo_id: string;
+  name: string;
+  display_name?: string;
+  description?: string;
+  revision: string;
+  size_bytes?: number | string;
+  tags?: string[];
+  updated_at?: string;
+}
+export interface SearchExternalModelsParams extends PageParams {
+  source: "huggingface" | "modelscope";
+  keyword: string;
+  owner?: string;
+  task?: string;
+  library?: string;
+}
+export interface SearchExternalModelsResponse {
+  items: ExternalModelCandidate[];
+  hasMore: boolean;
+}
+export interface CreateModelInput {
+  name: string;
+  display_name?: string;
+  description?: string;
+  capabilities: ModelCapability[];
+  model_id?: string;
+}
+export interface CreateModelRequest extends CreateModelInput {
+  idempotency_key: string;
+}
+export interface CreateModelVersionInput {
+  model_id: string;
+  version: string;
+  format: ModelFormat;
+  engine_type: string;
+  startup_command: string;
+  engine_image: string;
+}
+export interface CreateModelVersionRequest extends CreateModelVersionInput {
+  idempotency_key: string;
+}
+export interface ImportTask {
+  task_id: string;
+  task_type: string;
+  status: string;
+  location_url?: string;
+  model_id: string;
+  model_version_id: string;
+  attempt_count?: number;
+  progress_pct?: number;
+  error_message?: string;
+  created_at?: string;
+  completed_at?: string;
 }

@@ -1,4 +1,5 @@
-import { Button, Form, Select, Space } from "@arco-design/web-react";
+import { withFirst100 } from "@/api/pagination";
+import { Form, Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
@@ -7,8 +8,15 @@ import {
   listModels,
   listModelVersions,
   type ModelVersion,
+  type ModelPageParams,
 } from "@/api/models";
 import { withId } from "@/lib/id";
+
+const listModelOptions = withFirst100(listModels);
+const listVersionOptions = withFirst100(
+  ({ modelId, ...params }: { modelId: string } & ModelPageParams, signal?: AbortSignal) =>
+    listModelVersions(modelId, params, signal),
+);
 
 export default function InferenceModelFields({
   initialModelId,
@@ -20,55 +28,26 @@ export default function InferenceModelFields({
   onVersionChange: (version?: ModelVersion, modelName?: string) => void;
 }) {
   const [modelId, setModelId] = useState(initialModelId ?? "");
-  const [cursor, setCursor] = useState<string>();
-  const [previous, setPrevious] = useState<(string | undefined)[]>([]);
+  // FIXME(model-contract): 用户确认保留原分支模型列表，尚未与当前后端索引对齐。
+  // TODO(model-contract): 目标版本确认后验证模型选项及初始选择回显。
   const models = useQuery({
-    queryKey: ["governance-models", "inference-options", cursor],
-    queryFn: ({ signal }) => listModels({ status: "ready", cursor }, signal),
+    queryKey: ["governance-models", "options"],
+    queryFn: ({ signal }) => listModelOptions({}, signal),
     meta: { errorNotification: { id: "inference-models", action: "模型列表加载" } },
   });
   return (
     <>
-      <Form.Item
-        label="模型"
-        required
-        extra={
-          (previous.length > 0 || models.data?.meta?.next_cursor) && (
-            <Space>
-              <Button
-                size="mini"
-                disabled={models.isFetching || !previous.length}
-                onClick={() => {
-                  setCursor(previous[previous.length - 1]);
-                  setPrevious((current) => current.slice(0, -1));
-                }}
-              >
-                上一页模型
-              </Button>
-              <Button
-                size="mini"
-                disabled={models.isFetching || !models.data?.meta?.next_cursor}
-                onClick={() => {
-                  setPrevious((current) => [...current, cursor]);
-                  setCursor(models.data!.meta!.next_cursor);
-                }}
-              >
-                下一页模型
-              </Button>
-            </Space>
-          )
-        }
-      >
+      <Form.Item label="模型">
         <Select
           value={modelId || undefined}
           loading={models.isFetching}
           showSearch
           placeholder="请选择已就绪的模型"
           options={[
-            ...(modelId && !models.data?.models?.some((item) => item.id === modelId)
+            ...(modelId && !models.data?.items?.some((item) => item.id === modelId)
               ? [{ value: modelId, label: modelId }]
               : []),
-            ...(models.data?.models ?? []).map((item) => ({
+            ...(models.data?.items ?? []).map((item) => ({
               value: item.id,
               label: item.display_name || item.name,
             })),
@@ -100,8 +79,6 @@ function InferenceVersionFields({
 }) {
   const [selectedId, setSelectedId] = useState(initialVersionId ?? "");
   const [appliedId, setAppliedId] = useState("");
-  const [cursor, setCursor] = useState<string>();
-  const [previous, setPrevious] = useState<(string | undefined)[]>([]);
   const [chosenVersion, setChosenVersion] = useState<ModelVersion>();
   const model = useQuery({
     queryKey: ["governance-model", modelId],
@@ -109,10 +86,12 @@ function InferenceVersionFields({
     queryFn: ({ signal }) => getModel(modelId, signal),
     meta: { errorNotification: { id: withId("inference-model", modelId), action: "模型详情加载" } },
   });
+  // FIXME(model-contract): 用户确认保留原分支版本列表，当前索引仍是游标契约。
+  // TODO(model-contract): 目标版本就绪后验证前 100 项选项、版本归属及就绪状态。
   const versions = useQuery({
-    queryKey: ["governance-model-versions", modelId, cursor],
+    queryKey: ["governance-model-versions", modelId, "options"],
     enabled: Boolean(modelId),
-    queryFn: ({ signal }) => listModelVersions(modelId, { cursor }, signal),
+    queryFn: ({ signal }) => listVersionOptions({ modelId }, signal),
     meta: {
       errorNotification: { id: withId("inference-versions", modelId), action: "模型版本加载" },
     },
@@ -128,7 +107,7 @@ function InferenceVersionFields({
       },
     },
   });
-  const items = [...(versions.data?.versions ?? [])];
+  const items = [...(versions.data?.items ?? [])];
   if (chosenVersion && !items.some((item) => item.id === chosenVersion.id))
     items.push(chosenVersion);
   const initialVersion = initial.data?.version;
@@ -141,9 +120,7 @@ function InferenceVersionFields({
   const selected = items.find((item) => item.id === selectedId);
   useEffect(() => {
     if (selectedId || !versions.data) return;
-    const firstReady = versions.data.versions?.find(
-      (item) => item.status.toLowerCase() === "ready",
-    );
+    const firstReady = versions.data.items?.find((item) => item.status.toLowerCase() === "ready");
     if (firstReady) setSelectedId(firstReady.id);
   }, [selectedId, versions.data]);
   useEffect(() => {
@@ -156,33 +133,7 @@ function InferenceVersionFields({
     <Form.Item
       field="model_version_id"
       label="模型版本"
-      rules={[{ required: true, message: "请选择已就绪的模型版本" }]}
-      extra={
-        (previous.length > 0 || versions.data?.meta?.next_cursor) && (
-          <Space>
-            <Button
-              size="mini"
-              disabled={versions.isFetching || !previous.length}
-              onClick={() => {
-                setCursor(previous[previous.length - 1]);
-                setPrevious((current) => current.slice(0, -1));
-              }}
-            >
-              上一页版本
-            </Button>
-            <Button
-              size="mini"
-              disabled={versions.isFetching || !versions.data?.meta?.next_cursor}
-              onClick={() => {
-                setPrevious((current) => [...current, cursor]);
-                setCursor(versions.data!.meta!.next_cursor);
-              }}
-            >
-              下一页版本
-            </Button>
-          </Space>
-        )
-      }
+      rules={[{ type: "string", required: true, message: "请选择已就绪的模型版本" }]}
     >
       <Select
         value={selectedId || undefined}

@@ -2,7 +2,7 @@ import { useModelActions } from "@/hooks/useModelActions";
 
 import { Select, Space, Tag } from "@arco-design/web-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { listModels } from "@/api/models";
 import type { ListPagination } from "@/components/common/DataTable";
 
@@ -44,19 +44,13 @@ export default function ModelsPage() {
     capability: capability === "all" ? undefined : capability,
     status: getApiStatus(status),
   };
-  const scope = JSON.stringify(filters);
-  const [paging, setPaging] = useState({
-    scope,
-    page: 1,
-    pageSize: 10,
-    cursors: [undefined] as (string | undefined)[],
-  });
-  // A filter change starts a new cursor chain before the next query runs.
-  const current =
-    paging.scope === scope ? paging : { ...paging, scope, page: 1, cursors: [undefined] };
-  if (paging.scope !== scope) setPaging(current);
-  const { page, pageSize, cursors } = current;
-  const params = { ...filters, limit: pageSize, cursor: cursors[page - 1] };
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  useEffect(
+    () => setPage(1),
+    [filters.capability, filters.keyword, filters.source, filters.status],
+  );
+  const params = { ...filters, page, pageSize };
   const models = useQuery({
     queryKey: ["governance-models", params],
     queryFn: ({ signal }) => listModels(params, signal),
@@ -68,32 +62,27 @@ export default function ModelsPage() {
       },
     },
   });
-  const items = models.data?.models ?? [];
+  const items = models.data?.items ?? [];
+  const total = Number(models.data?.total ?? 0);
+  // FIXME(api-contract): 用户确认保留原推理分支页码分页，尚未与当前后端索引对齐。
+  // TODO(api-contract): 对应后端版本就绪后联调列表、筛选及 total，不回退旧分页。
   const pagination: ListPagination = {
-    // TODO(pagination-migration): 后端改为 page/pageSize 后移除此临时游标配置。
-    mode: "legacy-cursor",
+    mode: "total",
     page,
     pageSize,
     disabled: models.isFetching,
-    hasNextPage: Boolean(models.data?.meta?.next_cursor),
-    onPageChange: (next) => {
-      const nextCursor = models.data?.meta?.next_cursor;
-      if (next === page + 1 && nextCursor) {
-        setPaging({ ...current, page: next, cursors: [...cursors.slice(0, page), nextCursor] });
-      } else if (next >= 1 && next < page) {
-        setPaging({ ...current, page: next });
-      }
-    },
+    total,
+    onPageChange: setPage,
     onPageSizeChange: (size) => {
-      setPaging({ ...current, page: 1, pageSize: size, cursors: [undefined] });
+      setPageSize(size);
+      setPage(1);
     },
   };
   const refresh = () => {
-    qc.invalidateQueries({ queryKey: ["governance-models"], refetchType: "none" });
-    setPaging({ ...current, page: 1, cursors: [undefined] });
-    if (page === 1) models.refetch();
+    qc.invalidateQueries({ queryKey: ["governance-models"] });
+    setPage(1);
   };
-  const { actions, dialogNode } = useModelActions();
+  const { actions, dialogNode } = useModelActions(() => setPage(1));
 
   const columns: Array<ListColumn<Model>> = [
     {

@@ -4,12 +4,11 @@ import { useCallback, useRef, useState } from "react";
 import {
   createInferenceService,
   type CreateInferenceInput,
-  type InferenceAcceptance,
   type InferenceGpuSelection,
 } from "@/api/inference";
 import { getModelVersion, type ModelVersion } from "@/api/models";
-import { validateForm } from "@/lib/form";
 import { showMessage } from "@/lib/feedback";
+import { validateForm } from "@/lib/form";
 import InferenceModelFields from "./InferenceModelFields";
 import InferenceGpuFields from "./InferenceGpuFields";
 
@@ -21,13 +20,11 @@ type CreateValues = CreateInferenceInput & {
 
 export default function CreateInferenceModal({
   onCancel,
-  onCreated,
   initialServiceName,
   initialModelId,
   initialModelVersionId,
 }: {
   onCancel: () => void;
-  onCreated?: (result: InferenceAcceptance) => void;
   initialServiceName?: string;
   initialModelId?: string;
   initialModelVersionId?: string;
@@ -69,9 +66,9 @@ export default function CreateInferenceModal({
         errorFallback: "部署失败",
       },
     },
-    onSuccess: async (result) => {
+    onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["governance-inference-services"] });
-      onCreated?.(result);
+      // TODO(inference-task): 后续统一接入部署任务跟踪；当前仅刷新列表并关闭表单。
       onCancel();
     },
   });
@@ -112,7 +109,7 @@ export default function CreateInferenceModal({
       submitting.current = false;
     }
   };
-  const required = (message: string) => [{ required: true, match: /\S/, message }];
+  const required = (message: string) => [{ type: "string", required: true, match: /\S/, message }];
   return (
     <Modal
       visible
@@ -179,7 +176,11 @@ export default function CreateInferenceModal({
             <Input placeholder="例如 32Gi" />
           </Form.Item>
         </div>
-        <Form.Item field="runtime_mode" label="运行模式" rules={[{ required: true }]}>
+        <Form.Item
+          field="runtime_mode"
+          label="运行模式"
+          rules={[{ type: "string", required: true }]}
+        >
           <Select
             options={[
               { value: "RUNTIME_MODE_DEPLOYMENT", label: "Deployment" },
@@ -191,7 +192,7 @@ export default function CreateInferenceModal({
         <Form.Item
           field="replicas"
           label={distributed ? "副本组数" : "副本数"}
-          rules={[{ required: true, type: "integer", min: 1, message: "请输入大于 0 的整数" }]}
+          rules={[{ required: true, type: "number", min: 1, message: "请输入大于 0 的整数" }]}
         >
           <InputNumber
             min={1}
@@ -204,7 +205,7 @@ export default function CreateInferenceModal({
           <Form.Item
             field="worker_replicas"
             label="每组 Worker 数"
-            rules={[{ required: true, type: "integer", min: 1, message: "请输入大于 0 的整数" }]}
+            rules={[{ required: true, type: "number", min: 1, message: "请输入大于 0 的整数" }]}
           >
             <InputNumber
               min={1}

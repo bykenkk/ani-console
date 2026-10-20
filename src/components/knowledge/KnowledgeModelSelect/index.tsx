@@ -1,10 +1,11 @@
-// FIXME(governance-migration): 建库的 embedding/text-generation 候选仍来自旧 Services 的 capability + running 筛选。
-// TODO(governance-migration): governance 提供等价可调用候选并确认推理网关兼容后迁移；提交值继续使用 served_model_name。
+import { withFirst100 } from "@/api/pagination";
 import { Select, Space, Typography } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
-import { listInferenceServices, type InferenceServiceListParams } from "@/api/inference/legacy";
+import { listInferenceServices, type InferenceListParams } from "@/api/inference";
 import { withId } from "@/lib/id";
+
+const listInferenceOptions = withFirst100(listInferenceServices);
 
 export default function KnowledgeModelSelect({
   capability,
@@ -12,14 +13,16 @@ export default function KnowledgeModelSelect({
   onChange,
   required = false,
 }: {
-  capability: NonNullable<InferenceServiceListParams["capability"]>;
+  capability: NonNullable<InferenceListParams["capability"]>;
   value?: string;
   onChange?: (value: string | undefined) => void;
   required?: boolean;
 }) {
+  // FIXME(inference-contract): 目标推理路由待确认，用户同意保留原分支调用。
+  // TODO(inference-contract): 路由恢复后验证 capability/status 筛选及可调用模型选项。
   const models = useQuery({
-    queryKey: ["inference-services", "model-options", capability, "running"],
-    queryFn: () => listInferenceServices({ capability, status: "running" }),
+    queryKey: ["governance-inference-services", "options", capability, "running"],
+    queryFn: ({ signal }) => listInferenceOptions({ capability, status: "running" }, signal),
     meta: {
       errorNotification: {
         id: withId("inference-models", capability),

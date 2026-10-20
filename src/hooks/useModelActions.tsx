@@ -1,20 +1,44 @@
-// FIXME(governance-migration): 收藏、删除未有对应公开模型契约；新增版本的文件上传链路未确认，相关入口保持禁用。
-// TODO(governance-migration): 分别核对收藏/删除契约及版本元数据创建与文件上传流程，部署可用后恢复操作。
+// FIXME(governance-migration): 收藏和新增版本的公开契约仍未接入，相关入口保持禁用。
+import { Modal } from "@arco-design/web-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import CreateInferenceModal from "@/components/ai-inference/CreateInferenceModal";
-import InferenceOperationModal from "@/components/ai-inference/InferenceOperationModal";
-import type { InferenceAcceptance } from "@/api/inference";
-import type { Model } from "@/api/models";
+import { deleteModel, type Model } from "@/api/models";
 import type { RowAction } from "@/components/common";
 
-export function useModelActions() {
+export function useModelActions(onDeleted?: () => void) {
+  const qc = useQueryClient();
   const [deployModel, setDeployModel] = useState<Model | null>(null);
-  const [acceptance, setAcceptance] = useState<InferenceAcceptance>();
+  // FIXME(model-contract): 用户确认保留原分支删除契约及反馈，目标版本的删除完成语义待核对。
+  // TODO(model-contract): 确认同步/异步语义后复核反馈和删除后列表、详情刷新。
+  const remove = useMutation({
+    mutationFn: (item: Model) => deleteModel(item.id),
+    meta: {
+      feedback: {
+        channel: "notification",
+        id: "model-delete",
+        action: "删除模型",
+        successText: "模型已删除",
+        errorFallback: "删除模型失败",
+      },
+    },
+    onSuccess: async (_, item) => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["governance-models"] }),
+        qc.invalidateQueries({
+          queryKey: ["governance-model", item.id],
+          refetchType: "none",
+        }),
+      ]);
+      onDeleted?.();
+    },
+  });
   const actions: RowAction<Model>[] = [
     {
       key: "deploy",
       label: "部署",
-      disabled: (item) => item.status !== "ready" || !item.versions?.length,
+      disabled: (item) =>
+        !item.versions?.some((version) => version.status.toLowerCase() === "ready"),
       onClick: setDeployModel,
     },
     {
@@ -35,9 +59,15 @@ export function useModelActions() {
       key: "delete",
       label: "删除",
       intent: "danger",
-      disabled: () => true,
-      tooltip: "模型删除暂未开放",
-      onClick: () => undefined,
+      loading: (item) => remove.isPending && remove.variables?.id === item.id,
+      onClick: (item) => {
+        Modal.confirm({
+          title: "删除模型",
+          content: `确定删除「${item.name}」？删除后模型及其版本将不再出现在列表中。`,
+          okButtonProps: { status: "danger" },
+          onOk: () => remove.mutateAsync(item),
+        });
+      },
     },
   ];
   const dialogNode = (
@@ -46,14 +76,7 @@ export function useModelActions() {
         <CreateInferenceModal
           initialServiceName={("infer-" + deployModel.name).slice(0, 63)}
           initialModelId={deployModel.id}
-          onCreated={setAcceptance}
           onCancel={() => setDeployModel(null)}
-        />
-      )}
-      {acceptance && (
-        <InferenceOperationModal
-          acceptance={acceptance}
-          onCancel={() => setAcceptance(undefined)}
         />
       )}
     </>

@@ -51,7 +51,7 @@ export default function ModelDetailPage({
     queryKey: ["governance-model", modelId],
     queryFn: ({ signal }) => getModel(modelId, signal),
   });
-  const { actions, dialogNode } = useModelActions();
+  const { actions, dialogNode } = useModelActions(goBack);
 
   if (!model.data) {
     return <DetailPagePlaceholder loading={model.isLoading} />;

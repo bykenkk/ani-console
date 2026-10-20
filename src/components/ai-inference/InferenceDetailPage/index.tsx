@@ -1,3 +1,5 @@
+// FIXME(inference-contract): 当前后端索引已移除详情路由；用户确认保留原推理分支详情及关联入口。
+// TODO(inference-contract): 对应后端版本确认后联调详情、删除返回与关联资源。
 // FIXME(governance-migration): governance 尚未提供此页所需的策略、调用地址/测试、监控、日志及事件契约，相关区域保留空态。
 // TODO(governance-migration): 逐项接入新资源对应的公开能力；不得复用 legacy 日志/策略组件查询 governance 服务 ID。
 import { Empty } from "@arco-design/web-react";
@@ -30,10 +32,9 @@ export default function InferenceDetailPage({
   onTabChange: (tab: string) => void;
 }) {
   const goBack = useBackOrFallback("inference-service");
-  const { actions, dialogNode, deletionSubmitted } = useInferenceActions(goBack);
+  const { actions } = useInferenceActions(goBack);
   const service = useQuery({
     queryKey: ["governance-inference-service", serviceId],
-    enabled: !deletionSubmitted,
     queryFn: ({ signal }) => getInferenceService(serviceId, signal),
     meta: {
       errorNotification: { id: withId("inference-service", serviceId), action: "推理服务详情加载" },
@@ -124,7 +125,6 @@ export default function InferenceDetailPage({
         onTabChange={onTabChange}
         onBack={goBack}
       />
-      {dialogNode}
     </>
   );
 }

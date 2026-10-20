@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  listInferenceServices,
-  type InferenceService,
-  type InferenceAcceptance,
-} from "@/api/inference";
+import { listInferenceServices, type InferenceService } from "@/api/inference";
 import { useInferenceActions } from "@/hooks/useInferenceActions";
 import type { ListPagination } from "@/components/common/DataTable";
 import {
@@ -16,50 +12,45 @@ import {
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import CreateInferenceModal from "../CreateInferenceModal";
-import InferenceOperationModal from "../InferenceOperationModal";
 
 export default function InferencePage() {
-  const { actions, dialogNode } = useInferenceActions();
+  const { actions } = useInferenceActions(() => setPage(1));
   const [creating, setCreating] = useState(false);
-  const [acceptance, setAcceptance] = useState<InferenceAcceptance>();
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [tokens, setTokens] = useState<(string | undefined)[]>([undefined]);
   const query = useQuery({
-    queryKey: [
-      "governance-inference-services",
-      { page_size: pageSize, page_token: tokens[page - 1] },
-    ],
-    queryFn: ({ signal }) =>
-      listInferenceServices({ page_size: pageSize, page_token: tokens[page - 1] }, signal),
-    meta: { errorNotification: { id: "inference-services", action: "推理服务列表加载" } },
+    queryKey: ["governance-inference-services", { page, pageSize }],
+    queryFn: ({ signal }) => listInferenceServices({ page, pageSize }, signal),
+    meta: {
+      errorNotification: {
+        id: "inference-services",
+        action: "推理服务列表加载",
+      },
+    },
   });
-  const items = query.data?.services ?? [];
+  const items = query.data?.items ?? [];
+  const total = Number(query.data?.total ?? 0);
+  // FIXME(api-contract): 用户确认保留原推理分支页码分页，尚未与当前后端索引对齐。
+  // TODO(api-contract): 对应后端版本就绪后联调列表、筛选及 total，不回退旧分页。
   const pagination: ListPagination = {
-    // FIXME(pagination-migration): governance 已下线推理管理路由，当前调用等待后端重新发布契约。
-    // TODO(pagination-migration): 后端恢复并支持 page/pageSize 后移除此临时 token 分页配置。
-    mode: "legacy-cursor",
+    mode: "total",
     page,
     pageSize,
     disabled: query.isFetching,
-    hasNextPage: Boolean(query.data?.next_page_token),
-    onPageChange: (next) => {
-      if (next === page + 1 && query.data?.next_page_token) {
-        setTokens((current) => [...current.slice(0, page), query.data!.next_page_token]);
-        setPage(next);
-      } else if (next >= 1 && next < page) setPage(next);
-    },
+    total,
+    onPageChange: setPage,
     onPageSizeChange: (size) => {
       setPageSize(size);
       setPage(1);
-      setTokens([undefined]);
     },
   };
   const refresh = () => {
-    qc.invalidateQueries({ queryKey: ["governance-inference-services"], refetchType: "none" });
+    qc.invalidateQueries({
+      queryKey: ["governance-inference-services"],
+      refetchType: "none",
+    });
     setPage(1);
-    setTokens([undefined]);
     if (page === 1) query.refetch();
   };
   const columns: ListColumn<InferenceService>[] = [
@@ -69,8 +60,14 @@ export default function InferencePage() {
         <ResourceNameId name={item.name} id={item.id} type="inference-service" />
       ),
     },
-    { title: "运行阶段", render: (_, item) => <StatusBadge status={item.phase} /> },
-    { title: "调用健康", render: (_, item) => <StatusBadge status={item.health} /> },
+    {
+      title: "运行阶段",
+      render: (_, item) => <StatusBadge status={item.phase} />,
+    },
+    {
+      title: "调用健康",
+      render: (_, item) => <StatusBadge status={item.health} />,
+    },
     { title: "服务模型名", dataIndex: "served_model_name", ellipsis: true },
     { title: "模型版本", dataIndex: "model_version_id", ellipsis: true },
     { title: "启动命令", dataIndex: "command", ellipsis: true },
@@ -81,7 +78,11 @@ export default function InferencePage() {
         item.gpu ? `${item.gpu.profile_id} · v${item.gpu.profile_version}` : "CPU",
       ellipsis: true,
     },
-    { title: "观测时间", render: (_, item) => formatDateTime(item.observed_at), width: 170 },
+    {
+      title: "观测时间",
+      render: (_, item) => formatDateTime(item.observed_at),
+      width: 170,
+    },
   ];
   return (
     <>
@@ -111,16 +112,7 @@ export default function InferencePage() {
           tableLabel="推理服务列表"
         />
       </ListPageFrame>
-      {creating && (
-        <CreateInferenceModal onCancel={() => setCreating(false)} onCreated={setAcceptance} />
-      )}
-      {acceptance && (
-        <InferenceOperationModal
-          acceptance={acceptance}
-          onCancel={() => setAcceptance(undefined)}
-        />
-      )}
-      {dialogNode}
+      {creating && <CreateInferenceModal onCancel={() => setCreating(false)} />}
     </>
   );
 }

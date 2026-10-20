@@ -1,16 +1,24 @@
-// FIXME(governance-migration): 目前只提交远端仓库导入并刷新列表，未接入导入任务进度/重试及本地文件上传。
-// TODO(governance-migration): 接入 models/import-tasks 查询和重试；本地上传须先确认实际文件传输契约。
-import { importModel, type ImportModelInput } from "@/api/models";
-import { Form, Input, Modal, Select } from "@arco-design/web-react";
+import { importModelBundle, type ModelCapability, type ModelFormat } from "@/api/models";
+import { Form, Input, Modal, Select, Space } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { validateForm } from "@/lib/form";
+import ImportModelSourceFields, { type ImportModelSourceValues } from "./ImportModelSourceFields";
+
+type EngineType = "vllm" | "sglang";
+
+type ImportFormValues = ImportModelSourceValues & {
+  format: ModelFormat;
+  capabilities: ModelCapability[];
+  engine_type: EngineType;
+  engine_image: string;
+  startup_command: string;
+};
 
 export default function ImportModelModal({ onCancel }: { onCancel: () => void }) {
   const qc = useQueryClient();
-  const [form] = Form.useForm<ImportModelInput>();
+  const [form] = Form.useForm<ImportFormValues>();
   const submitting = useRef(false);
-
   const submit = useMutation({
     meta: {
       feedback: {
@@ -20,22 +28,40 @@ export default function ImportModelModal({ onCancel }: { onCancel: () => void })
         errorFallback: "提交模型导入任务失败",
       },
     },
-    mutationFn: (input: ImportModelInput) => importModel(input),
+    mutationFn: (values: ImportFormValues) =>
+      importModelBundle({
+        model: {
+          name: values.model_name.trim(),
+          display_name: values.display_name?.trim() || undefined,
+          description: values.description?.trim() || undefined,
+          capabilities: values.capabilities,
+          external_model_id: values.repo_id,
+        },
+        version: {
+          version: values.revision,
+          format: values.format,
+          engine_type: values.engine_type,
+          engine_image: values.engine_image,
+          startup_command: values.startup_command,
+        },
+        source: {
+          provider: values.source,
+          repo_id: values.repo_id,
+          revision: values.revision,
+        },
+      }),
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["governance-models"] });
       onCancel();
     },
   });
+
   const onSubmit = async () => {
     if (submitting.current) return;
     submitting.current = true;
     try {
-      const values = await validateForm<ImportModelInput>(form);
-      await submit.mutateAsync({
-        source: values.source,
-        repo_id: values.repo_id.trim(),
-        revision: values.revision?.trim() || "main",
-      });
+      const values = await validateForm<ImportFormValues>(form);
+      await submit.mutateAsync(values);
     } finally {
       submitting.current = false;
     }
@@ -47,6 +73,9 @@ export default function ImportModelModal({ onCancel }: { onCancel: () => void })
       title="导入模型"
       okText="开始导入"
       confirmLoading={submit.isPending}
+      closable={!submit.isPending}
+      escToExit={!submit.isPending}
+      cancelButtonProps={{ disabled: submit.isPending }}
       onCancel={onCancel}
       onOk={onSubmit}
       unmountOnExit
@@ -54,34 +83,77 @@ export default function ImportModelModal({ onCancel }: { onCancel: () => void })
       <Form
         form={form}
         layout="vertical"
-        initialValues={{ source: "huggingface", revision: "main" }}
+        disabled={submit.isPending}
+        initialValues={{
+          source: "huggingface",
+          revision: "main",
+          format: "safetensors",
+          capabilities: ["text-generation"],
+          engine_type: "vllm",
+        }}
       >
-        <Form.Item field="source" label="来源" rules={[{ required: true, message: "请选择来源" }]}>
+        <ImportModelSourceFields form={form} />
+        <Space className="w-full" align="start">
+          <Form.Item field="revision" label="版本 / Revision" rules={[{ required: true }]}>
+            <Input maxLength={128} />
+          </Form.Item>
+          <Form.Item
+            field="format"
+            label="模型格式"
+            rules={[{ required: true, message: "请选择模型格式" }]}
+          >
+            <Select
+              options={[
+                { value: "safetensors", label: "Safetensors" },
+                { value: "gguf", label: "GGUF" },
+                { value: "pytorch", label: "PyTorch" },
+              ]}
+            />
+          </Form.Item>
+        </Space>
+        <Form.Item
+          field="capabilities"
+          label="模型能力"
+          rules={[{ required: true, message: "请选择至少一个模型能力" }]}
+        >
           <Select
+            mode="multiple"
             options={[
-              { value: "huggingface", label: "HuggingFace" },
-              { value: "modelscope", label: "ModelScope" },
+              { value: "text-generation", label: "文本生成" },
+              { value: "embedding", label: "文本向量化" },
+              { value: "speech-to-text", label: "语音识别" },
             ]}
           />
         </Form.Item>
         <Form.Item
-          field="repo_id"
-          label="仓库 ID"
-          rules={[
-            { required: true, message: "请输入模型仓库 ID" },
-            {
-              validator: (value, callback) => {
-                if (typeof value !== "string" || value.trim().length < 3)
-                  callback("请输入有效的模型仓库 ID");
-                else callback();
-              },
-            },
-          ]}
+          field="engine_type"
+          label="引擎类型"
+          rules={[{ required: true, message: "请选择引擎类型" }]}
         >
-          <Input placeholder="例如 Qwen/Qwen2.5-7B-Instruct" maxLength={256} showWordLimit />
+          <Select
+            options={[
+              { value: "vllm", label: "vLLM" },
+              { value: "sglang", label: "SGLang" },
+            ]}
+          />
         </Form.Item>
-        <Form.Item field="revision" label="版本 / Revision">
-          <Input placeholder="main" maxLength={128} />
+        <Form.Item
+          field="engine_image"
+          label="引擎镜像"
+          rules={[{ required: true, message: "请输入引擎镜像" }]}
+        >
+          <Input placeholder="例如 registry.example.com/vllm:tag" />
+        </Form.Item>
+        <Form.Item
+          field="startup_command"
+          label="完整启动命令"
+          rules={[{ required: true, message: "请输入完整启动命令" }]}
+          extra="完整命令由调用方提供，平台不会拼接参数"
+        >
+          <Input.TextArea
+            placeholder="例如 vllm serve /models --served-model-name qwen"
+            autoSize={{ minRows: 2, maxRows: 5 }}
+          />
         </Form.Item>
       </Form>
     </Modal>

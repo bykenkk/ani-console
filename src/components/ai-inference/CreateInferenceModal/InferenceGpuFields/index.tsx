@@ -30,6 +30,8 @@ export default function InferenceGpuFields({
   const [pageToken, setPageToken] = useState<string>();
   const [previousTokens, setPreviousTokens] = useState<(string | undefined)[]>([]);
   const [selected, setSelected] = useState<AcceleratorProfile>();
+  // FIXME(pagination-migration): 原有 GPU 规格选项仍为 page_token 契约，保留调用等待后端分页改造。
+  // TODO(pagination-migration): 后端提供 page/pageSize 后改用 withFirst100，移除选项翻页。
   const profiles = useQuery({
     queryKey: ["accelerator-profiles", lookupClusterId, pageToken],
     enabled: enabled && Boolean(lookupClusterId) && lookupClusterId === clusterId.trim(),
@@ -78,7 +80,7 @@ export default function InferenceGpuFields({
           <Form.Item
             field="gpu_cluster_id"
             label="GPU 集群 ID"
-            rules={[{ required: true, match: /\S/, message: "请输入 GPU 集群 ID" }]}
+            rules={[{ type: "string", required: true, match: /\S/, message: "请输入 GPU 集群 ID" }]}
           >
             <Input
               placeholder="请输入 Accelerator 集群 ID"
@@ -96,7 +98,9 @@ export default function InferenceGpuFields({
           <Form.Item
             field="gpu_pool_id"
             label="GPU 资源池 ID"
-            rules={[{ required: true, match: /\S/, message: "请输入 GPU 资源池 ID" }]}
+            rules={[
+              { type: "string", required: true, match: /\S/, message: "请输入 GPU 资源池 ID" },
+            ]}
           >
             <Input placeholder="请输入该集群内的资源池 ID" onChange={setPoolId} />
           </Form.Item>

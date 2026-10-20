@@ -2,18 +2,11 @@ import { Modal } from "@arco-design/web-react";
 // FIXME(governance-migration): governance 当前未开放旧启停、重启及调整副本接口，不能将新资源 ID 交给 legacy 写接口。
 // TODO(governance-migration): 新后端提供对应命令与操作状态契约后恢复这些入口，沿用异步受理与完成分离的反馈。
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import {
-  deleteInferenceService,
-  type InferenceService,
-  type InferenceAcceptance,
-} from "@/api/inference";
+import { deleteInferenceService, type InferenceService } from "@/api/inference";
 import type { RowAction } from "@/components/common";
-import InferenceOperationModal from "@/components/ai-inference/InferenceOperationModal";
 
 export function useInferenceActions(onDeleted?: () => void) {
   const qc = useQueryClient();
-  const [acceptance, setAcceptance] = useState<InferenceAcceptance>();
   const remove = useMutation({
     mutationFn: (item: InferenceService) =>
       deleteInferenceService(item.id, item.gpu ? {} : { expected_generation: item.generation }),
@@ -26,13 +19,14 @@ export function useInferenceActions(onDeleted?: () => void) {
         errorFallback: "删除失败",
       },
     },
-    onSuccess: async (result, item) => {
-      setAcceptance(result);
+    onSuccess: async (_, item) => {
+      // TODO(inference-task): 后续统一接入删除任务跟踪；当前受理后刷新列表并返回。
       await qc.invalidateQueries({
         queryKey: ["governance-inference-service", item.id],
         refetchType: "none",
       });
       await qc.invalidateQueries({ queryKey: ["governance-inference-services"] });
+      onDeleted?.();
     },
   });
   const actions: RowAction<InferenceService>[] = [
@@ -47,7 +41,7 @@ export function useInferenceActions(onDeleted?: () => void) {
       key: "delete",
       label: "删除",
       intent: "danger",
-      disabled: () => remove.isPending || Boolean(acceptance),
+      disabled: () => remove.isPending,
       onClick: (item) => {
         Modal.confirm({
           title: "删除推理服务",
@@ -58,15 +52,5 @@ export function useInferenceActions(onDeleted?: () => void) {
       },
     },
   ];
-  const dialogNode = acceptance ? (
-    <InferenceOperationModal
-      acceptance={acceptance}
-      deleting
-      onCancel={() => {
-        setAcceptance(undefined);
-        onDeleted?.();
-      }}
-    />
-  ) : null;
-  return { actions, dialogNode, deletionSubmitted: Boolean(acceptance) };
+  return { actions };
 }

@@ -1,6 +1,5 @@
-// FIXME(governance-migration): 问答模型候选仍从旧 Services 筛选 text-generation + running，与新推理管理列表的数据源不同。
-// TODO(governance-migration): 确认可调用候选与知识库生成路由兼容后迁移；同步问答和 SSE 均保留 served_model_name 语义。
-import { listInferenceServices } from "@/api/inference/legacy";
+import { withFirst100 } from "@/api/pagination";
+import { listInferenceServices } from "@/api/inference";
 import {
   deleteKnowledgeBaseSession,
   listKnowledgeBaseCitations,
@@ -18,6 +17,8 @@ import KnowledgeConversation from "./KnowledgeConversation";
 import KnowledgeSessionsSidebar from "./KnowledgeSessionsSidebar";
 import { toThreadMessage, type QueryMode } from "./knowledgeQueryAdapter";
 
+const listInferenceOptions = withFirst100(listInferenceServices);
+
 export default function KnowledgeChat({
   kbId,
   defaultTopK = 5,
@@ -34,6 +35,8 @@ export default function KnowledgeChat({
   const [topK, setTopK] = useState(defaultTopK);
   const [inferenceServiceName, setInferenceServiceName] = useState<string>();
   const [citationsVisible, setCitationsVisible] = useState(false);
+  // FIXME(inference-contract): 目标推理路由待确认，用户同意保留原分支调用。
+  // TODO(inference-contract): 路由恢复后验证生成模型筛选与默认模型回落。
   const inferenceModels = useQuery({
     meta: {
       errorNotification: {
@@ -42,8 +45,9 @@ export default function KnowledgeChat({
         fallback: "将使用知识库或平台默认模型",
       },
     },
-    queryKey: ["inference-services", "model-options", "text-generation", "running"],
-    queryFn: () => listInferenceServices({ capability: "text-generation", status: "running" }),
+    queryKey: ["governance-inference-services", "options", "text-generation", "running"],
+    queryFn: ({ signal }) =>
+      listInferenceOptions({ capability: "text-generation", status: "running" }, signal),
   });
   const inferenceModelOptions = useMemo(
     () =>
@@ -63,7 +67,12 @@ export default function KnowledgeChat({
     }
   }, [inferenceModelOptions, inferenceModels.data, inferenceServiceName]);
   const sessions = useQuery({
-    meta: { errorNotification: { id: withId("knowledge-sessions", kbId), action: "会话列表加载" } },
+    meta: {
+      errorNotification: {
+        id: withId("knowledge-sessions", kbId),
+        action: "会话列表加载",
+      },
+    },
     queryKey: ["knowledge-base-sessions", kbId],
     queryFn: async () => (await listKnowledgeBaseSessions(kbId)).items,
   });
@@ -81,7 +90,10 @@ export default function KnowledgeChat({
   });
   const citations = useQuery({
     meta: {
-      errorNotification: { id: withId("knowledge-citations", kbId), action: "引用记录加载" },
+      errorNotification: {
+        id: withId("knowledge-citations", kbId),
+        action: "引用记录加载",
+      },
     },
     queryKey: ["knowledge-base-citations", kbId],
     enabled: citationsVisible,

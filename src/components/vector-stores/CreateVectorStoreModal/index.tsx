@@ -1,6 +1,5 @@
-// FIXME(governance-migration): 向量化模型仍依赖旧 Services 的 embedding + running 筛选，不能用已入库模型列表直接替代。
-// TODO(governance-migration): governance 补齐可调用候选并验证向量化链路后迁移；embedding_model 仍提交 served_model_name。
-import { listInferenceServices } from "@/api/inference/legacy";
+import { withFirst100 } from "@/api/pagination";
+import { listInferenceServices } from "@/api/inference";
 import {
   createVectorStore,
   type VectorMetric,
@@ -10,6 +9,8 @@ import { withId } from "@/lib/id";
 import { Form, Input, InputNumber, Modal, Select, Typography } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+
+const listInferenceOptions = withFirst100(listInferenceServices);
 
 export default function CreateVectorStoreModal({
   onCancel,
@@ -23,6 +24,8 @@ export default function CreateVectorStoreModal({
   const [embeddingModel, setEmbeddingModel] = useState("");
   const [dimension, setDimension] = useState(1536);
   const [metric, setMetric] = useState<VectorMetric>("cosine");
+  // FIXME(inference-contract): 目标推理路由待确认，用户同意保留原分支调用。
+  // TODO(inference-contract): 路由恢复后验证 capability/status 筛选及可调用模型选项。
   const models = useQuery({
     meta: {
       errorNotification: {
@@ -31,8 +34,9 @@ export default function CreateVectorStoreModal({
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["inference-services", "model-options", "embedding", "running"],
-    queryFn: () => listInferenceServices({ capability: "embedding", status: "running" }),
+    queryKey: ["governance-inference-services", "options", "embedding", "running"],
+    queryFn: ({ signal }) =>
+      listInferenceOptions({ capability: "embedding", status: "running" }, signal),
   });
   const modelOptions = useMemo(
     () => (models.data?.items ?? []).map((item) => item.served_model_name),
@@ -44,7 +48,13 @@ export default function CreateVectorStoreModal({
   }, [embeddingModel, modelOptions]);
 
   const create = useMutation({
-    meta: { feedback: { channel: "message", action: "创建向量存储", errorFallback: "请求失败" } },
+    meta: {
+      feedback: {
+        channel: "message",
+        action: "创建向量存储",
+        errorFallback: "请求失败",
+      },
+    },
     mutationFn: async (_: undefined) => {
       const trimmedName = name.trim();
       if (!trimmedName) throw new Error("请输入向量存储名称");
