@@ -1,6 +1,9 @@
 import { coreRequest } from "@/api/request";
 import type {
   AcceleratorPageParams,
+  AcceleratorClusterListResponse,
+  AcceleratorPoolListParams,
+  AcceleratorPoolListResponse,
   AcceleratorProfileListParams,
   AcceleratorUsageListParams,
   AcceleratorProfileVersion,
@@ -89,3 +92,28 @@ export function listAcceleratorBindings(
   );
 }
 export type * from "./types";
+
+// FIXME(gpu-location-contract): 用户确认本次接入现有 ACC 管理列表；接口仍要求平台身份及相应权限，不代表租户端已开放。
+// TODO(gpu-location-contract): 联调当前登录身份；后端提供租户列表及 page/pageSize 后迁移，移除本次游标契约例外。
+export function listAcceleratorClusters(
+  params: AcceleratorPageParams = {},
+  signal?: AbortSignal,
+): Promise<AcceleratorClusterListResponse> {
+  return coreRequest<AcceleratorClusterListResponse>("/admin/accelerator/clusters", {
+    method: "GET",
+    params,
+    signal,
+  });
+}
+// FIXME(gpu-location-contract): 用户确认本次沿用 ACC 管理端池列表的权限与游标契约；不改用其他系统的资源池 ID。
+// TODO(gpu-location-contract): 联调集群筛选与当前登录身份，待租户端页码列表开放后迁移。
+export function listAcceleratorPools(
+  params: AcceleratorPoolListParams,
+  signal?: AbortSignal,
+): Promise<AcceleratorPoolListResponse> {
+  return coreRequest<AcceleratorPoolListResponse>("/admin/accelerator/pools", {
+    method: "GET",
+    params,
+    signal,
+  });
+}

@@ -104,3 +104,26 @@ export interface AcceleratorAdmissionPreview {
   storage?: string;
   reasons?: string[];
 }
+
+export interface AcceleratorCluster {
+  cluster_id: string;
+  display_name: string;
+  connection_ref: string;
+  version: string;
+}
+export interface AcceleratorClusterListResponse {
+  items: AcceleratorCluster[];
+  next_page_token?: string;
+}
+export interface AcceleratorPool {
+  pool_id: string;
+  cluster_id: string;
+  display_name: string;
+}
+export interface AcceleratorPoolListParams extends AcceleratorPageParams {
+  cluster_id: string;
+}
+export interface AcceleratorPoolListResponse {
+  items: AcceleratorPool[];
+  next_page_token?: string;
+}

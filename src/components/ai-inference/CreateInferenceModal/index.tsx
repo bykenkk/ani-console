@@ -1,49 +1,34 @@
-import { Form, Input, InputNumber, Modal, Select } from "@arco-design/web-react";
+import { Form, Grid, Input, InputNumber, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef, useState } from "react";
-import {
-  createInferenceService,
-  type CreateInferenceInput,
-  type InferenceGpuSelection,
-} from "@/api/inference";
+import { createInferenceService, type CreateInferenceInput } from "@/api/inference";
 import { getModelVersion, type ModelVersion } from "@/api/models";
 import { showMessage } from "@/lib/feedback";
 import { validateForm } from "@/lib/form";
-import InferenceModelFields from "./InferenceModelFields";
-import InferenceGpuFields from "./InferenceGpuFields";
+import { randomString } from "@/lib/random";
+import { EngineSelect, ModelSelect, ModelVersionSelect } from "@/components/ai-models";
 
-type CreateValues = CreateInferenceInput & {
-  gpu_cluster_id?: string;
-  gpu_pool_id?: string;
-  gpu_profile?: string;
-};
+import type { CreateInferenceFormValues, CreateInferenceModalProps } from "./types";
 
 export default function CreateInferenceModal({
   onCancel,
   initialServiceName,
   initialModelId,
   initialModelVersionId,
-}: {
-  onCancel: () => void;
-  initialServiceName?: string;
-  initialModelId?: string;
-  initialModelVersionId?: string;
-}) {
-  const [form] = Form.useForm<CreateValues>();
+}: CreateInferenceModalProps) {
+  const [form] = Form.useForm<CreateInferenceFormValues>();
   const qc = useQueryClient();
   const submitting = useRef(false);
-  const [gpu, setGpu] = useState<InferenceGpuSelection>();
-  const [gpuEnabled, setGpuEnabled] = useState(false);
-  const [replicas, setReplicas] = useState(1);
+  const [modelName, setModelName] = useState("");
   const [distributed, setDistributed] = useState(false);
-  const [workers, setWorkers] = useState(1);
+  const [modelId, setModelId] = useState(initialModelId ?? "");
   const [version, setVersion] = useState<ModelVersion>();
   const changeVersion = useCallback(
-    (selected?: ModelVersion, modelName?: string) => {
+    (id: string, selected?: ModelVersion, modelName?: string) => {
       setVersion(selected);
+      setModelName(modelName ?? "");
       form.setFieldsValue({
-        model_version_id: selected?.id,
-        served_model_name: modelName ?? "",
+        model_version_id: id,
         engine_image: selected?.engine_image ?? "",
         engine_type: selected?.engine_type ?? "",
         command: selected?.startup_command ?? "",
@@ -56,6 +41,8 @@ export default function CreateInferenceModal({
       const latest = await getModelVersion(input.model_version_id);
       if (latest.version.status.toLowerCase() !== "ready")
         throw new Error("模型版本尚未就绪，请重新选择");
+      // FIXME(inference-contract): 用户确认保留原分支提交契约；推理管理路由尚待后端恢复。
+      // TODO(inference-model-config): 目标版本就绪后联调模型参数预填、用户修改及切换版本；提交采用用户确认的表单值，不以最新模型配置覆盖。
       return createInferenceService(input);
     },
     meta: {
@@ -76,7 +63,7 @@ export default function CreateInferenceModal({
     if (submitting.current) return;
     submitting.current = true;
     try {
-      const values = await validateForm<CreateValues>(form);
+      const values = await validateForm<CreateInferenceFormValues>(form);
       if (
         !version ||
         values.model_version_id !== version.id ||
@@ -85,23 +72,19 @@ export default function CreateInferenceModal({
         showMessage({ type: "error", content: "请选择已就绪的模型版本" });
         return;
       }
-      if (gpuEnabled && !gpu) {
-        showMessage({ type: "error", content: "请完整选择 GPU 集群、资源池和已发布规格" });
-        return;
-      }
+
       await create.mutateAsync({
         name: values.name.trim(),
         model_version_id: version.id,
-        served_model_name: values.served_model_name.trim(),
+        served_model_name: `${modelName}-${randomString(7)}`,
         engine_image: values.engine_image.trim(),
         engine_type: values.engine_type.trim(),
         command: values.command,
-        cpu: values.cpu.trim(),
-        memory: values.memory.trim(),
+        cpu: String(values.cpu),
+        memory: `${values.memory}Gi`,
         replicas: values.replicas,
         runtime_mode: values.runtime_mode,
         ...(distributed ? { worker_replicas: values.worker_replicas } : {}),
-        ...(gpu ? { gpu } : {}),
       });
     } catch {
       // 字段校验由统一入口提示；请求错误由 mutation feedback 处理。
@@ -129,51 +112,83 @@ export default function CreateInferenceModal({
         disabled={create.isPending}
         initialValues={{
           name: initialServiceName ?? "",
+          model_id: initialModelId,
+          model_version_id: initialModelId ? initialModelVersionId : undefined,
           replicas: 1,
-          cpu: "8",
-          memory: "32Gi",
+          cpu: 8,
+          memory: 32,
           runtime_mode: "RUNTIME_MODE_DEPLOYMENT",
           worker_replicas: 1,
         }}
       >
-        <Form.Item field="name" label="服务名称" rules={required("请输入服务名称")}>
-          <Input maxLength={63} placeholder="例如 qwen-service" />
+        <Form.Item field="name" label="名称" rules={required("请输入名称")}>
+          <Input maxLength={63} placeholder="请输入名称" />
         </Form.Item>
-        <InferenceModelFields
-          initialModelId={initialModelId}
-          initialModelVersionId={initialModelVersionId}
-          onVersionChange={changeVersion}
-        />
-        <Form.Item
-          field="served_model_name"
-          label="服务模型名"
-          rules={required("请输入服务模型名")}
-        >
-          <Input placeholder="客户端请求中使用的模型名" />
-        </Form.Item>
-        <Form.Item field="engine_image" label="运行镜像" rules={required("请输入运行镜像地址")}>
-          <Input placeholder="registry.example/vllm:latest" />
-        </Form.Item>
-        <Form.Item field="engine_type" label="引擎类型" rules={required("请输入引擎类型")}>
-          <Input placeholder="例如 vllm" />
+        <Grid.Row gutter={16}>
+          <Grid.Col span={12}>
+            <Form.Item field="model_id" label="模型" rules={required("请选择模型")}>
+              <ModelSelect
+                onChange={(id) => {
+                  setModelId(id);
+                  changeVersion("");
+                }}
+              />
+            </Form.Item>
+          </Grid.Col>
+          <Grid.Col span={12}>
+            <Form.Item
+              field="model_version_id"
+              label="模型版本"
+              rules={required("请选择已就绪的模型版本")}
+            >
+              <ModelVersionSelect key={modelId} modelId={modelId} onChange={changeVersion} />
+            </Form.Item>
+          </Grid.Col>
+        </Grid.Row>
+        <Form.Item label="引擎镜像" required extra="确认引擎类型和镜像">
+          <Input.Group compact>
+            <Form.Item
+              field="engine_type"
+              noStyle={{ showErrorTip: true }}
+              rules={required("请选择引擎类型")}
+            >
+              <EngineSelect style={{ width: 140 }} />
+            </Form.Item>
+            <Form.Item
+              field="engine_image"
+              noStyle={{ showErrorTip: true }}
+              rules={required("请输入运行镜像地址")}
+            >
+              <Input
+                aria-label="运行镜像"
+                style={{ width: "calc(100% - 140px)" }}
+                placeholder="请输入运行镜像地址"
+              />
+            </Form.Item>
+          </Input.Group>
         </Form.Item>
         <Form.Item
           field="command"
-          label="启动命令"
+          label="完整启动命令"
           rules={required("请输入完整启动命令")}
-          extra="提交完整命令，建议以 exec 开头；镜像需包含 /bin/sh。模型版本仅提供默认值。"
+          extra="确认完整启动命令"
         >
-          <Input.TextArea
-            autoSize={{ minRows: 3, maxRows: 6 }}
-            placeholder="exec vllm serve /models --served-model-name ..."
-          />
+          <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} placeholder="请输入完整启动命令" />
         </Form.Item>
         <div className="grid grid-cols-2 gap-x-4">
-          <Form.Item field="cpu" label="CPU" rules={required("请输入正数 CPU 资源量")}>
-            <Input placeholder="例如 8 或 500m" />
+          <Form.Item
+            field="cpu"
+            label="CPU"
+            rules={[{ required: true, message: "请输入 CPU 核数" }]}
+          >
+            <InputNumber min={1} precision={0} step={1} suffix="核" placeholder="请输入 CPU 核数" />
           </Form.Item>
-          <Form.Item field="memory" label="内存" rules={required("请输入正数内存资源量")}>
-            <Input placeholder="例如 32Gi" />
+          <Form.Item
+            field="memory"
+            label="内存"
+            rules={[{ required: true, message: "请输入内存容量" }]}
+          >
+            <InputNumber min={1} precision={0} step={1} suffix="GiB" placeholder="请输入内存容量" />
           </Form.Item>
         </div>
         <Form.Item
@@ -194,12 +209,7 @@ export default function CreateInferenceModal({
           label={distributed ? "副本组数" : "副本数"}
           rules={[{ required: true, type: "number", min: 1, message: "请输入大于 0 的整数" }]}
         >
-          <InputNumber
-            min={1}
-            max={2147483647}
-            precision={0}
-            onChange={(value) => setReplicas(value ?? 1)}
-          />
+          <InputNumber min={1} max={2147483647} precision={0} />
         </Form.Item>
         {distributed && (
           <Form.Item
@@ -207,21 +217,9 @@ export default function CreateInferenceModal({
             label="每组 Worker 数"
             rules={[{ required: true, type: "number", min: 1, message: "请输入大于 0 的整数" }]}
           >
-            <InputNumber
-              min={1}
-              max={2147483647}
-              precision={0}
-              onChange={(value) => setWorkers(value ?? 1)}
-            />
+            <InputNumber min={1} max={2147483647} precision={0} />
           </Form.Item>
         )}
-        <InferenceGpuFields
-          replicas={replicas}
-          distributed={distributed}
-          workerReplicas={workers}
-          onChange={setGpu}
-          onEnabledChange={setGpuEnabled}
-        />
       </Form>
     </Modal>
   );
