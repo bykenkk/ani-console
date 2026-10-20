@@ -1,14 +1,37 @@
 import { Form, Grid, Input, InputNumber, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef, useState } from "react";
-import { createInferenceService, type CreateInferenceInput } from "@/api/inference";
+import {
+  createInferenceService,
+  type CreateInferenceInput,
+  type InferenceRuntimeMode,
+} from "@/api/inference";
 import { getModelVersion, type ModelVersion } from "@/api/models";
 import { showMessage } from "@/lib/feedback";
 import { validateForm } from "@/lib/form";
 import { randomString } from "@/lib/random";
 import { EngineSelect, ModelSelect, ModelVersionSelect } from "@/components/ai-models";
 
-import type { CreateInferenceFormValues, CreateInferenceModalProps } from "./types";
+interface CreateInferenceFormValues {
+  name: string;
+  model_id: string;
+  model_version_id: string;
+  engine_type: string;
+  engine_image: string;
+  command: string;
+  cpu: number;
+  memory: number;
+  runtime_mode: InferenceRuntimeMode;
+  replicas: number;
+  worker_replicas?: number;
+}
+
+interface CreateInferenceModalProps {
+  onCancel: () => void;
+  initialServiceName?: string;
+  initialModelId?: string;
+  initialModelVersionId?: string;
+}
 
 export default function CreateInferenceModal({
   onCancel,

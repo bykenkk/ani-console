@@ -5,19 +5,18 @@ import { validateForm } from "@/lib/form";
 import { DatePicker, Form, Input, Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+type CreateApiKeyModalProps = {
+  onCancel: () => void;
+  onCreated: (credentials: ApiKeyCredentials) => void;
+};
+
 interface CreateApiKeyFormValues {
   name: string;
   role_id: number;
   expires_on?: string;
 }
 
-export function CreateApiKeyModal({
-  onCancel,
-  onCreated,
-}: {
-  onCancel: () => void;
-  onCreated: (credentials: ApiKeyCredentials) => void;
-}) {
+export function CreateApiKeyModal({ onCancel, onCreated }: CreateApiKeyModalProps) {
   const [form] = Form.useForm<CreateApiKeyFormValues>();
   const queryClient = useQueryClient();
   const create = useMutation({

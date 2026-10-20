@@ -4,7 +4,9 @@ import { getModelVersion } from "@/api/models";
 import { DataTable, ResourceNameId } from "@/components/common";
 import { withId } from "@/lib/id";
 
-export default function InferenceRelatedResources({ service }: { service: InferenceService }) {
+type InferenceRelatedResourcesProps = { service: InferenceService };
+
+export default function InferenceRelatedResources({ service }: InferenceRelatedResourcesProps) {
   const version = useQuery({
     queryKey: ["governance-model-version", service.model_version_id],
     enabled: Boolean(service.model_version_id),

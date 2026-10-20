@@ -6,19 +6,25 @@ import { useMutation } from "@tanstack/react-query";
 
 import { validateForm } from "@/lib/form";
 
+type GpuContainerAttachFilesystemModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 type Instance = InstanceRecord;
-type Values = { filesystemId: string; mountPath: string; readOnly?: boolean };
+type GpuContainerAttachFilesystemFormValues = {
+  filesystemId: string;
+  mountPath: string;
+  readOnly?: boolean;
+};
 
 export default function GpuContainerAttachFilesystemModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
-  const [form] = Form.useForm<Values>();
+}: GpuContainerAttachFilesystemModalProps) {
+  const [form] = Form.useForm<GpuContainerAttachFilesystemFormValues>();
   const mutation = useMutation({
     meta: {
       feedback: {
@@ -28,7 +34,7 @@ export default function GpuContainerAttachFilesystemModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async (values: Values) => {
+    mutationFn: async (values: GpuContainerAttachFilesystemFormValues) => {
       const submitData = {
         action: "attach_filesystem" as const,
         filesystem_id: values.filesystemId.trim(),

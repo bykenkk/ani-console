@@ -11,15 +11,9 @@ import { listVolumes } from "@/api/storage/volumes";
 import { WizardSteps } from "@/components/common";
 import type { ContainerNetworkItem } from "@/components/instances/ContainerNetworkFields";
 import { hasDuplicateContainerMountPath } from "@/components/instances/ContainerStorageFields/storage";
-import type {
-  Filesystem,
-  FormValues,
-  GpuSchedulingQueue,
-  GpuSchedulingQueueListResponse,
-  GpuSpecOption,
-  Volume,
-} from "../types";
-import { INITIAL_VALUES, isGpuSpecSelectable } from "../types";
+
+import { INITIAL_VALUES } from "../constants";
+import { isGpuSpecSelectable } from "../utils";
 import GpuContainerConfirmStep from "./GpuContainerConfirmStep";
 import GpuContainerImageStep from "./GpuContainerImageStep";
 import GpuContainerNetworkStorageStep from "./GpuContainerNetworkStorageStep";
@@ -29,21 +23,143 @@ import { validateForm } from "@/lib/form";
 import { showMessage } from "@/lib/feedback";
 import { withId } from "@/lib/id";
 import { withFirst100 } from "@/api/pagination";
+import type { GpuInstanceComputeSpec } from "@/lib/instances";
+
+export type GpuContainerConfigurationFormValues = {
+  name: string;
+  image: string;
+  spec_id: string;
+  queue_name: string;
+  compute_spec: GpuInstanceComputeSpec;
+  replicas: string;
+  vpc_id: string;
+  subnet_id: string;
+  env_text: string;
+  volume_id: string;
+  volume_mount_path: string;
+  volume_read_only: boolean;
+  filesystem_id: string;
+  filesystem_mount_path: string;
+  filesystem_read_only: boolean;
+  auto_start: boolean;
+};
+
+export type RegistryImage = {
+  image: string;
+  name?: string | null;
+  purpose?: string;
+  project: string;
+  repository: string;
+  tag: string;
+  size_bytes?: number;
+};
+
+export type Filesystem = {
+  id: string;
+  name?: string;
+  size_gib?: number;
+  protocol?: string;
+};
+
+export type Volume = {
+  id: string;
+  name?: string | null;
+};
+
+type GpuSpecAvailability = {
+  spec_id: string;
+  status: "available" | "full" | "device_full" | "unavailable";
+  available_count: number;
+  has_matching_nodes: boolean;
+  has_idle_devices: boolean;
+  device_idle_count: number;
+  gpu_count?: number;
+};
+
+export type GpuSpecAvailabilityListResponse = {
+  items: GpuSpecAvailability[];
+  quota_remaining: number;
+};
+
+export type GpuSpecOption = {
+  spec_id: string;
+  display_name: string;
+  gpu_type?: string;
+  gpu_mode?: "wholecard" | "vgpu";
+  shares?: number;
+  source: "api" | "temporary";
+  availability?: GpuSpecAvailability;
+};
+
+type GpuSchedulingQueue = {
+  id: string;
+  name: string;
+  workload_class: "inference" | "training" | "batch";
+  is_platform_default: boolean;
+  status?: {
+    state?: "open" | "closed" | "unknown";
+  } | null;
+};
+
+type GpuSchedulingQueueListResponse = {
+  items: GpuSchedulingQueue[];
+  total: number;
+  next_cursor?: string | null;
+};
+
+export type ExtendedCreateRequest = {
+  name: string;
+  kind: "gpu_container";
+  instance_type: "gpu_container";
+  image: string;
+  image_ref: string;
+  cpu: string;
+  memory: string;
+  auto_start: boolean;
+  termination_protection: boolean;
+  gpu_container_config: {
+    network: {
+      vpc_id: string;
+      subnet_id: string;
+      security_group_ids: string[];
+    };
+    replicas: number;
+    gpu: {
+      spec_id: string;
+      queue_name: string;
+    };
+    env: Array<{ name: string; value: string }>;
+    volume_mounts: Array<{
+      volume_id: string;
+      mount_path: string;
+      read_only: boolean;
+    }>;
+    filesystem_mounts: Array<{
+      filesystem_id: string;
+      mount_path: string;
+      read_only: boolean;
+    }>;
+  };
+};
 
 const listVpcOptions = withFirst100(listNetworkVpcs);
 
 const STEP_TITLES = ["基本信息", "资源配置", "摘要信息"];
 
-type Props = {
+type GpuContainerCreateFormProps = {
   submitting: boolean;
   onCancel: () => void;
-  onSubmit: (values: FormValues, securityGroupId: string) => void;
+  onSubmit: (values: GpuContainerConfigurationFormValues, securityGroupId: string) => void;
 };
 
-export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit }: Props) {
-  const [form] = Form.useForm<FormValues>();
+export default function GpuContainerCreateForm({
+  submitting,
+  onCancel,
+  onSubmit,
+}: GpuContainerCreateFormProps) {
+  const [form] = Form.useForm<GpuContainerConfigurationFormValues>();
   const [step, setStep] = useState(0);
-  const [values, setValues] = useState<FormValues>(INITIAL_VALUES);
+  const [values, setValues] = useState<GpuContainerConfigurationFormValues>(INITIAL_VALUES);
   const vpcs = useQuery({
     meta: {
       errorNotification: {
@@ -178,7 +294,10 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
     setStep((current) => Math.min(current + 1, STEP_TITLES.length - 1));
   };
 
-  const setFieldValue = (field: keyof FormValues, value: string | boolean) => {
+  const setFieldValue = (
+    field: keyof GpuContainerConfigurationFormValues,
+    value: string | boolean,
+  ) => {
     form.setFieldValue(field, value);
     setValues((current) => ({ ...current, [field]: value }));
   };
@@ -235,7 +354,7 @@ export default function GpuContainerCreateForm({ submitting, onCancel, onSubmit 
       <div className="flex flex-col">
         <WizardSteps current={step + 1} items={STEP_TITLES} size="small" className={styles.steps} />
         <div className="pt-7">
-          <Form<FormValues>
+          <Form<GpuContainerConfigurationFormValues>
             form={form}
             layout="vertical"
             initialValues={INITIAL_VALUES}

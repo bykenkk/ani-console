@@ -1,15 +1,17 @@
 import type { KBSourceChunk } from "@/api/knowledge";
 import { Drawer, Tag, Typography } from "@arco-design/web-react";
 
+type KnowledgeSourcesDrawerProps = {
+  title: string;
+  sources: { source: KBSourceChunk; index: number }[];
+  onCancel: () => void;
+};
+
 export default function KnowledgeSourcesDrawer({
   title,
   sources,
   onCancel,
-}: {
-  title: string;
-  sources: { source: KBSourceChunk; index: number }[];
-  onCancel: () => void;
-}) {
+}: KnowledgeSourcesDrawerProps) {
   return (
     <Drawer
       visible

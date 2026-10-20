@@ -18,6 +18,18 @@ import {
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
+type SandboxCodeRunnerProps = {
+  instanceId: string;
+  running: boolean;
+  onChanged: () => void;
+};
+
+type OutputBlockProps = {
+  title: string;
+  value?: string | null;
+  error?: boolean;
+};
+
 type Language = "python" | "javascript";
 
 const SAMPLES: Record<Language, string> = {
@@ -29,11 +41,7 @@ export default function SandboxCodeRunner({
   instanceId,
   running,
   onChanged,
-}: {
-  instanceId: string;
-  running: boolean;
-  onChanged: () => void;
-}) {
+}: SandboxCodeRunnerProps) {
   const [language, setLanguage] = useState<Language>("python");
   const [code, setCode] = useState(SAMPLES.python);
   const [stdin, setStdin] = useState("");
@@ -195,15 +203,7 @@ export default function SandboxCodeRunner({
   );
 }
 
-function OutputBlock({
-  title,
-  value,
-  error = false,
-}: {
-  title: string;
-  value?: string | null;
-  error?: boolean;
-}) {
+function OutputBlock({ title, value, error = false }: OutputBlockProps) {
   return (
     <div>
       <div className="mb-2 text-sm font-medium">{title}</div>

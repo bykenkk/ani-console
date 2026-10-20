@@ -29,6 +29,12 @@ import LoadBalancerEvents from "./LoadBalancerEvents";
 import LoadBalancerListeners from "./LoadBalancerListeners";
 import LoadBalancerMonitoring from "./LoadBalancerMonitoring";
 
+type LoadBalancerDetailPageProps = {
+  loadBalancerId: string;
+  tab?: string;
+  onTabChange: (tab: string) => void;
+};
+
 type LoadBalancer = NetworkLoadBalancer;
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
@@ -37,11 +43,7 @@ export default function LoadBalancerDetailPage({
   loadBalancerId,
   tab,
   onTabChange,
-}: {
-  loadBalancerId: string;
-  tab?: string;
-  onTabChange: (tab: string) => void;
-}) {
+}: LoadBalancerDetailPageProps) {
   const goBack = useBackOrFallback("load-balancer");
   const detail = useQuery({
     meta: {

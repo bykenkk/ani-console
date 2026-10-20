@@ -19,6 +19,34 @@ import KnowledgeSources from "../KnowledgeSources";
 import { createKnowledgeBaseAdapter, type QueryMode } from "../knowledgeQueryAdapter";
 import styles from "./index.module.css";
 
+type KnowledgeConversationProps = {
+  kbId: string;
+  sessionId?: string;
+  initialMessages: readonly ThreadMessageLike[];
+  mode: QueryMode;
+  topK: number;
+  onModeChange: (value: QueryMode) => void;
+  onTopKChange: (value: number) => void;
+  inferenceServiceName?: string;
+  inferenceModelOptions: { label: string; value: string }[];
+  inferenceModelsLoading: boolean;
+  defaultInferenceService?: string;
+  onInferenceServiceChange: (value?: string) => void;
+  onComplete: (sessionId?: string) => void;
+};
+
+type KnowledgeThreadProps = {
+  mode: QueryMode;
+  topK: number;
+  onModeChange: (value: QueryMode) => void;
+  onTopKChange: (value: number) => void;
+  inferenceServiceName?: string;
+  inferenceModelOptions: { label: string; value: string }[];
+  inferenceModelsLoading: boolean;
+  defaultInferenceService?: string;
+  onInferenceServiceChange: (value?: string) => void;
+};
+
 export default function KnowledgeConversation({
   kbId,
   sessionId,
@@ -33,21 +61,7 @@ export default function KnowledgeConversation({
   defaultInferenceService,
   onInferenceServiceChange,
   onComplete,
-}: {
-  kbId: string;
-  sessionId?: string;
-  initialMessages: readonly ThreadMessageLike[];
-  mode: QueryMode;
-  topK: number;
-  onModeChange: (value: QueryMode) => void;
-  onTopKChange: (value: number) => void;
-  inferenceServiceName?: string;
-  inferenceModelOptions: { label: string; value: string }[];
-  inferenceModelsLoading: boolean;
-  defaultInferenceService?: string;
-  onInferenceServiceChange: (value?: string) => void;
-  onComplete: (sessionId?: string) => void;
-}) {
+}: KnowledgeConversationProps) {
   const sessionIdRef = useRef(sessionId);
   const adapter = useMemo(
     () =>
@@ -85,17 +99,7 @@ function KnowledgeThread({
   inferenceModelsLoading,
   defaultInferenceService,
   onInferenceServiceChange,
-}: {
-  mode: QueryMode;
-  topK: number;
-  onModeChange: (value: QueryMode) => void;
-  onTopKChange: (value: number) => void;
-  inferenceServiceName?: string;
-  inferenceModelOptions: { label: string; value: string }[];
-  inferenceModelsLoading: boolean;
-  defaultInferenceService?: string;
-  onInferenceServiceChange: (value?: string) => void;
-}) {
+}: KnowledgeThreadProps) {
   return (
     <ThreadPrimitive.Root className={styles.threadRoot}>
       <ThreadPrimitive.Viewport className={styles.viewport}>

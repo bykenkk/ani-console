@@ -2,10 +2,12 @@ import { IconRight } from "@arco-design/web-react/icon";
 import { Link } from "@tanstack/react-router";
 import clsx from "clsx";
 import { AliIcon } from "@/components/common";
-import type { HomeSummaryCard } from "../types";
+import type { HomeSummaryCard } from "..";
 import styles from "../index.module.css";
 
-export default function SummaryOverview({ items }: { items: HomeSummaryCard[] }) {
+type SummaryOverviewProps = { items: HomeSummaryCard[] };
+
+export default function SummaryOverview({ items }: SummaryOverviewProps) {
   return (
     <section className={clsx(styles.panel, styles.summaryPanel)} aria-label="资源总览">
       <div className={styles.summaryGrid}>

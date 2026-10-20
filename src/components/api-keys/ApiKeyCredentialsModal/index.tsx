@@ -3,13 +3,12 @@ import { copyToClipboard } from "@/lib/clipboard";
 import { Alert, Button, Modal, Space, Typography } from "@arco-design/web-react";
 import { IconCopy } from "@arco-design/web-react/icon";
 
-export function ApiKeyCredentialsModal({
-  credentials,
-  onCancel,
-}: {
+type ApiKeyCredentialsModalProps = {
   credentials: ApiKeyCredentials;
   onCancel: () => void;
-}) {
+};
+
+export function ApiKeyCredentialsModal({ credentials, onCancel }: ApiKeyCredentialsModalProps) {
   return (
     <Modal
       visible

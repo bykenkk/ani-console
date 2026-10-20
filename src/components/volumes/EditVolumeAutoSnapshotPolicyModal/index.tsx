@@ -1,22 +1,29 @@
 import {
   updateVolumeAutoSnapshotPolicy,
   type StorageVolumeAutoSnapshotPolicy,
-  type StorageVolumeAutoSnapshotPolicyUpdateInput,
 } from "@/api/storage/volumes";
 import { validateForm } from "@/lib/form";
 import { Form, Input, InputNumber, Modal, Switch } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+type EditVolumeAutoSnapshotPolicyModalProps = {
+  volumeId: string;
+  policy: StorageVolumeAutoSnapshotPolicy;
+  onCancel: () => void;
+};
+
+type EditVolumeAutoSnapshotPolicyFormValues = {
+  enabled: boolean;
+  retain_days: number;
+  schedule: string;
+};
+
 export default function EditVolumeAutoSnapshotPolicyModal({
   volumeId,
   policy,
   onCancel,
-}: {
-  volumeId: string;
-  policy: StorageVolumeAutoSnapshotPolicy;
-  onCancel: () => void;
-}) {
-  const [form] = Form.useForm<StorageVolumeAutoSnapshotPolicyUpdateInput>();
+}: EditVolumeAutoSnapshotPolicyModalProps) {
+  const [form] = Form.useForm<EditVolumeAutoSnapshotPolicyFormValues>();
   const queryClient = useQueryClient();
   const updatePolicy = useMutation({
     meta: {
@@ -27,8 +34,12 @@ export default function EditVolumeAutoSnapshotPolicyModal({
         errorFallback: "自动快照策略保存失败",
       },
     },
-    mutationFn: (values: StorageVolumeAutoSnapshotPolicyUpdateInput) =>
-      updateVolumeAutoSnapshotPolicy(volumeId, values),
+    mutationFn: (values: EditVolumeAutoSnapshotPolicyFormValues) =>
+      updateVolumeAutoSnapshotPolicy(volumeId, {
+        enabled: values.enabled,
+        retain_days: values.retain_days,
+        schedule: values.schedule,
+      }),
     onSuccess: () => {
       onCancel();
       queryClient.invalidateQueries({ queryKey: ["volume", volumeId] });
@@ -44,7 +55,7 @@ export default function EditVolumeAutoSnapshotPolicyModal({
       confirmLoading={updatePolicy.isPending}
       okText="确认保存"
       onOk={() =>
-        validateForm<StorageVolumeAutoSnapshotPolicyUpdateInput>(form).then((values) =>
+        validateForm<EditVolumeAutoSnapshotPolicyFormValues>(form).then((values) =>
           updatePolicy.mutateAsync(values),
         )
       }

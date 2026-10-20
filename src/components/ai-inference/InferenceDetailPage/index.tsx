@@ -22,15 +22,17 @@ import InferenceRelatedResources from "./InferenceRelatedResources";
 import InferenceEvents from "./InferenceEvents";
 import InferenceMonitoring from "./InferenceMonitoring";
 
+type InferenceDetailPageProps = {
+  serviceId: string;
+  tab?: string;
+  onTabChange: (tab: string) => void;
+};
+
 export default function InferenceDetailPage({
   serviceId,
   tab,
   onTabChange,
-}: {
-  serviceId: string;
-  tab?: string;
-  onTabChange: (tab: string) => void;
-}) {
+}: InferenceDetailPageProps) {
   const goBack = useBackOrFallback("inference-service");
   const { actions } = useInferenceActions(goBack);
   const service = useQuery({

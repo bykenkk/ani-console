@@ -3,12 +3,9 @@ import { Button, Form, Input, Modal, Space, Typography } from "@arco-design/web-
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { WizardSteps } from "@/components/common";
-import {
-  INITIAL_VALUES,
-  getTemplateComputeSpec,
-  type FormValues,
-  type SandboxTemplate,
-} from "../types";
+import type { SandboxCreateFormValues, SandboxTemplate } from "..";
+import { INITIAL_VALUES } from "../constants";
+import { getTemplateComputeSpec } from "../utils";
 import SandboxConfirmStep from "./SandboxConfirmStep";
 import SandboxResourceStep from "./SandboxResourceStep";
 import SandboxRuntimeStep from "./SandboxRuntimeStep";
@@ -17,16 +14,20 @@ import { validateForm } from "@/lib/form";
 
 const STEP_TITLES = ["基础配置", "资源配置", "摘要信息"];
 
-type Props = {
+type SandboxCreateFormProps = {
   submitting: boolean;
   onCancel: () => void;
-  onSubmit: (values: FormValues, template: SandboxTemplate) => void;
+  onSubmit: (values: SandboxCreateFormValues, template: SandboxTemplate) => void;
 };
 
-export default function SandboxCreateForm({ submitting, onCancel, onSubmit }: Props) {
-  const [form] = Form.useForm<FormValues>();
+export default function SandboxCreateForm({
+  submitting,
+  onCancel,
+  onSubmit,
+}: SandboxCreateFormProps) {
+  const [form] = Form.useForm<SandboxCreateFormValues>();
   const [step, setStep] = useState(0);
-  const [values, setValues] = useState<FormValues>(INITIAL_VALUES);
+  const [values, setValues] = useState<SandboxCreateFormValues>(INITIAL_VALUES);
   const templates = useQuery({
     meta: {
       errorNotification: {
@@ -116,7 +117,7 @@ export default function SandboxCreateForm({ submitting, onCancel, onSubmit }: Pr
           className="mx-auto w-full max-w-160 shrink-0"
         />
         <div className="pt-7">
-          <Form<FormValues>
+          <Form<SandboxCreateFormValues>
             form={form}
             layout="vertical"
             initialValues={INITIAL_VALUES}

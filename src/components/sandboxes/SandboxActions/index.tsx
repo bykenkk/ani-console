@@ -3,16 +3,14 @@ import { Button, Space } from "@arco-design/web-react";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { useSandboxActions } from "@/hooks/useSandboxActions";
 
-export default function SandboxActions({
-  instance,
-  onChanged,
-  onDeleted,
-}: {
+type SandboxActionsProps = {
   instance: InstanceRecord;
   onChanged: () => void;
   onDeleted?: () => void;
   display?: "row" | "detail";
-}) {
+};
+
+export default function SandboxActions({ instance, onChanged, onDeleted }: SandboxActionsProps) {
   const { actions, dialogNode } = useSandboxActions(onChanged, onDeleted);
   const primaryAction = actions.find((action) => action.key === "terminal");
   return (

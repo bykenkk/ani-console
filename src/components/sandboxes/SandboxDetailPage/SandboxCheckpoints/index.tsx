@@ -13,15 +13,17 @@ import { useState } from "react";
 import SandboxCheckpointCloneModal from "@/components/sandboxes/SandboxCheckpointCloneModal";
 import SandboxCheckpointCreateModal from "@/components/sandboxes/SandboxCheckpointCreateModal";
 
+type SandboxCheckpointsProps = {
+  instanceId: string;
+  sessionState: string;
+  onChanged: () => void;
+};
+
 export default function SandboxCheckpoints({
   instanceId,
   sessionState,
   onChanged,
-}: {
-  instanceId: string;
-  sessionState: string;
-  onChanged: () => void;
-}) {
+}: SandboxCheckpointsProps) {
   const {
     query: checkpoints,
     items: pageItems,

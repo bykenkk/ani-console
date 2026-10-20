@@ -22,15 +22,17 @@ import K8sKubeconfig from "./K8sKubeconfig";
 import K8sNodePools from "./K8sNodePools";
 import K8sWorkloads from "./K8sWorkloads";
 
+type K8sClusterDetailPageProps = {
+  clusterId: string;
+  tab?: string;
+  onTabChange: (tab: string) => void;
+};
+
 export default function K8sClusterDetailPage({
   clusterId,
   tab,
   onTabChange,
-}: {
-  clusterId: string;
-  tab?: string;
-  onTabChange: (tab: string) => void;
-}) {
+}: K8sClusterDetailPageProps) {
   const goBack = useBackOrFallback("k8s-cluster");
   const [nodeCount, setNodeCount] = useState(0);
   const handleNodeCountChange = useCallback((count: number) => setNodeCount(count), []);

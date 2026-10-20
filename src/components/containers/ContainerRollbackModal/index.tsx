@@ -7,18 +7,22 @@ import { useMutation } from "@tanstack/react-query";
 import { validateForm } from "@/lib/form";
 import { getImageDisplayName } from "@/lib/render";
 
+type ContainerRollbackFormValues = { revision: string };
+
+type ContainerRollbackModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 type Instance = InstanceRecord;
 
 export default function ContainerRollbackModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
-  const [form] = Form.useForm<{ revision: string }>();
+}: ContainerRollbackModalProps) {
+  const [form] = Form.useForm<ContainerRollbackFormValues>();
   const mutation = useMutation({
     meta: {
       feedback: {
@@ -28,7 +32,7 @@ export default function ContainerRollbackModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async ({ revision }: { revision: string }) => {
+    mutationFn: async ({ revision }: ContainerRollbackFormValues) => {
       const submitData = { action: "rollback" as const, revision };
       await applyInstanceLifecycle(instance.id, submitData);
     },

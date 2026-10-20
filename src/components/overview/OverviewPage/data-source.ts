@@ -18,7 +18,7 @@ import type {
   HomeTrendConfig,
   HomeTrendHeadline,
   HomeTrendSnapshot,
-} from "./types";
+} from ".";
 
 const BLUE = "#0079D3";
 const HOME_TASK_LIMIT = 10;

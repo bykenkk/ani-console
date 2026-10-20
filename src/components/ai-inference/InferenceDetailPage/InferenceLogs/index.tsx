@@ -6,9 +6,11 @@ import { listInferenceServiceLogs, type InferenceServiceLog } from "@/api/infere
 import { DataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
+type InferenceLogsProps = { serviceId: string };
+
 type LogLevel = "all" | "debug" | "info" | "warn" | "error";
 
-export default function InferenceLogs({ serviceId }: { serviceId: string }) {
+export default function InferenceLogs({ serviceId }: InferenceLogsProps) {
   const [level, setLevel] = useState<LogLevel>("all");
   const {
     query: logs,

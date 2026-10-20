@@ -16,7 +16,9 @@ import { getKnowledgeBasePermissions, updateKnowledgeBasePermissions } from "@/a
 import { formatDateTime } from "@/lib/format";
 import { validateForm } from "@/lib/form";
 
-type PermissionFormValues = {
+type KnowledgePermissionsProps = { kbId: string };
+
+type KnowledgePermissionsFormValues = {
   public_read: boolean;
   allowed_user_ids_text?: string;
 };
@@ -34,8 +36,8 @@ function parseUserIds(value?: string) {
   );
 }
 
-export default function KnowledgePermissions({ kbId }: { kbId: string }) {
-  const [form] = Form.useForm<PermissionFormValues>();
+export default function KnowledgePermissions({ kbId }: KnowledgePermissionsProps) {
+  const [form] = Form.useForm<KnowledgePermissionsFormValues>();
   const initializedKb = useRef<string>();
   const qc = useQueryClient();
   const permissions = useQuery({
@@ -68,7 +70,7 @@ export default function KnowledgePermissions({ kbId }: { kbId: string }) {
         errorFallback: "保存知识库权限失败",
       },
     },
-    mutationFn: async (values: PermissionFormValues) => {
+    mutationFn: async (values: KnowledgePermissionsFormValues) => {
       const allowedUserIds = parseUserIds(values.allowed_user_ids_text);
       const invalidId = allowedUserIds.find((id) => !UUID_PATTERN.test(id));
       if (invalidId) throw new Error(`成员 ID 格式不正确：${invalidId}`);
@@ -132,7 +134,9 @@ export default function KnowledgePermissions({ kbId }: { kbId: string }) {
             type="primary"
             loading={update.isPending}
             onClick={() =>
-              validateForm<PermissionFormValues>(form).then((values) => update.mutate(values))
+              validateForm<KnowledgePermissionsFormValues>(form).then((values) =>
+                update.mutate(values),
+              )
             }
           >
             保存权限

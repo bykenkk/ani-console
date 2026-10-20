@@ -1,13 +1,12 @@
 import { Empty, Typography } from "@arco-design/web-react";
 import { PageHeader } from "@/layouts/AppLayout";
 
-export default function PlaceholderPage({
-  title,
-  description,
-}: {
+type PlaceholderPageProps = {
   title: string;
   description: string;
-}) {
+};
+
+export default function PlaceholderPage({ title, description }: PlaceholderPageProps) {
   return (
     <div className="space-y-4">
       <PageHeader title={title} subtitle={description} />

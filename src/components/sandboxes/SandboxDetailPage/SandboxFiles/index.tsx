@@ -9,15 +9,13 @@ import { formatBytes, formatDateTime } from "@/lib/format";
 import { copyToClipboard } from "@/lib/clipboard";
 import SandboxFileCreateModal from "@/components/sandboxes/SandboxFileCreateModal";
 
-export default function SandboxFiles({
-  instanceId,
-  running,
-  onChanged,
-}: {
+type SandboxFilesProps = {
   instanceId: string;
   running: boolean;
   onChanged: () => void;
-}) {
+};
+
+export default function SandboxFiles({ instanceId, running, onChanged }: SandboxFilesProps) {
   const [directory, setDirectory] = useState(".");
   const [pathInput, setPathInput] = useState(".");
 

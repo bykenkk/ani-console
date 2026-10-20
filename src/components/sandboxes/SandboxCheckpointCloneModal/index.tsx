@@ -6,15 +6,17 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { navigateToResourceDetail } from "@/lib/resources";
 
+type SandboxCheckpointCloneModalProps = {
+  instanceId: string;
+  checkpoint: SandboxCheckpoint;
+  onCancel: () => void;
+};
+
 export default function SandboxCheckpointCloneModal({
   instanceId,
   checkpoint,
   onCancel,
-}: {
-  instanceId: string;
-  checkpoint: SandboxCheckpoint;
-  onCancel: () => void;
-}) {
+}: SandboxCheckpointCloneModalProps) {
   const navigate = useNavigate();
   const [name, setName] = useState(`${checkpoint.name}-clone`);
   const cloneCheckpoint = useMutation({

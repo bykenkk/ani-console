@@ -3,15 +3,17 @@ import { Form, Input, Modal, Switch } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
+type SandboxCheckpointCreateModalProps = {
+  instanceId: string;
+  onCancel: () => void;
+  onCreated: () => void;
+};
+
 export default function SandboxCheckpointCreateModal({
   instanceId,
   onCancel,
   onCreated,
-}: {
-  instanceId: string;
-  onCancel: () => void;
-  onCreated: () => void;
-}) {
+}: SandboxCheckpointCreateModalProps) {
   const [name, setName] = useState("");
   const [keepMemory, setKeepMemory] = useState(false);
   const createCheckpoint = useMutation({

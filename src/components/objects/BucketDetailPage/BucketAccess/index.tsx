@@ -3,6 +3,8 @@ import { DataTable } from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
 import { Button, Space, Typography } from "@arco-design/web-react";
 
+type BucketAccessProps = { bucket: StorageBucketRecord };
+
 type AccessDomainRow = {
   key: "region" | "endpoint" | "bucket";
   type: string;
@@ -10,7 +12,7 @@ type AccessDomainRow = {
   copyable?: boolean;
 };
 
-export default function BucketAccess({ bucket }: { bucket: StorageBucketRecord }) {
+export default function BucketAccess({ bucket }: BucketAccessProps) {
   const rows: AccessDomainRow[] = [
     { key: "region", type: "区域", address: bucket.region ?? "-" },
     {

@@ -6,17 +6,19 @@ import { Form, Modal, Select, Typography } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
+type AttachVolumeModalProps = {
+  volume: StorageVolume;
+  onCancel: () => void;
+  onAttached?: () => void;
+};
+
 type Instance = InstanceRecord;
 
 export default function AttachVolumeModal({
   volume,
   onCancel,
   onAttached,
-}: {
-  volume: StorageVolume;
-  onCancel: () => void;
-  onAttached?: () => void;
-}) {
+}: AttachVolumeModalProps) {
   const qc = useQueryClient();
   const volumeId = volume.id;
   const [instanceId, setInstanceId] = useState("");

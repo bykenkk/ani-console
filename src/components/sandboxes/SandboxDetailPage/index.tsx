@@ -26,15 +26,17 @@ import SandboxEvents from "./SandboxEvents";
 import SandboxFiles from "./SandboxFiles";
 import { formatDurationSeconds, sandboxEgressLabel, sandboxTimeoutLabel } from "./utils";
 
+type SandboxDetailPageProps = {
+  instanceId: string;
+  tab?: string;
+  onTabChange: (tab: string) => void;
+};
+
 export default function SandboxDetailPage({
   instanceId,
   tab,
   onTabChange,
-}: {
-  instanceId: string;
-  tab?: string;
-  onTabChange: (tab: string) => void;
-}) {
+}: SandboxDetailPageProps) {
   const goBack = useBackOrFallback("sandbox-instance");
   const queryClient = useQueryClient();
 

@@ -15,6 +15,11 @@ import {
 } from "@/api/storage/filesystems";
 import { withFirst100 } from "@/api/pagination";
 
+type CreateFilesystemModalProps = {
+  onCancel: () => void;
+  onCreated?: (filesystem: Filesystem) => void;
+};
+
 const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type Filesystem = StorageFilesystem;
@@ -23,13 +28,7 @@ type FilesystemPerformanceMode = "standard" | "throughput";
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
 
-export default function CreateFilesystemModal({
-  onCancel,
-  onCreated,
-}: {
-  onCancel: () => void;
-  onCreated?: (filesystem: Filesystem) => void;
-}) {
+export default function CreateFilesystemModal({ onCancel, onCreated }: CreateFilesystemModalProps) {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [protocol, setProtocol] = useState<FilesystemProtocol>("nfs");

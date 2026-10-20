@@ -4,21 +4,16 @@ import { useQuery } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { getMyQuota } from "@/api/gpu-inventory";
 
-function CapacityMetric({
-  loading = false,
-  title,
-  value,
-  unit,
-  extra,
-  icon,
-}: {
+type CapacityMetricProps = {
   loading?: boolean;
   title: string;
   value: string | number;
   unit?: ReactNode;
   extra: string;
   icon: ReactNode;
-}) {
+};
+
+function CapacityMetric({ loading = false, title, value, unit, extra, icon }: CapacityMetricProps) {
   return (
     <Card className="h-full min-w-0 rounded-lg!" bodyStyle={{ padding: 24 }}>
       {loading ? (

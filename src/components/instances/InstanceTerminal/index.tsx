@@ -13,6 +13,12 @@ import styles from "./index.module.css";
 import { closeNotification, showMessage, showNotification } from "@/lib/feedback";
 import { withId } from "@/lib/id";
 
+type InstanceTerminalProps = {
+  instanceId: string;
+  height?: number | string;
+  className?: string;
+};
+
 type TerminalStatus = "connecting" | "connected" | "closed" | "error";
 
 type TerminalMessage = {
@@ -97,11 +103,7 @@ export default function InstanceTerminal({
   instanceId,
   height = "100%",
   className,
-}: {
-  instanceId: string;
-  height?: number | string;
-  className?: string;
-}) {
+}: InstanceTerminalProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const socketRef = useRef<WebSocket | null>(null);
   const [status, setStatus] = useState<TerminalStatus>("connecting");

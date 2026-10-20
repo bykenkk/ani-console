@@ -3,17 +3,19 @@ import { Alert, Form, InputNumber, Modal, Typography } from "@arco-design/web-re
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
+type ExpandFilesystemModalProps = {
+  filesystem: Filesystem;
+  onCancel: () => void;
+  onExpanded?: () => void;
+};
+
 type Filesystem = StorageFilesystem;
 
 export default function ExpandFilesystemModal({
   filesystem,
   onCancel,
   onExpanded,
-}: {
-  filesystem: Filesystem;
-  onCancel: () => void;
-  onExpanded?: () => void;
-}) {
+}: ExpandFilesystemModalProps) {
   const qc = useQueryClient();
   const [sizeGiB, setSizeGiB] = useState(filesystem.size_gib + 1);
   const expand = useMutation({

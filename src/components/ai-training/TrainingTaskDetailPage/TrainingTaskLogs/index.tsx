@@ -6,7 +6,9 @@ import { getModelDevExecutionLogs } from "@/api/modeldev";
 import { withId } from "@/lib/id";
 import { formatDateTime } from "@/lib/date";
 
-export default function TrainingTaskLogs({ executionId }: { executionId: string }) {
+type TrainingTaskLogsProps = { executionId: string };
+
+export default function TrainingTaskLogs({ executionId }: TrainingTaskLogsProps) {
   const logs = useQuery({
     queryKey: ["training-logs", executionId],
     queryFn: ({ signal }) => getModelDevExecutionLogs(executionId, {}, signal),

@@ -6,10 +6,12 @@ import { useState } from "react";
 import { DataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
+type SandboxSecurityEventsProps = { instanceId: string };
+
 type SecurityEvent = InstanceSecurityEvent;
 type Severity = "all" | "info" | "warning" | "critical";
 
-export default function SandboxSecurityEvents({ instanceId }: { instanceId: string }) {
+export default function SandboxSecurityEvents({ instanceId }: SandboxSecurityEventsProps) {
   const [severity, setSeverity] = useState<Severity>("all");
   const {
     query,

@@ -1,18 +1,28 @@
 // FIXME(governance-migration): 密钥绑定未对齐，保留原弹窗、入口、参数和 legacy 调用。
 // TODO(governance-migration): 待等价契约可用后迁移密钥绑定，不混用新创建/启停接口替代。
-import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
-import { listSecrets } from "@/api/secrets";
-import type { Secret } from "@/api/secrets";
+import {
+  applyInstanceLifecycle,
+  type InstanceRecord,
+  type InstanceLifecycleInput,
+} from "@/api/instances/legacy";
+import { listSecrets, type Secret } from "@/api/secrets";
+
 import { Form, Input, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { validateForm } from "@/lib/form";
 
+type GpuContainerBindSecretModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 type Instance = InstanceRecord;
-type Values = {
+type GpuContainerBindSecretFormValues = {
   secretId: string;
-  bindingType: "env" | "file";
+  bindingType: NonNullable<InstanceLifecycleInput["binding_type"]>;
   envName?: string;
   mountPath?: string;
 };
@@ -21,13 +31,10 @@ export default function GpuContainerBindSecretModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
-  const [form] = Form.useForm<Values>();
-  const [bindingType, setBindingType] = useState<"env" | "file">("env");
+}: GpuContainerBindSecretModalProps) {
+  const [form] = Form.useForm<GpuContainerBindSecretFormValues>();
+  const [bindingType, setBindingType] =
+    useState<GpuContainerBindSecretFormValues["bindingType"]>("env");
   const secrets = useQuery({
     meta: {
       errorNotification: {
@@ -48,7 +55,7 @@ export default function GpuContainerBindSecretModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async (values: Values) => {
+    mutationFn: async (values: GpuContainerBindSecretFormValues) => {
       const submitData = {
         action: "bind_secret" as const,
         secret_id: values.secretId,

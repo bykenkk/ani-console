@@ -1,13 +1,12 @@
 import { Checkbox, Form, InputNumber, Select } from "@arco-design/web-react";
-export default function ListenerOptions({
-  http,
-  udp,
-  redirectAllowed,
-}: {
+
+type ListenerOptionsProps = {
   http: boolean;
   udp: boolean;
   redirectAllowed: boolean;
-}) {
+};
+
+export default function ListenerOptions({ http, udp, redirectAllowed }: ListenerOptionsProps) {
   return (
     <>
       {!udp && (

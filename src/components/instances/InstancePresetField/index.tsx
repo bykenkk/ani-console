@@ -5,15 +5,14 @@ import { listInstancePresets, type ComputeType, type InstancePreset } from "@/ap
 import { withId } from "@/lib/id";
 import { withFirst100 } from "@/api/pagination";
 
-const listPresetOptions = withFirst100(listInstancePresets);
-
-export default function InstancePresetField({
-  computeType,
-  onChange,
-}: {
+type InstancePresetFieldProps = {
   computeType: ComputeType;
   onChange: (preset?: InstancePreset) => void;
-}) {
+};
+
+const listPresetOptions = withFirst100(listInstancePresets);
+
+export default function InstancePresetField({ computeType, onChange }: InstancePresetFieldProps) {
   const [selected, setSelected] = useState<InstancePreset>();
   const query = useQuery({
     queryKey: ["instance-presets", computeType, "options"],

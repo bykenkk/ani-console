@@ -5,15 +5,14 @@ import { DataTable, ResourceNameId, StatusBadge, type RowAction } from "@/compon
 
 import { Button } from "@arco-design/web-react";
 
-type MountedInstance = NonNullable<StorageVolume["used_by"]>[number];
-
-export default function VolumeRelatedResources({
-  volume,
-  onAttach,
-}: {
+type VolumeRelatedResourcesProps = {
   volume: StorageVolume;
   onAttach: () => void;
-}) {
+};
+
+type MountedInstance = NonNullable<StorageVolume["used_by"]>[number];
+
+export default function VolumeRelatedResources({ volume, onAttach }: VolumeRelatedResourcesProps) {
   const detachVolume = useVolumeDetach();
   const actions: RowAction<MountedInstance>[] = [
     {

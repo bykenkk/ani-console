@@ -2,6 +2,13 @@ import { Modal } from "@arco-design/web-react";
 import { type InstanceRecord, applyInstanceLifecycle } from "@/api/instances/legacy";
 import { useMutation } from "@tanstack/react-query";
 
+type VmRollbackModalProps = {
+  instance: Instance;
+  snapshot: Snapshot;
+  onCancel: () => void;
+  onSubmitted: (operationId: string) => void;
+};
+
 type Instance = InstanceRecord;
 type Snapshot = NonNullable<Instance["snapshots"]>[number];
 
@@ -10,12 +17,7 @@ export default function VmRollbackModal({
   snapshot,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  snapshot: Snapshot;
-  onCancel: () => void;
-  onSubmitted: (operationId: string) => void;
-}) {
+}: VmRollbackModalProps) {
   const mutation = useMutation({
     meta: {
       feedback: {

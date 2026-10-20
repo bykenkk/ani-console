@@ -3,7 +3,9 @@ import { listNetworkSubnets, type NetworkSubnet } from "@/api/network";
 import { DataTable, StatusBadge } from "@/components/common";
 import { withId } from "@/lib/id";
 
-export default function VpcSubnets({ vpcId }: { vpcId: string }) {
+type VpcSubnetsProps = { vpcId: string };
+
+export default function VpcSubnets({ vpcId }: VpcSubnetsProps) {
   const {
     query: subnets,
     items: pageItems,

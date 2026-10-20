@@ -27,17 +27,16 @@ import {
 } from "@/lib/ai-models";
 import ModelRelatedResources from "./ModelRelatedResources";
 import ModelOperationHistory from "./ModelOperationHistory";
-// import { ModelRecommendedConfiguration } from "./ModelRecommendedConfiguration";
 
-export default function ModelDetailPage({
-  modelId,
-  tab,
-  onTabChange,
-}: {
+type ModelDetailPageProps = {
   modelId: string;
   tab?: string;
   onTabChange: (tab: string) => void;
-}) {
+};
+
+// import { ModelRecommendedConfiguration } from "./ModelRecommendedConfiguration";
+
+export default function ModelDetailPage({ modelId, tab, onTabChange }: ModelDetailPageProps) {
   const goBack = useBackOrFallback("model");
 
   const model = useQuery({

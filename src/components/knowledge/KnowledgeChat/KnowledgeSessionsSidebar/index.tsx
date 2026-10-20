@@ -5,6 +5,18 @@ import type { KBSession as Session } from "@/api/knowledge";
 import { formatDateTime } from "@/lib/format";
 import styles from "./index.module.css";
 
+type KnowledgeSessionsSidebarProps = {
+  sessions?: Session[];
+  loading: boolean;
+  error: unknown;
+  activeSessionId?: string;
+  deletingSessionId?: string;
+  onNew: () => void;
+  onSelect: (sessionId: string) => void;
+  onDelete: (session: Session) => Promise<void>;
+  onViewCitations: () => void;
+};
+
 export default function KnowledgeSessionsSidebar({
   sessions,
   loading,
@@ -15,17 +27,7 @@ export default function KnowledgeSessionsSidebar({
   onSelect,
   onDelete,
   onViewCitations,
-}: {
-  sessions?: Session[];
-  loading: boolean;
-  error: unknown;
-  activeSessionId?: string;
-  deletingSessionId?: string;
-  onNew: () => void;
-  onSelect: (sessionId: string) => void;
-  onDelete: (session: Session) => Promise<void>;
-  onViewCitations: () => void;
-}) {
+}: KnowledgeSessionsSidebarProps) {
   return (
     <aside
       className="box-border flex min-h-0 w-55 min-w-46 flex-[0_1_220px] flex-col gap-3 bg-app-fill p-3.5 [border-right:1px_solid_var(--color-border-1)] [@media(max-width:1024px)]:w-46 [@media(max-width:1024px)]:basis-46"

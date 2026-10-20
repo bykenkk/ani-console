@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import styles from "./index.module.css";
-import type { DetailHeaderItems } from "../types";
+import type { DetailHeaderItems } from "..";
 
 type DetailPageHeaderProps = {
   title: ReactNode;

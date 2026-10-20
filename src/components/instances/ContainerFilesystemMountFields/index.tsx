@@ -1,12 +1,18 @@
 import { Form, Input, Select, Switch } from "@arco-design/web-react";
 
+type ContainerFilesystemMountFieldsProps = {
+  values: ContainerFilesystemMountFormValues;
+  filesystems?: ContainerFilesystemItem[];
+  mountPathError?: string;
+};
+
 export type ContainerFilesystemItem = {
   id: string;
   name?: string | null;
   size_gib?: number;
 };
 
-export type ContainerFilesystemMountValues = {
+type ContainerFilesystemMountFormValues = {
   filesystem_id: string;
   filesystem_mount_path: string;
   filesystem_read_only: boolean;
@@ -16,11 +22,7 @@ export default function ContainerFilesystemMountFields({
   values,
   filesystems,
   mountPathError,
-}: {
-  values: ContainerFilesystemMountValues;
-  filesystems?: ContainerFilesystemItem[];
-  mountPathError?: string;
-}) {
+}: ContainerFilesystemMountFieldsProps) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] items-start gap-4">
       <Form.Item field="filesystem_id" label="文件存储">

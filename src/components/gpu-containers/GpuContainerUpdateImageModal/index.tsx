@@ -7,18 +7,22 @@ import InstanceRegistryImageSelect from "@/components/instances/InstanceRegistry
 
 import { validateForm } from "@/lib/form";
 
+type GpuContainerUpdateImageFormValues = { imageId: string };
+
+type GpuContainerUpdateImageModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 type Instance = InstanceRecord;
 
 export default function GpuContainerUpdateImageModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
-  const [form] = Form.useForm<{ imageId: string }>();
+}: GpuContainerUpdateImageModalProps) {
+  const [form] = Form.useForm<GpuContainerUpdateImageFormValues>();
   const mutation = useMutation({
     meta: {
       feedback: {
@@ -28,7 +32,7 @@ export default function GpuContainerUpdateImageModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async ({ imageId }: { imageId: string }) => {
+    mutationFn: async ({ imageId }: GpuContainerUpdateImageFormValues) => {
       const submitData = {
         action: "update_image" as const,
         image_id: imageId,

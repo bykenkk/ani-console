@@ -11,7 +11,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import CreateLifecycleRuleModal from "@/components/objects/CreateLifecycleRuleModal";
 import { useState } from "react";
 
-export default function BucketLifecycle({ bucketId }: { bucketId: string }) {
+type BucketLifecycleProps = { bucketId: string };
+
+export default function BucketLifecycle({ bucketId }: BucketLifecycleProps) {
   const {
     query: rules,
     items: pageItems,

@@ -5,6 +5,8 @@ import { withId } from "@/lib/id";
 import { Space } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
+type SubnetRoutesProps = { subnetId: string; vpcId: string };
+
 type SubnetRouteRow = {
   id: string;
   destinationCidr: string;
@@ -14,7 +16,7 @@ type SubnetRouteRow = {
   source: "系统" | "自定义";
 };
 
-export default function SubnetRoutes({ subnetId, vpcId }: { subnetId: string; vpcId: string }) {
+export default function SubnetRoutes({ subnetId, vpcId }: SubnetRoutesProps) {
   const routes = useQuery({
     meta: {
       errorNotification: {

@@ -7,6 +7,15 @@ import { Button, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { type RowAction } from "@/components/common";
 
+type InstanceVersionsProps = {
+  instance?: InstanceRecord;
+  currentImage?: Pick<CurrentInstanceRecord, "imageId" | "imageDigest">;
+  loading?: boolean;
+  onChanged: () => void;
+  updateImage?: RowAction<InstanceRecord>;
+  rollbackDisabled: boolean;
+};
+
 type Release = NonNullable<NonNullable<InstanceRecord["container"]>["history"]>[number];
 
 export default function InstanceVersions({
@@ -16,14 +25,7 @@ export default function InstanceVersions({
   onChanged,
   updateImage,
   rollbackDisabled,
-}: {
-  instance?: InstanceRecord;
-  currentImage?: Pick<CurrentInstanceRecord, "imageId" | "imageDigest">;
-  loading?: boolean;
-  onChanged: () => void;
-  updateImage?: RowAction<InstanceRecord>;
-  rollbackDisabled: boolean;
-}) {
+}: InstanceVersionsProps) {
   const rollback = useMutation({
     meta: {
       feedback: {

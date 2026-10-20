@@ -4,13 +4,12 @@ import { DataTable, StatusBadge } from "@/components/common";
 import { withId } from "@/lib/id";
 import { useEffect } from "react";
 
-export default function K8sNodePools({
-  clusterId,
-  onNodeCountChange,
-}: {
+type K8sNodePoolsProps = {
   clusterId: string;
   onNodeCountChange: (count: number) => void;
-}) {
+};
+
+export default function K8sNodePools({ clusterId, onNodeCountChange }: K8sNodePoolsProps) {
   const {
     query: nodePools,
     items: pageItems,

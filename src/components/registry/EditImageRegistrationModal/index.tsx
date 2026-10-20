@@ -1,26 +1,31 @@
 import { Form, Modal, Typography } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  updateImageRegistration,
-  type ImageRegistration,
-  type UpdateImageRegistrationInput,
-} from "@/api/images";
+import { updateImageRegistration, type ImageRegistration } from "@/api/images";
 import { validateForm } from "@/lib/form";
 import ImageRegistrationFields from "../ImageRegistrationFields";
+
+type EditImageRegistrationModalProps = {
+  image: ImageRegistration;
+  onCancel: () => void;
+};
+
+type EditImageRegistrationFormValues = {
+  displayName: string;
+  description?: string;
+  purposes: string[];
+  accelerator?: string;
+};
 
 export default function EditImageRegistrationModal({
   image,
   onCancel,
-}: {
-  image: ImageRegistration;
-  onCancel: () => void;
-}) {
-  const [form] = Form.useForm<UpdateImageRegistrationInput>();
+}: EditImageRegistrationModalProps) {
+  const [form] = Form.useForm<EditImageRegistrationFormValues>();
   const client = useQueryClient();
   const mutation = useMutation({
-    mutationFn: (input: UpdateImageRegistrationInput) =>
+    mutationFn: (input: EditImageRegistrationFormValues) =>
       updateImageRegistration(image.image_id, {
-        ...input,
+        accelerator: input.accelerator,
         displayName: input.displayName.trim(),
         description: input.description?.trim() || "",
         purposes: input.purposes ?? [],

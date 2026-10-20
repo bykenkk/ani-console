@@ -3,7 +3,9 @@ import { listNetworkRoutes, type NetworkRoute } from "@/api/network";
 import { DataTable } from "@/components/common";
 import { withId } from "@/lib/id";
 
-export default function VpcRoutes({ vpcId }: { vpcId: string }) {
+type VpcRoutesProps = { vpcId: string };
+
+export default function VpcRoutes({ vpcId }: VpcRoutesProps) {
   const {
     query: routes,
     items: pageItems,

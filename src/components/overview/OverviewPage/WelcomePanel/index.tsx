@@ -3,10 +3,12 @@ import { IconDown, IconPlus } from "@arco-design/web-react/icon";
 import { Link } from "@tanstack/react-router";
 import clsx from "clsx";
 import { AliIcon } from "@/components/common";
-import type { HomeShortcut } from "../types";
+import type { HomeShortcut } from "..";
 import styles from "../index.module.css";
 
-export default function WelcomePanel({ quickCreateItems }: { quickCreateItems: HomeShortcut[] }) {
+type WelcomePanelProps = { quickCreateItems: HomeShortcut[] };
+
+export default function WelcomePanel({ quickCreateItems }: WelcomePanelProps) {
   const quickCreateMenu = (
     <Menu className={styles.quickCreateMenu}>
       {quickCreateItems.map((item) => (

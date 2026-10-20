@@ -9,7 +9,6 @@ export type {
   ListColumn,
   ListPagination,
   RowAction,
-  RowActionIntent,
 } from "./DataTable";
 export { default as ResourceNameId } from "./ResourceNameId";
 export type { ResourceNameIdProps } from "./ResourceNameId";
@@ -17,29 +16,12 @@ export type { ResourceDetailType } from "@/lib/resources";
 export { default as ListDataTable } from "./ListDataTable";
 export type { ListDataTableProps } from "./ListDataTable";
 export { default as ResourcePageFrame } from "./ResourcePageFrame";
-export type {
-  ResourcePageFrameProps,
-  ResourcePageHeaderAction,
-  ResourcePageHeaderConfig,
-} from "./ResourcePageFrame";
+
 export { default as ListPageFrame } from "./ListPageFrame";
-export type {
-  ListPageFrameProps,
-  ListPageRefreshConfig,
-  ListPageSearchConfig,
-  ListPageTabsConfig,
-  ListPageToolbarConfig,
-} from "./ListPageFrame";
+
 export { default as DetailPageFrame } from "./DetailPageFrame";
 export { default as DetailPagePlaceholder } from "./DetailPagePlaceholder";
-export type {
-  DetailBreadcrumbItem,
-  DetailCard,
-  DetailField,
-  DetailHeaderItems,
-  DetailSummaryItem,
-  DetailTab,
-} from "./DetailPageFrame/types";
+export type { DetailCard } from "./DetailPageFrame";
 export { default as Ipv4CidrInput } from "./Ipv4CidrInput";
 export { default as ImageNameText } from "./ImageNameText";
 export { default as NotFoundPage } from "./NotFoundPage";

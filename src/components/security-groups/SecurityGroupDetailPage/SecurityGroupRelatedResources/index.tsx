@@ -11,6 +11,12 @@ import { withId } from "@/lib/id";
 import { Card, Empty, List, Space, Tag, Typography } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
+type SecurityGroupRelatedResourcesProps = {
+  securityGroupId: string;
+  parentVpc?: NetworkVPC;
+  vpcLoading: boolean;
+};
+
 type RelatedResource = {
   key: string;
   id: string;
@@ -23,11 +29,7 @@ export default function SecurityGroupRelatedResources({
   securityGroupId,
   parentVpc,
   vpcLoading,
-}: {
-  securityGroupId: string;
-  parentVpc?: NetworkVPC;
-  vpcLoading: boolean;
-}) {
+}: SecurityGroupRelatedResourcesProps) {
   const bindings = useQuery({
     meta: {
       errorNotification: {

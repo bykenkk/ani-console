@@ -5,7 +5,9 @@ import { validateForm } from "@/lib/form";
 import { Form, Modal, Select } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 
-type ModalProps = {
+type InstanceDetachVolumeFormValues = { volumeId: string };
+
+type InstanceDetachVolumeModalProps = {
   instance: InstanceRecord;
   onCancel: () => void;
   onSubmitted: (operationId: string) => void;
@@ -17,8 +19,12 @@ function attachedVolumeId(volume: NonNullable<InstanceRecord["volumes"]>[number]
   return sourceRef.startsWith("volume/") ? sourceRef.slice("volume/".length) : sourceRef;
 }
 
-export default function InstanceDetachVolumeModal({ instance, onCancel, onSubmitted }: ModalProps) {
-  const [form] = Form.useForm<{ volumeId: string }>();
+export default function InstanceDetachVolumeModal({
+  instance,
+  onCancel,
+  onSubmitted,
+}: InstanceDetachVolumeModalProps) {
+  const [form] = Form.useForm<InstanceDetachVolumeFormValues>();
   const mutation = useMutation({
     meta: {
       feedback: {
@@ -28,7 +34,7 @@ export default function InstanceDetachVolumeModal({ instance, onCancel, onSubmit
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async ({ volumeId }: { volumeId: string }) => {
+    mutationFn: async ({ volumeId }: InstanceDetachVolumeFormValues) => {
       const data = await applyInstanceLifecycle(instance.id, {
         action: "detach_volume",
         volume_id: volumeId,

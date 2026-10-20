@@ -2,7 +2,7 @@ import clsx from "clsx";
 import { useEffect, useMemo, useState } from "react";
 import DetailInfoCard from "../DetailInfoCard";
 import styles from "./index.module.css";
-import type { DetailCard } from "../types";
+import type { DetailCard } from "..";
 
 type DetailInfoSidebarProps = {
   cards: DetailCard[];

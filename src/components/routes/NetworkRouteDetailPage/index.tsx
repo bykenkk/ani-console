@@ -12,7 +12,9 @@ import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 import NetworkRouteRelatedResources from "./NetworkRouteRelatedResources";
 
-export default function NetworkRouteDetailPage({ routeId }: { routeId: string }) {
+type NetworkRouteDetailPageProps = { routeId: string };
+
+export default function NetworkRouteDetailPage({ routeId }: NetworkRouteDetailPageProps) {
   const goBack = useBackOrFallback("network-route");
   const detail = useQuery({
     meta: {

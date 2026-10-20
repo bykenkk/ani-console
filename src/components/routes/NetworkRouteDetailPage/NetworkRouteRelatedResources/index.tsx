@@ -9,6 +9,12 @@ import { Card, Empty, Link, List, Tag, Typography } from "@arco-design/web-react
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 
+type NetworkRouteRelatedResourcesProps = {
+  route: NetworkRoute;
+  parentVpc?: NetworkVPC;
+  vpcLoading: boolean;
+};
+
 type RelatedResource = {
   id: string;
   kind: "VPC" | "实例";
@@ -36,11 +42,7 @@ export default function NetworkRouteRelatedResources({
   route,
   parentVpc,
   vpcLoading,
-}: {
-  route: NetworkRoute;
-  parentVpc?: NetworkVPC;
-  vpcLoading: boolean;
-}) {
+}: NetworkRouteRelatedResourcesProps) {
   const navigate = useNavigate();
   const instance = useQuery({
     meta: {

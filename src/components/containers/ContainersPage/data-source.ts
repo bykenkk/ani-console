@@ -1,15 +1,56 @@
 // FIXME(governance-migration): 原组件/适配保留供未对齐能力复核，不能作为 governance 契约使用。
 // TODO(governance-migration): 后端覆盖原字段后逐项对接，避免删除未支持的能力。
-import { listInstances } from "@/api/instances/legacy";
+import {
+  listInstances,
+  type FilterableInstanceState,
+  type InstanceRecord,
+} from "@/api/instances/legacy";
 import { getInstanceDisplayIp, getInstanceNetworkValue } from "@/lib/instances";
 import { getImageDisplayName } from "@/lib/render";
-import type {
-  ContainerInstance,
-  ContainerInstanceDataSource,
-  ContainerInstanceListResult,
-  ContainerInstanceQuery,
-  ContainerInstanceRecord,
-} from "./types";
+
+type ContainerInstanceRecord = InstanceRecord;
+
+type ContainerInstanceStatus = ContainerInstanceRecord["state"];
+
+type ContainerInstanceStatusFilter = "all" | FilterableInstanceState;
+
+type ContainerInstanceSearchField = "name" | "id";
+
+type ContainerInstance = {
+  record: ContainerInstanceRecord;
+  id: string;
+  name: string;
+  kind: "container";
+  vpc: string;
+  subnet: string;
+  ip: string;
+  status: ContainerInstanceStatus;
+  image: string;
+  cpuMemory: string;
+  replicas: string;
+  rolloutStatus: string;
+  node: string;
+  endpoint: string;
+  createdAt: string;
+};
+
+type ContainerInstanceQuery = {
+  status: ContainerInstanceStatusFilter;
+  searchField: ContainerInstanceSearchField;
+  keyword: string;
+  cursor?: string;
+  pageSize: number;
+};
+
+type ContainerInstanceListResult = {
+  items: ContainerInstance[];
+  total: number;
+  next_cursor?: string | null;
+};
+
+interface ContainerInstanceDataSource {
+  list(query: ContainerInstanceQuery): Promise<ContainerInstanceListResult>;
+}
 
 type InstancePage = {
   items: ContainerInstanceRecord[];

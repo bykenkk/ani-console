@@ -12,7 +12,9 @@ import BorderBeamPanel from "@/components/common/BorderBeamPanel";
 import { isAuthenticated, useAuthStore } from "@/stores/auth";
 import styles from "./index.module.css";
 
-export default function LoginPage({ redirect = "/" }: { redirect?: string }) {
+type LoginPageProps = { redirect?: string };
+
+export default function LoginPage({ redirect = "/" }: LoginPageProps) {
   const navigate = useNavigate();
   const setAuthSession = useAuthStore((state) => state.setAuthSession);
 
@@ -31,7 +33,7 @@ export default function LoginPage({ redirect = "/" }: { redirect?: string }) {
         errorFallback: "登录失败，请稍后重试",
       },
     },
-    mutationFn: async (values: PasswordLoginValues) => {
+    mutationFn: async (values: PasswordLoginFormValues) => {
       const submitData = {
         tenant_name: values.tenant_name.trim(),
         username: values.username.trim(),
@@ -74,7 +76,7 @@ export default function LoginPage({ redirect = "/" }: { redirect?: string }) {
           登录常青云平台
         </h1>
 
-        <Form<PasswordLoginValues>
+        <Form<PasswordLoginFormValues>
           className={styles.form}
           layout="vertical"
           requiredSymbol={false}
@@ -177,7 +179,7 @@ export default function LoginPage({ redirect = "/" }: { redirect?: string }) {
   );
 }
 
-interface PasswordLoginValues {
+interface PasswordLoginFormValues {
   tenant_name: string;
   username: string;
   password: string;

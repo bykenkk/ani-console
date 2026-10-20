@@ -24,15 +24,18 @@ import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceNetwork from "@/components/instances/InstanceNetwork";
 import InstanceOperations from "@/components/instances/InstanceOperations";
 import InstanceStorage from "@/components/instances/InstanceStorage";
+
+type ContainerDetailPageProps = {
+  instanceId: string;
+  tab?: string;
+  onTabChange: (tab: string) => void;
+};
+
 export default function ContainerDetailPage({
   instanceId,
   tab,
   onTabChange,
-}: {
-  instanceId: string;
-  tab?: string;
-  onTabChange: (tab: string) => void;
-}) {
+}: ContainerDetailPageProps) {
   const goBack = useBackOrFallback("container-instance");
   const qc = useQueryClient();
   const current = useQuery({

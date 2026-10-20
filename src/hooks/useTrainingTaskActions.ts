@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Modal } from "@arco-design/web-react";
 import { stopModelDevExecution, type ModelDevExecution } from "@/api/modeldev";
-import type { RowAction } from "@/components/common/DataTable/types";
+import type { RowAction } from "@/components/common/DataTable";
 import { withId } from "@/lib/id";
 
 export function useTrainingTaskActions(): RowAction<ModelDevExecution>[] {

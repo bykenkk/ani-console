@@ -2,9 +2,23 @@ import { withFirst100 } from "@/api/pagination";
 import { Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { getModel, getModelVersion, listModelVersions, type ModelVersion } from "@/api/models";
+import {
+  getModel,
+  getModelVersion,
+  listModelVersions,
+  type ModelVersion,
+  type ModelPageParams,
+} from "@/api/models";
 import { withId } from "@/lib/id";
-import type { ModelVersionSelectProps, ModelVersionOptionsParams } from "./types";
+
+interface ModelVersionSelectProps {
+  modelId: string;
+  value?: string;
+  onChange?: (value: string, version?: ModelVersion, modelName?: string) => void;
+  disabled?: boolean;
+}
+
+type ModelVersionOptionsParams = ModelPageParams & { modelId: string };
 
 const listVersionOptions = withFirst100(
   ({ modelId, ...params }: ModelVersionOptionsParams, signal?: AbortSignal) =>
@@ -78,5 +92,3 @@ export default function ModelVersionSelect({
     />
   );
 }
-
-export type { ModelVersionSelectProps } from "./types";

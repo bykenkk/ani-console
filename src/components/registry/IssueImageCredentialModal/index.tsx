@@ -10,15 +10,17 @@ import {
 } from "@/api/images";
 import { copyToClipboard } from "@/lib/clipboard";
 
+type IssueImageCredentialModalProps = {
+  credential: ImagePublisherCredential;
+  action: "issue" | "reset";
+  onCancel: () => void;
+};
+
 export default function IssueImageCredentialModal({
   credential,
   action,
   onCancel,
-}: {
-  credential: ImagePublisherCredential;
-  action: "issue" | "reset";
-  onCancel: () => void;
-}) {
+}: IssueImageCredentialModalProps) {
   const [delivery, setDelivery] = useState<ImageCredentialDelivery>();
   const client = useQueryClient();
   const reset = action === "reset";

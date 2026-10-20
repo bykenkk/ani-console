@@ -13,17 +13,19 @@ import { withId } from "@/lib/id";
 import TrainingTaskLogs from "./TrainingTaskLogs";
 import TrainingTaskArtifacts from "./TrainingTaskArtifacts";
 
+type TrainingTaskDetailPageProps = {
+  executionId: string;
+  tab?: string;
+  onTabChange: (tab: string) => void;
+  onBack: () => void;
+};
+
 export default function TrainingTaskDetailPage({
   executionId,
   tab,
   onTabChange,
   onBack,
-}: {
-  executionId: string;
-  tab?: string;
-  onTabChange: (tab: string) => void;
-  onBack: () => void;
-}) {
+}: TrainingTaskDetailPageProps) {
   const detail = useQuery({
     queryKey: ["training-execution", executionId],
     queryFn: ({ signal }) => getModelDevExecution(executionId, signal),

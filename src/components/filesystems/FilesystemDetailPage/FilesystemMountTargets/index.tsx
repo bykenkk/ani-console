@@ -13,15 +13,17 @@ import { Button } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useEffect } from "react";
 
+type FilesystemMountTargetsProps = {
+  filesystemId: string;
+  onCreateMountTarget: () => void;
+  onMountCountChange: (count: number) => void;
+};
+
 export default function FilesystemMountTargets({
   filesystemId,
   onMountCountChange,
   onCreateMountTarget,
-}: {
-  filesystemId: string;
-  onCreateMountTarget: () => void;
-  onMountCountChange: (count: number) => void;
-}) {
+}: FilesystemMountTargetsProps) {
   const {
     query: mounts,
     items: pageItems,

@@ -2,13 +2,15 @@
 import { Button, Select, Space } from "@arco-design/web-react";
 import type { ListPagination } from "..";
 
+type LegacyCursorPaginationProps = {
+  pagination: Extract<ListPagination, { mode: "legacy-cursor" }>;
+  tableLabel: string;
+};
+
 export default function LegacyCursorPagination({
   pagination,
   tableLabel,
-}: {
-  pagination: Extract<ListPagination, { mode: "legacy-cursor" }>;
-  tableLabel: string;
-}) {
+}: LegacyCursorPaginationProps) {
   const { page, pageSize, disabled, hasNextPage, onPageChange, onPageSizeChange } = pagination;
   return (
     <nav aria-label={tableLabel + "分页"} className="mt-4 flex shrink-0 justify-end">

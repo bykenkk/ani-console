@@ -6,19 +6,21 @@ import { IMAGE_SPACE_STATES } from "../options";
 import ImagePublisherCredential from "../ImagePublisherCredential";
 import RegistryPushInstructionsModal from "../RegistryPushInstructionsModal";
 
+type ManageImageSpaceModalProps = {
+  space: ImageSpace | null | undefined;
+  loading: boolean;
+  refreshing: boolean;
+  onRefresh: () => void;
+  onCancel: () => void;
+};
+
 export default function ManageImageSpaceModal({
   space,
   loading,
   refreshing,
   onRefresh,
   onCancel,
-}: {
-  space: ImageSpace | null | undefined;
-  loading: boolean;
-  refreshing: boolean;
-  onRefresh: () => void;
-  onCancel: () => void;
-}) {
+}: ManageImageSpaceModalProps) {
   const [push, setPush] = useState(false);
   return (
     <Modal visible title="镜像空间与凭证" footer={null} onCancel={onCancel} style={{ width: 680 }}>

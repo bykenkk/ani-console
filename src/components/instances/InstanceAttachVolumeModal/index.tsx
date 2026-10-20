@@ -7,20 +7,24 @@ import { withId } from "@/lib/id";
 import { Checkbox, Form, Input, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-type ModalProps = {
+type InstanceAttachVolumeModalProps = {
   instance: InstanceRecord;
   onCancel: () => void;
   onSubmitted: (operationId: string) => void;
 };
 
-type AttachValues = {
+type InstanceAttachVolumeFormValues = {
   volumeId: string;
   mountPath: string;
   readOnly?: boolean;
 };
 
-export default function InstanceAttachVolumeModal({ instance, onCancel, onSubmitted }: ModalProps) {
-  const [form] = Form.useForm<AttachValues>();
+export default function InstanceAttachVolumeModal({
+  instance,
+  onCancel,
+  onSubmitted,
+}: InstanceAttachVolumeModalProps) {
+  const [form] = Form.useForm<InstanceAttachVolumeFormValues>();
   const volumeMode = instance.kind === "vm" ? "block" : "filesystem";
   const volumes = useQuery({
     meta: {
@@ -48,7 +52,7 @@ export default function InstanceAttachVolumeModal({ instance, onCancel, onSubmit
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async (values: AttachValues) => {
+    mutationFn: async (values: InstanceAttachVolumeFormValues) => {
       if (!options.some((volume) => volume.id === values.volumeId)) {
         throw new Error("请选择与实例类型匹配的可挂载云盘；卷用途不可修改，需按目标用途重新创建");
       }

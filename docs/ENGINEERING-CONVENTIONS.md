@@ -51,7 +51,8 @@ src/api/<domain>/
 
 ### 组件 Props 与表单类型
 
-- 新增或调整组件时，Props 与组件私有类型统一维护在当前组件目录的 `types.ts`，组件实现通过 `import type` 引用，不在组件参数中内联定义 Props。Props 类型使用 `<ComponentName>Props` 命名，例如 `CreateInferenceModalProps`。
+- 新增或调整组件时，Props、表单值与组件私有类型直接在所属组件或页面的实现文件中声明，不单独抽取到 `types.ts`。Props 类型使用 `<ComponentName>Props` 命名，例如 `CreateInferenceModalProps`，不在组件参数中使用匿名对象类型。
+- 类型默认仅在本文件内使用，只有其他文件实际需要引用时才添加 `export`，调用方通过 `import type` 引用，不为私有类型添加多余的导出或转导出。常量、初始值和辅助函数按职责放在组件实现或独立的 `constants.ts`、`utils.ts` 等实现文件中。
 - 表单值类型按业务或操作命名为 `<BusinessOrAction>FormValues`，例如 `CreateInferenceFormValues`，不得使用 `CreateValues` 等缺少业务含义的名称。表单实体独立声明实际字段，不通过继承、交叉、`Pick` 或 `Omit` 等方式从整个接口提交类型派生；提交时显式组装接口参数，处理单位转换及自动生成字段。
 - 表单实体独立不代表字段类型重复定义。单个字段已有对应的领域类型、枚举或联合类型时必须直接引用，例如 `runtime_mode: InferenceRuntimeMode`；不复制其枚举值，也不为复用单字段类型而关联整个提交实体。
 

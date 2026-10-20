@@ -11,6 +11,12 @@ import {
 } from "@/api/network";
 import { withFirst100 } from "@/api/pagination";
 
+type CreateSecurityGroupModalProps = {
+  defaultVpcId?: string;
+  onCancel: () => void;
+  onCreated?: (securityGroup: NetworkSecurityGroup) => void;
+};
+
 const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type SecurityGroupRule = NetworkSecurityGroupRule;
@@ -52,11 +58,7 @@ export default function CreateSecurityGroupModal({
   defaultVpcId,
   onCancel,
   onCreated,
-}: {
-  defaultVpcId?: string;
-  onCancel: () => void;
-  onCreated?: (securityGroup: NetworkSecurityGroup) => void;
-}) {
+}: CreateSecurityGroupModalProps) {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [vpcId, setVpcId] = useState(defaultVpcId ?? "");

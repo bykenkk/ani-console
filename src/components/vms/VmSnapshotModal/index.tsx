@@ -4,19 +4,17 @@ import { useMutation } from "@tanstack/react-query";
 
 import { validateForm } from "@/lib/form";
 
-type Instance = InstanceRecord;
-type Values = { snapshotName: string; includeDataDisks?: boolean };
-
-export default function VmSnapshotModal({
-  instance,
-  onCancel,
-  onSubmitted,
-}: {
+type VmSnapshotModalProps = {
   instance: Instance;
   onCancel: () => void;
   onSubmitted: (operationId: string) => void;
-}) {
-  const [form] = Form.useForm<Values>();
+};
+
+type Instance = InstanceRecord;
+type VmSnapshotFormValues = { snapshotName: string; includeDataDisks?: boolean };
+
+export default function VmSnapshotModal({ instance, onCancel, onSubmitted }: VmSnapshotModalProps) {
+  const [form] = Form.useForm<VmSnapshotFormValues>();
   const mutation = useMutation({
     meta: {
       feedback: {
@@ -26,7 +24,7 @@ export default function VmSnapshotModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async (values: Values) => {
+    mutationFn: async (values: VmSnapshotFormValues) => {
       const submitData = {
         action: "snapshot" as const,
         snapshot_name: values.snapshotName.trim(),

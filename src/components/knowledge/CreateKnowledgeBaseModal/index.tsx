@@ -3,15 +3,18 @@ import { Form, Input, InputNumber, Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
-import {
-  createKnowledgeBase,
-  type CreateKnowledgeBaseInput,
-  type KnowledgeBase,
-} from "@/api/knowledge";
+import { createKnowledgeBase, type KnowledgeBase } from "@/api/knowledge";
 import KnowledgeModelSelect from "@/components/knowledge/KnowledgeModelSelect";
 import { validateForm } from "@/lib/form";
 
-type CreateKnowledgeBaseFormValues = CreateKnowledgeBaseInput & {
+type CreateKnowledgeBaseModalProps = {
+  onCancel: () => void;
+  onCreated?: (item: KnowledgeBase) => void;
+};
+
+type CreateKnowledgeBaseFormValues = {
+  name: string;
+  description?: string;
   embedding_model: string;
   default_inference_service: string;
   chunk_size: number;
@@ -21,11 +24,8 @@ type CreateKnowledgeBaseFormValues = CreateKnowledgeBaseInput & {
 export default function CreateKnowledgeBaseModal({
   onCancel,
   onCreated,
-}: {
-  onCancel: () => void;
-  onCreated?: (item: KnowledgeBase) => void;
-}) {
-  const [form] = Form.useForm();
+}: CreateKnowledgeBaseModalProps) {
+  const [form] = Form.useForm<CreateKnowledgeBaseFormValues>();
   const qc = useQueryClient();
   const create = useMutation({
     meta: {
@@ -38,7 +38,10 @@ export default function CreateKnowledgeBaseModal({
     },
     mutationFn: async (values: CreateKnowledgeBaseFormValues) => {
       const submitData = {
-        ...values,
+        embedding_model: values.embedding_model,
+        default_inference_service: values.default_inference_service,
+        chunk_size: values.chunk_size,
+        top_k: values.top_k,
         name: values.name.trim(),
         description: values.description?.trim() || undefined,
       };

@@ -7,6 +7,12 @@ import TopNav from "./TopNav";
 import { Sidebar, SIDEBAR_COLLAPSED_WIDTH, SIDEBAR_WIDTH } from "./Sidebar";
 import { activeTopNavKeyForPath, sidebarNavigationForPath } from "./navigation";
 
+type PageHeaderProps = {
+  title: string;
+  subtitle?: string;
+  extra?: React.ReactNode;
+};
+
 const { Content } = Layout;
 
 const APP_CONTENT_STYLE = {
@@ -94,15 +100,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   );
 }
 
-export function PageHeader({
-  title,
-  subtitle,
-  extra,
-}: {
-  title: string;
-  subtitle?: string;
-  extra?: React.ReactNode;
-}) {
+export function PageHeader({ title, subtitle, extra }: PageHeaderProps) {
   return (
     <header className="mb-5">
       <Space align="start" className="w-full justify-between">

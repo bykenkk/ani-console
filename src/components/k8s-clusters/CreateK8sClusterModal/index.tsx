@@ -1,16 +1,20 @@
-import { createK8sCluster, type CreateK8sClusterInput } from "@/api/k8s-clusters";
+import { createK8sCluster } from "@/api/k8s-clusters";
 import { validateForm } from "@/lib/form";
 import { Form, Input, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 
-export default function CreateK8sClusterModal({
-  onCancel,
-  onCreated,
-}: {
+type CreateK8sClusterModalProps = {
   onCancel: () => void;
   onCreated: () => void;
-}) {
-  const [form] = Form.useForm<CreateK8sClusterInput>();
+};
+
+type CreateK8sClusterFormValues = {
+  name: string;
+  version?: string;
+};
+
+export default function CreateK8sClusterModal({ onCancel, onCreated }: CreateK8sClusterModalProps) {
+  const [form] = Form.useForm<CreateK8sClusterFormValues>();
   const createCluster = useMutation({
     meta: {
       feedback: {
@@ -19,7 +23,7 @@ export default function CreateK8sClusterModal({
         errorFallback: "请求失败",
       },
     },
-    mutationFn: (values: CreateK8sClusterInput) =>
+    mutationFn: (values: CreateK8sClusterFormValues) =>
       createK8sCluster({ name: values.name, version: values.version || undefined }),
     onSuccess: () => {
       onCreated();

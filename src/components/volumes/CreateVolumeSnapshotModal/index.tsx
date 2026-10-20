@@ -3,13 +3,15 @@ import { Form, Input, Modal, Typography } from "@arco-design/web-react";
 import { useState } from "react";
 import { createVolumeSnapshot } from "@/api/storage/volumes";
 
+type CreateVolumeSnapshotModalProps = {
+  volumeId: string;
+  onCancel: () => void;
+};
+
 export default function CreateVolumeSnapshotModal({
   volumeId,
   onCancel,
-}: {
-  volumeId: string;
-  onCancel: () => void;
-}) {
+}: CreateVolumeSnapshotModalProps) {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const create = useMutation({

@@ -1,7 +1,22 @@
 import { Form, Input, Select, Switch } from "@arco-design/web-react";
 import ContainerFilesystemMountFields from "@/components/instances/ContainerFilesystemMountFields";
 import { type ContainerFilesystemItem } from "@/components/instances/ContainerFilesystemMountFields";
-import { type ContainerStorageFormValues, hasDuplicateContainerMountPath } from "./storage";
+import { hasDuplicateContainerMountPath } from "./storage";
+
+export type ContainerStorageFormValues = {
+  volume_id: string;
+  volume_mount_path: string;
+  volume_read_only: boolean;
+  filesystem_id: string;
+  filesystem_mount_path: string;
+  filesystem_read_only: boolean;
+};
+
+type ContainerStorageFieldsProps = {
+  values: ContainerStorageFormValues;
+  volumes?: StorageItem[];
+  filesystems?: ContainerFilesystemItem[];
+};
 
 type StorageItem = {
   id: string;
@@ -12,11 +27,7 @@ export default function ContainerStorageFields({
   values,
   volumes,
   filesystems,
-}: {
-  values: ContainerStorageFormValues;
-  volumes?: StorageItem[];
-  filesystems?: ContainerFilesystemItem[];
-}) {
+}: ContainerStorageFieldsProps) {
   const hasDuplicateMountPath = hasDuplicateContainerMountPath(values);
 
   return (

@@ -1,7 +1,15 @@
 import { StatusBadge } from "@/components/common";
 import InstanceComputeSpecSelect from "@/components/instances/InstanceComputeSpecSelect";
 import { Form, Input, Select, Tag } from "@arco-design/web-react";
-import { type FormValues, type GpuSpecOption, isGpuSpecSelectable } from "../../types";
+import type { GpuContainerConfigurationFormValues, GpuSpecOption } from "..";
+import { isGpuSpecSelectable } from "../../utils";
+
+type GpuContainerResourceStepProps = {
+  values: GpuContainerConfigurationFormValues;
+  specs: GpuSpecOption[];
+  quotaRemaining: number;
+  specsLoading: boolean;
+};
 
 function specStatusTag(spec: GpuSpecOption) {
   if (spec.source === "temporary") {
@@ -23,12 +31,7 @@ function specStatusTag(spec: GpuSpecOption) {
 export default function GpuContainerResourceStep({
   specs,
   specsLoading,
-}: {
-  values: FormValues;
-  specs: GpuSpecOption[];
-  quotaRemaining: number;
-  specsLoading: boolean;
-}) {
+}: GpuContainerResourceStepProps) {
   return (
     <>
       <Form.Item

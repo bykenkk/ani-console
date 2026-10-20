@@ -8,8 +8,14 @@ import { useMutation } from "@tanstack/react-query";
 
 import { validateForm } from "@/lib/form";
 
+type ContainerResizeModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 type Instance = InstanceRecord;
-type Values = { spec: string };
+type ContainerResizeFormValues = { spec: string };
 
 function getCurrentResizeSpec(instance: Instance) {
   const cpu = String(instance.compute?.cpu ?? "")
@@ -31,12 +37,8 @@ export default function ContainerResizeModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
-  const [form] = Form.useForm<Values>();
+}: ContainerResizeModalProps) {
+  const [form] = Form.useForm<ContainerResizeFormValues>();
   const currentSpec = getCurrentResizeSpec(instance);
   const resizeSpecs = CPU_INSTANCE_COMPUTE_SPECS.some(
     (option) => option.value === currentSpec.value,
@@ -52,7 +54,7 @@ export default function ContainerResizeModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async (values: Values) => {
+    mutationFn: async (values: ContainerResizeFormValues) => {
       const spec = resizeSpecs.find((option) => option.value === values.spec);
       if (!spec) throw new Error("请选择有效的规格档位");
 

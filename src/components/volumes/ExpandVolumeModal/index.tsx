@@ -3,15 +3,14 @@ import { Alert, Form, InputNumber, Modal, Typography } from "@arco-design/web-re
 import { useState } from "react";
 import { expandVolume, type StorageVolume } from "@/api/storage/volumes";
 
-type Volume = StorageVolume;
-
-export default function ExpandVolumeModal({
-  volume,
-  onCancel,
-}: {
+type ExpandVolumeModalProps = {
   volume: Volume;
   onCancel: () => void;
-}) {
+};
+
+type Volume = StorageVolume;
+
+export default function ExpandVolumeModal({ volume, onCancel }: ExpandVolumeModalProps) {
   const qc = useQueryClient();
   const [sizeGiB, setSizeGiB] = useState(volume.size_gib + 1);
   const expand = useMutation({

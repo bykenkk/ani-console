@@ -1,22 +1,29 @@
 import { Form, Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { registerImage, type RegisterImageInput } from "@/api/images";
+import { registerImage } from "@/api/images";
 import { validateForm } from "@/lib/form";
 import ImageRegistrationFields from "../ImageRegistrationFields";
 
-export default function RegisterImageModal({
-  onCancel,
-  onCreated,
-}: {
+type RegisterImageModalProps = {
   onCancel: () => void;
   onCreated: () => void;
-}) {
-  const [form] = Form.useForm<RegisterImageInput>();
+};
+
+type RegisterImageFormValues = {
+  imageReference: string;
+  displayName: string;
+  description?: string;
+  purposes: string[];
+  accelerator?: string;
+};
+
+export default function RegisterImageModal({ onCancel, onCreated }: RegisterImageModalProps) {
+  const [form] = Form.useForm<RegisterImageFormValues>();
   const client = useQueryClient();
   const mutation = useMutation({
-    mutationFn: (input: RegisterImageInput) =>
+    mutationFn: (input: RegisterImageFormValues) =>
       registerImage({
-        ...input,
+        accelerator: input.accelerator,
         imageReference: input.imageReference.trim(),
         displayName: input.displayName.trim(),
         description: input.description?.trim() || "",

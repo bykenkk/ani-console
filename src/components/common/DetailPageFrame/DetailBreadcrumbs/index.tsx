@@ -2,7 +2,7 @@ import { Breadcrumb, Button, Tooltip } from "@arco-design/web-react";
 import { Link, useRouter } from "@tanstack/react-router";
 import AliIcon from "../../AliIcon";
 import styles from "./index.module.css";
-import type { DetailBreadcrumbItem } from "../types";
+import type { DetailBreadcrumbItem } from "..";
 
 type DetailBreadcrumbsProps = {
   items: DetailBreadcrumbItem[];

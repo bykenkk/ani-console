@@ -2,6 +2,15 @@ import { Button, Drawer, Empty, Spin, Typography } from "@arco-design/web-react"
 import type { KBCitation as Citation } from "@/api/knowledge";
 import { formatDateTime } from "@/lib/format";
 
+type KnowledgeCitationsDrawerProps = {
+  visible: boolean;
+  citations?: Citation[];
+  loading: boolean;
+  error: unknown;
+  onCancel: () => void;
+  onSelectSession: (sessionId: string) => void;
+};
+
 export default function KnowledgeCitationsDrawer({
   visible,
   citations,
@@ -9,14 +18,7 @@ export default function KnowledgeCitationsDrawer({
   error,
   onCancel,
   onSelectSession,
-}: {
-  visible: boolean;
-  citations?: Citation[];
-  loading: boolean;
-  error: unknown;
-  onCancel: () => void;
-  onSelectSession: (sessionId: string) => void;
-}) {
+}: KnowledgeCitationsDrawerProps) {
   return (
     <Drawer width={560} title="本库全部引用" visible={visible} footer={null} onCancel={onCancel}>
       {loading ? (

@@ -3,17 +3,21 @@ import { Form, InputNumber, Modal, Typography } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { validateForm } from "@/lib/form";
 
+type InferenceScaleFormValues = { replicas: number };
+
+type InferenceScaleModalProps = {
+  serviceId: string;
+  initialReplicas: number;
+  onCancel: () => void;
+};
+
 export default function InferenceScaleModal({
   serviceId,
   initialReplicas,
   onCancel,
-}: {
-  serviceId: string;
-  initialReplicas: number;
-  onCancel: () => void;
-}) {
+}: InferenceScaleModalProps) {
   const qc = useQueryClient();
-  const [form] = Form.useForm<{ replicas: number }>();
+  const [form] = Form.useForm<InferenceScaleFormValues>();
   const scale = useMutation({
     meta: {
       feedback: {
@@ -37,7 +41,7 @@ export default function InferenceScaleModal({
       onCancel={onCancel}
       confirmLoading={scale.isPending}
       onOk={async () => {
-        const values = await validateForm<{ replicas: number }>(form);
+        const values = await validateForm<InferenceScaleFormValues>(form);
         await scale.mutateAsync(values.replicas);
       }}
     >

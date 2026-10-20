@@ -27,15 +27,13 @@ type Vpc = NetworkVPC;
 import SubnetRelatedResources from "./SubnetRelatedResources";
 import SubnetRoutes from "./SubnetRoutes";
 
-export default function SubnetDetailPage({
-  subnetId,
-  tab,
-  onTabChange,
-}: {
+type SubnetDetailPageProps = {
   subnetId: string;
   tab?: string;
   onTabChange: (tab: string) => void;
-}) {
+};
+
+export default function SubnetDetailPage({ subnetId, tab, onTabChange }: SubnetDetailPageProps) {
   const goBack = useBackOrFallback("subnet");
   const detail = useQuery({
     meta: {

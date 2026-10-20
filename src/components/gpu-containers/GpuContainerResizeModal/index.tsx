@@ -7,16 +7,23 @@ import {
 } from "@/api/instances/legacy";
 import { Form, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
-import GpuContainerResizeFields from "@/components/gpu-containers/GpuContainerResizeFields";
+import GpuContainerResizeFields, {
+  type GpuContainerResizeFormValues,
+} from "@/components/gpu-containers/GpuContainerResizeFields";
 import {
   buildGpuContainerResizeFields,
   getGpuContainerResizeInitialValues,
   isGpuContainerResizeUnchanged,
-  type GpuContainerResizeFormValues,
 } from "@/components/gpu-containers/GpuContainerResizeFields/helpers";
 
 import { showMessage } from "@/lib/feedback";
 import { validateForm } from "@/lib/form";
+
+type GpuContainerResizeModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
 
 type Instance = InstanceRecord;
 
@@ -24,11 +31,7 @@ export default function GpuContainerResizeModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
+}: GpuContainerResizeModalProps) {
   const [form] = Form.useForm<GpuContainerResizeFormValues>();
   const mutation = useMutation({
     meta: {

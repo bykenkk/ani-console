@@ -6,6 +6,8 @@ import { listInferenceServicePolicies, type InferenceAccessPolicy } from "@/api/
 import { DataTable, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
+type InferencePoliciesProps = { serviceId: string };
+
 const SCOPE_LABELS: Record<InferenceAccessPolicy["scope"]["type"], string> = {
   tenant_default: "租户默认",
   inference_service: "推理服务",
@@ -21,7 +23,7 @@ function formatRateLimits(policy: InferenceAccessPolicy) {
   return limits.length ? limits.join(" / ") : "-";
 }
 
-export default function InferencePolicies({ serviceId }: { serviceId: string }) {
+export default function InferencePolicies({ serviceId }: InferencePoliciesProps) {
   const policies = useQuery({
     meta: {
       errorNotification: {

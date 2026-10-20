@@ -19,6 +19,8 @@ import { withId } from "@/lib/id";
 import { Space, Tag, Typography } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
+type VpcRelatedResourcesProps = { vpcId: string };
+
 type RelatedResource = {
   id: string;
   kind: "子网" | "安全组" | "路由" | "负载均衡" | "实例";
@@ -27,7 +29,7 @@ type RelatedResource = {
   group: "网络" | "算力";
 };
 
-export default function VpcRelatedResources({ vpcId }: { vpcId: string }) {
+export default function VpcRelatedResources({ vpcId }: VpcRelatedResourcesProps) {
   const subnets = useQuery({
     meta: {
       errorNotification: {

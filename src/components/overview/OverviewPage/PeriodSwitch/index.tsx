@@ -1,5 +1,11 @@
 import clsx from "clsx";
-import type { HomeTimeRange } from "../types";
+import type { HomeTimeRange } from "..";
+
+type PeriodSwitchProps = {
+  value: HomeTimeRange;
+  onChange: (value: HomeTimeRange) => void;
+  ariaLabel?: string;
+};
 
 const PERIODS: Array<{ value: HomeTimeRange; label: string }> = [
   { value: "1d", label: "1 天" },
@@ -11,11 +17,7 @@ export default function PeriodSwitch({
   value,
   onChange,
   ariaLabel = "时间范围",
-}: {
-  value: HomeTimeRange;
-  onChange: (value: HomeTimeRange) => void;
-  ariaLabel?: string;
-}) {
+}: PeriodSwitchProps) {
   return (
     <div className="flex items-center gap-2" role="group" aria-label={ariaLabel}>
       {PERIODS.map((period) => (

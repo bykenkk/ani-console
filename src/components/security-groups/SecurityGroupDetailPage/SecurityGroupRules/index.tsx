@@ -1,20 +1,24 @@
 import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { listNetworkSecurityGroupRules, deleteNetworkSecurityGroupRule } from "@/api/network";
 import { DataTable, type RowAction } from "@/components/common";
-import SecurityGroupRuleModal from "@/components/security-groups/SecurityGroupRuleModal";
-import { type SecurityGroupRuleResource } from "@/components/security-groups/SecurityGroupRuleModal";
+import SecurityGroupRuleModal, {
+  type SecurityGroupRuleResource,
+} from "@/components/security-groups/SecurityGroupRuleModal";
+
 import { withId } from "@/lib/id";
 import { Button, Space, Tag, Typography, Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
+type SecurityGroupRulesProps = {
+  securityGroupId: string;
+  direction: SecurityGroupRuleResource["direction"];
+};
+
 export default function SecurityGroupRules({
   securityGroupId,
   direction,
-}: {
-  securityGroupId: string;
-  direction: SecurityGroupRuleResource["direction"];
-}) {
+}: SecurityGroupRulesProps) {
   const {
     query: rules,
     items: pageItems,

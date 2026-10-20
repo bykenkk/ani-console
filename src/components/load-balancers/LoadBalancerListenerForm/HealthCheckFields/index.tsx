@@ -1,4 +1,7 @@
 import { Form, Grid, Input, InputNumber, Select } from "@arco-design/web-react";
+
+type HealthCheckFieldsProps = { udp: boolean };
+
 const fields = [
   { field: "interval_seconds", label: "检查间隔（秒）", min: 1 },
   { field: "timeout_seconds", label: "超时时间（秒）", min: 1 },
@@ -6,7 +9,7 @@ const fields = [
   { field: "unhealthy_threshold", label: "不健康阈值", min: 1 },
   { field: "port", label: "健康检查端口（0 使用业务端口）", min: 0, max: 65535 },
 ];
-export default function HealthCheckFields({ udp }: { udp: boolean }) {
+export default function HealthCheckFields({ udp }: HealthCheckFieldsProps) {
   return (
     <>
       <Form.Item label="健康检查协议" field="health_check.protocol" rules={[{ required: true }]}>

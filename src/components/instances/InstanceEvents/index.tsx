@@ -10,13 +10,12 @@ import { Tag } from "@arco-design/web-react";
 import { DataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
-export default function InstanceEvents({
-  instanceId,
-  instanceKind,
-}: {
+type InstanceEventsProps = {
   instanceId: string;
   instanceKind?: legacy.InstanceKind;
-}) {
+};
+
+export default function InstanceEvents({ instanceId, instanceKind }: InstanceEventsProps) {
   const [history, setHistory] = useState(false);
   const migrated = instanceKind === "container" || instanceKind === "gpu_container";
   const current = useQuery({

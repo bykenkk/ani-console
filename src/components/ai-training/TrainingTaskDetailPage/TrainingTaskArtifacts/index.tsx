@@ -7,7 +7,9 @@ import { withId } from "@/lib/id";
 import { formatDateTime } from "@/lib/date";
 import TrainingArtifactDownload from "./TrainingArtifactDownload";
 
-export default function TrainingTaskArtifacts({ executionId }: { executionId: string }) {
+type TrainingTaskArtifactsProps = { executionId: string };
+
+export default function TrainingTaskArtifacts({ executionId }: TrainingTaskArtifactsProps) {
   const { query, pagination, refresh } = useCursorPaginatedQuery({
     queryKey: ["training-artifacts", executionId],
     errorNotification: {

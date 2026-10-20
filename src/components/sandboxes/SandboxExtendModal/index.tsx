@@ -5,17 +5,19 @@ import { useState } from "react";
 
 import { formatDurationSeconds } from "../SandboxDetailPage/utils";
 
+type SandboxExtendModalProps = {
+  instance: SandboxInstance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 type SandboxInstance = InstanceRecord;
 
 export default function SandboxExtendModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: SandboxInstance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
+}: SandboxExtendModalProps) {
   const [duration, setDuration] = useState("1h");
   const mutation = useMutation({
     meta: {

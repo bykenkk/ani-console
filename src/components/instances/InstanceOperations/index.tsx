@@ -7,6 +7,11 @@ import { DataTable, StatusBadge } from "@/components/common";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 
+type InstanceOperationsProps = {
+  instanceId: string;
+  operationId?: string;
+};
+
 const OPERATION_LABELS: Record<string, string> = {
   create: "创建",
   start: "启动",
@@ -30,13 +35,7 @@ const OPERATION_LABELS: Record<string, string> = {
   console_session: "终端会话",
 };
 
-export default function InstanceOperations({
-  instanceId,
-  operationId,
-}: {
-  instanceId: string;
-  operationId?: string;
-}) {
+export default function InstanceOperations({ instanceId, operationId }: InstanceOperationsProps) {
   const current = useQuery({
     queryKey: ["governance-instance-operation", operationId],
     enabled: Boolean(operationId),

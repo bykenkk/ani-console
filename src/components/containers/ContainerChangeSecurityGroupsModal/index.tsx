@@ -1,12 +1,20 @@
 // FIXME(governance-migration): 安全组变更未对齐，保留原弹窗、入口、参数和 legacy 调用。
 // TODO(governance-migration): 待等价契约可用后迁移安全组变更，不混用新创建/启停接口替代。
 import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
-import { listNetworkSecurityGroups } from "@/api/network";
-import type { NetworkSecurityGroup } from "@/api/network";
+import { listNetworkSecurityGroups, type NetworkSecurityGroup } from "@/api/network";
+
 import { Form, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { validateForm } from "@/lib/form";
+
+type ContainerChangeSecurityGroupsFormValues = { securityGroupIds?: string[] };
+
+type ContainerChangeSecurityGroupsModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
 
 type Instance = InstanceRecord;
 type SecurityGroup = NetworkSecurityGroup;
@@ -15,12 +23,8 @@ export default function ContainerChangeSecurityGroupsModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
-  const [form] = Form.useForm<{ securityGroupIds?: string[] }>();
+}: ContainerChangeSecurityGroupsModalProps) {
+  const [form] = Form.useForm<ContainerChangeSecurityGroupsFormValues>();
   const groups = useQuery({
     meta: {
       errorNotification: {
@@ -49,7 +53,7 @@ export default function ContainerChangeSecurityGroupsModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async ({ securityGroupIds }: { securityGroupIds?: string[] }) => {
+    mutationFn: async ({ securityGroupIds }: ContainerChangeSecurityGroupsFormValues) => {
       const submitData = {
         action: "change_security_groups" as const,
         security_group_ids: securityGroupIds ?? [],

@@ -1,18 +1,18 @@
 import type { ReactNode } from "react";
 import { Empty, Table, type TableColumnProps, type TableProps } from "@arco-design/web-react";
-import DataTableSectionHeader from "./DataTableSectionHeader";
-import { type DataTableSectionHeaderProps } from "./DataTableSectionHeader";
+import DataTableSectionHeader, { type DataTableSectionHeaderProps } from "./DataTableSectionHeader";
+
 import {
   getRowActionsColumnWidth,
   normalizeDataTableColumns,
   resolveDataTableScroll,
 } from "./layout";
-import { ConfiguredDataTableRowActions } from "./RowActions";
-import type { RowAction } from "./types";
+import { ConfiguredDataTableRowActions, type RowAction } from "./RowActions";
+
 import LegacyCursorPagination from "./LegacyCursorPagination";
 
 export { DataTableRowActionButton, DataTableRowActions } from "./RowActions";
-export type { RowAction, RowActionIntent } from "./types";
+export type { RowAction } from "./RowActions";
 export type { DataTableSectionHeaderProps } from "./DataTableSectionHeader";
 
 export type ListColumn<T> = TableColumnProps<T>;

@@ -24,6 +24,12 @@ import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import SecurityGroupRelatedResources from "./SecurityGroupRelatedResources";
 import SecurityGroupRules from "./SecurityGroupRules";
 
+type SecurityGroupDetailPageProps = {
+  securityGroupId: string;
+  tab?: string;
+  onTabChange: (tab: string) => void;
+};
+
 type SecurityGroup = NetworkSecurityGroup;
 type Vpc = NetworkVPC;
 
@@ -31,11 +37,7 @@ export default function SecurityGroupDetailPage({
   securityGroupId,
   tab,
   onTabChange,
-}: {
-  securityGroupId: string;
-  tab?: string;
-  onTabChange: (tab: string) => void;
-}) {
+}: SecurityGroupDetailPageProps) {
   const goBack = useBackOrFallback("security-group");
   const detail = useQuery({
     meta: {

@@ -1,6 +1,6 @@
 import { Tabs } from "@arco-design/web-react";
 import styles from "./index.module.css";
-import type { DetailTab } from "../types";
+import type { DetailTab } from "..";
 
 type DetailContentTabsProps<TKey extends string> = {
   tabs: DetailTab<TKey>[];

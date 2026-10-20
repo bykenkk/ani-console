@@ -3,7 +3,9 @@ import { DataTable, ResourceNameId } from "@/components/common";
 import { loadBalancerLabel } from "@/lib/load-balancers";
 import { loadBalancerListeners } from "@/lib/load-balancers";
 
-export default function LoadBalancerListeners({ item }: { item: NetworkLoadBalancer }) {
+type LoadBalancerListenersProps = { item: NetworkLoadBalancer };
+
+export default function LoadBalancerListeners({ item }: LoadBalancerListenersProps) {
   return (
     <DataTable<NetworkLoadBalancerListenerResource>
       columns={[

@@ -11,9 +11,15 @@ import type {
   HomeTimeRange,
   HomeTrendConfig,
   HomeTrendSnapshot,
-} from "../types";
+} from "..";
 import PeriodSwitch from "../PeriodSwitch";
 import styles from "../index.module.css";
+
+type TrendCardProps = {
+  config: HomeTrendConfig;
+  dataSource: HomeOverviewDataSource;
+  metric: HomeResourceTrendMetric;
+};
 
 function areaColor(color: string) {
   return color.toUpperCase() === "#67C23A" ? "rgba(103, 194, 58, 0.12)" : "rgba(0, 121, 211, 0.15)";
@@ -30,15 +36,7 @@ function percentTooltip(value: unknown) {
   return Number.isFinite(number) ? `${Number(number.toFixed(2))}%` : "-";
 }
 
-export default function TrendCard({
-  config,
-  dataSource,
-  metric,
-}: {
-  config: HomeTrendConfig;
-  dataSource: HomeOverviewDataSource;
-  metric: HomeResourceTrendMetric;
-}) {
+export default function TrendCard({ config, dataSource, metric }: TrendCardProps) {
   const [range, setRange] = useState<HomeTimeRange>("7d");
   const trendQuery = useQuery({
     meta: {

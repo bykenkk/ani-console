@@ -5,6 +5,12 @@ import type { InstanceRuntime } from "@/api/instances";
 import { DataTable } from "@/components/common";
 import { getInstanceDisplayIp, getInstanceNetworkValue } from "@/lib/instances";
 
+type InstanceNetworkProps = {
+  instance?: InstanceRecord;
+  runtime?: InstanceRuntime;
+  loading?: boolean;
+};
+
 type NetworkRow = {
   type: string;
   name: string;
@@ -14,11 +20,7 @@ export default function InstanceNetwork({
   instance,
   runtime,
   loading = false,
-}: {
-  instance?: InstanceRecord;
-  runtime?: InstanceRuntime;
-  loading?: boolean;
-}) {
+}: InstanceNetworkProps) {
   const rows: NetworkRow[] = [
     ...(runtime ? [{ type: "Pod IP", name: runtime.pod?.podIp ?? "-" }] : []),
     { type: "VPC", name: getInstanceNetworkValue(instance, "vpc_id") },

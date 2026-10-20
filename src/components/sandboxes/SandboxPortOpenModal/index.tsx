@@ -3,17 +3,19 @@ import { Form, Input, InputNumber, Modal, Select } from "@arco-design/web-react"
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
+type SandboxPortOpenModalProps = {
+  instance: SandboxInstance;
+  onCancel: () => void;
+  onSuccess: () => void;
+};
+
 type SandboxInstance = InstanceRecord;
 
 export default function SandboxPortOpenModal({
   instance,
   onCancel,
   onSuccess,
-}: {
-  instance: SandboxInstance;
-  onCancel: () => void;
-  onSuccess: () => void;
-}) {
+}: SandboxPortOpenModalProps) {
   const [port, setPort] = useState(8080);
   const [portName, setPortName] = useState("");
   const [protocol, setProtocol] = useState<"tcp" | "http">("http");

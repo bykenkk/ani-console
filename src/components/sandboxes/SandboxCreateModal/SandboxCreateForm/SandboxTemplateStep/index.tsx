@@ -1,15 +1,20 @@
 import { Empty, Form, Select, Spin } from "@arco-design/web-react";
 import { ImageNameText } from "@/components/common";
-import type { SandboxTemplate } from "../../types";
+import type { SandboxTemplate } from "../..";
 
-type Props = {
+type SandboxTemplateStepProps = {
   templates: SandboxTemplate[];
   loading: boolean;
   error: boolean;
   onChange: (templateId: string) => void;
 };
 
-export default function SandboxTemplateStep({ templates, loading, error, onChange }: Props) {
+export default function SandboxTemplateStep({
+  templates,
+  loading,
+  error,
+  onChange,
+}: SandboxTemplateStepProps) {
   return (
     <>
       {loading ? (

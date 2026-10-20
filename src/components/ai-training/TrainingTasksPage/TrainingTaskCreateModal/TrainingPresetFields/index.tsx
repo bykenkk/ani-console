@@ -3,6 +3,8 @@
 import { Card, Form, Input, Typography } from "@arco-design/web-react";
 import type { ModelDevPreset, ModelDevParameterRule } from "@/api/modeldev";
 
+type TrainingPresetFieldsProps = { preset?: ModelDevPreset };
+
 function parameterError(rule: ModelDevParameterRule, value?: string) {
   if (!value?.trim()) return rule.required ? "请填写此参数" : undefined;
   if (rule.allowed_values?.length && !rule.allowed_values.some((item) => item.value === value))
@@ -20,7 +22,7 @@ function parameterError(rule: ModelDevParameterRule, value?: string) {
   return undefined;
 }
 
-export default function TrainingPresetFields({ preset }: { preset?: ModelDevPreset }) {
+export default function TrainingPresetFields({ preset }: TrainingPresetFieldsProps) {
   return (
     <Card bordered={false}>
       {(preset?.parameter_rules ?? []).map((rule, index) => (

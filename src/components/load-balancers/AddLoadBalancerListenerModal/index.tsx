@@ -1,19 +1,21 @@
 import { listenerInput } from "@/lib/load-balancers";
 import { Form, Modal } from "@arco-design/web-react";
-import type { LoadBalancerListenerValues } from "@/components/load-balancers/LoadBalancerListenerForm";
+import type { LoadBalancerListenerFormValues } from "@/components/load-balancers/LoadBalancerListenerForm";
 import LoadBalancerListenerForm from "@/components/load-balancers/LoadBalancerListenerForm";
 import { validateForm } from "@/lib/form";
+
+type AddLoadBalancerListenerModalProps = {
+  usedPorts: number[];
+  onCancel: () => void;
+  onAdd: (listener: LoadBalancerListenerFormValues) => void;
+};
 
 export default function AddLoadBalancerListenerModal({
   usedPorts,
   onCancel,
   onAdd,
-}: {
-  usedPorts: number[];
-  onCancel: () => void;
-  onAdd: (listener: LoadBalancerListenerValues) => void;
-}) {
-  const [form] = Form.useForm<LoadBalancerListenerValues>();
+}: AddLoadBalancerListenerModalProps) {
+  const [form] = Form.useForm<LoadBalancerListenerFormValues>();
   return (
     <Modal
       visible
@@ -22,7 +24,7 @@ export default function AddLoadBalancerListenerModal({
       okText="添加"
       onCancel={onCancel}
       onOk={async () => {
-        const values = await validateForm<LoadBalancerListenerValues>(form);
+        const values = await validateForm<LoadBalancerListenerFormValues>(form);
         onAdd(listenerInput({ ...values, backends: [] }));
       }}
     >

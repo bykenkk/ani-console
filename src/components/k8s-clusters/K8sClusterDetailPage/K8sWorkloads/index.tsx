@@ -4,7 +4,9 @@ import { DataTable, StatusBadge } from "@/components/common";
 import { withId } from "@/lib/id";
 import { Card, Grid } from "@arco-design/web-react";
 
-export default function K8sWorkloads({ clusterId }: { clusterId: string }) {
+type K8sWorkloadsProps = { clusterId: string };
+
+export default function K8sWorkloads({ clusterId }: K8sWorkloadsProps) {
   const {
     query: workloads,
     items: pageItems,

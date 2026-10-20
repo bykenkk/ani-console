@@ -7,6 +7,14 @@ import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 
 import { Button, Space } from "@arco-design/web-react";
 
+type InstanceStorageProps = {
+  instance?: Instance;
+  runtime?: InstanceRuntime;
+  loading?: boolean;
+  mountVolume?: RowAction<Instance>;
+  mountFilesystem?: RowAction<Instance>;
+};
+
 type Instance = InstanceRecord;
 type Volume = NonNullable<Instance["volumes"]>[number];
 type FilesystemAttachment = NonNullable<Instance["storage_attachments"]>[number];
@@ -16,13 +24,7 @@ export default function InstanceStorage({
   loading = false,
   mountVolume,
   mountFilesystem,
-}: {
-  instance?: Instance;
-  runtime?: InstanceRuntime;
-  loading?: boolean;
-  mountVolume?: RowAction<Instance>;
-  mountFilesystem?: RowAction<Instance>;
-}) {
+}: InstanceStorageProps) {
   const volumes = instance?.volumes ?? [];
   const filesystems = (instance?.storage_attachments ?? []).filter(
     (attachment) => attachment.resource_type === "filesystem",

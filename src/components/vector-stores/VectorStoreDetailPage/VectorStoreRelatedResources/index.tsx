@@ -6,9 +6,11 @@ import { Button, Link, Modal, Space } from "@arco-design/web-react";
 
 import { useNavigate } from "@tanstack/react-router";
 
+type VectorStoreRelatedResourcesProps = { store: VectorStore };
+
 type RelatedResource = { id: string; type: "知识库"; name: string };
 
-export default function VectorStoreRelatedResources({ store }: { store: VectorStore }) {
+export default function VectorStoreRelatedResources({ store }: VectorStoreRelatedResourcesProps) {
   const navigate = useNavigate();
 
   const qc = useQueryClient();

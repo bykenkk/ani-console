@@ -1,14 +1,13 @@
 import { Empty, Form, Select, Spin } from "@arco-design/web-react";
 import { ImageNameText } from "@/components/common";
-import type { RegistryImage } from "../../types";
+import type { RegistryImage } from "..";
 
-export default function GpuContainerImageStep({
-  images,
-  loading,
-}: {
+type GpuContainerImageStepProps = {
   images: RegistryImage[];
   loading: boolean;
-}) {
+};
+
+export default function GpuContainerImageStep({ images, loading }: GpuContainerImageStepProps) {
   return (
     <>
       {loading ? (

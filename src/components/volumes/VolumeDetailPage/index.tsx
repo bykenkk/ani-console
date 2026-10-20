@@ -23,17 +23,15 @@ import VolumeMountHistory from "./VolumeMountHistory";
 import VolumeRelatedResources from "./VolumeRelatedResources";
 import VolumeSnapshots from "./VolumeSnapshots";
 
-type Volume = StorageVolume;
-
-export default function VolumeDetailPage({
-  volumeId,
-  tab,
-  onTabChange,
-}: {
+type VolumeDetailPageProps = {
   volumeId: string;
   tab?: string;
   onTabChange: (tab: string) => void;
-}) {
+};
+
+type Volume = StorageVolume;
+
+export default function VolumeDetailPage({ volumeId, tab, onTabChange }: VolumeDetailPageProps) {
   const goBack = useBackOrFallback("volume");
 
   const detail = useQuery({

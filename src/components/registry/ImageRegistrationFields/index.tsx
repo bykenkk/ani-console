@@ -1,7 +1,9 @@
 import { Form, Input, Select } from "@arco-design/web-react";
 import { IMAGE_ACCELERATORS, IMAGE_PURPOSES } from "../options";
 
-export default function ImageRegistrationFields({ creating }: { creating: boolean }) {
+type ImageRegistrationFieldsProps = { creating: boolean };
+
+export default function ImageRegistrationFields({ creating }: ImageRegistrationFieldsProps) {
   return (
     <>
       {creating && (

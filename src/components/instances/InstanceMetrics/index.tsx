@@ -16,6 +16,14 @@ import { closeNotification, showNotification } from "@/lib/feedback";
 import { withId } from "@/lib/id";
 import { formatBytes } from "@/lib/format";
 
+type InstanceMetricsProps = {
+  instanceId: string;
+  instanceKind: InstanceKind;
+  gpuOnly?: boolean;
+  gpuModel?: string | null;
+  gpuCount?: number | null;
+};
+
 type InstanceKind = InstanceRecord["kind"];
 type RangeMetrics = ObservabilityRangeQueryResponse;
 type MonitoringTrendSeries = {
@@ -56,13 +64,7 @@ export default function InstanceMetrics({
   gpuOnly = false,
   gpuModel,
   gpuCount,
-}: {
-  instanceId: string;
-  instanceKind: InstanceKind;
-  gpuOnly?: boolean;
-  gpuModel?: string | null;
-  gpuCount?: number | null;
-}) {
+}: InstanceMetricsProps) {
   const hasGpuMetrics = instanceKind === "gpu_container";
   const metrics = useQuery({
     meta: {

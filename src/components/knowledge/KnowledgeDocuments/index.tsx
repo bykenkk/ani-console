@@ -20,6 +20,8 @@ import styles from "./index.module.css";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import ChunksDrawer from "./ChunksDrawer";
 
+type KnowledgeDocumentsProps = { kbId: string; action?: ReactNode };
+
 function formatBytes(value?: number) {
   if (value == null) return "-";
   if (value < 1024) return `${value} B`;
@@ -67,7 +69,7 @@ function statusTag(document: KBDocument) {
   );
 }
 
-export default function KnowledgeDocuments({ kbId, action }: { kbId: string; action?: ReactNode }) {
+export default function KnowledgeDocuments({ kbId, action }: KnowledgeDocumentsProps) {
   const {
     query: documents,
     resetPagination,

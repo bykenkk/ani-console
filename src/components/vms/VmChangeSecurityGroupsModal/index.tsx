@@ -1,10 +1,18 @@
 import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
-import { listNetworkSecurityGroups } from "@/api/network";
-import type { NetworkSecurityGroup } from "@/api/network";
+import { listNetworkSecurityGroups, type NetworkSecurityGroup } from "@/api/network";
+
 import { Form, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import { validateForm } from "@/lib/form";
+
+type VmChangeSecurityGroupsFormValues = { securityGroupIds?: string[] };
+
+type VmChangeSecurityGroupsModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: (operationId: string) => void;
+};
 
 type Instance = InstanceRecord;
 type SecurityGroup = NetworkSecurityGroup;
@@ -13,12 +21,8 @@ export default function VmChangeSecurityGroupsModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: (operationId: string) => void;
-}) {
-  const [form] = Form.useForm<{ securityGroupIds?: string[] }>();
+}: VmChangeSecurityGroupsModalProps) {
+  const [form] = Form.useForm<VmChangeSecurityGroupsFormValues>();
   const groups = useQuery({
     meta: {
       errorNotification: {
@@ -46,7 +50,7 @@ export default function VmChangeSecurityGroupsModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async ({ securityGroupIds }: { securityGroupIds?: string[] }) => {
+    mutationFn: async ({ securityGroupIds }: VmChangeSecurityGroupsFormValues) => {
       const submitData = {
         action: "change_security_groups" as const,
         security_group_ids: securityGroupIds ?? [],

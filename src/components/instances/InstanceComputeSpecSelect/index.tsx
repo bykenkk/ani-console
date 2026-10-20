@@ -8,7 +8,7 @@ type ComputeSpecOption = {
   disabled?: boolean;
 };
 
-type Props = {
+type InstanceComputeSpecSelectProps = {
   field: string;
   profile: "cpu" | "gpu";
   options?: readonly ComputeSpecOption[];
@@ -19,7 +19,7 @@ type Props = {
 const PROFILE_OPTIONS = {
   cpu: CPU_INSTANCE_COMPUTE_SPECS,
   gpu: GPU_INSTANCE_COMPUTE_SPECS,
-} satisfies Record<Props["profile"], readonly ComputeSpecOption[]>;
+} satisfies Record<InstanceComputeSpecSelectProps["profile"], readonly ComputeSpecOption[]>;
 
 export default function InstanceComputeSpecSelect({
   field,
@@ -27,7 +27,7 @@ export default function InstanceComputeSpecSelect({
   options = PROFILE_OPTIONS[profile],
   label = "CPU / 内存",
   placeholder = "请选择 CPU / 内存规格",
-}: Props) {
+}: InstanceComputeSpecSelectProps) {
   return (
     <Form.Item field={field} label={label} rules={[{ required: true, message: placeholder }]}>
       <Select placeholder={placeholder} options={options.map((item) => item)} />

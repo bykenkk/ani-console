@@ -8,9 +8,13 @@ import {
 } from "@/api/knowledge";
 import { sha256File } from "@/lib/hash";
 
+type KnowledgeDocumentUploadButtonProps = { kbId: string };
+
 const allowedTypes = ["pdf", "docx", "xlsx", "pptx", "md", "txt"] as const;
 
-export default function KnowledgeDocumentUploadButton({ kbId }: { kbId: string }) {
+export default function KnowledgeDocumentUploadButton({
+  kbId,
+}: KnowledgeDocumentUploadButtonProps) {
   const qc = useQueryClient();
   const upload = useMutation({
     meta: {

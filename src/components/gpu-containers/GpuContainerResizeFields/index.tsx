@@ -9,15 +9,22 @@ import InstanceComputeSpecSelect from "@/components/instances/InstanceComputeSpe
 import { GPU_INSTANCE_COMPUTE_SPECS } from "@/lib/instances";
 import { currentCpuMemorySpec, currentGpuSpecValue } from "./helpers";
 
+export type GpuContainerResizeFormValues = {
+  gpu_spec_id?: string;
+  cpu_memory_spec?: string;
+};
+
+type GpuContainerResizeFieldsProps = {
+  instance: Instance;
+  enabled: boolean;
+};
+
 type Instance = InstanceRecord;
 
 export default function GpuContainerResizeFields({
   instance,
   enabled,
-}: {
-  instance: Instance;
-  enabled: boolean;
-}) {
+}: GpuContainerResizeFieldsProps) {
   const gpuSpecs = useQuery({
     meta: {
       errorNotification: {

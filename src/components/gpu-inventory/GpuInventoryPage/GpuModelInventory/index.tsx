@@ -3,6 +3,8 @@ import type { GpuOccupancyStats } from "@/api/gpu-inventory";
 import { ListDataTable } from "@/components/common";
 import { useGpuOccupancyQuery } from "../useGpuOccupancyQuery";
 
+type GpuModelInventoryProps = { onCreate: () => void };
+
 type ModelInventoryRow = {
   id: string;
   gpuType: string;
@@ -29,7 +31,7 @@ function getModelInventory(occupancy?: GpuOccupancyStats): ModelInventoryRow[] {
   });
 }
 
-export default function GpuModelInventory({ onCreate }: { onCreate: () => void }) {
+export default function GpuModelInventory({ onCreate }: GpuModelInventoryProps) {
   const occupancy = useGpuOccupancyQuery();
   const modelInventory = getModelInventory(occupancy.data);
 

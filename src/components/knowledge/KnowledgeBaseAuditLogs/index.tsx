@@ -5,6 +5,8 @@ import { listKnowledgeBaseAuditLogs, type KBAuditLog } from "@/api/knowledge";
 import { DataTable, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
+type KnowledgeBaseAuditLogsProps = { kbId: string };
+
 const ACTION_LABELS: Record<string, string> = {
   "kb.create": "创建知识库",
   "kb.update": "更新知识库",
@@ -20,7 +22,7 @@ const ACTION_LABELS: Record<string, string> = {
   "session.delete": "删除会话",
 };
 
-export default function KnowledgeBaseAuditLogs({ kbId }: { kbId: string }) {
+export default function KnowledgeBaseAuditLogs({ kbId }: KnowledgeBaseAuditLogsProps) {
   // TODO(pagination-migration): 后端仍仅支持 limit/cursor；支持 page/pageSize 后移除临时游标兼容。
   const {
     query: logs,

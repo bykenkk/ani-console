@@ -16,17 +16,16 @@ import {
 } from "@/lib/validators";
 import { withFirst100 } from "@/api/pagination";
 
+type CreateSubnetModalProps = {
+  onCancel: () => void;
+  onCreated: () => void;
+};
+
 const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type Vpc = NetworkVPC;
 
-export default function CreateSubnetModal({
-  onCancel,
-  onCreated,
-}: {
-  onCancel: () => void;
-  onCreated: () => void;
-}) {
+export default function CreateSubnetModal({ onCancel, onCreated }: CreateSubnetModalProps) {
   const [form] = Form.useForm();
   const [name, setName] = useState("");
   const [vpcId, setVpcId] = useState("");

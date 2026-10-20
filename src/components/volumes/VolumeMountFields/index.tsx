@@ -3,6 +3,15 @@ import type { StorageVolumeMode } from "@/api/storage/volumes";
 import { VOLUME_MODE_LABELS } from "@/lib/volumes";
 import { Form, Select } from "@arco-design/web-react";
 
+type VolumeMountFieldsProps = {
+  mode: StorageVolumeMode;
+  instanceId: string;
+  instances: InstanceRecord[];
+  loading: boolean;
+  onModeChange: (mode: StorageVolumeMode) => void;
+  onInstanceChange: (id: string) => void;
+};
+
 export default function VolumeMountFields({
   mode,
   instanceId,
@@ -10,14 +19,7 @@ export default function VolumeMountFields({
   loading,
   onModeChange,
   onInstanceChange,
-}: {
-  mode: StorageVolumeMode;
-  instanceId: string;
-  instances: InstanceRecord[];
-  loading: boolean;
-  onModeChange: (mode: StorageVolumeMode) => void;
-  onInstanceChange: (id: string) => void;
-}) {
+}: VolumeMountFieldsProps) {
   return (
     <>
       <Form.Item label="用途" required extra="用途创建后不可修改。如需更换用途，须重新创建卷。">

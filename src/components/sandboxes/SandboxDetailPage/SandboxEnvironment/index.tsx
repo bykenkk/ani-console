@@ -3,10 +3,12 @@ import { DataTable } from "@/components/common";
 import { Descriptions, Space, Tag, Typography } from "@arco-design/web-react";
 import { sandboxEgressLabel } from "../utils";
 
+type SandboxEnvironmentProps = { sandbox: SandboxStatus };
+
 type SandboxStatus = NonNullable<SandboxInstanceStatus>;
 type SandboxEnv = NonNullable<SandboxStatus["env"]>[number];
 
-export default function SandboxEnvironment({ sandbox }: { sandbox: SandboxStatus }) {
+export default function SandboxEnvironment({ sandbox }: SandboxEnvironmentProps) {
   const env = sandbox.env ?? [];
   const allowlist = sandbox.egress_allowlist ?? [];
 

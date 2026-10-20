@@ -7,7 +7,9 @@ import { isDateTimeExpired, isValidDateTime } from "@/lib/date";
 import { withId } from "@/lib/id";
 import { showMessage } from "@/lib/feedback";
 
-export default function TrainingArtifactDownload({ artifact }: { artifact: ModelDevArtifact }) {
+type TrainingArtifactDownloadProps = { artifact: ModelDevArtifact };
+
+export default function TrainingArtifactDownload({ artifact }: TrainingArtifactDownloadProps) {
   const pending = useRef<ReturnType<typeof reserveExternalWindow> | null>(null);
   const controller = useRef<AbortController | null>(null);
   useEffect(

@@ -2,15 +2,18 @@ import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getInstance, stopInstance } from "@/api/instances";
 import { withId } from "@/lib/id";
+
+type ContainerStopModalProps = {
+  instance: { id: string; name: string; version?: string };
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 export default function ContainerStopModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: { id: string; name: string; version?: string };
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
+}: ContainerStopModalProps) {
   const qc = useQueryClient();
   const mutation = useMutation({
     mutationFn: async () => {

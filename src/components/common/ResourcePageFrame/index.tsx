@@ -1,12 +1,48 @@
 import { Space, Tooltip } from "@arco-design/web-react";
 import clsx from "clsx";
-import { forwardRef, type ButtonHTMLAttributes } from "react";
-import type {
-  ResourcePageFrameProps,
-  ResourcePageHeaderAction,
-  ResourcePageHeaderConfig,
-} from "./types";
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
+
 import styles from "./index.module.css";
+
+type ResourcePageHeaderActionButtonProps = { action: ResourcePageHeaderAction };
+
+type ResourcePageTitleProps = {
+  iconClassName: string;
+  title: string;
+  subtitle?: string;
+};
+
+type ResourcePageHeaderAction = {
+  key: string;
+  label: ReactNode;
+  iconClassName?: string;
+  variant?: "primary" | "outline" | "secondary" | "danger";
+  tooltip?: ReactNode;
+  disabled?: boolean;
+  onClick?: () => void;
+  buttonProps?: Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "disabled" | "onClick">;
+};
+
+type ResourcePageHeaderBaseConfig = ResourcePageTitleProps;
+
+export type ResourcePageHeaderConfig = ResourcePageHeaderBaseConfig &
+  (
+    | {
+        actions?: ResourcePageHeaderAction[];
+        extra?: never;
+      }
+    | {
+        actions?: never;
+        extra: ReactNode;
+      }
+  );
+
+type ResourcePageHeaderProps = ResourcePageHeaderConfig;
+
+type ResourcePageFrameProps = {
+  header: ResourcePageHeaderConfig;
+  children: ReactNode;
+};
 
 type ToolbarButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   iconClassName?: string;
@@ -30,15 +66,7 @@ const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(function
   );
 });
 
-function ResourcePageTitle({
-  iconClassName,
-  title,
-  subtitle,
-}: {
-  iconClassName: string;
-  title: string;
-  subtitle?: string;
-}) {
+function ResourcePageTitle({ iconClassName, title, subtitle }: ResourcePageTitleProps) {
   return (
     <>
       <div className={styles.pageHeaderIcon} aria-hidden="true">
@@ -52,7 +80,7 @@ function ResourcePageTitle({
   );
 }
 
-function ResourcePageHeaderActionButton({ action }: { action: ResourcePageHeaderAction }) {
+function ResourcePageHeaderActionButton({ action }: ResourcePageHeaderActionButtonProps) {
   const button = (
     <ToolbarButton
       {...action.buttonProps}
@@ -80,7 +108,7 @@ function ResourcePageHeader({
   subtitle,
   actions,
   extra,
-}: ResourcePageHeaderConfig) {
+}: ResourcePageHeaderProps) {
   const actionArea = actions?.length ? (
     <Space size={8}>
       {actions.map((action) => (
@@ -107,9 +135,3 @@ export default function ResourcePageFrame({ header, children }: ResourcePageFram
     </div>
   );
 }
-
-export type {
-  ResourcePageFrameProps,
-  ResourcePageHeaderAction,
-  ResourcePageHeaderConfig,
-} from "./types";

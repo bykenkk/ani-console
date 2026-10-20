@@ -3,15 +3,13 @@ import { IconCopy } from "@arco-design/web-react/icon";
 import clsx from "clsx";
 import { copyToClipboard } from "@/lib/clipboard";
 
-export default function ResourceId({
-  value,
-  className,
-  copyable = true,
-}: {
+type ResourceIdProps = {
   value: string;
   className?: string;
   copyable?: boolean;
-}) {
+};
+
+export default function ResourceId({ value, className, copyable = true }: ResourceIdProps) {
   return (
     <span className={clsx("inline-flex max-w-full min-w-0 items-center gap-1", className)}>
       <span className="min-w-0 truncate font-mono" title={value}>

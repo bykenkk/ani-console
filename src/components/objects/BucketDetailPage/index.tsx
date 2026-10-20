@@ -16,17 +16,15 @@ import BucketAccess from "./BucketAccess";
 import BucketLifecycle from "./BucketLifecycle";
 import BucketObjects from "./BucketObjects";
 
-type Bucket = StorageBucketRecord;
-
-export default function BucketDetailPage({
-  bucketId,
-  tab,
-  onTabChange,
-}: {
+type BucketDetailPageProps = {
   bucketId: string;
   tab?: string;
   onTabChange: (tab: string) => void;
-}) {
+};
+
+type Bucket = StorageBucketRecord;
+
+export default function BucketDetailPage({ bucketId, tab, onTabChange }: BucketDetailPageProps) {
   const goBack = useBackOrFallback("bucket");
 
   const { actions, dialogNode } = useBucketActions(goBack);

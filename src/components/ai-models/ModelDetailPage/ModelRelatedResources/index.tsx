@@ -9,7 +9,9 @@ import type { ListPagination } from "@/components/common/DataTable";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 
-export default function ModelRelatedResources({ model }: { model: Model }) {
+type ModelRelatedResourcesProps = { model: Model };
+
+export default function ModelRelatedResources({ model }: ModelRelatedResourcesProps) {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const params = { page, pageSize };

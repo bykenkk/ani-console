@@ -9,6 +9,15 @@ import { DataTable, ImageNameText, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
 
+type InstanceReleasesProps = {
+  instance?: Instance;
+  currentImage?: Pick<CurrentInstanceRecord, "imageId" | "imageDigest">;
+  loading?: boolean;
+  actions?: ReactNode;
+  versionLayout?: boolean;
+  revisionActions?: RowAction<Release>[];
+};
+
 type Instance = InstanceRecord;
 type Release = NonNullable<NonNullable<Instance["container"]>["history"]>[number];
 
@@ -19,14 +28,7 @@ export default function InstanceReleases({
   actions,
   versionLayout = false,
   revisionActions,
-}: {
-  instance?: Instance;
-  currentImage?: Pick<CurrentInstanceRecord, "imageId" | "imageDigest">;
-  loading?: boolean;
-  actions?: ReactNode;
-  versionLayout?: boolean;
-  revisionActions?: RowAction<Release>[];
-}) {
+}: InstanceReleasesProps) {
   const releases = instance?.container?.history ?? [];
   const rolloutLabels: Record<string, string> = {
     pending: "待发布",

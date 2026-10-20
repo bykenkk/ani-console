@@ -9,17 +9,19 @@ import {
   type ModelDevInputVersion,
 } from "@/api/modeldev";
 
+type TrainingTaskBasicFieldsProps = {
+  preset?: ModelDevPreset;
+  dataset?: ModelDevInputVersion;
+  onPresetChange: (preset: ModelDevPreset) => void;
+  onDatasetChange: (dataset: ModelDevInputVersion) => void;
+};
+
 export default function TrainingTaskBasicFields({
   preset,
   dataset,
   onPresetChange,
   onDatasetChange,
-}: {
-  preset?: ModelDevPreset;
-  dataset?: ModelDevInputVersion;
-  onPresetChange: (preset: ModelDevPreset) => void;
-  onDatasetChange: (dataset: ModelDevInputVersion) => void;
-}) {
+}: TrainingTaskBasicFieldsProps) {
   const presets = useQuery({
     queryKey: ["training-presets"],
     queryFn: ({ signal }) => listModelDevPresets({}, signal),

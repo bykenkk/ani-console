@@ -3,17 +3,19 @@ import { Form, Input, InputNumber, Modal, Select } from "@arco-design/web-react"
 import { useState } from "react";
 import { createBucketLifecycleRule, type StorageBucketLifecycleRule } from "@/api/storage/buckets";
 
+type CreateLifecycleRuleModalProps = {
+  bucketId: string;
+  rule?: LifecycleRule;
+  onCancel: () => void;
+};
+
 type LifecycleRule = StorageBucketLifecycleRule;
 
 export default function CreateLifecycleRuleModal({
   bucketId,
   rule,
   onCancel,
-}: {
-  bucketId: string;
-  rule?: LifecycleRule;
-  onCancel: () => void;
-}) {
+}: CreateLifecycleRuleModalProps) {
   const qc = useQueryClient();
   const [name, setName] = useState(rule?.name ?? "");
   const [prefix, setPrefix] = useState(rule?.prefix ?? "");

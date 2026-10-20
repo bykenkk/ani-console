@@ -6,18 +6,22 @@ import { useMutation } from "@tanstack/react-query";
 
 import { validateForm } from "@/lib/form";
 
+type GpuContainerRollbackFormValues = { revision: string };
+
+type GpuContainerRollbackModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 type Instance = InstanceRecord;
 
 export default function GpuContainerRollbackModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
-  const [form] = Form.useForm<{ revision: string }>();
+}: GpuContainerRollbackModalProps) {
+  const [form] = Form.useForm<GpuContainerRollbackFormValues>();
   const mutation = useMutation({
     meta: {
       feedback: {
@@ -27,7 +31,7 @@ export default function GpuContainerRollbackModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async ({ revision }: { revision: string }) => {
+    mutationFn: async ({ revision }: GpuContainerRollbackFormValues) => {
       const submitData = {
         action: "rollback" as const,
         revision: revision.trim(),

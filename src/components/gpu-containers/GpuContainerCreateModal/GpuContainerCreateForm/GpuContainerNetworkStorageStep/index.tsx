@@ -5,13 +5,16 @@ import {
   type ContainerNetworkItem,
 } from "@/components/instances/ContainerNetworkFields";
 import ContainerStorageFields from "@/components/instances/ContainerStorageFields";
-import type { Filesystem, FormValues, Volume } from "../../types";
+import type { Filesystem, GpuContainerConfigurationFormValues, Volume } from "..";
 
 const CollapseItem = Collapse.Item;
 
-type Props = {
-  onFieldValueChange: (field: keyof FormValues, value: string | boolean) => void;
-  values: FormValues;
+type GpuContainerNetworkStorageStepProps = {
+  onFieldValueChange: (
+    field: keyof GpuContainerConfigurationFormValues,
+    value: string | boolean,
+  ) => void;
+  values: GpuContainerConfigurationFormValues;
   vpcs: ContainerNetworkItem[];
   subnets: ContainerNetworkItem[];
   volumes: Volume[];
@@ -29,7 +32,7 @@ export default function GpuContainerNetworkStorageStep({
   filesystems,
   defaultSecurityGroup,
   networkLoading,
-}: Props) {
+}: GpuContainerNetworkStorageStepProps) {
   return (
     <>
       <div className="grid grid-cols-2 gap-4">

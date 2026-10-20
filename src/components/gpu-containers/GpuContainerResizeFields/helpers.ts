@@ -7,10 +7,7 @@ type Instance = InstanceRecord;
 
 export const CURRENT_GPU_SPEC_VALUE = "__current_gpu_spec__";
 
-export type GpuContainerResizeFormValues = {
-  gpu_spec_id?: string;
-  cpu_memory_spec?: string;
-};
+import type { GpuContainerResizeFormValues } from ".";
 
 export function currentCpuMemorySpec(instance: Instance) {
   const cpu = String(instance.compute?.cpu ?? "").replace(/C$/i, "");

@@ -16,12 +16,17 @@ import {
   getModelDevInputVersion,
 } from "@/api/modeldev";
 import TrainingPresetFields from "./TrainingPresetFields";
-import TrainingTaskSummary, { type TrainingCreateValues } from "./TrainingTaskSummary";
+import TrainingTaskSummary, { type TrainingTaskCreateFormValues } from "./TrainingTaskSummary";
 import TrainingTaskBasicFields from "./TrainingTaskBasicFields";
 import styles from "./index.module.css";
 
+type TrainingTaskCreateModalProps = {
+  onCancel: () => void;
+  onCreated?: () => void;
+};
+
 const steps = ["基础信息", "参数配置", "摘要信息"];
-const initialValues: TrainingCreateValues = {
+const initialValues: TrainingTaskCreateFormValues = {
   name: "",
   preset_id: "",
   dataset_version_id: "",
@@ -31,11 +36,8 @@ const initialValues: TrainingCreateValues = {
 export default function TrainingTaskCreateModal({
   onCancel,
   onCreated,
-}: {
-  onCancel: () => void;
-  onCreated?: () => void;
-}) {
-  const [form] = Form.useForm<TrainingCreateValues>();
+}: TrainingTaskCreateModalProps) {
+  const [form] = Form.useForm<TrainingTaskCreateFormValues>();
   const [values, setValues] = useState(initialValues);
   const [preset, setPreset] = useState<ModelDevPreset>();
   const [dataset, setDataset] = useState<ModelDevInputVersion>();
@@ -65,7 +67,7 @@ export default function TrainingTaskCreateModal({
     if (submitting.current) return;
     submitting.current = true;
     try {
-      const submitted = await validateForm<TrainingCreateValues>(form);
+      const submitted = await validateForm<TrainingTaskCreateFormValues>(form);
       if (
         preset?.kind !== "GENERAL_TRAINING" ||
         !preset.new_submissions_enabled ||

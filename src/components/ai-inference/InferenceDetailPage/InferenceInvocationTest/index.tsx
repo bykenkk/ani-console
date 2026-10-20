@@ -1,14 +1,16 @@
 import { Descriptions } from "@arco-design/web-react";
 
+type InferenceInvocationTestProps = {
+  servedModelName: string;
+  status: string;
+  endpointUrl?: string | null;
+};
+
 export default function InferenceInvocationTest({
   servedModelName,
   status,
   endpointUrl,
-}: {
-  servedModelName: string;
-  status: string;
-  endpointUrl?: string | null;
-}) {
+}: InferenceInvocationTestProps) {
   return (
     <div>
       <Descriptions

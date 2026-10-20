@@ -2,6 +2,8 @@ import type { StorageVolumeMountHistoryEntry } from "@/api/storage/volumes";
 import { DataTable, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
+type VolumeMountHistoryProps = { items: StorageVolumeMountHistoryEntry[] };
+
 const actionText: Record<StorageVolumeMountHistoryEntry["action"], string> = {
   mount: "挂载",
   unmount: "卸载",
@@ -9,7 +11,7 @@ const actionText: Record<StorageVolumeMountHistoryEntry["action"], string> = {
   os_init: "OS 初始化",
 };
 
-export default function VolumeMountHistory({ items }: { items: StorageVolumeMountHistoryEntry[] }) {
+export default function VolumeMountHistory({ items }: VolumeMountHistoryProps) {
   return (
     <DataTable<StorageVolumeMountHistoryEntry>
       columns={[

@@ -7,14 +7,27 @@ import {
   type NetworkSecurityGroupRuleResource,
 } from "@/api/network";
 
+type SecurityGroupRuleModalProps = {
+  securityGroupId: string;
+  direction: Direction;
+  rule?: SecurityGroupRuleResource | null;
+  onCancel: () => void;
+  onSuccess?: () => void;
+};
+
 export type SecurityGroupRuleResource = NetworkSecurityGroupRuleResource;
 type Direction = SecurityGroupRuleResource["direction"];
-type RuleDraft = Pick<
-  SecurityGroupRuleResource,
-  "priority" | "direction" | "protocol" | "port_range" | "cidr" | "action"
-> & { description?: string };
+type SecurityGroupRuleFormValues = {
+  priority: number;
+  direction: SecurityGroupRuleResource["direction"];
+  protocol: SecurityGroupRuleResource["protocol"];
+  port_range: string;
+  cidr: string;
+  action: SecurityGroupRuleResource["action"];
+  description?: string;
+};
 
-const emptyRule = (direction: Direction): RuleDraft => ({
+const emptyRule = (direction: Direction): SecurityGroupRuleFormValues => ({
   priority: 100,
   direction,
   protocol: "tcp",
@@ -23,7 +36,10 @@ const emptyRule = (direction: Direction): RuleDraft => ({
   action: "allow",
   description: "",
 });
-const initialRule = (direction: Direction, rule?: SecurityGroupRuleResource | null): RuleDraft =>
+const initialRule = (
+  direction: Direction,
+  rule?: SecurityGroupRuleResource | null,
+): SecurityGroupRuleFormValues =>
   rule
     ? {
         priority: rule.priority,
@@ -42,20 +58,19 @@ export default function SecurityGroupRuleModal({
   rule,
   onCancel,
   onSuccess,
-}: {
-  securityGroupId: string;
-  direction: Direction;
-  rule?: SecurityGroupRuleResource | null;
-  onCancel: () => void;
-  onSuccess?: () => void;
-}) {
+}: SecurityGroupRuleModalProps) {
   const qc = useQueryClient();
-  const [draft, setDraft] = useState<RuleDraft>(() => initialRule(direction, rule));
+  const [draft, setDraft] = useState<SecurityGroupRuleFormValues>(() =>
+    initialRule(direction, rule),
+  );
   const save = useMutation({
     meta: { feedback: { channel: "message", action: "更新", errorFallback: "请求失败" } },
     mutationFn: async () => {
       const submitData = {
-        ...draft,
+        priority: draft.priority,
+        direction: draft.direction,
+        protocol: draft.protocol,
+        action: draft.action,
         port_range: draft.port_range.trim(),
         cidr: draft.cidr.trim(),
         description: draft.description?.trim() || undefined,

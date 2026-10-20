@@ -2,15 +2,18 @@ import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { getInstance, stopInstance } from "@/api/instances";
 import { withId } from "@/lib/id";
+
+type GpuContainerStopModalProps = {
+  instance: { id: string; name: string; version?: string };
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 export default function GpuContainerStopModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: { id: string; name: string; version?: string };
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
+}: GpuContainerStopModalProps) {
   const qc = useQueryClient();
   const mutation = useMutation({
     mutationFn: async () => {

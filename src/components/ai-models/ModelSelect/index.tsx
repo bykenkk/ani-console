@@ -2,7 +2,12 @@ import { withFirst100 } from "@/api/pagination";
 import { Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { listModels } from "@/api/models";
-import type { ModelSelectProps } from "./types";
+
+interface ModelSelectProps {
+  value?: string;
+  onChange?: (value: string) => void;
+  disabled?: boolean;
+}
 
 const listModelOptions = withFirst100(listModels);
 
@@ -37,6 +42,3 @@ export default function ModelSelect({ value, onChange, disabled }: ModelSelectPr
 }
 
 export { default as ModelVersionSelect } from "./ModelVersionSelect";
-
-export type { ModelSelectProps } from "./types";
-export type { ModelVersionSelectProps } from "./ModelVersionSelect";

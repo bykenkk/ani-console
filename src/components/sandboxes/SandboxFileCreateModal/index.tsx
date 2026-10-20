@@ -4,17 +4,19 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { encodeSandboxText } from "@/components/sandboxes/SandboxDetailPage/utils";
 
+type SandboxFileCreateModalProps = {
+  instanceId: string;
+  directory: string;
+  onCancel: () => void;
+  onCreated: () => void;
+};
+
 export default function SandboxFileCreateModal({
   instanceId,
   directory,
   onCancel,
   onCreated,
-}: {
-  instanceId: string;
-  directory: string;
-  onCancel: () => void;
-  onCreated: () => void;
-}) {
+}: SandboxFileCreateModalProps) {
   const [filePath, setFilePath] = useState("");
   const [content, setContent] = useState("");
   const [overwrite, setOverwrite] = useState(false);

@@ -1,43 +1,7 @@
-import {
-  type CreateInstanceInput,
-  type SandboxNetworkEgressPolicy,
-  type SandboxTemplate as ApiSandboxTemplate,
-} from "@/api/instances/legacy";
-import {
-  CPU_INSTANCE_COMPUTE_SPECS,
-  DEFAULT_CPU_INSTANCE_COMPUTE_SPEC,
-  type CpuInstanceComputeSpec,
-} from "@/lib/instances";
-
-export type SandboxTemplate = ApiSandboxTemplate;
-export type EgressPolicy = SandboxNetworkEgressPolicy;
-
-export type FormValues = {
-  name: string;
-  template_id: string;
-  compute_spec: CpuInstanceComputeSpec;
-  session_timeout: string;
-  idle_timeout: string;
-  on_timeout: "pause" | "kill";
-  egress_policy: EgressPolicy;
-  egress_allowlist: string;
-  auto_start: boolean;
-};
-
-export const INITIAL_VALUES: FormValues = {
-  name: "",
-  template_id: "",
-  compute_spec: DEFAULT_CPU_INSTANCE_COMPUTE_SPEC,
-  session_timeout: "120m",
-  idle_timeout: "30m",
-  on_timeout: "pause",
-  egress_policy: "allowlist",
-  egress_allowlist: "pypi.org\ngithub.com\nregistry.npmjs.org",
-  auto_start: true,
-};
-
-export const SESSION_TIMEOUT_OPTIONS = ["30m", "45m", "60m", "90m", "120m", "240m"];
-export const IDLE_TIMEOUT_OPTIONS = ["5m", "10m", "15m", "30m", "60m"];
+import type { CreateInstanceInput } from "@/api/instances/legacy";
+import { CPU_INSTANCE_COMPUTE_SPECS, type CpuInstanceComputeSpec } from "@/lib/instances";
+import { INITIAL_VALUES } from "./constants";
+import type { SandboxCreateFormValues, SandboxTemplate } from ".";
 
 export function parseEgressAllowlist(value: string) {
   return value
@@ -60,7 +24,7 @@ export function getTemplateComputeSpec(template?: SandboxTemplate): CpuInstanceC
 }
 
 export function buildCreateRequest(
-  values: FormValues,
+  values: SandboxCreateFormValues,
   template: SandboxTemplate,
 ): CreateInstanceInput {
   const computeSpec =

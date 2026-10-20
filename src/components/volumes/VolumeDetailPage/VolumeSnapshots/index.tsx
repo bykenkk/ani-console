@@ -6,13 +6,12 @@ import { formatBytes, formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 import { Button } from "@arco-design/web-react";
 
-export default function VolumeSnapshots({
-  volumeId,
-  onCreateSnapshot,
-}: {
+type VolumeSnapshotsProps = {
   volumeId: string;
   onCreateSnapshot: () => void;
-}) {
+};
+
+export default function VolumeSnapshots({ volumeId, onCreateSnapshot }: VolumeSnapshotsProps) {
   const {
     query: snapshots,
     items: pageItems,

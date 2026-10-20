@@ -1,28 +1,30 @@
 import { Button, Modal, Space } from "@arco-design/web-react";
 import { IconPlus } from "@arco-design/web-react/icon";
 import { useState } from "react";
-import type { LoadBalancerListenerValues } from "@/components/load-balancers/LoadBalancerListenerForm";
+import type { LoadBalancerListenerFormValues } from "@/components/load-balancers/LoadBalancerListenerForm";
 import AddLoadBalancerListenerModal from "@/components/load-balancers/AddLoadBalancerListenerModal";
 
 import { DataTable } from "@/components/common/DataTable";
 import EditLoadBalancerListenerModal from "@/components/load-balancers/EditLoadBalancerListenerModal";
 
+type LoadBalancerListenersFieldProps = {
+  value?: LoadBalancerListenerFormValues[];
+  onChange?: (value: LoadBalancerListenerFormValues[]) => void;
+  disabled?: boolean;
+};
+
 export default function LoadBalancerListenersField({
   value = [],
   onChange,
   disabled,
-}: {
-  value?: LoadBalancerListenerValues[];
-  onChange?: (value: LoadBalancerListenerValues[]) => void;
-  disabled?: boolean;
-}) {
+}: LoadBalancerListenersFieldProps) {
   const [adding, setAdding] = useState(false);
-  const [editing, setEditing] = useState<LoadBalancerListenerValues>();
+  const [editing, setEditing] = useState<LoadBalancerListenerFormValues>();
   return (
     <>
       <Space direction="vertical" className="w-full">
         {value.length > 0 && (
-          <DataTable<LoadBalancerListenerValues>
+          <DataTable<LoadBalancerListenerFormValues>
             pagination={false}
             rowKey="port"
             data={value}

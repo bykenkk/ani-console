@@ -19,15 +19,17 @@ import VectorStoreWorkbench from "@/components/vector-stores/VectorStoreWorkbenc
 import { formatDateTime } from "@/lib/format";
 import VectorStoreRelatedResources from "./VectorStoreRelatedResources";
 
+type VectorStoreDetailPageProps = {
+  vectorStoreId: string;
+  tab?: string;
+  onTabChange: (tab: string) => void;
+};
+
 export default function VectorStoreDetailPage({
   vectorStoreId,
   tab,
   onTabChange,
-}: {
-  vectorStoreId: string;
-  tab?: string;
-  onTabChange: (tab: string) => void;
-}) {
+}: VectorStoreDetailPageProps) {
   const goBack = useBackOrFallback("vector-store");
   const { actions } = useVectorStoreActions(goBack);
   const detail = useQuery({

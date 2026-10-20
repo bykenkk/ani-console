@@ -8,19 +8,21 @@ import { useState } from "react";
 
 import { validateForm } from "@/lib/form";
 
+type VmAttachFilesystemModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: (operationId: string) => void;
+};
+
 type Instance = InstanceRecord;
-type Values = { filesystemId: string; mountPath: string; readOnly?: boolean };
+type VmAttachFilesystemFormValues = { filesystemId: string; mountPath: string; readOnly?: boolean };
 
 export default function VmAttachFilesystemModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: (operationId: string) => void;
-}) {
-  const [form] = Form.useForm<Values>();
+}: VmAttachFilesystemModalProps) {
+  const [form] = Form.useForm<VmAttachFilesystemFormValues>();
   const [selectedId, setSelectedId] = useState("");
   const filesystems = useQuery({
     meta: {
@@ -58,7 +60,7 @@ export default function VmAttachFilesystemModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async (values: Values) => {
+    mutationFn: async (values: VmAttachFilesystemFormValues) => {
       const submitData = {
         action: "attach_filesystem" as const,
         filesystem_id: values.filesystemId,

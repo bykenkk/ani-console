@@ -7,18 +7,22 @@ import InstanceRegistryImageSelect from "@/components/instances/InstanceRegistry
 
 import { validateForm } from "@/lib/form";
 
+type ContainerUpdateImageFormValues = { imageId: string };
+
+type ContainerUpdateImageModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 type Instance = InstanceRecord;
 
 export default function ContainerUpdateImageModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
-  const [form] = Form.useForm<{ imageId: string }>();
+}: ContainerUpdateImageModalProps) {
+  const [form] = Form.useForm<ContainerUpdateImageFormValues>();
   const mutation = useMutation({
     meta: {
       feedback: {
@@ -28,7 +32,7 @@ export default function ContainerUpdateImageModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async ({ imageId }: { imageId: string }) => {
+    mutationFn: async ({ imageId }: ContainerUpdateImageFormValues) => {
       const submitData = {
         action: "update_image" as const,
         image_id: imageId,

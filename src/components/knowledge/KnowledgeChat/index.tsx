@@ -17,17 +17,19 @@ import KnowledgeConversation from "./KnowledgeConversation";
 import KnowledgeSessionsSidebar from "./KnowledgeSessionsSidebar";
 import { toThreadMessage, type QueryMode } from "./knowledgeQueryAdapter";
 
+type KnowledgeChatProps = {
+  kbId: string;
+  defaultTopK?: number;
+  defaultInferenceService?: string;
+};
+
 const listInferenceOptions = withFirst100(listInferenceServices);
 
 export default function KnowledgeChat({
   kbId,
   defaultTopK = 5,
   defaultInferenceService,
-}: {
-  kbId: string;
-  defaultTopK?: number;
-  defaultInferenceService?: string;
-}) {
+}: KnowledgeChatProps) {
   const qc = useQueryClient();
   const [activeSessionId, setActiveSessionId] = useState<string>();
   const [draftVersion, setDraftVersion] = useState(0);

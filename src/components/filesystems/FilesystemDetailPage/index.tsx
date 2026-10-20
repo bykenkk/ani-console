@@ -19,9 +19,11 @@ import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 import FilesystemMountTargets from "./FilesystemMountTargets";
 
+type FilesystemDetailPageProps = { filesystemId: string };
+
 type Filesystem = StorageFilesystem;
 
-export default function FilesystemDetailPage({ filesystemId }: { filesystemId: string }) {
+export default function FilesystemDetailPage({ filesystemId }: FilesystemDetailPageProps) {
   const goBack = useBackOrFallback("filesystem");
 
   const [mountCount, setMountCount] = useState(0);

@@ -10,15 +10,14 @@ import InstanceImageFields from "@/components/instances/InstanceImageFields";
 import { validateForm } from "@/lib/form";
 import { showMessage } from "@/lib/feedback";
 
-type FormValues = { name: string; preset_id: string; image_id: string };
-export default function ContainerCreateModal({
-  onCancel,
-  onCreated,
-}: {
+type ContainerCreateModalProps = {
   onCancel: () => void;
   onCreated: () => void;
-}) {
-  const [form] = Form.useForm<FormValues>();
+};
+
+type ContainerCreateFormValues = { name: string; preset_id: string; image_id: string };
+export default function ContainerCreateModal({ onCancel, onCreated }: ContainerCreateModalProps) {
+  const [form] = Form.useForm<ContainerCreateFormValues>();
   const [preset, setPreset] = useState<InstancePreset>();
   const [image, setImage] = useState<ImageRegistration>();
   const submitting = useRef(false);
@@ -46,7 +45,7 @@ export default function ContainerCreateModal({
     if (submitting.current) return;
     submitting.current = true;
     try {
-      const values = await validateForm<FormValues>(form);
+      const values = await validateForm<ContainerCreateFormValues>(form);
       if (
         !preset ||
         preset.compute_type !== "cpu" ||

@@ -1,11 +1,4 @@
-export type ContainerStorageFormValues = {
-  volume_id: string;
-  volume_mount_path: string;
-  volume_read_only: boolean;
-  filesystem_id: string;
-  filesystem_mount_path: string;
-  filesystem_read_only: boolean;
-};
+import type { ContainerStorageFormValues } from ".";
 
 export function hasDuplicateContainerMountPath(values: ContainerStorageFormValues) {
   return Boolean(

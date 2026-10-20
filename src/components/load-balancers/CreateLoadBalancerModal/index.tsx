@@ -10,21 +10,26 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ipInRanges, parseIpRanges, subnetIpUnavailableReason } from "@/lib/subnets";
 import LoadBalancerListenersField from "../LoadBalancerListenersField";
 import LoadBalancerNetworkFields from "../LoadBalancerNetworkFields";
-import type { LoadBalancerListenerValues } from "../LoadBalancerListenerForm";
+import type { LoadBalancerListenerFormValues } from "../LoadBalancerListenerForm";
 import { listenerInput, listenerSetError } from "@/lib/load-balancers";
 
-export type LoadBalancerConfigurationValues = {
+type CreateLoadBalancerModalProps = { onCancel: () => void };
+
+export type LoadBalancerConfigurationFormValues = {
   vpc_id: string;
   subnet_id?: string;
   scheme: "internal" | "public" | "both";
   size: "small" | "medium" | "large";
   vip: string;
   publicIp?: string;
-  listeners: LoadBalancerListenerValues[];
+  listeners: LoadBalancerListenerFormValues[];
 };
-type Values = LoadBalancerConfigurationValues & { name: string; description?: string };
-export default function CreateLoadBalancerModal({ onCancel }: { onCancel: () => void }) {
-  const [form] = Form.useForm<Values>();
+type CreateLoadBalancerFormValues = LoadBalancerConfigurationFormValues & {
+  name: string;
+  description?: string;
+};
+export default function CreateLoadBalancerModal({ onCancel }: CreateLoadBalancerModalProps) {
+  const [form] = Form.useForm<CreateLoadBalancerFormValues>();
   const [available, setAvailable] = useState(false);
   const qc = useQueryClient();
   const create = useMutation({
@@ -77,7 +82,7 @@ export default function CreateLoadBalancerModal({ onCancel }: { onCancel: () => 
       closable={!create.isPending}
       cancelButtonProps={{ disabled: create.isPending }}
       onOk={async () => {
-        const values = await validateForm<Values>(form);
+        const values = await validateForm<CreateLoadBalancerFormValues>(form);
         await create.mutateAsync({
           name: values.name.trim(),
           description: values.description,

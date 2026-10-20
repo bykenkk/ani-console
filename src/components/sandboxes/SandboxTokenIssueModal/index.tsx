@@ -19,6 +19,11 @@ import { useState } from "react";
 import { formatDateTime } from "@/lib/format";
 import { copyToClipboard } from "@/lib/clipboard";
 
+type SandboxTokenIssueModalProps = {
+  instance: SandboxInstance;
+  onCancel: () => void;
+};
+
 type SandboxInstance = InstanceRecord;
 type SandboxToken = SandboxTokenResponse;
 type TokenScope = SandboxToken["scopes"][number];
@@ -33,10 +38,7 @@ const TOKEN_SCOPE_OPTIONS = [
 export default function SandboxTokenIssueModal({
   instance,
   onCancel,
-}: {
-  instance: SandboxInstance;
-  onCancel: () => void;
-}) {
+}: SandboxTokenIssueModalProps) {
   const [token, setToken] = useState<SandboxToken>();
   const [tokenExpiresIn, setTokenExpiresIn] = useState("15m");
   const [tokenScopes, setTokenScopes] = useState<TokenScope[]>(["connect"]);

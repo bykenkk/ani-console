@@ -2,17 +2,15 @@ import { Modal } from "@arco-design/web-react";
 import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
 import { useMutation } from "@tanstack/react-query";
 
-type Instance = InstanceRecord;
-
-export default function VmDeleteModal({
-  instance,
-  onCancel,
-  onSubmitted,
-}: {
+type VmDeleteModalProps = {
   instance: Instance;
   onCancel: () => void;
   onSubmitted: (operationId: string) => void;
-}) {
+};
+
+type Instance = InstanceRecord;
+
+export default function VmDeleteModal({ instance, onCancel, onSubmitted }: VmDeleteModalProps) {
   const mutation = useMutation({
     meta: {
       feedback: {

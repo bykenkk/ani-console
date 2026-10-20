@@ -5,22 +5,24 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { listNetworkSubnets, listNetworkVpcs } from "@/api/network";
 
-import type { LoadBalancerConfigurationValues } from "@/components/load-balancers/CreateLoadBalancerModal";
+import type { LoadBalancerConfigurationFormValues } from "@/components/load-balancers/CreateLoadBalancerModal";
 import LoadBalancerPublicIpField from "@/components/load-balancers/LoadBalancerPublicIpField";
 import { withFirst100 } from "@/api/pagination";
+
+type LoadBalancerNetworkFieldsProps = {
+  form: Pick<
+    FormInstance<LoadBalancerConfigurationFormValues>,
+    "setFieldsValue" | "setFieldValue" | "getFieldValue"
+  >;
+  onAvailabilityChange: (available: boolean) => void;
+};
 
 const listVpcOptions = withFirst100(listNetworkVpcs);
 
 export default function LoadBalancerNetworkFields({
   form,
   onAvailabilityChange,
-}: {
-  form: Pick<
-    FormInstance<LoadBalancerConfigurationValues>,
-    "setFieldsValue" | "setFieldValue" | "getFieldValue"
-  >;
-  onAvailabilityChange: (available: boolean) => void;
-}) {
+}: LoadBalancerNetworkFieldsProps) {
   const [vpcId, setVpcId] = useState<string>();
   const vpcs = useQuery({
     queryKey: ["network-vpcs", "load-balancer-create", "options"],

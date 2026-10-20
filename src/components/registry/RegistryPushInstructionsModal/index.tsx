@@ -2,13 +2,15 @@ import { Button, Modal, Space, Typography } from "@arco-design/web-react";
 import type { ImageSpace } from "@/api/images";
 import { copyToClipboard } from "@/lib/clipboard";
 
+type RegistryPushInstructionsModalProps = {
+  space: ImageSpace;
+  onCancel: () => void;
+};
+
 export default function RegistryPushInstructionsModal({
   space,
   onCancel,
-}: {
-  space: ImageSpace;
-  onCancel: () => void;
-}) {
+}: RegistryPushInstructionsModalProps) {
   const target = `${space.registryAuthority}/${space.projectName}/app:latest`;
   const commands = [
     {

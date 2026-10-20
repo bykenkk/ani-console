@@ -13,17 +13,16 @@ import {
 
 import { bucketNamePattern } from "@/lib/validators";
 
+type CreateBucketModalProps = {
+  onCancel: () => void;
+  onCreated?: (bucket: Bucket) => void;
+};
+
 type Bucket = StorageBucketRecord;
 type Acl = StorageBucketAcl;
 type StorageClass = StorageBucketClass;
 
-export default function CreateBucketModal({
-  onCancel,
-  onCreated,
-}: {
-  onCancel: () => void;
-  onCreated?: (bucket: Bucket) => void;
-}) {
+export default function CreateBucketModal({ onCancel, onCreated }: CreateBucketModalProps) {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [acl, setAcl] = useState<Acl>("private");

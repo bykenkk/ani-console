@@ -3,15 +3,14 @@ import { StatusBadge } from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
 import { Button, Descriptions, Space, Typography } from "@arco-design/web-react";
 
-type VmInstance = InstanceRecord;
-
-export default function VmSshAccess({
-  instance,
-  onOpenConsole,
-}: {
+type VmSshAccessProps = {
   instance: VmInstance;
   onOpenConsole: () => void;
-}) {
+};
+
+type VmInstance = InstanceRecord;
+
+export default function VmSshAccess({ instance, onOpenConsole }: VmSshAccessProps) {
   const ssh = instance.ssh;
   const privateIp = instance.network?.private_ip ?? instance.private_ip;
   const available = instance.access?.ssh_available !== false && ssh?.ready === true;

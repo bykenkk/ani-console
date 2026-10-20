@@ -3,7 +3,7 @@ import { useModelActions } from "@/hooks/useModelActions";
 import { Select, Space, Tag } from "@arco-design/web-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { listModels } from "@/api/models";
+import { listModels, type ModelCapability } from "@/api/models";
 import type { ListPagination } from "@/components/common/DataTable";
 
 import ImportModelModal from "./ImportModelModal";
@@ -20,7 +20,7 @@ import { formatModelCapabilities, MODEL_SOURCE_LABELS, type Model } from "@/lib/
 type StatusFilter = "all" | "pending" | "available" | "importing" | "failed";
 type SearchField = "name";
 type SourceFilter = "all" | Model["source"];
-type CapabilityFilter = "all" | "text-generation" | "embedding" | "speech-to-text";
+type CapabilityFilter = "all" | ModelCapability;
 
 function getApiStatus(status: StatusFilter) {
   if (status === "pending") return "pending" as const;

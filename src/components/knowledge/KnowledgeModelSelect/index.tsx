@@ -5,6 +5,13 @@ import { useQuery } from "@tanstack/react-query";
 import { listInferenceServices, type InferenceListParams } from "@/api/inference";
 import { withId } from "@/lib/id";
 
+type KnowledgeModelSelectProps = {
+  capability: NonNullable<InferenceListParams["capability"]>;
+  value?: string;
+  onChange?: (value: string | undefined) => void;
+  required?: boolean;
+};
+
 const listInferenceOptions = withFirst100(listInferenceServices);
 
 export default function KnowledgeModelSelect({
@@ -12,12 +19,7 @@ export default function KnowledgeModelSelect({
   value,
   onChange,
   required = false,
-}: {
-  capability: NonNullable<InferenceListParams["capability"]>;
-  value?: string;
-  onChange?: (value: string | undefined) => void;
-  required?: boolean;
-}) {
+}: KnowledgeModelSelectProps) {
   // FIXME(inference-contract): 目标推理路由待确认，用户同意保留原分支调用。
   // TODO(inference-contract): 路由恢复后验证 capability/status 筛选及可调用模型选项。
   const models = useQuery({

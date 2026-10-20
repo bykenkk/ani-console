@@ -1,20 +1,20 @@
 import { Descriptions } from "@arco-design/web-react";
 import { ImageNameText } from "@/components/common";
-import { parseEgressAllowlist, type FormValues, type SandboxTemplate } from "../../types";
+import type { SandboxCreateFormValues, SandboxTemplate } from "../..";
+import { parseEgressAllowlist } from "../../utils";
 
-const EGRESS_LABELS: Record<FormValues["egress_policy"], string> = {
+type SandboxConfirmStepProps = {
+  values: SandboxCreateFormValues;
+  template: SandboxTemplate;
+};
+
+const EGRESS_LABELS: Record<SandboxCreateFormValues["egress_policy"], string> = {
   deny_all: "禁止访问外部网络",
   allowlist: "仅允许白名单地址",
   internet: "允许访问公网",
 };
 
-export default function SandboxConfirmStep({
-  values,
-  template,
-}: {
-  values: FormValues;
-  template: SandboxTemplate;
-}) {
+export default function SandboxConfirmStep({ values, template }: SandboxConfirmStepProps) {
   const allowlist = parseEgressAllowlist(values.egress_allowlist);
 
   return (

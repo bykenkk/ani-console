@@ -2,7 +2,9 @@ import { loadBalancerListeners } from "@/lib/load-balancers";
 import type { NetworkLoadBalancer, NetworkLoadBalancerBackend } from "@/api/network";
 import { DataTable, StatusBadge } from "@/components/common";
 
-export default function LoadBalancerBackends({ item }: { item: NetworkLoadBalancer }) {
+type LoadBalancerBackendsProps = { item: NetworkLoadBalancer };
+
+export default function LoadBalancerBackends({ item }: LoadBalancerBackendsProps) {
   const backends = loadBalancerListeners(item).flatMap((listener) =>
     (listener.backends ?? []).map((backend) => ({
       ...backend,

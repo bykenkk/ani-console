@@ -2,18 +2,53 @@ import clsx from "clsx";
 import { forwardRef, type ReactNode } from "react";
 import { Button, Dropdown, Menu, Tooltip, type ButtonProps } from "@arco-design/web-react";
 import { IconMoreVertical } from "@arco-design/web-react/icon";
-import type { RowAction, RowActionIntent } from "./types";
+
 import styles from "./index.module.css";
+
+type DataTableRowActionsProps = { children: ReactNode };
+
+type DataTableRowActionButtonProps = ButtonProps & { children: ReactNode };
+
+type ConfiguredDataTableRowActionsProps<T> = {
+  actions: Array<RowAction<T>>;
+  record: T;
+};
+
+type RowActionIntent = "default" | "danger" | "warning" | "success";
+
+type ActionValue<T, V> = V | ((record: T) => V);
+
+type StaticActionLabel = {
+  label: string;
+  widthLabel?: never;
+};
+
+type DynamicActionLabel<T> = {
+  label: (record: T) => string;
+  widthLabel: string;
+};
+
+type RowActionBase<T> = {
+  key: string;
+  intent?: RowActionIntent;
+  visible?: (record: T) => boolean;
+  disabled?: (record: T) => boolean;
+  loading?: (record: T) => boolean;
+  tooltip?: ActionValue<T, string | undefined>;
+  onClick: (record: T) => void | Promise<unknown>;
+};
+
+export type RowAction<T> = RowActionBase<T> & (StaticActionLabel | DynamicActionLabel<T>);
 
 const MORE_ACTIONS_LABEL = "更多操作";
 
-export function DataTableRowActions({ children }: { children: ReactNode }) {
+export function DataTableRowActions({ children }: DataTableRowActionsProps) {
   return <div className={styles.rowActions}>{children}</div>;
 }
 
 export const DataTableRowActionButton = forwardRef<
   HTMLButtonElement,
-  ButtonProps & { children: ReactNode }
+  DataTableRowActionButtonProps
 >(function DataTableRowActionButton({ children, ...buttonProps }, ref) {
   return (
     <Button ref={ref} type="text" size="small" {...buttonProps} className={styles.rowActionButton}>
@@ -52,10 +87,7 @@ function renderTooltip<T>(action: RowAction<T>, record: T, node: ReactNode) {
 export function ConfiguredDataTableRowActions<T>({
   actions,
   record,
-}: {
-  actions: Array<RowAction<T>>;
-  record: T;
-}) {
+}: ConfiguredDataTableRowActionsProps<T>) {
   const visibleActions = actions.filter((action) => action.visible?.(record) !== false);
   const menu = visibleActions.length ? (
     <Menu

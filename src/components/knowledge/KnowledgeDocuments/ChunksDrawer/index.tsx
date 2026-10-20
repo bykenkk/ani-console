@@ -6,6 +6,17 @@ import { listKnowledgeBaseDocumentChunks, type KBChunk, type KBDocument } from "
 import { formatDateTime } from "@/lib/format";
 import styles from "./index.module.css";
 
+type ChunkMetaProps = { chunk: KBChunk };
+
+type ParentChunkSectionProps = { group: ParentChunkGroup; index: number };
+
+type ChunksDrawerProps = {
+  kbId: string;
+  document?: KBDocument;
+  visible: boolean;
+  onCancel: () => void;
+};
+
 const CHUNK_TYPE_LABELS: Record<KBChunk["chunk_type"], string> = {
   child: "子分块",
   parent: "父分块",
@@ -68,7 +79,7 @@ function groupChunks(chunks: KBChunk[]) {
   };
 }
 
-function ChunkMeta({ chunk }: { chunk: KBChunk }) {
+function ChunkMeta({ chunk }: ChunkMetaProps) {
   return (
     <Typography.Text type="secondary" className={styles.meta}>
       {chunk.page_number ? `第 ${chunk.page_number} 页 · ` : ""}
@@ -83,7 +94,7 @@ function getChunkName(chunk?: KBChunk) {
   return typeof sectionPath === "string" && sectionPath.trim() ? sectionPath.trim() : undefined;
 }
 
-function ParentChunkSection({ group, index }: { group: ParentChunkGroup; index: number }) {
+function ParentChunkSection({ group, index }: ParentChunkSectionProps) {
   const content = group.parent?.content ?? group.parentContent;
   const childCount = group.children.length;
   const parentLabel = `分段-${String(index + 1).padStart(2, "0")}`;
@@ -152,17 +163,7 @@ function ParentChunkSection({ group, index }: { group: ParentChunkGroup; index: 
   );
 }
 
-export default function ChunksDrawer({
-  kbId,
-  document,
-  visible,
-  onCancel,
-}: {
-  kbId: string;
-  document?: KBDocument;
-  visible: boolean;
-  onCancel: () => void;
-}) {
+export default function ChunksDrawer({ kbId, document, visible, onCancel }: ChunksDrawerProps) {
   const chunks = useQuery({
     meta: {
       errorNotification: {

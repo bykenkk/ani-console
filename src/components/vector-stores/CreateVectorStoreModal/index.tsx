@@ -11,15 +11,17 @@ import { Form, Input, InputNumber, Modal, Select, Typography } from "@arco-desig
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 
+type CreateVectorStoreModalProps = {
+  onCancel: () => void;
+  onCreated?: (store: VectorStore) => void;
+};
+
 const listInferenceOptions = withFirst100(listInferenceServices);
 
 export default function CreateVectorStoreModal({
   onCancel,
   onCreated,
-}: {
-  onCancel: () => void;
-  onCreated?: (store: VectorStore) => void;
-}) {
+}: CreateVectorStoreModalProps) {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [embeddingModel, setEmbeddingModel] = useState("");

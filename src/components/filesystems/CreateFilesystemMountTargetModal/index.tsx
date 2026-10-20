@@ -10,6 +10,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { withFirst100 } from "@/api/pagination";
 
+type CreateFilesystemMountTargetModalProps = {
+  filesystemId: string;
+  onCancel: () => void;
+};
+
 const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type Vpc = NetworkVPC;
@@ -18,10 +23,7 @@ type Subnet = NetworkSubnet;
 export default function CreateFilesystemMountTargetModal({
   filesystemId,
   onCancel,
-}: {
-  filesystemId: string;
-  onCancel: () => void;
-}) {
+}: CreateFilesystemMountTargetModalProps) {
   const qc = useQueryClient();
   const [vpcId, setVpcId] = useState("");
   const [subnetId, setSubnetId] = useState("");

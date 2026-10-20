@@ -8,9 +8,11 @@ import { Alert, Button, Form, Input, InputNumber, Typography } from "@arco-desig
 import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
+type VectorStoreWorkbenchProps = { store: VectorStore };
+
 type SearchHit = VectorStoreSearchHit & { content: string };
 
-export default function VectorStoreWorkbench({ store }: { store: VectorStore }) {
+export default function VectorStoreWorkbench({ store }: VectorStoreWorkbenchProps) {
   const [searchVector, setSearchVector] = useState("");
   const [topK, setTopK] = useState(10);
   const [filterKey, setFilterKey] = useState("");

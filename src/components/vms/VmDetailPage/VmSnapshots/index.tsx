@@ -5,18 +5,16 @@ import { formatDateTime } from "@/lib/format";
 import VmRollbackModal from "@/components/vms/VmRollbackModal";
 import { useState } from "react";
 
-type VmInstance = InstanceRecord;
-type Snapshot = NonNullable<VmInstance["snapshots"]>[number];
-
-export default function VmSnapshots({
-  instance,
-  onChanged,
-  createAction,
-}: {
+type VmSnapshotsProps = {
   instance: VmInstance;
   onChanged: () => void;
   createAction?: RowAction<VmInstance>;
-}) {
+};
+
+type VmInstance = InstanceRecord;
+type Snapshot = NonNullable<VmInstance["snapshots"]>[number];
+
+export default function VmSnapshots({ instance, onChanged, createAction }: VmSnapshotsProps) {
   const [rollbackSnapshot, setRollbackSnapshot] = useState<Snapshot>();
   const actions: RowAction<Snapshot>[] = [
     {

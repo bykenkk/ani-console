@@ -1,14 +1,13 @@
 import { Button, Dropdown, Menu, Tooltip } from "@arco-design/web-react";
 import { IconMoreVertical } from "@arco-design/web-react/icon";
-import type { RowAction } from "@/components/common/DataTable/types";
+import type { RowAction } from "@/components/common/DataTable/RowActions";
 
-export default function ResourceActionMenu<T>({
-  record,
-  actions,
-}: {
+type ResourceActionMenuProps<T> = {
   record: T;
   actions: RowAction<T>[];
-}) {
+};
+
+export default function ResourceActionMenu<T>({ record, actions }: ResourceActionMenuProps<T>) {
   const visible = actions.filter((action) => action.visible?.(record) !== false);
   return (
     <Dropdown

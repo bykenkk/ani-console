@@ -7,15 +7,13 @@ import {
   type ImageDisplaySource,
 } from "@/lib/render";
 
-export default function ImageNameText({
-  image,
-  showSize = false,
-  className,
-}: {
+type ImageNameTextProps = {
   image?: ImageDisplaySource | string | null;
   showSize?: boolean;
   className?: string;
-}) {
+};
+
+export default function ImageNameText({ image, showSize = false, className }: ImageNameTextProps) {
   const label = showSize ? getImageSelectionLabel(image) : getImageDisplayName(image);
 
   return (

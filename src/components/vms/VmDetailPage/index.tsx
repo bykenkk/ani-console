@@ -25,6 +25,12 @@ import { openInstanceVncWindow } from "@/lib/instances";
 import VmSnapshots from "./VmSnapshots";
 import VmSshAccess from "./VmSshAccess";
 
+type VmDetailPageProps = {
+  instanceId: string;
+  tab?: string;
+  onTabChange: (tab: string) => void;
+};
+
 type VmInstance = InstanceRecord;
 
 function imageLabel(instance: VmInstance) {
@@ -49,15 +55,7 @@ function flavorLabel(instance: VmInstance) {
   return `${cpuText}C${memoryText}`;
 }
 
-export default function VmDetailPage({
-  instanceId,
-  tab,
-  onTabChange,
-}: {
-  instanceId: string;
-  tab?: string;
-  onTabChange: (tab: string) => void;
-}) {
+export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailPageProps) {
   const goBack = useBackOrFallback("vm-instance");
   const detail = useQuery({
     meta: {

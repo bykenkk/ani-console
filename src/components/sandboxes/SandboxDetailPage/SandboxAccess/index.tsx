@@ -11,17 +11,16 @@ import { useState } from "react";
 import SandboxPortOpenModal from "@/components/sandboxes/SandboxPortOpenModal";
 import SandboxTokenIssueModal from "@/components/sandboxes/SandboxTokenIssueModal";
 
+type SandboxAccessProps = {
+  instance: SandboxInstance;
+  onChanged: () => void;
+};
+
 type SandboxInstance = InstanceRecord;
 type SandboxStatus = NonNullable<SandboxInstanceStatus>;
 type SandboxPortSummary = NonNullable<SandboxStatus["ports"]>[number];
 
-export default function SandboxAccess({
-  instance,
-  onChanged,
-}: {
-  instance: SandboxInstance;
-  onChanged: () => void;
-}) {
+export default function SandboxAccess({ instance, onChanged }: SandboxAccessProps) {
   const sandbox = instance.sandbox!;
 
   const [tokenVisible, setTokenVisible] = useState(false);

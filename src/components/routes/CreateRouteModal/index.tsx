@@ -13,6 +13,12 @@ import { Ipv4CidrInput } from "@/components/common";
 import { ipv4CidrError, requireIpv4Cidr } from "@/lib/validators";
 import { withFirst100 } from "@/api/pagination";
 
+type CreateRouteModalProps = {
+  defaultVpcId?: string;
+  onCancel: () => void;
+  onCreated?: (route: NetworkRoute) => void;
+};
+
 const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type Vpc = NetworkVPC;
@@ -21,11 +27,7 @@ export default function CreateRouteModal({
   defaultVpcId,
   onCancel,
   onCreated,
-}: {
-  defaultVpcId?: string;
-  onCancel: () => void;
-  onCreated?: (route: NetworkRoute) => void;
-}) {
+}: CreateRouteModalProps) {
   const qc = useQueryClient();
   const [vpcId, setVpcId] = useState(defaultVpcId ?? "");
   const [destinationCidr, setDestinationCidr] = useState("0.0.0.0/0");

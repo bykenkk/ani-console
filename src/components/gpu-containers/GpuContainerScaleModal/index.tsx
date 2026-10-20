@@ -6,18 +6,22 @@ import { useMutation } from "@tanstack/react-query";
 
 import { validateForm } from "@/lib/form";
 
+type GpuContainerScaleFormValues = { replicas: number };
+
+type GpuContainerScaleModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 type Instance = InstanceRecord;
 
 export default function GpuContainerScaleModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
-  const [form] = Form.useForm<{ replicas: number }>();
+}: GpuContainerScaleModalProps) {
+  const [form] = Form.useForm<GpuContainerScaleFormValues>();
   const mutation = useMutation({
     meta: {
       feedback: {
@@ -27,7 +31,7 @@ export default function GpuContainerScaleModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async ({ replicas }: { replicas: number }) => {
+    mutationFn: async ({ replicas }: GpuContainerScaleFormValues) => {
       const submitData = { action: "scale" as const, replicas };
       await applyInstanceLifecycle(instance.id, submitData);
     },

@@ -10,15 +10,17 @@ import InstanceImageFields from "@/components/instances/InstanceImageFields";
 import { validateForm } from "@/lib/form";
 import { showMessage } from "@/lib/feedback";
 
-type FormValues = { name: string; preset_id: string; image_id: string };
+type GpuContainerCreateModalProps = {
+  onCancel: () => void;
+  onCreated: () => void;
+};
+
+type GpuContainerCreateFormValues = { name: string; preset_id: string; image_id: string };
 export default function GpuContainerCreateModal({
   onCancel,
   onCreated,
-}: {
-  onCancel: () => void;
-  onCreated: () => void;
-}) {
-  const [form] = Form.useForm<FormValues>();
+}: GpuContainerCreateModalProps) {
+  const [form] = Form.useForm<GpuContainerCreateFormValues>();
   const [preset, setPreset] = useState<InstancePreset>();
   const [image, setImage] = useState<ImageRegistration>();
   const submitting = useRef(false);
@@ -46,7 +48,7 @@ export default function GpuContainerCreateModal({
     if (submitting.current) return;
     submitting.current = true;
     try {
-      const values = await validateForm<FormValues>(form);
+      const values = await validateForm<GpuContainerCreateFormValues>(form);
       if (
         !preset ||
         preset.compute_type !== "gpu" ||

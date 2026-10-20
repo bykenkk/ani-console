@@ -22,15 +22,17 @@ import KnowledgeBaseAuditLogs from "@/components/knowledge/KnowledgeBaseAuditLog
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 
+type KnowledgeBaseDetailPageProps = {
+  kbId: string;
+  tab?: string;
+  onTabChange: (tab: string) => void;
+};
+
 export default function KnowledgeBaseDetailPage({
   kbId,
   tab,
   onTabChange,
-}: {
-  kbId: string;
-  tab?: string;
-  onTabChange: (tab: string) => void;
-}) {
+}: KnowledgeBaseDetailPageProps) {
   const goBack = useBackOrFallback("knowledge-base");
   const detail = useQuery({
     meta: {

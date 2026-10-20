@@ -1,7 +1,12 @@
 import { Card, Descriptions, Table } from "@arco-design/web-react";
 import type { ModelDevPreset } from "@/api/modeldev";
 
-export interface TrainingCreateValues {
+type TrainingTaskSummaryProps = {
+  values: TrainingTaskCreateFormValues;
+  preset?: ModelDevPreset;
+};
+
+export interface TrainingTaskCreateFormValues {
   name: string;
   preset_id: string;
   dataset_version_id: string;
@@ -9,13 +14,7 @@ export interface TrainingCreateValues {
   parameters: string[];
 }
 
-export default function TrainingTaskSummary({
-  values,
-  preset,
-}: {
-  values: TrainingCreateValues;
-  preset?: ModelDevPreset;
-}) {
+export default function TrainingTaskSummary({ values, preset }: TrainingTaskSummaryProps) {
   const parameters = (preset?.parameter_rules ?? []).map((rule, index) => ({
     name: rule.name,
     value: values.parameters[index] || "未指定",

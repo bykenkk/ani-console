@@ -2,11 +2,20 @@ import { ImageNameText } from "@/components/common";
 import { Descriptions } from "@arco-design/web-react";
 import {
   type Filesystem,
-  type FormValues,
+  type GpuContainerConfigurationFormValues,
   type GpuSpecOption,
   type RegistryImage,
   type Volume,
-} from "../../types";
+} from "..";
+
+type GpuContainerConfirmStepProps = {
+  values: GpuContainerConfigurationFormValues;
+  image?: RegistryImage;
+  volume?: Volume;
+  filesystem?: Filesystem;
+  gpuSpec?: GpuSpecOption;
+  securityGroupName: string;
+};
 
 export default function GpuContainerConfirmStep({
   values,
@@ -15,14 +24,7 @@ export default function GpuContainerConfirmStep({
   filesystem,
   gpuSpec,
   securityGroupName,
-}: {
-  values: FormValues;
-  image?: RegistryImage;
-  volume?: Volume;
-  filesystem?: Filesystem;
-  gpuSpec?: GpuSpecOption;
-  securityGroupName: string;
-}) {
+}: GpuContainerConfirmStepProps) {
   return (
     <>
       <Descriptions

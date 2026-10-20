@@ -1,6 +1,6 @@
 import { ipRangePage } from "./utils";
 import type { FormInstance } from "@arco-design/web-react/es/Form";
-import type { LoadBalancerConfigurationValues } from "../CreateLoadBalancerModal";
+import type { LoadBalancerConfigurationFormValues } from "../CreateLoadBalancerModal";
 import { subnetIpUnavailableReason } from "@/lib/subnets";
 import { Form, Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
@@ -9,15 +9,17 @@ import { getNetworkSubnet } from "@/api/network";
 import { withId } from "@/lib/id";
 import { ipInRanges, parseIpRanges } from "@/lib/subnets";
 
+type LoadBalancerPrivateIpFieldProps = {
+  subnetId?: string;
+  onAvailabilityChange: (available: boolean) => void;
+  form: Pick<FormInstance<LoadBalancerConfigurationFormValues>, "setFieldValue" | "getFieldValue">;
+};
+
 export default function LoadBalancerPrivateIpField({
   subnetId,
   form,
   onAvailabilityChange,
-}: {
-  subnetId?: string;
-  onAvailabilityChange: (available: boolean) => void;
-  form: Pick<FormInstance<LoadBalancerConfigurationValues>, "setFieldValue" | "getFieldValue">;
-}) {
+}: LoadBalancerPrivateIpFieldProps) {
   const [visibleCount, setVisibleCount] = useState(100);
   const [search, setSearch] = useState("");
   const subnet = useQuery({

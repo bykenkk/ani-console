@@ -5,6 +5,8 @@ import { Space } from "@arco-design/web-react";
 import { DataTable } from "@/components/common";
 import { getImageDisplayName } from "@/lib/render";
 
+type InstanceResourceAssociationsProps = { instance: Instance };
+
 type Instance = InstanceRecord;
 type ImageRow = {
   key: string;
@@ -44,7 +46,9 @@ function attachmentTypeLabel(type: string) {
   return type;
 }
 
-export default function InstanceResourceAssociations({ instance }: { instance: Instance }) {
+export default function InstanceResourceAssociations({
+  instance,
+}: InstanceResourceAssociationsProps) {
   const network = instance.network;
   const vpcId = network?.vpc_id ?? instance.vpc_id;
   const subnetId = network?.subnet_id ?? instance.subnet_id;

@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import AliIcon from "../../AliIcon";
 import styles from "./index.module.css";
-import type { DetailCard } from "../types";
+import type { DetailCard } from "..";
 
 type DetailInfoCardProps = {
   card: DetailCard;

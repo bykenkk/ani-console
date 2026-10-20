@@ -24,15 +24,18 @@ import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceNetwork from "@/components/instances/InstanceNetwork";
 import InstanceOperations from "@/components/instances/InstanceOperations";
 import InstanceStorage from "@/components/instances/InstanceStorage";
+
+type GpuContainerDetailPageProps = {
+  instanceId: string;
+  tab?: string;
+  onTabChange: (tab: string) => void;
+};
+
 export default function GpuContainerDetailPage({
   instanceId,
   tab,
   onTabChange,
-}: {
-  instanceId: string;
-  tab?: string;
-  onTabChange: (tab: string) => void;
-}) {
+}: GpuContainerDetailPageProps) {
   const goBack = useBackOrFallback("gpu-instance");
   const qc = useQueryClient();
   const current = useQuery({

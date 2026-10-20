@@ -6,9 +6,11 @@ import { DataTable, StatusBadge, type ListColumn } from "@/components/common";
 import { withId } from "@/lib/id";
 import { Tag } from "@arco-design/web-react";
 
+type SubnetRelatedResourcesProps = { subnetId: string };
+
 type RelatedResource = { id: string; kind: "实例"; name: string; status: string };
 
-export default function SubnetRelatedResources({ subnetId }: { subnetId: string }) {
+export default function SubnetRelatedResources({ subnetId }: SubnetRelatedResourcesProps) {
   const {
     query: instances,
     items,

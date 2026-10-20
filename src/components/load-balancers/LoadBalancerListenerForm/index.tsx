@@ -5,16 +5,31 @@ import type { NetworkLoadBalancerListener, NetworkLoadBalancerProtocol } from "@
 import HealthCheckFields from "./HealthCheckFields";
 import ListenerOptions from "./ListenerOptions";
 
-export type LoadBalancerListenerValues = NetworkLoadBalancerListener;
+type LoadBalancerListenerFormProps = {
+  form: FormInstance<LoadBalancerListenerFormValues>;
+  usedPorts?: number[];
+  initialValues?: LoadBalancerListenerFormValues;
+};
+
+export type LoadBalancerListenerFormValues = {
+  id?: string;
+  name: string;
+  protocol: NetworkLoadBalancerProtocol;
+  port: number;
+  backends: NetworkLoadBalancerListener["backends"];
+  health_check?: NetworkLoadBalancerListener["health_check"];
+  certificate_ref?: NetworkLoadBalancerListener["certificate_ref"];
+  algorithm?: NetworkLoadBalancerListener["algorithm"];
+  session_persistence?: NetworkLoadBalancerListener["session_persistence"];
+  max_connections?: number;
+  gzip_enabled?: boolean;
+  https_redirect_status_code?: number;
+};
 export default function LoadBalancerListenerForm({
   form,
   usedPorts = [],
   initialValues,
-}: {
-  form: FormInstance<LoadBalancerListenerValues>;
-  usedPorts?: number[];
-  initialValues?: LoadBalancerListenerValues;
-}) {
+}: LoadBalancerListenerFormProps) {
   const [protocol, setProtocol] = useState<NetworkLoadBalancerProtocol>(
     initialValues?.protocol ?? "LOAD_BALANCER_LISTENER_PROTOCOL_HTTP",
   );

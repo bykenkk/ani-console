@@ -17,13 +17,12 @@ import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 
 import { formatBytes, formatDateTime } from "@/lib/format";
 
-export default function ObjectDetailPage({
-  bucketId,
-  objectId,
-}: {
+type ObjectDetailPageProps = {
   bucketId: string;
   objectId: string;
-}) {
+};
+
+export default function ObjectDetailPage({ bucketId, objectId }: ObjectDetailPageProps) {
   const goBack = useBackOrFallback("object", bucketId);
 
   const detail = useQuery({

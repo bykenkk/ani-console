@@ -1,8 +1,47 @@
-import ResourcePageFrame from "../ResourcePageFrame";
-import { ListToolbar, ToolbarIconButton, ToolbarSearch } from "./ListToolbar";
-import StatusTabs from "./StatusTabs";
-import type { ListPageFrameProps } from "./types";
+import ResourcePageFrame, { type ResourcePageHeaderConfig } from "../ResourcePageFrame";
+import { ListToolbar, ToolbarIconButton, ToolbarSearch, type SearchField } from "./ListToolbar";
+import StatusTabs, { type ListStatusTab } from "./StatusTabs";
+
 import styles from "./index.module.css";
+import type { ReactNode } from "react";
+
+type ListPageTabsConfig<TStatus extends string> = {
+  items: Array<ListStatusTab<TStatus>>;
+  value: TStatus;
+  onChange: (value: TStatus) => void;
+  ariaLabel?: string;
+};
+
+type ListPageSearchConfig<TSearchField extends string> = {
+  fields: Array<SearchField<TSearchField>>;
+  field: TSearchField;
+  value: string;
+  placeholder?: string;
+  onFieldChange: (field: TSearchField) => void;
+  onChange: (value: string) => void;
+};
+
+type ListPageRefreshConfig = {
+  onClick: () => void;
+  spinning?: boolean;
+  disabled?: boolean;
+  label?: string;
+};
+
+type ListPageToolbarConfig<TSearchField extends string> = {
+  actions?: ReactNode;
+  search?: ListPageSearchConfig<TSearchField>;
+  filters?: ReactNode;
+  refresh?: ListPageRefreshConfig;
+  tools?: ReactNode;
+};
+
+type ListPageFrameProps<TStatus extends string = string, TSearchField extends string = string> = {
+  header: ResourcePageHeaderConfig;
+  tabs?: ListPageTabsConfig<TStatus>;
+  toolbar?: ListPageToolbarConfig<TSearchField>;
+  children: ReactNode;
+};
 
 export default function ListPageFrame<
   TStatus extends string = string,
@@ -43,12 +82,3 @@ export default function ListPageFrame<
     </ResourcePageFrame>
   );
 }
-
-export type { ResourcePageHeaderAction, ResourcePageHeaderConfig } from "../ResourcePageFrame";
-export type {
-  ListPageFrameProps,
-  ListPageRefreshConfig,
-  ListPageSearchConfig,
-  ListPageTabsConfig,
-  ListPageToolbarConfig,
-} from "./types";

@@ -32,6 +32,11 @@ import { optionalIpv4WithinCidrError, subnetFixedOctets, suggestGatewayIp } from
 import styles from "./index.module.css";
 import { withFirst100 } from "@/api/pagination";
 
+type VmCreateModalProps = {
+  onCancel: () => void;
+  onCreated: (operationId?: string) => void;
+};
+
 const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type SecurityGroup = NetworkSecurityGroup;
@@ -71,7 +76,7 @@ type VmConfig = {
     read_only: boolean;
   }>;
 };
-type Values = {
+type VmCreateFormValues = {
   name: string;
   description: string;
   imageRef: string;
@@ -96,7 +101,7 @@ type Values = {
 
 const SSH_KEY_LOGIN_VISIBLE = false;
 
-const INITIAL: Values = {
+const INITIAL: VmCreateFormValues = {
   name: "",
   description: "",
   imageRef: "",
@@ -174,16 +179,10 @@ const buildPasswordCloudInit = (username: string, password: string, customUserDa
   ].join("\r\n");
 };
 
-export default function VmCreateModal({
-  onCancel,
-  onCreated,
-}: {
-  onCancel: () => void;
-  onCreated: (operationId?: string) => void;
-}) {
-  const [form] = Form.useForm<Values>();
+export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProps) {
+  const [form] = Form.useForm<VmCreateFormValues>();
   const [step, setStep] = useState(0);
-  const [values, setValues] = useState<Values>(INITIAL);
+  const [values, setValues] = useState<VmCreateFormValues>(INITIAL);
   const queryClient = useQueryClient();
 
   const images = useQuery({
@@ -385,7 +384,7 @@ export default function VmCreateModal({
     }
     setStep((current) => Math.min(STEPS.length - 1, current + 1));
   };
-  const setValue = <K extends keyof Values>(key: K, value: Values[K]) => {
+  const setValue = <K extends keyof VmCreateFormValues>(key: K, value: VmCreateFormValues[K]) => {
     form.setFieldValue(key, value);
     setValues((current) => ({ ...current, [key]: value }));
   };

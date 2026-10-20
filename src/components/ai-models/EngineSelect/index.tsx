@@ -1,5 +1,14 @@
 import { Select } from "@arco-design/web-react";
-import type { EngineSelectProps } from "./types";
+import type { CSSProperties } from "react";
+
+export type EngineType = "vllm" | "sglang";
+
+interface EngineSelectProps {
+  value?: string;
+  onChange?: (value: EngineType) => void;
+  disabled?: boolean;
+  style?: CSSProperties;
+}
 
 export default function EngineSelect({ value, onChange, disabled, style }: EngineSelectProps) {
   return (
@@ -17,5 +26,3 @@ export default function EngineSelect({ value, onChange, disabled, style }: Engin
     />
   );
 }
-
-export type { EngineSelectProps, EngineType } from "./types";

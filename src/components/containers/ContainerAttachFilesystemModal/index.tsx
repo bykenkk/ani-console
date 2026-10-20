@@ -10,19 +10,25 @@ import { useState } from "react";
 
 import { validateForm } from "@/lib/form";
 
+type ContainerAttachFilesystemModalProps = {
+  instance: Instance;
+  onCancel: () => void;
+  onSubmitted: () => void;
+};
+
 type Instance = InstanceRecord;
-type Values = { filesystemId: string; mountPath: string; readOnly?: boolean };
+type ContainerAttachFilesystemFormValues = {
+  filesystemId: string;
+  mountPath: string;
+  readOnly?: boolean;
+};
 
 export default function ContainerAttachFilesystemModal({
   instance,
   onCancel,
   onSubmitted,
-}: {
-  instance: Instance;
-  onCancel: () => void;
-  onSubmitted: () => void;
-}) {
-  const [form] = Form.useForm<Values>();
+}: ContainerAttachFilesystemModalProps) {
+  const [form] = Form.useForm<ContainerAttachFilesystemFormValues>();
   const [selectedId, setSelectedId] = useState("");
   const filesystems = useQuery({
     meta: {
@@ -61,7 +67,7 @@ export default function ContainerAttachFilesystemModal({
         errorFallback: "操作失败，请稍后重试",
       },
     },
-    mutationFn: async (values: Values) => {
+    mutationFn: async (values: ContainerAttachFilesystemFormValues) => {
       const submitData = {
         action: "attach_filesystem" as const,
         filesystem_id: values.filesystemId,

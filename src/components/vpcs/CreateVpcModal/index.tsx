@@ -4,13 +4,12 @@ import { useState } from "react";
 import { createNetworkVpc, listNetworkVpcCidrPresets } from "@/api/network";
 import VpcCidrField from "../VpcCidrField";
 
-export default function CreateVpcModal({
-  onCancel,
-  onCreated,
-}: {
+type CreateVpcModalProps = {
   onCancel: () => void;
   onCreated: () => void;
-}) {
+};
+
+export default function CreateVpcModal({ onCancel, onCreated }: CreateVpcModalProps) {
   const [name, setName] = useState("");
   const [cidr, setCidr] = useState("");
   const [submitted, setSubmitted] = useState(false);

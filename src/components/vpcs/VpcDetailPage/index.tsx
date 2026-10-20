@@ -20,17 +20,15 @@ import VpcRelatedResources from "./VpcRelatedResources";
 import VpcRoutes from "./VpcRoutes";
 import VpcSubnets from "./VpcSubnets";
 
-type Vpc = NetworkVPC;
-
-export default function VpcDetailPage({
-  vpcId,
-  tab,
-  onTabChange,
-}: {
+type VpcDetailPageProps = {
   vpcId: string;
   tab?: string;
   onTabChange: (tab: string) => void;
-}) {
+};
+
+type Vpc = NetworkVPC;
+
+export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPageProps) {
   const goBack = useBackOrFallback("vpc");
   const detail = useQuery({
     meta: {

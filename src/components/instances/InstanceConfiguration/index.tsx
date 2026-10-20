@@ -11,6 +11,14 @@ import { Space, Tooltip, Modal } from "@arco-design/web-react";
 import { type ReactNode } from "react";
 import { useMutation } from "@tanstack/react-query";
 
+type InstanceConfigurationProps = {
+  instance?: Instance;
+  runtime?: InstanceRuntime;
+  loading?: boolean;
+  onChanged: () => void;
+  secretAction?: ReactNode;
+};
+
 type Instance = InstanceRecord;
 
 type SecretRow = {
@@ -41,13 +49,7 @@ export default function InstanceConfiguration({
   loading = false,
   onChanged,
   secretAction,
-}: {
-  instance?: Instance;
-  runtime?: InstanceRuntime;
-  loading?: boolean;
-  onChanged: () => void;
-  secretAction?: ReactNode;
-}) {
+}: InstanceConfigurationProps) {
   const environmentVariables = instance?.container?.env ?? [];
   const secretRefs = secretReferences(instance);
   const secretRows: SecretRow[] = secretRefs.map((reference) => ({

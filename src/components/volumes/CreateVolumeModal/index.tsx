@@ -8,6 +8,13 @@ import { canMountVolumeMode } from "@/lib/volumes";
 import { validateForm } from "@/lib/form";
 import VolumeMountFields from "@/components/volumes/VolumeMountFields";
 
+type CreateVolumeFormValues = { name: string; sizeGiB: number };
+
+type CreateVolumeModalProps = {
+  onCancel: () => void;
+  onCreated?: (volume: Volume) => void;
+};
+
 type Volume = StorageVolume;
 type Instance = InstanceRecord;
 
@@ -19,15 +26,9 @@ const INSTANCE_ROUTE: Record<string, string> = {
   gpu_container: "/gpu-containers",
 };
 
-export default function CreateVolumeModal({
-  onCancel,
-  onCreated,
-}: {
-  onCancel: () => void;
-  onCreated?: (volume: Volume) => void;
-}) {
+export default function CreateVolumeModal({ onCancel, onCreated }: CreateVolumeModalProps) {
   const qc = useQueryClient();
-  const [form] = Form.useForm<{ name: string; sizeGiB: number }>();
+  const [form] = Form.useForm<CreateVolumeFormValues>();
   const [storageClass, setStorageClass] = useState("ani-block");
   const [encrypted, setEncrypted] = useState(false);
   const [volumeMode, setVolumeMode] = useState<StorageVolumeMode>("filesystem");
@@ -60,7 +61,7 @@ export default function CreateVolumeModal({
         errorFallback: "请求失败",
       },
     },
-    mutationFn: async ({ name, sizeGiB }: { name: string; sizeGiB: number }) => {
+    mutationFn: async ({ name, sizeGiB }: CreateVolumeFormValues) => {
       const trimmedName = name.trim();
       if (!trimmedName) throw new Error("请输入卷名称");
       if (!Number.isInteger(sizeGiB) || sizeGiB < 1)

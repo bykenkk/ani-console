@@ -9,6 +9,11 @@ import { isDateTimeExpired } from "@/lib/date";
 import { closeNotification, showNotification } from "@/lib/feedback";
 import { withId } from "@/lib/id";
 
+type InstanceVncProps = {
+  instanceId: string;
+  protocol?: "vnc" | "novnc";
+};
+
 type ConsoleStatus = "connecting" | "connected" | "disconnected" | "error" | "expired";
 type ViewMode = "fit" | "native";
 
@@ -35,13 +40,7 @@ function applyViewMode(rfb: RFB, mode: ViewMode) {
   rfb.focusOnClick = true;
 }
 
-export default function InstanceVnc({
-  instanceId,
-  protocol = "novnc",
-}: {
-  instanceId: string;
-  protocol?: "vnc" | "novnc";
-}) {
+export default function InstanceVnc({ instanceId, protocol = "novnc" }: InstanceVncProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const rfbRef = useRef<RFB | null>(null);
   const expiresAtRef = useRef<string | null>(null);

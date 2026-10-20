@@ -9,13 +9,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import BucketFolderCreateModal from "@/components/objects/BucketFolderCreateModal";
 
-export default function BucketObjects({
-  bucketId,
-  bucket,
-}: {
+type BucketObjectsProps = {
   bucketId: string;
   bucket: StorageBucketRecord;
-}) {
+};
+
+export default function BucketObjects({ bucketId, bucket }: BucketObjectsProps) {
   const qc = useQueryClient();
   const [folderVisible, setFolderVisible] = useState(false);
   const [prefix, setPrefix] = useState("/");

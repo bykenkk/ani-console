@@ -3,17 +3,19 @@ import { Input, Modal, Typography } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
+type BucketFolderCreateModalProps = {
+  bucketId: string;
+  prefix: string;
+  onCancel: () => void;
+  onCreated: () => void;
+};
+
 export default function BucketFolderCreateModal({
   bucketId,
   prefix,
   onCancel,
   onCreated,
-}: {
-  bucketId: string;
-  prefix: string;
-  onCancel: () => void;
-  onCreated: () => void;
-}) {
+}: BucketFolderCreateModalProps) {
   const [folderName, setFolderName] = useState("");
   const createFolder = useMutation({
     meta: {

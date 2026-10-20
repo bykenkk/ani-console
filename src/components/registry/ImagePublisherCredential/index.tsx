@@ -10,7 +10,9 @@ import { formatDateTime } from "@/lib/format";
 import { IMAGE_CREDENTIAL_STATES } from "../options";
 import IssueImageCredentialModal from "../IssueImageCredentialModal";
 
-export default function ImagePublisherCredential({ available }: { available: boolean }) {
+type ImagePublisherCredentialProps = { available: boolean };
+
+export default function ImagePublisherCredential({ available }: ImagePublisherCredentialProps) {
   const [operation, setOperation] = useState<{
     action: "issue" | "reset";
     credential: Credential;

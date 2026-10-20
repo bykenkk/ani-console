@@ -5,6 +5,14 @@ import { useEffect, useRef, useState } from "react";
 import { Button, Empty, Select, Space, Spin, Typography } from "@arco-design/web-react";
 import { closeNotification, showNotification } from "@/lib/feedback";
 import { withId } from "@/lib/id";
+
+type InstanceLogsProps = {
+  instanceId: string;
+  active: boolean;
+  instanceKind?: legacy.InstanceKind;
+  container?: string;
+};
+
 type LogLevel = "debug" | "info" | "warn" | "error";
 type LevelFilter = LogLevel | "all";
 type StreamStatus = "idle" | "connecting" | "connected";
@@ -141,16 +149,7 @@ async function connectLogStream({
   return readLogStream(data, signal, appendLog, textChunks);
 }
 
-export default function InstanceLogs({
-  instanceId,
-  active,
-  instanceKind,
-}: {
-  instanceId: string;
-  active: boolean;
-  instanceKind?: legacy.InstanceKind;
-  container?: string;
-}) {
+export default function InstanceLogs({ instanceId, active, instanceKind }: InstanceLogsProps) {
   const [level, setLevel] = useState<LevelFilter>("all");
   // FIXME(governance-instance-logs): 新接口只返回 text，级别筛选依赖原结构化日志，保留入口和旧调用。
   // TODO(governance-instance-logs): 待结构化日志与级别筛选对齐后迁移，文本块不可补造时间/级别或去重。

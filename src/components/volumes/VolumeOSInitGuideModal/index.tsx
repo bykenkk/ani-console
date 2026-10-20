@@ -5,13 +5,15 @@ import { completeVolumeOSInit, getVolumeOSInitGuide } from "@/api/storage/volume
 import { copyToClipboard } from "@/lib/clipboard";
 import { withId } from "@/lib/id";
 
+type VolumeOSInitGuideModalProps = {
+  volumeId: string;
+  onCancel: () => void;
+};
+
 export default function VolumeOSInitGuideModal({
   volumeId,
   onCancel,
-}: {
-  volumeId: string;
-  onCancel: () => void;
-}) {
+}: VolumeOSInitGuideModalProps) {
   const qc = useQueryClient();
   const guide = useQuery({
     meta: {

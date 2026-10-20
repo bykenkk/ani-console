@@ -8,11 +8,11 @@ import {
 } from "@/api/images";
 import { withId } from "@/lib/id";
 
-export default function InstanceImageFields({
-  onChange,
-}: {
+type InstanceImageFieldsProps = {
   onChange: (image?: ImageRegistration) => void;
-}) {
+};
+
+export default function InstanceImageFields({ onChange }: InstanceImageFieldsProps) {
   const [scope, setScope] = useState<ImageRegistrationScope>("tenant");
   const [selected, setSelected] = useState<ImageRegistration>();
   const query = useQuery({

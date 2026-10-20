@@ -1,11 +1,36 @@
-import { EngineSelect, ModelSourceInput, type ModelSourceValue } from "@/components/ai-models";
-import { importModelBundle, type ExternalModelCandidate } from "@/api/models";
+import {
+  EngineSelect,
+  ModelSourceInput,
+  type ModelSourceValue,
+  type EngineType,
+} from "@/components/ai-models";
+import {
+  importModelBundle,
+  type ExternalModelCandidate,
+  type ModelCapability,
+  type ModelFormat,
+} from "@/api/models";
 import { Form, Input, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { validateForm } from "@/lib/form";
 
-import type { ImportModelFormValues, ImportModelModalProps } from "./types";
+interface ImportModelFormValues {
+  model_source: ModelSourceValue;
+  model_name: string;
+  display_name: string;
+  description: string;
+  revision: string;
+  format: ModelFormat;
+  capabilities: ModelCapability[];
+  engine_type: EngineType;
+  engine_image: string;
+  startup_command: string;
+}
+
+interface ImportModelModalProps {
+  onCancel: () => void;
+}
 
 export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
   const qc = useQueryClient();

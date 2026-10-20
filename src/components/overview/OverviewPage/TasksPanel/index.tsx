@@ -6,8 +6,17 @@ import {
   IconRefresh,
 } from "@arco-design/web-react/icon";
 import clsx from "clsx";
-import type { HomeTask, HomeTaskFilter } from "../types";
+import type { HomeTask, HomeTaskFilter } from "..";
 import styles from "../index.module.css";
+
+type TasksPanelProps = {
+  items: HomeTask[];
+  filter: HomeTaskFilter;
+  loading: boolean;
+  refreshing: boolean;
+  onFilterChange: (filter: HomeTaskFilter) => void;
+  onRefresh: () => void;
+};
 
 export default function TasksPanel({
   items,
@@ -16,14 +25,7 @@ export default function TasksPanel({
   refreshing,
   onFilterChange,
   onRefresh,
-}: {
-  items: HomeTask[];
-  filter: HomeTaskFilter;
-  loading: boolean;
-  refreshing: boolean;
-  onFilterChange: (filter: HomeTaskFilter) => void;
-  onRefresh: () => void;
-}) {
+}: TasksPanelProps) {
   return (
     <section className={clsx(styles.panel, styles.taskPanel)}>
       <header className="flex flex-none items-center justify-between">
