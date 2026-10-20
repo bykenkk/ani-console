@@ -1,36 +1,15 @@
-import {
-  EngineSelect,
-  ModelSourceInput,
-  type EngineType,
-  type ModelSourceValue,
-} from "@/components/ai-models";
-import {
-  importModelBundle,
-  type ExternalModelCandidate,
-  type ModelCapability,
-  type ModelFormat,
-} from "@/api/models";
+import { EngineSelect, ModelSourceInput, type ModelSourceValue } from "@/components/ai-models";
+import { importModelBundle, type ExternalModelCandidate } from "@/api/models";
 import { Form, Input, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { validateForm } from "@/lib/form";
 
-type ImportFormValues = {
-  model_source: ModelSourceValue;
-  model_name: string;
-  display_name: string;
-  description: string;
-  revision: string;
-  format: ModelFormat;
-  capabilities: ModelCapability[];
-  engine_type: EngineType;
-  engine_image: string;
-  startup_command: string;
-};
+import type { ImportModelFormValues, ImportModelModalProps } from "./types";
 
-export default function ImportModelModal({ onCancel }: { onCancel: () => void }) {
+export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
   const qc = useQueryClient();
-  const [form] = Form.useForm<ImportFormValues>();
+  const [form] = Form.useForm<ImportModelFormValues>();
   const submitting = useRef(false);
   const selectedModel = useRef<ExternalModelCandidate>();
   const source = useRef<ModelSourceValue["source"]>("modelscope");
@@ -71,7 +50,7 @@ export default function ImportModelModal({ onCancel }: { onCancel: () => void })
         errorFallback: "提交模型导入任务失败",
       },
     },
-    mutationFn: (values: ImportFormValues) =>
+    mutationFn: (values: ImportModelFormValues) =>
       importModelBundle({
         model: {
           name: values.model_name.trim(),
@@ -103,7 +82,7 @@ export default function ImportModelModal({ onCancel }: { onCancel: () => void })
     if (submitting.current) return;
     submitting.current = true;
     try {
-      const values = await validateForm<ImportFormValues>(form);
+      const values = await validateForm<ImportModelFormValues>(form);
       await submit.mutateAsync(values);
     } finally {
       submitting.current = false;

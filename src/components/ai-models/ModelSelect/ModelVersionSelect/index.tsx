@@ -2,17 +2,12 @@ import { withFirst100 } from "@/api/pagination";
 import { Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import {
-  getModel,
-  getModelVersion,
-  listModelVersions,
-  type ModelVersion,
-  type ModelPageParams,
-} from "@/api/models";
+import { getModel, getModelVersion, listModelVersions, type ModelVersion } from "@/api/models";
 import { withId } from "@/lib/id";
+import type { ModelVersionSelectProps, ModelVersionOptionsParams } from "./types";
 
 const listVersionOptions = withFirst100(
-  ({ modelId, ...params }: { modelId: string } & ModelPageParams, signal?: AbortSignal) =>
+  ({ modelId, ...params }: ModelVersionOptionsParams, signal?: AbortSignal) =>
     listModelVersions(modelId, params, signal),
 );
 
@@ -21,12 +16,7 @@ export default function ModelVersionSelect({
   value,
   onChange,
   disabled,
-}: {
-  modelId: string;
-  value?: string;
-  onChange?: (value: string, version?: ModelVersion, modelName?: string) => void;
-  disabled?: boolean;
-}) {
+}: ModelVersionSelectProps) {
   const appliedId = useRef("");
   const [chosenVersion, setChosenVersion] = useState<ModelVersion>();
   const model = useQuery({
@@ -88,3 +78,5 @@ export default function ModelVersionSelect({
     />
   );
 }
+
+export type { ModelVersionSelectProps } from "./types";

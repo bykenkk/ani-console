@@ -49,6 +49,12 @@ src/api/<domain>/
 - 时间解析、校验与展示统一使用 `date-fns`，并先封装在 `src/lib` 公共适配层；业务组件、页面和领域 API 不得直接调用 `date-fns` 或原生日期格式化。
 - `src` 下的全局类型、环境类型和第三方模块增强声明统一维护在 `src/vite-env.d.ts`，不得新增 `src/types` 或其他分散的 `.d.ts` 文件；领域类型仍跟随所属 API、组件或功能模块维护。
 
+### 组件 Props 与表单类型
+
+- 新增或调整组件时，Props 与组件私有类型统一维护在当前组件目录的 `types.ts`，组件实现通过 `import type` 引用，不在组件参数中内联定义 Props。Props 类型使用 `<ComponentName>Props` 命名，例如 `CreateInferenceModalProps`。
+- 表单值类型按业务或操作命名为 `<BusinessOrAction>FormValues`，例如 `CreateInferenceFormValues`，不得使用 `CreateValues` 等缺少业务含义的名称。表单实体独立声明实际字段，不通过继承、交叉、`Pick` 或 `Omit` 等方式从整个接口提交类型派生；提交时显式组装接口参数，处理单位转换及自动生成字段。
+- 表单实体独立不代表字段类型重复定义。单个字段已有对应的领域类型、枚举或联合类型时必须直接引用，例如 `runtime_mode: InferenceRuntimeMode`；不复制其枚举值，也不为复用单字段类型而关联整个提交实体。
+
 ## 异步调用与返回值
 
 - 不为普通方法调用、事件回调或 Promise 调用机械添加 `void` 前缀；仅在确需强制丢弃返回值或满足明确接口约束时使用。

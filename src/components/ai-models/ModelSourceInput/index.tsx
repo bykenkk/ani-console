@@ -2,26 +2,10 @@ import { AutoComplete, Input, Select } from "@arco-design/web-react";
 
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import {
-  searchExternalModels,
-  type ExternalModelCandidate,
-  type ImportModelInput,
-} from "@/api/models";
+import { searchExternalModels, type ExternalModelCandidate } from "@/api/models";
+import type { ModelSourceInputProps } from "./types";
 
-export interface ModelSourceValue {
-  source: ImportModelInput["source"];
-  repo_id: string;
-}
-
-export default function ModelSourceInput({
-  value,
-  onChange,
-  disabled,
-}: {
-  value?: ModelSourceValue;
-  onChange?: (value: ModelSourceValue, candidate?: ExternalModelCandidate) => void;
-  disabled?: boolean;
-}) {
+export default function ModelSourceInput({ value, onChange, disabled }: ModelSourceInputProps) {
   const source = value?.source ?? "modelscope";
   const [searchInput, setSearchInput] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -102,3 +86,5 @@ export default function ModelSourceInput({
     </Input.Group>
   );
 }
+
+export type { ModelSourceInputProps, ModelSourceValue } from "./types";
