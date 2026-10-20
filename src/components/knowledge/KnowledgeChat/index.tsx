@@ -1,3 +1,4 @@
+import { withFirst100 } from "@/api/pagination";
 import { listInferenceServices } from "@/api/inference";
 import {
   deleteKnowledgeBaseSession,
@@ -16,6 +17,8 @@ import KnowledgeConversation from "./KnowledgeConversation";
 import KnowledgeSessionsSidebar from "./KnowledgeSessionsSidebar";
 import { toThreadMessage, type QueryMode } from "./knowledgeQueryAdapter";
 
+const listInferenceOptions = withFirst100(listInferenceServices);
+
 export default function KnowledgeChat({
   kbId,
   defaultTopK = 5,
@@ -32,6 +35,8 @@ export default function KnowledgeChat({
   const [topK, setTopK] = useState(defaultTopK);
   const [inferenceServiceName, setInferenceServiceName] = useState<string>();
   const [citationsVisible, setCitationsVisible] = useState(false);
+  // FIXME(inference-contract): 目标推理路由待确认，用户同意保留原分支调用。
+  // TODO(inference-contract): 路由恢复后验证生成模型筛选与默认模型回落。
   const inferenceModels = useQuery({
     meta: {
       errorNotification: {
@@ -40,9 +45,9 @@ export default function KnowledgeChat({
         fallback: "将使用知识库或平台默认模型",
       },
     },
-    queryKey: ["inference-services", "model-options", "text-generation", "running"],
+    queryKey: ["governance-inference-services", "options", "text-generation", "running"],
     queryFn: ({ signal }) =>
-      listInferenceServices({ capability: "text-generation", status: "running" }, signal),
+      listInferenceOptions({ capability: "text-generation", status: "running" }, signal),
   });
   const inferenceModelOptions = useMemo(
     () =>

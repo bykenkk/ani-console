@@ -3,15 +3,14 @@ import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import CreateInferenceModal from "@/components/ai-inference/CreateInferenceModal";
-import InferenceOperationModal from "@/components/ai-inference/InferenceOperationModal";
-import type { InferenceAcceptance } from "@/api/inference";
 import { deleteModel, type Model } from "@/api/models";
 import type { RowAction } from "@/components/common";
 
 export function useModelActions(onDeleted?: () => void) {
   const qc = useQueryClient();
   const [deployModel, setDeployModel] = useState<Model | null>(null);
-  const [acceptance, setAcceptance] = useState<InferenceAcceptance>();
+  // FIXME(model-contract): 用户确认保留原分支删除契约及反馈，目标版本的删除完成语义待核对。
+  // TODO(model-contract): 确认同步/异步语义后复核反馈和删除后列表、详情刷新。
   const remove = useMutation({
     mutationFn: (item: Model) => deleteModel(item.id),
     meta: {
@@ -77,14 +76,7 @@ export function useModelActions(onDeleted?: () => void) {
         <CreateInferenceModal
           initialServiceName={("infer-" + deployModel.name).slice(0, 63)}
           initialModelId={deployModel.id}
-          onCreated={setAcceptance}
           onCancel={() => setDeployModel(null)}
-        />
-      )}
-      {acceptance && (
-        <InferenceOperationModal
-          acceptance={acceptance}
-          onCancel={() => setAcceptance(undefined)}
         />
       )}
     </>

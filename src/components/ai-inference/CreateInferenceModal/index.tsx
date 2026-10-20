@@ -4,11 +4,11 @@ import { useCallback, useRef, useState } from "react";
 import {
   createInferenceService,
   type CreateInferenceInput,
-  type InferenceAcceptance,
   type InferenceGpuSelection,
 } from "@/api/inference";
 import { getModelVersion, type ModelVersion } from "@/api/models";
 import { showMessage } from "@/lib/feedback";
+import { validateForm } from "@/lib/form";
 import InferenceModelFields from "./InferenceModelFields";
 import InferenceGpuFields from "./InferenceGpuFields";
 
@@ -20,13 +20,11 @@ type CreateValues = CreateInferenceInput & {
 
 export default function CreateInferenceModal({
   onCancel,
-  onCreated,
   initialServiceName,
   initialModelId,
   initialModelVersionId,
 }: {
   onCancel: () => void;
-  onCreated?: (result: InferenceAcceptance) => void;
   initialServiceName?: string;
   initialModelId?: string;
   initialModelVersionId?: string;
@@ -68,9 +66,9 @@ export default function CreateInferenceModal({
         errorFallback: "部署失败",
       },
     },
-    onSuccess: async (result) => {
+    onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["governance-inference-services"] });
-      onCreated?.(result);
+      // TODO(inference-task): 后续统一接入部署任务跟踪；当前仅刷新列表并关闭表单。
       onCancel();
     },
   });
@@ -78,23 +76,7 @@ export default function CreateInferenceModal({
     if (submitting.current) return;
     submitting.current = true;
     try {
-      let values: CreateValues;
-      try {
-        values = await form.validate();
-      } catch (error) {
-        const fieldErrors = form.getFieldsError();
-        const firstError = Object.values(fieldErrors)
-          .flat()
-          .find((item) => typeof item?.message === "string");
-        showMessage({
-          type: "error",
-          content:
-            typeof firstError?.message === "string"
-              ? firstError.message
-              : "请检查并修正表单中的错误项",
-        });
-        throw error;
-      }
+      const values = await validateForm<CreateValues>(form);
       if (
         !version ||
         values.model_version_id !== version.id ||

@@ -51,13 +51,15 @@ export default function ModelRelatedResources({ model }: { model: Model }) {
   const services = (relatedServices.data?.items ?? []).filter((service) =>
     versionIds.has(service.model_version_id),
   );
-  const total = Number(relatedServices.data?.total ?? services.length);
+  const total = Number(relatedServices.data?.total ?? 0);
+  // FIXME(api-contract): 用户确认保留原推理分支页码分页，尚未与当前后端索引对齐。
+  // TODO(api-contract): 对应后端版本就绪后联调列表、筛选及 total，不回退旧分页。
   const pagination: ListPagination = {
     mode: "total",
     page,
     pageSize,
     disabled: relatedServices.isFetching || versions.some((query) => query.isFetching),
-    total: Number.isFinite(total) ? total : services.length,
+    total,
     onPageChange: setPage,
     onPageSizeChange: (size) => {
       setPageSize(size);

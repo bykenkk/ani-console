@@ -1,4 +1,5 @@
-import { Button, Form, Select, Space } from "@arco-design/web-react";
+import { withFirst100 } from "@/api/pagination";
+import { Form, Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import {
@@ -7,8 +8,15 @@ import {
   listModels,
   listModelVersions,
   type ModelVersion,
+  type ModelPageParams,
 } from "@/api/models";
 import { withId } from "@/lib/id";
+
+const listModelOptions = withFirst100(listModels);
+const listVersionOptions = withFirst100(
+  ({ modelId, ...params }: { modelId: string } & ModelPageParams, signal?: AbortSignal) =>
+    listModelVersions(modelId, params, signal),
+);
 
 export default function InferenceModelFields({
   initialModelId,
@@ -20,42 +28,16 @@ export default function InferenceModelFields({
   onVersionChange: (version?: ModelVersion, modelName?: string) => void;
 }) {
   const [modelId, setModelId] = useState(initialModelId ?? "");
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
+  // FIXME(model-contract): 用户确认保留原分支模型列表，尚未与当前后端索引对齐。
+  // TODO(model-contract): 目标版本确认后验证模型选项及初始选择回显。
   const models = useQuery({
-    queryKey: ["governance-models", "inference-options", page, pageSize],
-    queryFn: ({ signal }) => listModels({ page, pageSize }, signal),
+    queryKey: ["governance-models", "options"],
+    queryFn: ({ signal }) => listModelOptions({}, signal),
     meta: { errorNotification: { id: "inference-models", action: "模型列表加载" } },
   });
   return (
     <>
-      <Form.Item
-        label="模型"
-        extra={
-          (page > 1 || page * pageSize < Number(models.data?.total ?? 0)) && (
-            <Space>
-              <Button
-                size="mini"
-                disabled={models.isFetching || page === 1}
-                onClick={() => {
-                  setPage((current) => Math.max(1, current - 1));
-                }}
-              >
-                上一页模型
-              </Button>
-              <Button
-                size="mini"
-                disabled={models.isFetching || page * pageSize >= Number(models.data?.total ?? 0)}
-                onClick={() => {
-                  setPage((current) => current + 1);
-                }}
-              >
-                下一页模型
-              </Button>
-            </Space>
-          )
-        }
-      >
+      <Form.Item label="模型">
         <Select
           value={modelId || undefined}
           loading={models.isFetching}
@@ -72,7 +54,6 @@ export default function InferenceModelFields({
           ]}
           onChange={(id) => {
             setModelId(id);
-            setPage(1);
             onVersionChange();
           }}
         />
@@ -98,8 +79,6 @@ function InferenceVersionFields({
 }) {
   const [selectedId, setSelectedId] = useState(initialVersionId ?? "");
   const [appliedId, setAppliedId] = useState("");
-  const [page, setPage] = useState(1);
-  const pageSize = 10;
   const [chosenVersion, setChosenVersion] = useState<ModelVersion>();
   const model = useQuery({
     queryKey: ["governance-model", modelId],
@@ -107,10 +86,12 @@ function InferenceVersionFields({
     queryFn: ({ signal }) => getModel(modelId, signal),
     meta: { errorNotification: { id: withId("inference-model", modelId), action: "模型详情加载" } },
   });
+  // FIXME(model-contract): 用户确认保留原分支版本列表，当前索引仍是游标契约。
+  // TODO(model-contract): 目标版本就绪后验证前 100 项选项、版本归属及就绪状态。
   const versions = useQuery({
-    queryKey: ["governance-model-versions", modelId, page, pageSize],
+    queryKey: ["governance-model-versions", modelId, "options"],
     enabled: Boolean(modelId),
-    queryFn: ({ signal }) => listModelVersions(modelId, { page, pageSize }, signal),
+    queryFn: ({ signal }) => listVersionOptions({ modelId }, signal),
     meta: {
       errorNotification: { id: withId("inference-versions", modelId), action: "模型版本加载" },
     },
@@ -153,30 +134,6 @@ function InferenceVersionFields({
       field="model_version_id"
       label="模型版本"
       rules={[{ type: "string", required: true, message: "请选择已就绪的模型版本" }]}
-      extra={
-        (page > 1 || page * pageSize < Number(versions.data?.total ?? 0)) && (
-          <Space>
-            <Button
-              size="mini"
-              disabled={versions.isFetching || page === 1}
-              onClick={() => {
-                setPage((current) => Math.max(1, current - 1));
-              }}
-            >
-              上一页版本
-            </Button>
-            <Button
-              size="mini"
-              disabled={versions.isFetching || page * pageSize >= Number(versions.data?.total ?? 0)}
-              onClick={() => {
-                setPage((current) => current + 1);
-              }}
-            >
-              下一页版本
-            </Button>
-          </Space>
-        )
-      }
     >
       <Select
         value={selectedId || undefined}

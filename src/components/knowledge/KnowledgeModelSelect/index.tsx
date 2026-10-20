@@ -1,8 +1,11 @@
+import { withFirst100 } from "@/api/pagination";
 import { Select, Space, Typography } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
 import { listInferenceServices, type InferenceListParams } from "@/api/inference";
 import { withId } from "@/lib/id";
+
+const listInferenceOptions = withFirst100(listInferenceServices);
 
 export default function KnowledgeModelSelect({
   capability,
@@ -15,9 +18,11 @@ export default function KnowledgeModelSelect({
   onChange?: (value: string | undefined) => void;
   required?: boolean;
 }) {
+  // FIXME(inference-contract): 目标推理路由待确认，用户同意保留原分支调用。
+  // TODO(inference-contract): 路由恢复后验证 capability/status 筛选及可调用模型选项。
   const models = useQuery({
-    queryKey: ["inference-services", "model-options", capability, "running"],
-    queryFn: ({ signal }) => listInferenceServices({ capability, status: "running" }, signal),
+    queryKey: ["governance-inference-services", "options", capability, "running"],
+    queryFn: ({ signal }) => listInferenceOptions({ capability, status: "running" }, signal),
     meta: {
       errorNotification: {
         id: withId("inference-models", capability),

@@ -63,13 +63,15 @@ export default function ModelsPage() {
     },
   });
   const items = models.data?.items ?? [];
-  const total = Number(models.data?.total ?? items.length);
+  const total = Number(models.data?.total ?? 0);
+  // FIXME(api-contract): 用户确认保留原推理分支页码分页，尚未与当前后端索引对齐。
+  // TODO(api-contract): 对应后端版本就绪后联调列表、筛选及 total，不回退旧分页。
   const pagination: ListPagination = {
     mode: "total",
     page,
     pageSize,
     disabled: models.isFetching,
-    total: Number.isFinite(total) ? total : items.length,
+    total,
     onPageChange: setPage,
     onPageSizeChange: (size) => {
       setPageSize(size);
@@ -77,10 +79,10 @@ export default function ModelsPage() {
     },
   };
   const refresh = () => {
-    void qc.invalidateQueries({ queryKey: ["governance-models"] });
+    qc.invalidateQueries({ queryKey: ["governance-models"] });
     setPage(1);
   };
-  const { actions, dialogNode } = useModelActions();
+  const { actions, dialogNode } = useModelActions(() => setPage(1));
 
   const columns: Array<ListColumn<Model>> = [
     {

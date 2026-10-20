@@ -1,3 +1,4 @@
+import { withFirst100 } from "@/api/pagination";
 import { listInferenceServices } from "@/api/inference";
 import {
   createVectorStore,
@@ -8,6 +9,8 @@ import { withId } from "@/lib/id";
 import { Form, Input, InputNumber, Modal, Select, Typography } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
+
+const listInferenceOptions = withFirst100(listInferenceServices);
 
 export default function CreateVectorStoreModal({
   onCancel,
@@ -21,6 +24,8 @@ export default function CreateVectorStoreModal({
   const [embeddingModel, setEmbeddingModel] = useState("");
   const [dimension, setDimension] = useState(1536);
   const [metric, setMetric] = useState<VectorMetric>("cosine");
+  // FIXME(inference-contract): 目标推理路由待确认，用户同意保留原分支调用。
+  // TODO(inference-contract): 路由恢复后验证 capability/status 筛选及可调用模型选项。
   const models = useQuery({
     meta: {
       errorNotification: {
@@ -29,9 +34,9 @@ export default function CreateVectorStoreModal({
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["inference-services", "model-options", "embedding", "running"],
+    queryKey: ["governance-inference-services", "options", "embedding", "running"],
     queryFn: ({ signal }) =>
-      listInferenceServices({ capability: "embedding", status: "running" }, signal),
+      listInferenceOptions({ capability: "embedding", status: "running" }, signal),
   });
   const modelOptions = useMemo(
     () => (models.data?.items ?? []).map((item) => item.served_model_name),

@@ -1,3 +1,5 @@
+import type { PageParams } from "@/api/types";
+
 export type InferenceRuntimeMode = "RUNTIME_MODE_DEPLOYMENT" | "RUNTIME_MODE_LEADER_WORKER_SET";
 
 export interface InferenceGpuSelection {
@@ -60,9 +62,9 @@ export interface InferenceService {
   publication_phase?: string;
   applied_generation?: string;
 }
-export interface InferenceListParams {
-  page?: number;
-  pageSize?: number;
+// FIXME(inference-contract): 当前索引已移除推理管理路由；用户确认保留原分支列表契约。
+// TODO(inference-contract): 后端版本确认后复核筛选、分页与 total 类型并联调。
+export interface InferenceListParams extends PageParams {
   status?: string;
   capability?: "embedding" | "text-generation" | "speech-to-text";
 }

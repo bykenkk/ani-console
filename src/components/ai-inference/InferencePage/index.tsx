@@ -1,10 +1,6 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  listInferenceServices,
-  type InferenceService,
-  type InferenceAcceptance,
-} from "@/api/inference";
+import { listInferenceServices, type InferenceService } from "@/api/inference";
 import { useInferenceActions } from "@/hooks/useInferenceActions";
 import type { ListPagination } from "@/components/common/DataTable";
 import {
@@ -16,12 +12,10 @@ import {
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import CreateInferenceModal from "../CreateInferenceModal";
-import InferenceOperationModal from "../InferenceOperationModal";
 
 export default function InferencePage() {
-  const { actions, dialogNode } = useInferenceActions();
+  const { actions } = useInferenceActions(() => setPage(1));
   const [creating, setCreating] = useState(false);
-  const [acceptance, setAcceptance] = useState<InferenceAcceptance>();
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -36,13 +30,15 @@ export default function InferencePage() {
     },
   });
   const items = query.data?.items ?? [];
-  const total = Number(query.data?.total ?? items.length);
+  const total = Number(query.data?.total ?? 0);
+  // FIXME(api-contract): 用户确认保留原推理分支页码分页，尚未与当前后端索引对齐。
+  // TODO(api-contract): 对应后端版本就绪后联调列表、筛选及 total，不回退旧分页。
   const pagination: ListPagination = {
     mode: "total",
     page,
     pageSize,
     disabled: query.isFetching,
-    total: Number.isFinite(total) ? total : items.length,
+    total,
     onPageChange: setPage,
     onPageSizeChange: (size) => {
       setPageSize(size);
@@ -116,16 +112,7 @@ export default function InferencePage() {
           tableLabel="推理服务列表"
         />
       </ListPageFrame>
-      {creating && (
-        <CreateInferenceModal onCancel={() => setCreating(false)} onCreated={setAcceptance} />
-      )}
-      {acceptance && (
-        <InferenceOperationModal
-          acceptance={acceptance}
-          onCancel={() => setAcceptance(undefined)}
-        />
-      )}
-      {dialogNode}
+      {creating && <CreateInferenceModal onCancel={() => setCreating(false)} />}
     </>
   );
 }

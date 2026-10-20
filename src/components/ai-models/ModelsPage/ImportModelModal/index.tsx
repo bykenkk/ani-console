@@ -1,25 +1,13 @@
-import {
-  importModelBundle,
-  searchExternalModels,
-  type ExternalModelCandidate,
-  type ImportModelInput,
-  type ModelCapability,
-  type ModelFormat,
-} from "@/api/models";
+import { importModelBundle, type ModelCapability, type ModelFormat } from "@/api/models";
 import { Form, Input, Modal, Select, Space } from "@arco-design/web-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 import { validateForm } from "@/lib/form";
+import ImportModelSourceFields, { type ImportModelSourceValues } from "./ImportModelSourceFields";
 
 type EngineType = "vllm" | "sglang";
 
-type ImportFormValues = {
-  source: ImportModelInput["source"];
-  repo_id: string;
-  model_name: string;
-  display_name: string;
-  description: string;
-  revision: string;
+type ImportFormValues = ImportModelSourceValues & {
   format: ModelFormat;
   capabilities: ModelCapability[];
   engine_type: EngineType;
@@ -27,40 +15,10 @@ type ImportFormValues = {
   startup_command: string;
 };
 
-function modelNameFromCandidate(candidate: ExternalModelCandidate): string {
-  const normalized = candidate.name
-    .toLowerCase()
-    .replace(/[^a-z0-9.-]+/g, "-")
-    .replace(/^[.-]+|[.-]+$/g, "")
-    .slice(0, 63);
-  return normalized || "model";
-}
-
 export default function ImportModelModal({ onCancel }: { onCancel: () => void }) {
   const qc = useQueryClient();
   const [form] = Form.useForm<ImportFormValues>();
   const submitting = useRef(false);
-  const [searchInput, setSearchInput] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [source, setSource] = useState<ImportFormValues["source"]>("huggingface");
-  useEffect(() => {
-    const timer = window.setTimeout(() => setSearchKeyword(searchInput.trim()), 300);
-    return () => window.clearTimeout(timer);
-  }, [searchInput]);
-  const search = useQuery({
-    queryKey: ["external-models", source, searchKeyword],
-    enabled: searchKeyword.length >= 2,
-    queryFn: ({ signal }) =>
-      searchExternalModels({ source, keyword: searchKeyword, page: 1, pageSize: 20 }, signal),
-    meta: {
-      errorNotification: {
-        id: "external-model-search",
-        action: "外部模型搜索",
-        fallback: "模型搜索失败，请稍后重试",
-      },
-    },
-  });
-
   const submit = useMutation({
     meta: {
       feedback: {
@@ -115,6 +73,9 @@ export default function ImportModelModal({ onCancel }: { onCancel: () => void })
       title="导入模型"
       okText="开始导入"
       confirmLoading={submit.isPending}
+      closable={!submit.isPending}
+      escToExit={!submit.isPending}
+      cancelButtonProps={{ disabled: submit.isPending }}
       onCancel={onCancel}
       onOk={onSubmit}
       unmountOnExit
@@ -122,6 +83,7 @@ export default function ImportModelModal({ onCancel }: { onCancel: () => void })
       <Form
         form={form}
         layout="vertical"
+        disabled={submit.isPending}
         initialValues={{
           source: "huggingface",
           revision: "main",
@@ -130,70 +92,7 @@ export default function ImportModelModal({ onCancel }: { onCancel: () => void })
           engine_type: "vllm",
         }}
       >
-        <Form.Item field="source" label="来源" rules={[{ required: true, message: "请选择来源" }]}>
-          <Select
-            options={[
-              { value: "huggingface", label: "HuggingFace" },
-              { value: "modelscope", label: "ModelScope" },
-            ]}
-            onChange={(value) => {
-              setSource(value);
-              form.setFieldsValue({ revision: value === "modelscope" ? "master" : "main" });
-              setSearchInput("");
-              setSearchKeyword("");
-            }}
-          />
-        </Form.Item>
-        <Form.Item
-          field="model_name"
-          label="模型名称"
-          rules={[
-            { required: true, message: "请输入模型名称" },
-            {
-              validator: (value, callback) => {
-                if (typeof value !== "string" || !/^[a-z0-9.-]{1,63}$/.test(value.trim())) {
-                  callback("模型名称只能包含小写字母、数字、点和短横线，最多 63 个字符");
-                } else {
-                  callback();
-                }
-              },
-            },
-          ]}
-          extra="输入名称后自动搜索，选择候选模型；只能使用小写字母、数字、点和短横线，最多 63 个字符"
-        >
-          <Select
-            showSearch
-            allowCreate
-            filterOption={false}
-            placeholder="输入模型名称搜索并选择"
-            loading={search.isFetching}
-            onSearch={setSearchInput}
-            options={(search.data?.items ?? []).map((candidate) => ({
-              value: modelNameFromCandidate(candidate),
-              label: `${candidate.display_name || candidate.name} · ${candidate.repo_id}`,
-            }))}
-            onChange={(value) => {
-              const modelName = String(value);
-              const candidate = (search.data?.items ?? []).find(
-                (item) => modelNameFromCandidate(item) === modelName,
-              );
-              if (!candidate) {
-                form.setFieldsValue({ repo_id: "" });
-                return;
-              }
-              form.setFieldsValue({
-                repo_id: candidate.repo_id,
-                model_name: modelName,
-                display_name: candidate.display_name || candidate.name,
-                description: candidate.description || "",
-                revision: candidate.revision,
-              });
-            }}
-          />
-        </Form.Item>
-        <Form.Item field="repo_id" rules={[{ required: true, message: "请选择搜索结果中的模型" }]}>
-          <Input style={{ display: "none" }} />
-        </Form.Item>
+        <ImportModelSourceFields form={form} />
         <Space className="w-full" align="start">
           <Form.Item field="revision" label="版本 / Revision" rules={[{ required: true }]}>
             <Input maxLength={128} />

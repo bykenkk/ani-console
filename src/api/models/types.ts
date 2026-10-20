@@ -1,3 +1,5 @@
+import type { PageParams } from "@/api/types";
+
 export interface ModelVersion {
   id: string;
   model_id: string;
@@ -33,11 +35,9 @@ export interface Model {
   model_id?: string;
   versions?: ModelVersion[];
 }
-// TODO(pagination-migration): governance 模型/版本列表仍使用 page.limit/page.cursor，保留嵌套游标契约；待后端改造后迁移 PageParams。
-export interface ModelPageParams {
-  page?: number;
-  pageSize?: number;
-}
+// FIXME(model-contract): 当前索引为游标分页；用户确认本次保留原分支页码契约。
+// TODO(model-contract): 目标版本确认后核对分页与响应类型并联调。
+export type ModelPageParams = PageParams;
 export interface ModelListParams extends ModelPageParams {
   keyword?: string;
   source?: string;
@@ -116,14 +116,12 @@ export interface ExternalModelCandidate {
   tags?: string[];
   updated_at?: string;
 }
-export interface SearchExternalModelsParams {
+export interface SearchExternalModelsParams extends PageParams {
   source: "huggingface" | "modelscope";
   keyword: string;
   owner?: string;
   task?: string;
   library?: string;
-  page?: number;
-  pageSize?: number;
 }
 export interface SearchExternalModelsResponse {
   items: ExternalModelCandidate[];
