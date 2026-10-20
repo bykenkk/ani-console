@@ -15,7 +15,6 @@ import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated/_a
 import { Route as AuthenticatedTerminalRouteImport } from './routes/_authenticated/terminal'
 import { Route as AuthenticatedVncRouteImport } from './routes/_authenticated/vnc'
 import { Route as LoginIndexRouteImport } from './routes/login.index'
-import { Route as LoginCallbackRouteImport } from './routes/login.callback'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/_app/index'
 import { Route as AuthenticatedAppAiInferenceIndexRouteImport } from './routes/_authenticated/_app/ai-inference/index'
 import { Route as AuthenticatedAppAiInferenceServiceIdRouteImport } from './routes/_authenticated/_app/ai-inference/$serviceId'
@@ -88,11 +87,6 @@ const AuthenticatedVncRoute = AuthenticatedVncRouteImport.update({
 const LoginIndexRoute = LoginIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => LoginRoute,
-} as any)
-const LoginCallbackRoute = LoginCallbackRouteImport.update({
-  id: '/callback',
-  path: '/callback',
   getParentRoute: () => LoginRoute,
 } as any)
 const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
@@ -368,7 +362,6 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRouteWithChildren
   '/terminal': typeof AuthenticatedTerminalRoute
   '/vnc': typeof AuthenticatedVncRoute
-  '/login/callback': typeof LoginCallbackRoute
   '/login/': typeof LoginIndexRoute
   '/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
   '/ai-models/$modelId': typeof AuthenticatedAppAiModelsModelIdRoute
@@ -419,7 +412,6 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedAppIndexRoute
   '/terminal': typeof AuthenticatedTerminalRoute
   '/vnc': typeof AuthenticatedVncRoute
-  '/login/callback': typeof LoginCallbackRoute
   '/login': typeof LoginIndexRoute
   '/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
   '/ai-models/$modelId': typeof AuthenticatedAppAiModelsModelIdRoute
@@ -472,7 +464,6 @@ export interface FileRoutesById {
   '/_authenticated/_app': typeof AuthenticatedAppRouteWithChildren
   '/_authenticated/terminal': typeof AuthenticatedTerminalRoute
   '/_authenticated/vnc': typeof AuthenticatedVncRoute
-  '/login/callback': typeof LoginCallbackRoute
   '/login/': typeof LoginIndexRoute
   '/_authenticated/_app/': typeof AuthenticatedAppIndexRoute
   '/_authenticated/_app/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
@@ -527,7 +518,6 @@ export interface FileRouteTypes {
     | '/login'
     | '/terminal'
     | '/vnc'
-    | '/login/callback'
     | '/login/'
     | '/ai-inference/$serviceId'
     | '/ai-models/$modelId'
@@ -578,7 +568,6 @@ export interface FileRouteTypes {
     | '/'
     | '/terminal'
     | '/vnc'
-    | '/login/callback'
     | '/login'
     | '/ai-inference/$serviceId'
     | '/ai-models/$modelId'
@@ -630,7 +619,6 @@ export interface FileRouteTypes {
     | '/_authenticated/_app'
     | '/_authenticated/terminal'
     | '/_authenticated/vnc'
-    | '/login/callback'
     | '/login/'
     | '/_authenticated/_app/'
     | '/_authenticated/_app/ai-inference/$serviceId'
@@ -726,13 +714,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/login/'
       preLoaderRoute: typeof LoginIndexRouteImport
-      parentRoute: typeof LoginRoute
-    }
-    '/login/callback': {
-      id: '/login/callback'
-      path: '/callback'
-      fullPath: '/login/callback'
-      preLoaderRoute: typeof LoginCallbackRouteImport
       parentRoute: typeof LoginRoute
     }
     '/_authenticated/_app/': {
@@ -1200,12 +1181,10 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 )
 
 interface LoginRouteChildren {
-  LoginCallbackRoute: typeof LoginCallbackRoute
   LoginIndexRoute: typeof LoginIndexRoute
 }
 
 const LoginRouteChildren: LoginRouteChildren = {
-  LoginCallbackRoute: LoginCallbackRoute,
   LoginIndexRoute: LoginIndexRoute,
 }
 

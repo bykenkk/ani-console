@@ -1,4 +1,6 @@
-import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances";
+// FIXME(governance-migration): governance 尚无等价云盘挂载契约，保留原挂载弹窗、入口与 legacy 调用。
+// TODO(governance-migration): 待挂载契约齐备后迁移，挂载观测字段不能替代操作。
+import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
 import { listVolumes, type StorageVolume } from "@/api/storage/volumes";
 import { validateForm } from "@/lib/form";
 import { withId } from "@/lib/id";
@@ -29,6 +31,7 @@ export default function InstanceAttachVolumeModal({ instance, onCancel, onSubmit
       },
     },
     queryKey: ["volumes", withId("instance-attach", instance.kind, instance.id), volumeMode],
+    // TODO(instance-option-pagination): 云盘选项仍沿用后端 limit/cursor 过渡契约，待分页改造完成后改为 page=1、pageSize=100；保留用途和可挂载实例筛选，不增加翻页入口。
     queryFn: () =>
       listVolumes({
         state: "pending,available",

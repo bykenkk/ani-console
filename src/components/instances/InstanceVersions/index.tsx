@@ -1,4 +1,7 @@
-import { type InstanceRecord, applyInstanceLifecycle } from "@/api/instances";
+// FIXME(governance-migration): 当前镜像可读新详情，版本历史、更新镜像及回滚仍保留原组件、入口和 lifecycle 调用。
+// TODO(governance-migration): 等版本及发布操作契约对齐后迁移，不把资源 version 当作发布修订。
+import { type InstanceRecord, applyInstanceLifecycle } from "@/api/instances/legacy";
+import type { InstanceRecord as CurrentInstanceRecord } from "@/api/instances";
 import InstanceReleases from "@/components/instances/InstanceReleases";
 import { Button, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
@@ -8,11 +11,15 @@ type Release = NonNullable<NonNullable<InstanceRecord["container"]>["history"]>[
 
 export default function InstanceVersions({
   instance,
+  currentImage,
+  loading = false,
   onChanged,
   updateImage,
   rollbackDisabled,
 }: {
-  instance: InstanceRecord;
+  instance?: InstanceRecord;
+  currentImage?: Pick<CurrentInstanceRecord, "imageId" | "imageDigest">;
+  loading?: boolean;
   onChanged: () => void;
   updateImage?: RowAction<InstanceRecord>;
   rollbackDisabled: boolean;
@@ -28,6 +35,7 @@ export default function InstanceVersions({
       },
     },
     mutationFn: async (release: Release) => {
+      if (!instance) throw new Error("实例发布信息尚未加载");
       await applyInstanceLifecycle(instance.id, {
         action: "rollback",
         revision: release.revision,
@@ -36,7 +44,12 @@ export default function InstanceVersions({
     onSuccess: onChanged,
   });
   const confirmRollback = (release: Release) => {
-    if (rollbackDisabled || rollback.isPending || release.revision === instance.container?.revision)
+    if (
+      !instance ||
+      rollbackDisabled ||
+      rollback.isPending ||
+      release.revision === instance.container?.revision
+    )
       return;
     Modal.confirm({
       title: `回滚到 ${release.revision}`,
@@ -51,7 +64,10 @@ export default function InstanceVersions({
       key: "rollback",
       label: "回滚到此版本",
       disabled: (release) =>
-        rollbackDisabled || rollback.isPending || release.revision === instance.container?.revision,
+        !instance ||
+        rollbackDisabled ||
+        rollback.isPending ||
+        release.revision === instance.container?.revision,
       loading: (release) => rollback.isPending && rollback.variables?.revision === release.revision,
       onClick: confirmRollback,
     },
@@ -60,11 +76,15 @@ export default function InstanceVersions({
   return (
     <InstanceReleases
       instance={instance}
+      currentImage={currentImage}
+      loading={loading}
       versionLayout
       actions={
         <Button
-          disabled={!updateImage || updateImage.disabled?.(instance)}
-          onClick={() => updateImage?.onClick(instance)}
+          disabled={!instance || !updateImage || updateImage.disabled?.(instance)}
+          onClick={() => {
+            if (instance) updateImage?.onClick(instance);
+          }}
         >
           更新镜像
         </Button>

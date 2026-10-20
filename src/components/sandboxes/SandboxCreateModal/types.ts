@@ -1,8 +1,8 @@
-import type {
-  CreateInstanceInput,
-  SandboxNetworkEgressPolicy,
-  SandboxTemplate as ApiSandboxTemplate,
-} from "@/api/instances";
+import {
+  type CreateInstanceInput,
+  type SandboxNetworkEgressPolicy,
+  type SandboxTemplate as ApiSandboxTemplate,
+} from "@/api/instances/legacy";
 import {
   CPU_INSTANCE_COMPUTE_SPECS,
   DEFAULT_CPU_INSTANCE_COMPUTE_SPEC,

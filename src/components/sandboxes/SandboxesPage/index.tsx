@@ -1,4 +1,8 @@
-import { listInstances, type InstanceRecord, type FilterableInstanceState } from "@/api/instances";
+import {
+  listInstances,
+  type InstanceRecord,
+  type FilterableInstanceState,
+} from "@/api/instances/legacy";
 import { useState } from "react";
 import {
   ResourceNameId,
@@ -11,7 +15,7 @@ import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
 import SandboxCreateModal from "@/components/sandboxes/SandboxCreateModal";
-import { useSandboxInstanceActions } from "@/hooks/useSandboxInstanceActions";
+import { useSandboxActions } from "@/hooks/useSandboxActions";
 
 type SandboxInstance = InstanceRecord;
 type SandboxStatus = "all" | FilterableInstanceState;
@@ -31,7 +35,7 @@ export default function SandboxesPage() {
   } = useCursorPaginatedQuery<SandboxInstance>({
     errorNotification: {
       id: "sandboxes",
-      action: "沙箱实例列表加载",
+      action: "沙箱列表加载",
       fallback: "请求失败，请稍后重试",
     },
     queryKey: ["sandbox-instances", { status, searchField, searchText }],
@@ -47,7 +51,7 @@ export default function SandboxesPage() {
       });
     },
   });
-  const { dialogNode, actions } = useSandboxInstanceActions(refresh);
+  const { dialogNode, actions } = useSandboxActions(refresh);
 
   const statusTabs = [
     { value: "all" as const, label: "全部" },
@@ -123,7 +127,7 @@ export default function SandboxesPage() {
       <ListPageFrame
         header={{
           iconClassName: "icon-Sandbox",
-          title: "沙箱实例",
+          title: "沙箱",
           subtitle: "隔离会话、双超时与受控网络出口",
           actions: [
             {
@@ -169,7 +173,7 @@ export default function SandboxesPage() {
           columns={columns}
           rowActions={actions}
           loading={query.isFetching}
-          tableLabel="沙箱实例列表"
+          tableLabel="沙箱列表"
           pagination={pagination}
         />
       </ListPageFrame>

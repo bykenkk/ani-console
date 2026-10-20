@@ -1,4 +1,5 @@
-import type { FilterableInstanceState, InstanceRecord } from "@/api/instances";
+import { type FilterableInstanceState, type InstanceRecord } from "@/api/instances/legacy";
+
 export type ContainerInstanceRecord = InstanceRecord;
 export type ContainerInstanceStatus = ContainerInstanceRecord["state"];
 export type ContainerInstanceStatusFilter = "all" | FilterableInstanceState;

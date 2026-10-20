@@ -1,4 +1,4 @@
-import VpcDetailPage from "@/components/network/VpcDetailPage";
+import VpcDetailPage from "@/components/vpcs/VpcDetailPage";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/_app/vpcs/$vpcId")({

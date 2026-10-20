@@ -2,7 +2,9 @@ import { useEffect } from "react";
 import type { ListPagination } from "@/components/common/DataTable";
 import { useListPagination } from "./useListPagination";
 
-/** Temporary local paging, also usable for collections composed from multiple queries. */
+/** 仅对已获取的完整集合做本地分页，不将服务端当前页当作全量。
+ * TODO(pagination-migration): 远程列表提供 page/pageSize 后逐项迁移；真正的本地数组继续使用本地分页。
+ */
 export function useClientPagination<T>(items: T[], scope: string, initialPageSize = 10) {
   const { page, pageSize, setPage, setPageSize, resetPagination } = useListPagination(
     scope,

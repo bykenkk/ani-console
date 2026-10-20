@@ -1,48 +1,55 @@
-import { applyInstanceLifecycle } from "@/api/instances";
-import type { InstanceRecord } from "@/api/instances";
 import { Modal } from "@arco-design/web-react";
-import { useMutation } from "@tanstack/react-query";
-
-type Instance = InstanceRecord;
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { getInstance, stopInstance, type InstanceAcceptance } from "@/api/instances";
+import { withId } from "@/lib/id";
 export default function GpuContainerStopModal({
   instance,
   onCancel,
   onSubmitted,
 }: {
-  instance: Instance;
+  instance: { id: string; name: string; version?: string };
   onCancel: () => void;
-  onSubmitted: () => void;
+  onSubmitted: (result: InstanceAcceptance) => void;
 }) {
+  const qc = useQueryClient();
   const mutation = useMutation({
+    mutationFn: async () => {
+      const version = instance.version ?? (await getInstance(instance.id)).version;
+      return stopInstance(instance.id, { expected_version: version });
+    },
     meta: {
       feedback: {
-        channel: "message",
-        action: "操作",
+        channel: "notification",
+        id: withId("instance-command", "stop", instance.id),
+        action: "停止",
         successText: "停止已提交",
-        errorFallback: "操作失败，请稍后重试",
+        errorFallback: "停止失败，请刷新后重试",
       },
     },
-    mutationFn: async () => {
-      const submitData = { action: "stop" as const };
-      await applyInstanceLifecycle(instance.id, submitData);
-    },
-    onSuccess: () => {
-      onSubmitted();
+    onSuccess: async (result) => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["governance-instances"] }),
+        qc.invalidateQueries({ queryKey: ["legacy-instances"] }),
+        qc.invalidateQueries({
+          queryKey: ["governance-instance", instance.id],
+          refetchType: "active",
+        }),
+        qc.invalidateQueries({ queryKey: ["legacy-instance", instance.id], refetchType: "active" }),
+      ]);
+      onSubmitted(result);
     },
   });
   return (
     <Modal
-      title="停止 GPU 容器实例"
       visible
+      title="停止 GPU 容器"
       confirmLoading={mutation.isPending}
+      onOk={() => mutation.mutateAsync()}
       onCancel={() => {
-        onCancel();
+        if (!mutation.isPending) onCancel();
       }}
-      onOk={() => mutation.mutate()}
-      unmountOnExit
     >
-      确定停止「{instance.name}」？
+      确认停止“{instance.name}”？
     </Modal>
   );
 }

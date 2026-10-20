@@ -1,5 +1,4 @@
-// FIXME(modeldev-integration): 产物列表使用的公共分页 Hook 按页码推算 cursor，未将 next_cursor 原样用于下一页。
-// TODO(modeldev-integration): 与训练任务列表一起核对并接入真实游标链，避免翻页遗漏或重复产物。
+// TODO(pagination-migration): 已通过公共 Hook 原样回传 next_cursor；后端提供 page/pageSize 后移除临时游标分页兼容。
 import { Button } from "@arco-design/web-react";
 import { listModelDevExecutionArtifacts, type ModelDevArtifact } from "@/api/modeldev";
 import { DataTable } from "@/components/common";

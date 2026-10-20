@@ -1,4 +1,6 @@
-import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances";
+// FIXME(governance-migration): governance 尚无等价云盘卸载契约，保留原卸载弹窗、入口与 legacy 调用。
+// TODO(governance-migration): 待卸载契约齐备后迁移，不能删除原实例选择及卷引用。
+import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
 import { validateForm } from "@/lib/form";
 import { Form, Modal, Select } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";

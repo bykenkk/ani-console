@@ -131,7 +131,6 @@ export default function TrainingTaskCreateModal({
       title="创建训练任务"
       style={{ width: 960, maxWidth: "calc(100vw - 48px)" }}
       className={styles.modal}
-      maskClosable={false}
       closable={!create.isPending}
       escToExit={!create.isPending}
       onCancel={onCancel}

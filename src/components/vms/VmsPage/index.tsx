@@ -1,4 +1,8 @@
-import { listInstances, type FilterableInstanceState, type InstanceRecord } from "@/api/instances";
+import {
+  listInstances,
+  type FilterableInstanceState,
+  type InstanceRecord,
+} from "@/api/instances/legacy";
 import { useState } from "react";
 import {
   ResourceNameId,
@@ -11,7 +15,7 @@ import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import { getImageDisplayName } from "@/lib/render";
 import VmCreateModal from "../VmCreateModal";
-import { useVmInstanceActions } from "@/hooks/useVmInstanceActions";
+import { useVmActions } from "@/hooks/useVmActions";
 
 type VmInstance = InstanceRecord;
 type StatusFilter = "all" | FilterableInstanceState;
@@ -52,7 +56,7 @@ export default function VmsPage() {
     },
   });
 
-  const { dialogNode, actions } = useVmInstanceActions(refresh);
+  const { dialogNode, actions } = useVmActions(refresh);
 
   const statusTabs = [
     { value: "all" as const, label: "全部" },

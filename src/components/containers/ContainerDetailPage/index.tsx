@@ -1,6 +1,6 @@
-import { Button, Space } from "@arco-design/web-react";
-import { withId } from "@/lib/id";
-import type { InstanceRecord } from "@/api/instances";
+import { Empty } from "@arco-design/web-react";
+import * as legacy from "@/api/instances/legacy";
+import { getInstance, getInstanceRuntime } from "@/api/instances";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import {
@@ -10,22 +10,20 @@ import {
   ResourceId,
   StatusBadge,
 } from "@/components/common";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
+import { useContainerActions } from "@/hooks/useContainerActions";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
+import { formatDateTime } from "@/lib/format";
+import { getInstanceNetworkValue } from "@/lib/instances";
+import { withId } from "@/lib/id";
 import InstanceLogs from "@/components/instances/InstanceLogs";
+import InstanceVersions from "@/components/instances/InstanceVersions";
+import InstanceConfiguration from "@/components/instances/InstanceConfiguration";
 import InstanceEvents from "@/components/instances/InstanceEvents";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
-import InstanceOperations from "@/components/instances/InstanceOperations";
-import InstanceConfiguration from "@/components/instances/InstanceConfiguration";
 import InstanceNetwork from "@/components/instances/InstanceNetwork";
+import InstanceOperations from "@/components/instances/InstanceOperations";
 import InstanceStorage from "@/components/instances/InstanceStorage";
-import InstanceVersions from "@/components/instances/InstanceVersions";
-import { useContainerInstanceActions } from "@/hooks/useContainerInstanceActions";
-import ResourceActionMenu from "@/components/common/ResourceActionMenu";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
-import { formatDateTime } from "@/lib/format";
-import { getImageDisplayName } from "@/lib/render";
-import { getInstanceDisplayIp, getInstanceNetworkValue } from "@/lib/instances";
-import { containerDetailDataSource } from "./data-source";
-
 export default function ContainerDetailPage({
   instanceId,
   tab,
@@ -37,74 +35,90 @@ export default function ContainerDetailPage({
 }) {
   const goBack = useBackOrFallback("container-instance");
   const qc = useQueryClient();
-
-  const query = useQuery({
+  const current = useQuery({
+    queryKey: ["governance-instance", instanceId],
+    queryFn: ({ signal }) => getInstance(instanceId, signal),
     meta: {
       errorNotification: {
-        id: withId("container", instanceId),
-        action: "容器实例详情加载",
+        id: withId("instance", instanceId),
+        action: "实例详情加载",
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["container-instance-detail", instanceId],
-    queryFn: () => containerDetailDataSource.getDetail(instanceId),
+  });
+  const runtime = useQuery({
+    queryKey: ["governance-instance-runtime", instanceId],
+    queryFn: ({ signal }) => getInstanceRuntime(instanceId, signal),
+    meta: {
+      errorNotification: {
+        id: withId("instance-runtime", instanceId),
+        action: "运行状态加载",
+        fallback: "请求失败，请稍后重试",
+      },
+    },
+  });
+  // FIXME(governance-instance-detail): 旧网络、存储、配置、发布、保护及关联字段未对齐，保留原组件、入口和调用。
+  // TODO(governance-instance-detail): 逐项补齐后迁移，Pod IP 不等于原私网 IP；旧 kind 不能直接替换为 compute_type。
+  const oldQuery = useQuery({
+    queryKey: ["legacy-instance", instanceId],
+    queryFn: () => legacy.getInstance(instanceId),
+    meta: {
+      errorNotification: {
+        id: withId("instance-configuration", instanceId),
+        action: "实例配置加载",
+        fallback: "请求失败，请稍后重试",
+      },
+    },
   });
   const refreshInstance = () => {
-    query.refetch();
-    qc.invalidateQueries({ queryKey: ["container-instances"] });
+    current.refetch();
+    runtime.refetch();
+    oldQuery.refetch();
+    qc.invalidateQueries({ queryKey: ["governance-instances"] });
   };
-  const { actions, dialogNode } = useContainerInstanceActions(refreshInstance, goBack);
-  const primaryAction = actions.find((action) => action.key === "terminal");
-  if (!query.data) return <DetailPagePlaceholder loading={query.isLoading} />;
-
-  const detail = query.data;
-  const rollbackAction = actions.find((action) => action.key === "rollback");
-
-  const nameValue =
-    detail.compute?.cpu || detail.compute?.memory
-      ? [detail.compute?.cpu, detail.compute?.memory].filter(Boolean).join(" / ")
-      : "-";
-
+  const { actions, legacyActions, dialogNode } = useContainerActions(() => {}, goBack);
+  const detail = oldQuery.data;
+  const rollbackAction = legacyActions.find((action) => action.key === "rollback");
+  if (!current.data) return <DetailPagePlaceholder loading={current.isLoading} />;
+  const record = current.data;
+  if (record.instance_kind !== "container" || record.compute_type !== "cpu")
+    return <Empty description="当前资源不是普通容器" />;
   return (
     <>
       <DetailPageFrame
-        breadcrumbs={[...navigationBreadcrumbsForPath("/containers"), { label: detail.name }]}
+        breadcrumbs={[...navigationBreadcrumbsForPath("/containers"), { label: record.name }]}
+        title={record.name}
         icon={<AliIcon name="icon-rongqishili" size={28} />}
-        title={detail.name}
-        status={<StatusBadge status={detail.state} reason={detail.reason} />}
-        headerItems={[
-          { label: "镜像", value: getImageDisplayName(detail.image) },
-          { label: "规格", value: nameValue },
-          { label: "私网 IP", value: getInstanceDisplayIp(detail) || "-" },
-        ]}
+        status={<StatusBadge status={record.observedState} reason={record.reason} />}
+        headerItems={[{ label: "期望状态", value: record.desiredState }]}
         actions={
-          <Space>
-            <Button
-              type="primary"
-              disabled={!primaryAction || primaryAction.disabled?.(detail)}
-              loading={primaryAction?.loading?.(detail)}
-              onClick={() => primaryAction?.onClick(detail)}
-            >
-              远程终端
-            </Button>
-            <ResourceActionMenu
-              record={detail}
-              actions={actions.filter((action) => action.key !== "terminal")}
-            />
-          </Space>
+          <ResourceActionMenu
+            record={record}
+            actions={[...actions, { key: "refresh", label: "刷新", onClick: refreshInstance }]}
+          />
         }
         cards={[
           {
             key: "basic",
             title: "基本信息",
             fields: [
-              { label: "ID", value: <ResourceId value={detail.id} /> },
-              { label: "节点", value: detail.node_name ?? "-" },
-              { label: "创建时间", value: formatDateTime(detail.created_at) },
-              { label: "更新时间", value: formatDateTime(detail.updated_at) },
+              { label: "ID", value: <ResourceId value={record.id} /> },
+              { label: "节点", value: runtime.data?.pod?.nodeName ?? "-" },
+              { label: "创建时间", value: formatDateTime(record.createdAt) },
+              // FIXME(governance-instance-basic): 更新时间、终止保护未对齐，保留原字段位置和旧详情来源。
+              // TODO(governance-instance-basic): 后端补齐后替换；ID、节点、创建时间继续使用新契约。
+              {
+                label: "更新时间",
+                value: detail?.updated_at ? formatDateTime(detail.updated_at) : "-",
+              },
               {
                 label: "终止保护",
-                value: detail.termination_protection ? "已开启" : "未开启",
+                value:
+                  detail?.termination_protection == null
+                    ? "-"
+                    : detail.termination_protection
+                      ? "已开启"
+                      : "未开启",
               },
             ],
           },
@@ -116,20 +130,16 @@ export default function ContainerDetailPage({
               {
                 label: "副本",
                 value:
-                  detail.container?.replicas != null
-                    ? `${detail.container.ready_replicas ?? 0}/${detail.container.replicas}`
-                    : "-",
+                  String(runtime.data?.statefulSet?.readyReplicas ?? "-") +
+                  "/" +
+                  String(runtime.data?.statefulSet?.desiredReplicas ?? "-"),
               },
-              {
-                label: "发布状态",
-                value: detail.container?.rollout_status ?? "-",
-              },
-              { label: "访问地址", value: detail.endpoint ?? "-" },
-              { label: "VPC", value: getInstanceNetworkValue(detail, "vpc_id") },
-              {
-                label: "子网",
-                value: getInstanceNetworkValue(detail, "subnet_id"),
-              },
+              // FIXME(governance-instance-release-network): 发布状态、访问地址及 VPC/子网仍依赖旧详情，不能用 runtime 副本或 Pod IP 替代。
+              // TODO(governance-instance-release-network): 等发布及网络契约对齐后逐项迁移，保留原资源状态区块和旧调用。
+              { label: "发布状态", value: detail?.container?.rollout_status ?? "-" },
+              { label: "访问地址", value: detail?.endpoint ?? "-" },
+              { label: "VPC", value: detail ? getInstanceNetworkValue(detail, "vpc_id") : "-" },
+              { label: "子网", value: detail ? getInstanceNetworkValue(detail, "subnet_id") : "-" },
             ],
           },
         ]}
@@ -139,12 +149,14 @@ export default function ContainerDetailPage({
             label: "版本",
             content: (
               <InstanceVersions
-                instance={detail as InstanceRecord}
-                onChanged={() => {
-                  query.refetch();
-                }}
-                updateImage={actions.find((action) => action.key === "update_image")}
-                rollbackDisabled={!rollbackAction || Boolean(rollbackAction.disabled?.(detail))}
+                instance={detail}
+                currentImage={record}
+                loading={oldQuery.isLoading}
+                onChanged={refreshInstance}
+                updateImage={legacyActions.find((action) => action.key === "update_image")}
+                rollbackDisabled={
+                  !detail || !rollbackAction || Boolean(rollbackAction.disabled?.(detail))
+                }
               />
             ),
           },
@@ -153,10 +165,10 @@ export default function ContainerDetailPage({
             label: "配置",
             content: (
               <InstanceConfiguration
-                instance={detail as InstanceRecord}
-                onChanged={() => {
-                  query.refetch();
-                }}
+                instance={detail}
+                runtime={runtime.data}
+                loading={oldQuery.isLoading}
+                onChanged={refreshInstance}
               />
             ),
           },
@@ -165,16 +177,24 @@ export default function ContainerDetailPage({
             label: "数据卷",
             content: (
               <InstanceStorage
-                instance={detail as InstanceRecord}
-                mountVolume={actions.find((action) => action.key === "attach_volume")}
-                mountFilesystem={actions.find((action) => action.key === "attach_filesystem")}
+                instance={detail}
+                runtime={runtime.data}
+                loading={oldQuery.isLoading}
+                mountVolume={legacyActions.find((action) => action.key === "attach_volume")}
+                mountFilesystem={legacyActions.find((action) => action.key === "attach_filesystem")}
               />
             ),
           },
           {
             key: "network",
             label: "网络",
-            content: <InstanceNetwork instance={detail as InstanceRecord} />,
+            content: (
+              <InstanceNetwork
+                instance={detail}
+                runtime={runtime.data}
+                loading={oldQuery.isLoading}
+              />
+            ),
           },
           {
             key: "monitoring",
@@ -184,20 +204,26 @@ export default function ContainerDetailPage({
           {
             key: "logs",
             label: "日志",
-            content: <InstanceLogs instanceId={instanceId} active={true} />,
+            content: (
+              <InstanceLogs instanceId={instanceId} active={true} instanceKind="container" />
+            ),
           },
           {
             key: "events",
             label: "事件",
-            content: <InstanceEvents instanceId={instanceId} />,
+            content: <InstanceEvents instanceId={instanceId} instanceKind="container" />,
           },
           {
             key: "operations",
             label: "操作记录",
-            content: <InstanceOperations instanceId={instanceId} />,
+            content: (
+              <InstanceOperations
+                instanceId={instanceId}
+                operationId={record.lastOperationId || record.createOperationId}
+              />
+            ),
           },
         ]}
-
         activeTabKey={tab}
         onTabChange={onTabChange}
         onBack={goBack}

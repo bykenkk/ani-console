@@ -1,4 +1,6 @@
-import type { InstanceRecord } from "@/api/instances";
+// FIXME(governance-migration): 网络及存储等关联仍使用旧 kind/筛选契约，保留原组件、入口与查询。
+// TODO(governance-migration): 等关联查询对齐后迁移，不能将旧 kind 直接替换为新 compute_type。
+import { type InstanceRecord } from "@/api/instances/legacy";
 import { Space } from "@arco-design/web-react";
 import { DataTable } from "@/components/common";
 import { getImageDisplayName } from "@/lib/render";

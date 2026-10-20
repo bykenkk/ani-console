@@ -1,3 +1,5 @@
+import type { PageParams } from "@/api/types";
+
 export interface ApiKeyRecord {
   id: number;
   name: string;
@@ -10,15 +12,11 @@ export interface ApiKeyRecord {
   created_at?: string | null;
 }
 
-/** FIXME(backend): 后端统一支持 limit/cursor 后，移除此旧分页类型并改用 CursorPageParams；当前保留 page/pageSize，返回 items/total。 */
-export interface ApiKeyListParams {
-  page?: number;
-  pageSize?: number;
-}
+export type ApiKeyListParams = PageParams;
 
 export interface ApiKeyListResponse {
   items: ApiKeyRecord[];
-  total: number | string;
+  total: string;
 }
 
 export interface CreateApiKeyInput {

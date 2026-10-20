@@ -1,5 +1,5 @@
+import { getInstance } from "@/api/instances/legacy";
 import { withId } from "@/lib/id";
-import { getInstance } from "@/api/instances";
 import { Empty } from "@arco-design/web-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
@@ -15,7 +15,7 @@ import InstanceLogs from "@/components/instances/InstanceLogs";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceOperations from "@/components/instances/InstanceOperations";
 import SandboxActions from "@/components/sandboxes/SandboxActions";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatBytes, formatDateTime } from "@/lib/format";
 import { getSandboxProviderLabel } from "@/lib/instances";
 import SandboxAccess from "./SandboxAccess";
@@ -42,7 +42,7 @@ export default function SandboxDetailPage({
     meta: {
       errorNotification: {
         id: withId("sandbox", instanceId),
-        action: "沙箱实例加载",
+        action: "沙箱加载",
         fallback: "请求失败，请稍后重试",
       },
     },
@@ -62,7 +62,7 @@ export default function SandboxDetailPage({
 
   const instance = detail.data;
   if (instance.kind !== "sandbox" || !instance.sandbox) {
-    return <Empty description="当前资源不是沙箱实例，或缺少沙箱运行摘要" />;
+    return <Empty description="当前资源不是沙箱，或缺少沙箱运行摘要" />;
   }
 
   const sandbox = instance.sandbox;

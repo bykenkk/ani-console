@@ -9,6 +9,7 @@ import {
 } from "./layout";
 import { ConfiguredDataTableRowActions } from "./RowActions";
 import type { RowAction } from "./types";
+import LegacyCursorPagination from "./LegacyCursorPagination";
 
 export { DataTableRowActionButton, DataTableRowActions } from "./RowActions";
 export type { RowAction, RowActionIntent } from "./types";
@@ -23,7 +24,11 @@ export type ListPagination = {
   pageSizeOptions?: number[];
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
-} & ({ mode?: "total"; total: number } | { mode: "cursor"; hasNextPage: boolean });
+} & (
+  | { mode?: "total"; total: number }
+  // TODO(pagination-migration): cursor/limit 或 page_token 接口迁至 page/pageSize 后移除此临时模式。
+  | { mode: "legacy-cursor"; hasNextPage: boolean }
+);
 
 export type DataTableProps<T> = {
   className?: string;
@@ -87,24 +92,19 @@ export function DataTable<T>({
     ? resolveDataTableScroll(resolvedColumns, scroll)
     : { x: "max-content" as const, ...scroll };
   const tablePagination =
-    pagination === false
+    pagination === false || pagination.mode === "legacy-cursor"
       ? false
       : {
           current: pagination.page,
           pageSize: pagination.pageSize,
-          // Cursor APIs expose a reachable page boundary, not a record total.
-          total:
-            pagination.mode === "cursor"
-              ? (pagination.page + Number(pagination.hasNextPage)) * pagination.pageSize
-              : Math.max(pagination.total, 1),
+          total: Math.max(pagination.total, 1),
           disabled: pagination.disabled,
           sizeCanChange: true,
           sizeOptions: pagination.pageSizeOptions ?? [10, 20, 50],
           pageSizeChangeResetCurrent: true,
           hideOnSinglePage: false,
-          showTotal: pagination.mode === "cursor" ? false : () => `共 ${pagination.total} 条记录`,
-          showJumper: pagination.mode !== "cursor",
-          showMore: pagination.mode === "cursor" && pagination.hasNextPage,
+          showTotal: () => `共 ${pagination.total} 条记录`,
+          showJumper: true,
         };
 
   return (
@@ -121,7 +121,7 @@ export function DataTable<T>({
         pagination={tablePagination}
         tableLayoutFixed
         onChange={
-          pagination === false
+          pagination === false || pagination.mode === "legacy-cursor"
             ? undefined
             : (nextPagination, _sorter, _filters, extra) => {
                 if (extra.action !== "paginate") return;
@@ -139,6 +139,9 @@ export function DataTable<T>({
         scroll={resolvedScroll}
         rowSelection={rowSelection}
       />
+      {pagination !== false && pagination.mode === "legacy-cursor" && (
+        <LegacyCursorPagination pagination={pagination} tableLabel={tableLabel} />
+      )}
     </>
   );
 }

@@ -1,6 +1,8 @@
+import { streamInstanceLogs } from "@/api/instances/legacy";
+import * as legacy from "@/api/instances/legacy";
+import { streamInstanceLogs as streamCurrentLogs } from "@/api/instances";
 import { useEffect, useRef, useState } from "react";
 import { Button, Empty, Select, Space, Spin, Typography } from "@arco-design/web-react";
-import { streamInstanceLogs } from "@/api/instances";
 import { closeNotification, showNotification } from "@/lib/feedback";
 import { withId } from "@/lib/id";
 type LogLevel = "debug" | "info" | "warn" | "error";
@@ -56,6 +58,7 @@ async function readLogStream(
   stream: ReadableStream<Uint8Array>,
   signal: AbortSignal,
   appendLog: (log: InstanceLog) => void,
+  textChunks = false,
 ): Promise<StreamResult> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
@@ -72,14 +75,18 @@ async function readLogStream(
 
     const payload = dataLines.join("\n");
     if (eventType === "log") {
-      appendLog(parseInstanceLog(payload));
+      if (textChunks) {
+        const value = JSON.parse(payload) as { text?: unknown };
+        if (typeof value.text !== "string") throw new Error("日志流返回了无法识别的文本数据");
+        appendLog({ message: value.text, timestamp: "", level: "", container: "", stream: "" });
+      } else appendLog(parseInstanceLog(payload));
       return;
     }
     if (eventType === "error") {
-      const error = JSON.parse(payload) as { message?: string };
-      throw new Error(error.message || "日志流发生错误");
+      const error = JSON.parse(payload) as { message?: string; reason?: string };
+      throw new Error(error.message || error.reason || "日志流发生错误");
     }
-    if (eventType === "done") {
+    if (eventType === (textChunks ? "end" : "done")) {
       const done = JSON.parse(payload) as { reason?: string };
       return { type: "done", reason: done.reason || "closed" };
     }
@@ -106,39 +113,49 @@ async function readLogStream(
 async function connectLogStream({
   instanceId,
   level,
+  textChunks,
   signal,
   appendLog,
   onConnected,
 }: {
   instanceId: string;
   level: LevelFilter;
+  textChunks: boolean;
   signal: AbortSignal;
   appendLog: (log: InstanceLog) => void;
   onConnected: () => void;
 }): Promise<StreamResult> {
-  const data = await streamInstanceLogs(
-    instanceId,
-    {
-      limit: LOG_LIMIT,
-      interval_seconds: LOG_INTERVAL_SECONDS,
-      level: level === "all" ? undefined : level,
-    },
-    signal,
-  );
+  const data = textChunks
+    ? await streamCurrentLogs(instanceId, { tailLines: LOG_LIMIT, follow: true }, signal)
+    : await streamInstanceLogs(
+        instanceId,
+        {
+          limit: LOG_LIMIT,
+          interval_seconds: LOG_INTERVAL_SECONDS,
+          level: level === "all" ? undefined : level,
+        },
+        signal,
+      );
 
   onConnected();
-  return readLogStream(data, signal, appendLog);
+  return readLogStream(data, signal, appendLog, textChunks);
 }
 
 export default function InstanceLogs({
   instanceId,
   active,
+  instanceKind,
 }: {
   instanceId: string;
   active: boolean;
+  instanceKind?: legacy.InstanceKind;
   container?: string;
 }) {
   const [level, setLevel] = useState<LevelFilter>("all");
+  // FIXME(governance-instance-logs): 新接口只返回 text，级别筛选依赖原结构化日志，保留入口和旧调用。
+  // TODO(governance-instance-logs): 待结构化日志与级别筛选对齐后迁移，文本块不可补造时间/级别或去重。
+  const textChunks =
+    (instanceKind === "container" || instanceKind === "gpu_container") && level === "all";
   const [reconnectVersion, setReconnectVersion] = useState(0);
   const [logs, setLogs] = useState<InstanceLog[]>([]);
   const [streamStatus, setStreamStatus] = useState<StreamStatus>("idle");
@@ -164,9 +181,11 @@ export default function InstanceLogs({
 
     const appendLog = (log: InstanceLog) => {
       if (cancelled) return;
-      const identity = logIdentity(log);
-      if (knownLogsRef.current.has(identity)) return;
-      knownLogsRef.current.add(identity);
+      if (!textChunks) {
+        const identity = logIdentity(log);
+        if (knownLogsRef.current.has(identity)) return;
+        knownLogsRef.current.add(identity);
+      }
       setLogs((current) => [...current, log]);
     };
 
@@ -178,6 +197,7 @@ export default function InstanceLogs({
           const result = await connectLogStream({
             instanceId,
             level,
+            textChunks,
             signal: controller.signal,
             appendLog,
             onConnected: () => {
@@ -212,7 +232,7 @@ export default function InstanceLogs({
       cancelled = true;
       controller.abort();
     };
-  }, [active, instanceId, level, reconnectVersion]);
+  }, [active, instanceId, level, reconnectVersion, textChunks]);
 
   const handleScroll = () => {
     const output = outputRef.current;
@@ -260,7 +280,7 @@ export default function InstanceLogs({
           </div>
         ) : (
           <pre className="m-0 whitespace-pre-wrap wrap-break-word p-3 font-mono text-xs leading-5 text-[#f7f8fa]">
-            {logs.map(formatLog).join("\n")}
+            {logs.map(formatLog).join(textChunks ? "" : "\n")}
           </pre>
         )}
       </div>

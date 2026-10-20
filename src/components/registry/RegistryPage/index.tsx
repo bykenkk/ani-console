@@ -90,7 +90,8 @@ export default function RegistryPage() {
     return client.invalidateQueries({ queryKey: ["image-registrations"] });
   };
   const pagination: ListPagination = {
-    mode: "cursor",
+    // TODO(pagination-migration): 后端改为 page/pageSize 后移除此临时游标配置。
+    mode: "legacy-cursor",
     page: current.page,
     pageSize: current.pageSize,
     hasNextPage: Boolean(query.data?.nextCursor),

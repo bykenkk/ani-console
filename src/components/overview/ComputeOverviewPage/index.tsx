@@ -1,6 +1,6 @@
 import { Card, Empty, Grid } from "@arco-design/web-react";
 import MetricCard from "@/components/common/MetricCard";
-import { PageHeader } from "@/components/layouts/AppLayout";
+import { PageHeader } from "@/layouts/AppLayout";
 
 export default function ComputeOverviewPage() {
   return (

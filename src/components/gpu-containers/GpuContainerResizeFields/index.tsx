@@ -1,4 +1,6 @@
-import type { InstanceRecord } from "@/api/instances";
+// FIXME(governance-instance-resize): GPU 变配仍依赖原 compute、GPU 规格及 lifecycle 参数，保留原组件和适配。
+// TODO(governance-instance-resize): 等等价变配契约齐备后迁移，不用新创建预设替代旧变配请求。
+import { type InstanceRecord } from "@/api/instances/legacy";
 import { getGpuSpecAvailability } from "@/api/gpu-inventory";
 import { Form, Select, Typography } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";

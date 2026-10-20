@@ -1,4 +1,4 @@
-import { type InstanceRecord } from "@/api/instances";
+import { type InstanceRecord } from "@/api/instances/legacy";
 import { Button, Tooltip } from "@arco-design/web-react";
 import { DataTable, ResourceNameId, StatusBadge, type RowAction } from "@/components/common";
 import { formatDateTime } from "@/lib/format";

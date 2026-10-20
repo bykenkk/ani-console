@@ -1,0 +1,145 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Form, Input, Modal, Select, Typography } from "@arco-design/web-react";
+import { useState } from "react";
+import {
+  createNetworkSecurityGroup,
+  listNetworkVpcs,
+  type NetworkSecurityGroup,
+  type NetworkSecurityGroupRule,
+  type NetworkVPC,
+} from "@/api/network";
+import { withFirst100 } from "@/api/pagination";
+
+const listVpcOptions = withFirst100(listNetworkVpcs);
+
+type SecurityGroupRule = NetworkSecurityGroupRule;
+type Vpc = NetworkVPC;
+type RuleTemplate = "common" | "open" | "custom";
+
+const RULE_TEMPLATES: Record<RuleTemplate, SecurityGroupRule[]> = {
+  common: [
+    { direction: "ingress", protocol: "tcp", port_range: "22", cidr: "0.0.0.0/0", action: "allow" },
+    {
+      direction: "ingress",
+      protocol: "tcp",
+      port_range: "3389",
+      cidr: "0.0.0.0/0",
+      action: "allow",
+    },
+    {
+      direction: "ingress",
+      protocol: "icmp",
+      port_range: "all",
+      cidr: "0.0.0.0/0",
+      action: "allow",
+    },
+  ],
+  open: [
+    {
+      direction: "ingress",
+      protocol: "all",
+      port_range: "all",
+      cidr: "0.0.0.0/0",
+      action: "allow",
+    },
+    { direction: "egress", protocol: "all", port_range: "all", cidr: "0.0.0.0/0", action: "allow" },
+  ],
+  custom: [],
+};
+
+export default function CreateSecurityGroupModal({
+  defaultVpcId,
+  onCancel,
+  onCreated,
+}: {
+  defaultVpcId?: string;
+  onCancel: () => void;
+  onCreated?: (securityGroup: NetworkSecurityGroup) => void;
+}) {
+  const qc = useQueryClient();
+  const [name, setName] = useState("");
+  const [vpcId, setVpcId] = useState(defaultVpcId ?? "");
+  const [ruleTemplate, setRuleTemplate] = useState<RuleTemplate>("common");
+  const vpcs = useQuery({
+    meta: {
+      errorNotification: {
+        id: "vpcs",
+        action: "VPC 列表加载",
+        fallback: "请求失败，请稍后重试",
+      },
+    },
+    queryKey: ["network-vpcs", "security-group-create", "options"],
+    queryFn: () => listVpcOptions({}),
+  });
+
+  const create = useMutation({
+    meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
+    mutationFn: async () => {
+      const trimmedName = name.trim();
+      if (!trimmedName) throw new Error("请输入安全组名称");
+      if (!vpcId) throw new Error("请选择绑定的 VPC");
+      const submitData = {
+        name: trimmedName,
+        vpc_id: vpcId,
+        rules: RULE_TEMPLATES[ruleTemplate],
+      };
+      return createNetworkSecurityGroup(submitData);
+    },
+    onSuccess: (data) => {
+      qc.invalidateQueries({ queryKey: ["network-security-groups"] });
+      onCreated?.(data);
+      onCancel();
+    },
+  });
+
+  return (
+    <Modal
+      visible
+      title="创建安全组"
+      onCancel={onCancel}
+      onOk={() => create.mutateAsync()}
+      confirmLoading={create.isPending}
+      unmountOnExit
+    >
+      <Form layout="vertical">
+        <Form.Item label="名称" required>
+          <Input
+            value={name}
+            onChange={setName}
+            placeholder="请输入安全组名称"
+            maxLength={64}
+            showWordLimit
+          />
+        </Form.Item>
+        <Form.Item label="绑定 VPC" required>
+          <Select
+            value={vpcId || undefined}
+            onChange={setVpcId}
+            loading={vpcs.isLoading}
+            placeholder="请选择 VPC"
+            showSearch
+            filterOption={(inputValue, option) =>
+              String(option.props.children).toLowerCase().includes(inputValue.toLowerCase())
+            }
+          >
+            {((vpcs.data?.items ?? []) as Vpc[]).map((vpc) => (
+              <Select.Option key={vpc.id} value={vpc.id}>
+                {vpc.name} · {vpc.cidr}
+              </Select.Option>
+            ))}
+          </Select>
+        </Form.Item>
+        <Form.Item label="规则模板" required>
+          <Select value={ruleTemplate} onChange={setRuleTemplate}>
+            <Select.Option value="common">常用远程端口（22 / 3389 / ICMP）</Select.Option>
+            <Select.Option value="open">放通全部（仅试验）</Select.Option>
+            <Select.Option value="custom">自定义空规则</Select.Option>
+          </Select>
+        </Form.Item>
+        <Typography.Text type="secondary">
+          创建后可在安全组详情页逐条添加或编辑入站、出站规则。
+        </Typography.Text>
+      </Form>
+    </Modal>
+  );
+}

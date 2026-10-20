@@ -25,6 +25,7 @@ export interface AsyncTask {
   completed_at?: string | null;
 }
 
+// TODO(pagination-migration): ANI taskAPI.list 仍读取 limit/cursor，保留过渡请求；后端完成页码分页后迁移 PageParams。
 export interface TaskListParams extends CursorPageParams {
   status?: AsyncTaskStatus;
   task_type?: string;

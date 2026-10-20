@@ -1,6 +1,6 @@
+import { Modal } from "@arco-design/web-react";
 // FIXME(governance-migration): governance 当前未开放旧启停、重启及调整副本接口，不能将新资源 ID 交给 legacy 写接口。
 // TODO(governance-migration): 新后端提供对应命令与操作状态契约后恢复这些入口，沿用异步受理与完成分离的反馈。
-import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {

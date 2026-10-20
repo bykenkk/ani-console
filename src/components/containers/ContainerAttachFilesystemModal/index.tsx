@@ -1,5 +1,6 @@
-import type { InstanceRecord } from "@/api/instances";
-import { applyInstanceLifecycle } from "@/api/instances";
+// FIXME(governance-migration): NFS 挂载未对齐，保留原弹窗、入口、参数和 legacy 调用。
+// TODO(governance-migration): 待等价契约可用后迁移NFS 挂载，不混用新创建/启停接口替代。
+import { type InstanceRecord, applyInstanceLifecycle } from "@/api/instances/legacy";
 import type { StorageFilesystem } from "@/api/storage/filesystems";
 import { listFilesystemMountTargets, listFilesystems } from "@/api/storage/filesystems";
 import { withId } from "@/lib/id";
@@ -32,6 +33,7 @@ export default function ContainerAttachFilesystemModal({
       },
     },
     queryKey: ["filesystems", "container-instance-attach-filesystem", instance.id],
+    // TODO(instance-option-pagination): 文件存储选项仍沿用后端 limit/cursor 过渡契约，待分页改造完成后改为 page=1、pageSize=100；保留协议和可挂载实例筛选，不增加翻页入口。
     queryFn: () =>
       listFilesystems({
         protocol: "nfs",

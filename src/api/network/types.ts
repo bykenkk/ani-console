@@ -1,4 +1,4 @@
-import type { CoreDevProfileInfo, CursorPageParams } from "@/api/types";
+import type { CoreDevProfileInfo, CursorPageParams, PageParams } from "@/api/types";
 
 export type NetworkResourceState =
   | "pending"
@@ -62,19 +62,13 @@ export interface NetworkSubnetListParams {
   keyword?: string;
 }
 
-export interface NetworkVPCListParams extends CursorPageParams {
+export interface NetworkVPCListParams extends PageParams {
   state?: "" | NetworkResourceStateFilter;
   name?: string;
 }
 
 export interface NetworkVPCListResponse {
   items: NetworkVPC[];
-  /** Safely converted from the Governance int64 JSON string for existing consumers. */
-  total: number;
-  next_cursor?: string | null;
-}
-
-export interface NetworkVPCListWireResponse extends Omit<NetworkVPCListResponse, "total"> {
   total: string;
 }
 
@@ -299,6 +293,7 @@ export interface NetworkLoadBalancerMutationResponse {
   load_balancer: NetworkLoadBalancer;
   operation: NetworkOperation;
 }
+// TODO(pagination-migration): governance ListLoadBalancersRequest 仍使用 limit/cursor，保留原分页；待后端改造后迁移 PageParams。
 export interface NetworkLoadBalancerListParams extends CursorPageParams {
   vpc_id?: string;
   subnet_id?: string;
@@ -380,7 +375,11 @@ export interface NetworkEip {
   managed_by?: string;
   binding_target?: { kind?: string; id?: string; state?: string };
 }
-export type NetworkEipListParams = NetworkVPCListParams;
+// TODO(pagination-migration): 后端 ListEIPsRequest 仍仅支持 limit/cursor，暂保留原参数；待后端改造后迁移至 PageParams，不能复用 VPC 页码契约。
+export interface NetworkEipListParams extends CursorPageParams {
+  state?: "" | NetworkResourceStateFilter;
+  name?: string;
+}
 export interface NetworkEipListResponse {
   items: NetworkEip[];
   next_cursor?: string;

@@ -1,4 +1,4 @@
-import BucketDetailPage from "@/components/storage/BucketDetailPage";
+import BucketDetailPage from "@/components/objects/BucketDetailPage";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/_app/objects/$bucketId/")({

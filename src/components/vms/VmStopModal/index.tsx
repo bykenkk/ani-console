@@ -1,6 +1,5 @@
-import { applyInstanceLifecycle } from "@/api/instances";
-import type { InstanceRecord } from "@/api/instances";
 import { Modal } from "@arco-design/web-react";
+import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
 import { useMutation } from "@tanstack/react-query";
 
 type Instance = InstanceRecord;

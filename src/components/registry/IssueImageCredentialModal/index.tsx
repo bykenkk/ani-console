@@ -51,7 +51,6 @@ export default function IssueImageCredentialModal({
         </span>
       }
       onCancel={onCancel}
-      maskClosable={false}
       escToExit={!mutation.isPending}
       closable={!mutation.isPending}
       footer={

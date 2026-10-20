@@ -1,6 +1,6 @@
+import { listInstanceSecurityEvents, type InstanceSecurityEvent } from "@/api/instances/legacy";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
-import { listInstanceSecurityEvents, type InstanceSecurityEvent } from "@/api/instances";
 import { Select, Space, Tag } from "@arco-design/web-react";
 import { useState } from "react";
 import { DataTable } from "@/components/common";

@@ -1,4 +1,4 @@
-import VolumeDetailPage from "@/components/storage/VolumeDetailPage";
+import VolumeDetailPage from "@/components/volumes/VolumeDetailPage";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/_authenticated/_app/volumes/$volumeId")({

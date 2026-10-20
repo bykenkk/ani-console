@@ -1,5 +1,10 @@
-import { applyInstanceLifecycle } from "@/api/instances";
-import type { InstanceLifecycleInput, InstanceRecord } from "@/api/instances";
+// FIXME(governance-migration): 实例变配未对齐，保留原弹窗、入口、参数和 legacy 调用。
+// TODO(governance-migration): 待等价契约可用后迁移实例变配，不混用新创建/启停接口替代。
+import {
+  applyInstanceLifecycle,
+  type InstanceLifecycleInput,
+  type InstanceRecord,
+} from "@/api/instances/legacy";
 import { Form, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import GpuContainerResizeFields from "@/components/gpu-containers/GpuContainerResizeFields";

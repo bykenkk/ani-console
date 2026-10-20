@@ -1,5 +1,5 @@
+import { createSandboxCodeRun, type SandboxCodeRun } from "@/api/instances/legacy";
 import { StatusBadge } from "@/components/common";
-import { createSandboxCodeRun, type SandboxCodeRun } from "@/api/instances";
 import type { AsyncTask } from "@/api/tasks";
 import { formatDateTime } from "@/lib/format";
 import {

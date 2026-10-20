@@ -1,5 +1,5 @@
+import { type InstanceRecord } from "@/api/instances/legacy";
 import { StatusBadge } from "@/components/common";
-import type { InstanceRecord } from "@/api/instances";
 import { copyToClipboard } from "@/lib/clipboard";
 import { Button, Descriptions, Space, Typography } from "@arco-design/web-react";
 

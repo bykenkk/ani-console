@@ -16,6 +16,7 @@ export interface KnowledgeBase {
   updated_at?: string | null;
 }
 
+// TODO(pagination-migration): ANI 知识库网关仍读取 limit/cursor，保留当前 Services 分页；待后端改造后迁移 PageParams。
 export interface KnowledgeBaseListParams extends CursorPageParams {
   status?: string;
   name?: string;
@@ -74,6 +75,7 @@ export interface KBDocument {
   parsed_at?: string | null;
 }
 
+// TODO(pagination-migration): ANI 知识库网关仍读取 limit/cursor，保留当前 Services 分页；待后端改造后迁移 PageParams。
 export interface KBDocumentListParams extends CursorPageParams {
   parse_status?: string;
 }
@@ -134,6 +136,7 @@ export interface KBChunk {
   created_at: string;
 }
 
+// TODO(pagination-migration): ANI 知识库网关仍读取 limit/cursor，保留当前 Services 分页；待后端改造后迁移 PageParams。
 export interface KBChunkListParams extends CursorPageParams {
   chunk_type?: "child" | "parent" | "doc_summary";
 }

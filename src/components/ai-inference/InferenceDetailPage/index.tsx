@@ -11,7 +11,7 @@ import {
   StatusBadge,
 } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { useInferenceActions } from "@/hooks/useInferenceActions";
 import { formatDateTime } from "@/lib/format";

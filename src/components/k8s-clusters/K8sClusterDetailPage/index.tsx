@@ -16,7 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { useCallback, useState } from "react";
 
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import K8sEvents from "./K8sEvents";
 import K8sKubeconfig from "./K8sKubeconfig";
 import K8sNodePools from "./K8sNodePools";

@@ -1,11 +1,11 @@
-import VolumeOSInitGuideModal from "@/components/storage/VolumeOSInitGuideModal";
+import VolumeOSInitGuideModal from "@/components/volumes/VolumeOSInitGuideModal";
 import { useVolumeDetach } from "@/hooks/useVolumeDetach";
 import { useResourceDelete } from "@/hooks/useResourceDelete";
 import { useState } from "react";
 import { type StorageVolume } from "@/api/storage/volumes";
-import CreateVolumeSnapshotModal from "@/components/storage/CreateVolumeSnapshotModal";
-import ExpandVolumeModal from "@/components/storage/ExpandVolumeModal";
-import AttachVolumeModal from "@/components/storage/AttachVolumeModal";
+import CreateVolumeSnapshotModal from "@/components/volumes/CreateVolumeSnapshotModal";
+import ExpandVolumeModal from "@/components/volumes/ExpandVolumeModal";
+import AttachVolumeModal from "@/components/volumes/AttachVolumeModal";
 import type { RowAction } from "@/components/common";
 type Volume = StorageVolume;
 export function useVolumeActions(onDeleted?: (item: Volume) => void) {

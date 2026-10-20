@@ -1,7 +1,6 @@
+import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
 import { listNetworkSecurityGroups } from "@/api/network";
-import { applyInstanceLifecycle } from "@/api/instances";
 import type { NetworkSecurityGroup } from "@/api/network";
-import type { InstanceRecord } from "@/api/instances";
 import { Form, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 

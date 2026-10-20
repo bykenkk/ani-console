@@ -10,7 +10,7 @@ import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 
 import { getModel } from "@/api/models";
 
-import { navigationBreadcrumbsForPath } from "@/components/layouts/AppLayout/navigation";
+import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import {
   AliIcon,
   DetailPageFrame,

@@ -1,4 +1,11 @@
-import { type InstanceEnvVar, type InstanceRecord, applyInstanceLifecycle } from "@/api/instances";
+// FIXME(governance-migration): 环境来源已接新 runtime，环境变量值、密钥引用及解绑继续保留原组件、入口和调用。
+// TODO(governance-migration): 等配置读写契约补齐后再迁移，不以 environmentSources 伪造旧环境变量值。
+import {
+  type InstanceEnvVar,
+  type InstanceRecord,
+  applyInstanceLifecycle,
+} from "@/api/instances/legacy";
+import type { InstanceRuntime } from "@/api/instances";
 import { DataTable, type RowAction } from "@/components/common";
 import { Space, Tooltip, Modal } from "@arco-design/web-react";
 import { type ReactNode } from "react";
@@ -12,7 +19,8 @@ type SecretRow = {
   purpose: string;
 };
 
-function secretReferences(instance: Instance) {
+function secretReferences(instance?: Instance) {
+  if (!instance) return [];
   const refs = [instance.ssh?.key_ref, ...(instance.resource_refs ?? [])].filter(
     (ref): ref is string => Boolean(ref),
   );
@@ -29,14 +37,18 @@ function secretPurpose(reference: string) {
 
 export default function InstanceConfiguration({
   instance,
+  runtime,
+  loading = false,
   onChanged,
   secretAction,
 }: {
-  instance: Instance;
+  instance?: Instance;
+  runtime?: InstanceRuntime;
+  loading?: boolean;
   onChanged: () => void;
   secretAction?: ReactNode;
 }) {
-  const environmentVariables = instance.container?.env ?? [];
+  const environmentVariables = instance?.container?.env ?? [];
   const secretRefs = secretReferences(instance);
   const secretRows: SecretRow[] = secretRefs.map((reference) => ({
     reference,
@@ -55,6 +67,7 @@ export default function InstanceConfiguration({
       },
     },
     mutationFn: async (reference: string) => {
+      if (!instance) throw new Error("实例密钥信息尚未加载");
       const submitData = {
         action: "unbind_secret" as const,
         secret_id: reference.replace(/^(secret|key|credential)[/:]/i, ""),
@@ -84,10 +97,25 @@ export default function InstanceConfiguration({
 
   return (
     <Space direction="vertical" size={24} className="w-full">
+      {runtime && (
+        <section>
+          <DataTable
+            header={{ title: "环境变量来源" }}
+            data={runtime.pod?.environmentSources ?? []}
+            rowKey="name"
+            pagination={false}
+            columns={[
+              { title: "名称", dataIndex: "name", width: 240, ellipsis: true },
+              { title: "来源类型", dataIndex: "sourceType", width: 200, ellipsis: true },
+            ]}
+          />
+        </section>
+      )}
       <section>
         <DataTable<InstanceEnvVar>
           header={{ title: "环境变量" }}
           data={environmentVariables}
+          loading={loading}
           rowKey="name"
           pagination={false}
           columns={[
@@ -133,6 +161,7 @@ export default function InstanceConfiguration({
         <DataTable<SecretRow>
           header={{ title: "绑定密钥", extra: secretAction }}
           data={secretRows}
+          loading={loading}
           rowKey="reference"
           pagination={false}
           rowActions={actions}

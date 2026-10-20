@@ -1,4 +1,4 @@
-import { cloneSandboxCheckpoint, type SandboxCheckpoint } from "@/api/instances";
+import { cloneSandboxCheckpoint, type SandboxCheckpoint } from "@/api/instances/legacy";
 import { Form, Input, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";

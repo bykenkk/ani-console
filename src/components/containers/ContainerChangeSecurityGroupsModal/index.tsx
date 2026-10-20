@@ -1,7 +1,8 @@
+// FIXME(governance-migration): 安全组变更未对齐，保留原弹窗、入口、参数和 legacy 调用。
+// TODO(governance-migration): 待等价契约可用后迁移安全组变更，不混用新创建/启停接口替代。
+import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
 import { listNetworkSecurityGroups } from "@/api/network";
-import { applyInstanceLifecycle } from "@/api/instances";
 import type { NetworkSecurityGroup } from "@/api/network";
-import type { InstanceRecord } from "@/api/instances";
 import { Form, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
@@ -33,6 +34,7 @@ export default function ContainerChangeSecurityGroupsModal({
       "container-instance-change-security-groups",
       instance.network?.vpc_id,
     ],
+    // TODO(instance-option-pagination): 安全组选项仍沿用后端 limit/cursor 过渡契约，待分页改造完成后改为 page=1、pageSize=100；保留 VPC 筛选，不增加翻页入口。
     queryFn: () =>
       listNetworkSecurityGroups({
         vpc_id: instance.network?.vpc_id || undefined,

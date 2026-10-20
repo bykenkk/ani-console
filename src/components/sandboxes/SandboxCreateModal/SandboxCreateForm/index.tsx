@@ -1,7 +1,7 @@
+import { listSandboxTemplates } from "@/api/instances/legacy";
 import { Button, Form, Input, Modal, Space, Typography } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { listSandboxTemplates } from "@/api/instances";
 import { WizardSteps } from "@/components/common";
 import {
   INITIAL_VALUES,

@@ -1,9 +1,11 @@
+// FIXME(governance-migration): CPU/GPU 指标及 query_range 未对齐，保留原指标组件、筛选入口和调用。
+// TODO(governance-migration): 等指标契约对齐后迁移，不影响沙箱、虚拟机等复用方。
 import {
   getInstanceMetrics,
   queryObservabilityRange,
   type InstanceRecord,
   type ObservabilityRangeQueryResponse,
-} from "@/api/instances";
+} from "@/api/instances/legacy";
 import { Card, Empty, Grid, Statistic, Tooltip } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import type { EChartsOption } from "echarts";

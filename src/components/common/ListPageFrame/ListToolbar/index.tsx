@@ -48,6 +48,7 @@ export const ToolbarIconButton = forwardRef<HTMLButtonElement, ToolbarIconButton
 export type SearchField<T extends string> = {
   value: T;
   label: string;
+  disabled?: boolean;
 };
 
 type ToolbarSearchProps<T extends string> = {
