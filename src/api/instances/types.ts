@@ -92,12 +92,6 @@ export interface ChangeInstanceInput {
   expected_version: string;
 }
 export type ChangeInstanceRequest = { data: ChangeInstanceInput & { idempotency_key: string } };
-export interface InstanceAcceptance {
-  operationId: string;
-  resourceId: string;
-  replayed?: boolean;
-  result: string;
-}
 export interface InstanceOperation {
   id: string;
   instanceId: string;

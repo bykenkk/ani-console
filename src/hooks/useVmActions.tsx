@@ -1,3 +1,4 @@
+// TODO(submit-result): VM 操作迁移 governance 后按实际契约确认提交返回值，清理无用的 operation_id 提取及回传。
 import { Modal } from "@arco-design/web-react";
 import {
   type InstanceLifecycleRequest,

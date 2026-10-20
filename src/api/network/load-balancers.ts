@@ -7,7 +7,6 @@ import type {
   NetworkLoadBalancer,
   NetworkLoadBalancerListParams,
   NetworkLoadBalancerListResponse,
-  NetworkLoadBalancerMutationResponse,
 } from "./types";
 
 const createScope = createIdempotencyScope("network-load-balancer-create", ["POST"]);
@@ -27,16 +26,13 @@ export function listNetworkLoadBalancers(
 
 export function createNetworkLoadBalancer(
   submitData: CreateNetworkLoadBalancerInput,
-): Promise<NetworkLoadBalancerMutationResponse> {
-  return runIdempotentRequest(createScope, submitData, (body) =>
-    coreRequest<NetworkLoadBalancerMutationResponse, CreateNetworkLoadBalancerRequest>(
-      "/networks/load-balancers",
-      {
-        method: "POST",
-        data: body,
-      },
-    ),
-  );
+): Promise<void> {
+  return runIdempotentRequest(createScope, submitData, async (body) => {
+    await coreRequest<void, CreateNetworkLoadBalancerRequest>("/networks/load-balancers", {
+      method: "POST",
+      data: body,
+    });
+  });
 }
 
 export function getNetworkLoadBalancer(
@@ -49,10 +45,8 @@ export function getNetworkLoadBalancer(
   });
 }
 
-export function deleteNetworkLoadBalancer(
-  loadBalancerId: string,
-): Promise<NetworkLoadBalancerMutationResponse> {
-  return coreRequest<NetworkLoadBalancerMutationResponse>(loadBalancerPath(loadBalancerId), {
+export async function deleteNetworkLoadBalancer(loadBalancerId: string): Promise<void> {
+  await coreRequest<void>(loadBalancerPath(loadBalancerId), {
     method: "DELETE",
   });
 }

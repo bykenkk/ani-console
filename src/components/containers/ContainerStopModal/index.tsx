@@ -1,6 +1,6 @@
 import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { getInstance, stopInstance, type InstanceAcceptance } from "@/api/instances";
+import { getInstance, stopInstance } from "@/api/instances";
 import { withId } from "@/lib/id";
 export default function ContainerStopModal({
   instance,
@@ -9,7 +9,7 @@ export default function ContainerStopModal({
 }: {
   instance: { id: string; name: string; version?: string };
   onCancel: () => void;
-  onSubmitted: (result: InstanceAcceptance) => void;
+  onSubmitted: () => void;
 }) {
   const qc = useQueryClient();
   const mutation = useMutation({
@@ -26,17 +26,19 @@ export default function ContainerStopModal({
         errorFallback: "停止失败，请刷新后重试",
       },
     },
-    onSuccess: async (result) => {
+    // TODO(container-task): 停止受理后仅刷新资源并关闭确认框，任务进度后续统一接入。
+    onSuccess: async () => {
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["governance-instances"] }),
         qc.invalidateQueries({ queryKey: ["legacy-instances"] }),
+        qc.invalidateQueries({ queryKey: ["governance-instance-runtime", instance.id] }),
         qc.invalidateQueries({
           queryKey: ["governance-instance", instance.id],
           refetchType: "active",
         }),
         qc.invalidateQueries({ queryKey: ["legacy-instance", instance.id], refetchType: "active" }),
       ]);
-      onSubmitted(result);
+      onSubmitted();
     },
   });
   return (

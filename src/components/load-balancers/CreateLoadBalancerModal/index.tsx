@@ -5,7 +5,6 @@ import {
   createNetworkLoadBalancer,
   getNetworkSubnet,
   type CreateNetworkLoadBalancerInput,
-  type NetworkLoadBalancer,
 } from "@/api/network";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ipInRanges, parseIpRanges, subnetIpUnavailableReason } from "@/lib/subnets";
@@ -24,13 +23,7 @@ export type LoadBalancerConfigurationValues = {
   listeners: LoadBalancerListenerValues[];
 };
 type Values = LoadBalancerConfigurationValues & { name: string; description?: string };
-export default function CreateLoadBalancerModal({
-  onCancel,
-  onCreated,
-}: {
-  onCancel: () => void;
-  onCreated?: (item: NetworkLoadBalancer) => void;
-}) {
+export default function CreateLoadBalancerModal({ onCancel }: { onCancel: () => void }) {
   const [form] = Form.useForm<Values>();
   const [available, setAvailable] = useState(false);
   const qc = useQueryClient();
@@ -58,7 +51,7 @@ export default function CreateLoadBalancerModal({
         errorFallback: "创建失败，请稍后重试",
       },
     },
-    onSuccess: async (result) => {
+    onSuccess: async () => {
       await Promise.all(
         [
           "network-load-balancers",
@@ -68,7 +61,6 @@ export default function CreateLoadBalancerModal({
           "network-eip",
         ].map((key) => qc.invalidateQueries({ queryKey: [key] })),
       );
-      onCreated?.(result.load_balancer);
       onCancel();
     },
   });

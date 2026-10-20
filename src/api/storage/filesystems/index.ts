@@ -27,6 +27,7 @@ export function listFilesystems(
   return coreRequest<StorageFilesystemListResponse>("/filesystems", { method: "GET", params });
 }
 
+// TODO(submit-result): governance 对接后确认组合创建方案；当前调用方需用返回的文件系统 ID 创建挂载点，暂不丢弃响应。
 export function createFilesystem(
   submitData: CreateStorageFilesystemInput,
 ): Promise<StorageFilesystem> {

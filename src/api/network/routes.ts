@@ -18,6 +18,7 @@ export function listNetworkRoutes(
   return coreRequest<NetworkRouteListResponse>("/networks/routes", { method: "GET", params });
 }
 
+// TODO(submit-result): 接入 governance 后按实际契约确认提交返回值；普通创建、操作默认丢弃响应，并清理无用回传及创建后跳转。
 export function createNetworkRoute(submitData: CreateNetworkRouteInput): Promise<NetworkRoute> {
   return runIdempotentRequest(createScope, submitData, (body) =>
     coreRequest<NetworkRoute, CreateNetworkRouteRequest>("/networks/routes", {

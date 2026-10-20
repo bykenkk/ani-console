@@ -1,3 +1,4 @@
+// TODO(submit-result): governance 对接后确认 ACL/存储类型配置所需桶 ID 的取得方式，再清理创建响应和无人使用的 onCreated 回传。
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Form, Input, Modal, Select, Typography } from "@arco-design/web-react";
 import { useState } from "react";

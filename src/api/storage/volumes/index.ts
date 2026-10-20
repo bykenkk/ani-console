@@ -33,6 +33,7 @@ export function listVolumes(
   return coreRequest<StorageVolumeListResponse>("/volumes", { method: "GET", params });
 }
 
+// TODO(submit-result): 接入 governance 后按实际契约确认提交返回值；普通创建、操作默认丢弃响应，并清理无用回传及创建后跳转。
 export function createVolume(submitData: CreateStorageVolumeInput): Promise<StorageVolume> {
   return runIdempotentRequest(createScope, submitData, (body) =>
     coreRequest<StorageVolume, CreateStorageVolumeRequest>("/volumes", {

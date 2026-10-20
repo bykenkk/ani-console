@@ -11,7 +11,6 @@ import type {
   CreateInstanceRequest,
   ChangeInstanceInput,
   ChangeInstanceRequest,
-  InstanceAcceptance,
   InstanceOperation,
   InstanceRuntime,
   InstanceEventsResponse,
@@ -42,50 +41,53 @@ export function listInstancePresets(params: InstancePresetListParams = {}, signa
     signal,
   });
 }
-export function createInstance(input: CreateInstanceInput) {
+export function createInstance(input: CreateInstanceInput): Promise<void> {
   // FIXME(governance-instance-create): 创建以新契约为准，不发送 preset_version 或旧配置字段。
   // TODO(governance-instance-create): 网络/存储等配置管理待后端提供等价契约后对接。
-  return runIdempotentRequest(createScope, input, (data) =>
-    coreRequest<InstanceAcceptance, CreateInstanceRequest>("/instances", {
+  return runIdempotentRequest(createScope, input, async (data) => {
+    await coreRequest<void, CreateInstanceRequest>("/instances", {
       method: "POST",
       data: { data },
-    }),
-  );
+    });
+  });
 }
-export function startInstance(id: string, input: ChangeInstanceInput) {
+export function startInstance(id: string, input: ChangeInstanceInput): Promise<void> {
   return runIdempotentRequest(
     startScope,
     input,
-    (data) =>
-      coreRequest<InstanceAcceptance, ChangeInstanceRequest>(`${instancePath(id)}:start`, {
+    async (data) => {
+      await coreRequest<void, ChangeInstanceRequest>(`${instancePath(id)}:start`, {
         method: "POST",
         data: { data },
-      }),
+      });
+    },
     [id],
   );
 }
-export function stopInstance(id: string, input: ChangeInstanceInput) {
+export function stopInstance(id: string, input: ChangeInstanceInput): Promise<void> {
   return runIdempotentRequest(
     stopScope,
     input,
-    (data) =>
-      coreRequest<InstanceAcceptance, ChangeInstanceRequest>(`${instancePath(id)}:stop`, {
+    async (data) => {
+      await coreRequest<void, ChangeInstanceRequest>(`${instancePath(id)}:stop`, {
         method: "POST",
         data: { data },
-      }),
+      });
+    },
     [id],
   );
 }
-export function deleteInstance(id: string, input: ChangeInstanceInput) {
+export function deleteInstance(id: string, input: ChangeInstanceInput): Promise<void> {
   // DELETE 的 data body、幂等键及 expected_version 均由新契约明确要求。
   return runIdempotentRequest(
     deleteScope,
     input,
-    (data) =>
-      coreRequest<InstanceAcceptance, ChangeInstanceRequest>(instancePath(id), {
+    async (data) => {
+      await coreRequest<void, ChangeInstanceRequest>(instancePath(id), {
         method: "DELETE",
         data: { data },
-      }),
+      });
+    },
     [id],
   );
 }

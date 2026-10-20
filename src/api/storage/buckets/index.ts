@@ -51,6 +51,7 @@ export function deleteBucket(bucketId: string): Promise<StorageBucketRecord> {
   return coreRequest<StorageBucketRecord>(bucketPath(bucketId), { method: "DELETE" });
 }
 
+// TODO(submit-result): governance 对接后确认 ACL/存储类型的组合创建方案；当前调用方需用返回的桶 ID 继续配置，暂不丢弃响应。
 export function createBucket(submitData: CreateStorageBucketInput): Promise<StorageBucketRecord> {
   return runIdempotentRequest(createScope, submitData, (body) =>
     coreRequest<StorageBucketRecord, CreateStorageBucketRequest>("/buckets", {

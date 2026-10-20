@@ -1,3 +1,4 @@
+// TODO(submit-result): VM 迁移 governance 后按实际契约确认提交返回值，并清理当前未被页面使用的 operation_id 回传。
 import { createInstance } from "@/api/instances/legacy";
 import type { NetworkSecurityGroup } from "@/api/network";
 import { listNetworkSecurityGroups, listNetworkSubnets, listNetworkVpcs } from "@/api/network";

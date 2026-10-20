@@ -1,6 +1,5 @@
 // TODO(pagination-migration): 已通过公共 Hook 原样回传 next_cursor；后端提供 page/pageSize 后移除临时游标分页兼容。
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { listModelDevExecutions, type ModelDevExecution } from "@/api/modeldev";
 import { ListDataTable, ListPageFrame } from "@/components/common";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
@@ -10,9 +9,6 @@ import TrainingTaskCreateModal from "./TrainingTaskCreateModal";
 
 export default function TrainingTasksPage() {
   const [createVisible, setCreateVisible] = useState(false);
-  const navigate = useNavigate();
-  const openDetail = (executionId: string) =>
-    navigate({ to: "/ai-training/$executionId", params: { executionId } });
   const { query, pagination, refresh } = useCursorPaginatedQuery({
     queryKey: ["training-executions"],
     errorNotification: {
@@ -55,13 +51,7 @@ export default function TrainingTasksPage() {
         />
       </ListPageFrame>
       {createVisible && (
-        <TrainingTaskCreateModal
-          onCancel={() => setCreateVisible(false)}
-          onCreated={(result) => {
-            refresh();
-            openDetail(result.execution_id);
-          }}
-        />
+        <TrainingTaskCreateModal onCancel={() => setCreateVisible(false)} onCreated={refresh} />
       )}
     </>
   );

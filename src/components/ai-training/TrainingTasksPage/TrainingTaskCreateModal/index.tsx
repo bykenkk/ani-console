@@ -13,7 +13,6 @@ import {
   type ModelDevPreset,
   type ModelDevInputVersion,
   type CreateModelDevExecutionInput,
-  type ModelDevExecutionAcceptance,
   getModelDevInputVersion,
 } from "@/api/modeldev";
 import TrainingPresetFields from "./TrainingPresetFields";
@@ -34,7 +33,7 @@ export default function TrainingTaskCreateModal({
   onCreated,
 }: {
   onCancel: () => void;
-  onCreated?: (result: ModelDevExecutionAcceptance) => void;
+  onCreated?: () => void;
 }) {
   const [form] = Form.useForm<TrainingCreateValues>();
   const [values, setValues] = useState(initialValues);
@@ -47,7 +46,7 @@ export default function TrainingTaskCreateModal({
     mutationFn: async (input: CreateModelDevExecutionInput) => {
       const current = await getModelDevInputVersion(input.dataset_version_id);
       if (current.state !== "READY") throw new Error("数据集尚未就绪，请重新选择");
-      return createModelDevExecution(input);
+      await createModelDevExecution(input);
     },
     meta: {
       feedback: {
@@ -57,8 +56,8 @@ export default function TrainingTaskCreateModal({
         errorFallback: "创建失败，请稍后重试",
       },
     },
-    onSuccess: (result) => {
-      onCreated?.(result);
+    onSuccess: () => {
+      onCreated?.();
       onCancel();
     },
   });

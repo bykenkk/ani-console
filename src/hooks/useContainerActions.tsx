@@ -10,9 +10,7 @@ import {
   getInstance,
   startInstance,
   type InstanceRecord as GovernanceInstance,
-  type InstanceAcceptance,
 } from "@/api/instances";
-import InstanceOperationModal from "@/components/instances/InstanceOperationModal";
 import { withId } from "@/lib/id";
 import type { RowAction } from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
@@ -60,7 +58,6 @@ export function useContainerActions(onChanged: () => void, onDeleted?: () => voi
     action: "stop" | "delete";
     instance: GovernanceInstance;
   }>();
-  const [acceptance, setAcceptance] = useState<InstanceAcceptance>();
   const [loadingLegacy, setLoadingLegacy] = useState(false);
   const refresh = async () => {
     onChanged();
@@ -87,10 +84,8 @@ export function useContainerActions(onChanged: () => void, onDeleted?: () => voi
       startInstance(instance.id, {
         expected_version: instance.version ?? (await getInstance(instance.id)).version,
       }),
-    onSuccess: async (result) => {
-      setAcceptance(result);
-      await refresh();
-    },
+    // TODO(container-task): 启动任务跟踪后续统一接入，当前仅提示已提交并刷新资源。
+    onSuccess: refresh,
   });
   const restart = useMutation({
     meta: {
@@ -246,16 +241,15 @@ export function useContainerActions(onChanged: () => void, onDeleted?: () => voi
   ];
 
   const close = () => setDialog(undefined);
-  const submitted = async (result?: InstanceAcceptance | string) => {
-    if (result && typeof result !== "string") {
-      setAcceptance(result);
-      onChanged();
-      close();
-      setCommandDialog(undefined);
-      return;
-    }
+  const submitted = async () => {
     close();
     await refresh();
+  };
+  // TODO(container-task): 停止任务跟踪后续统一接入；提交弹窗负责刷新资源，此处只关闭并通知页面。
+  const stopSubmitted = () => {
+    close();
+    setCommandDialog(undefined);
+    onChanged();
   };
   const deleteSubmitted = () => {
     close();
@@ -374,7 +368,11 @@ export function useContainerActions(onChanged: () => void, onDeleted?: () => voi
   const dialogNode = (
     <>
       {dialog?.action === "stop" && (
-        <ContainerStopModal instance={dialog.instance} onCancel={close} onSubmitted={submitted} />
+        <ContainerStopModal
+          instance={dialog.instance}
+          onCancel={close}
+          onSubmitted={stopSubmitted}
+        />
       )}
       {dialog?.action === "delete" && (
         <ContainerDeleteModal
@@ -442,7 +440,7 @@ export function useContainerActions(onChanged: () => void, onDeleted?: () => voi
         <ContainerStopModal
           instance={commandDialog.instance}
           onCancel={() => setCommandDialog(undefined)}
-          onSubmitted={submitted}
+          onSubmitted={stopSubmitted}
         />
       )}
       {commandDialog?.action === "delete" && (
@@ -450,14 +448,6 @@ export function useContainerActions(onChanged: () => void, onDeleted?: () => voi
           instance={commandDialog.instance}
           onCancel={() => setCommandDialog(undefined)}
           onSubmitted={deleteSubmitted}
-        />
-      )}
-      {acceptance && (
-        <InstanceOperationModal
-          acceptance={acceptance}
-          onCancel={() => {
-            setAcceptance(undefined);
-          }}
         />
       )}
     </>

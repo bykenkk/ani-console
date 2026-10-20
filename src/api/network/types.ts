@@ -289,10 +289,6 @@ export interface NetworkLoadBalancerBackend {
   observed_at?: string;
   observation_stale?: boolean;
 }
-export interface NetworkLoadBalancerMutationResponse {
-  load_balancer: NetworkLoadBalancer;
-  operation: NetworkOperation;
-}
 // TODO(pagination-migration): governance ListLoadBalancersRequest 仍使用 limit/cursor，保留原分页；待后端改造后迁移 PageParams。
 export interface NetworkLoadBalancerListParams extends CursorPageParams {
   vpc_id?: string;

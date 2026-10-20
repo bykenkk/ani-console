@@ -1,3 +1,4 @@
+// TODO(submit-result): 沙箱克隆尚未迁移 governance，暂保留原结果提示和详情入口；迁移后确认返回值用途并清理创建后导航。
 import { cloneSandboxCheckpoint, type SandboxCheckpoint } from "@/api/instances/legacy";
 import { Form, Input, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
