@@ -1,42 +1,24 @@
-import { listInstanceOperations, type InstanceOperation } from "@/api/instances/legacy";
+// TODO(instance-detail-migration): 云主机、沙箱先统一使用实例公共组件；对应字段、契约及运行时联调验证完成后移除此标记。
 import { Button } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { getInstanceOperation } from "@/api/instances";
-import { withId } from "@/lib/id";
 import { DataTable, StatusBadge } from "@/components/common";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
-import { formatDateTime } from "@/lib/format";
+import { withId } from "@/lib/id";
 
-type InstanceOperationsProps = {
-  instanceId: string;
-  operationId?: string;
-};
-
-const OPERATION_LABELS: Record<string, string> = {
+type InstanceOperationsProps = { operationId?: string };
+const ACTION_LABELS: Record<string, string> = {
+  CREATE: "创建",
+  START: "启动",
+  STOP: "停止",
+  DELETE: "删除",
   create: "创建",
   start: "启动",
   stop: "停止",
-  restart: "重启",
-  scale: "扩缩容",
-  update_image: "更新镜像",
-  resize: "变配",
-  rebuild: "重建",
   delete: "删除",
-  snapshot: "快照",
-  attach_volume: "挂载云盘",
-  detach_volume: "卸载云盘",
-  attach_filesystem: "挂载 NFS",
-  detach_filesystem: "卸载 NFS",
-  bind_secret: "绑定密钥",
-  unbind_secret: "解绑密钥",
-  change_security_groups: "更换安全组",
-  set_termination_protection: "终止保护",
-  rollback: "回滚发布",
-  console_session: "终端会话",
 };
 
-export default function InstanceOperations({ instanceId, operationId }: InstanceOperationsProps) {
-  const current = useQuery({
+export default function InstanceOperations({ operationId }: InstanceOperationsProps) {
+  const query = useQuery({
     queryKey: ["governance-instance-operation", operationId],
     enabled: Boolean(operationId),
     queryFn: ({ signal }) => getInstanceOperation(operationId!, signal),
@@ -44,76 +26,45 @@ export default function InstanceOperations({ instanceId, operationId }: Instance
       errorNotification: { id: withId("instance-operation", operationId), action: "操作状态加载" },
     },
   });
-  // FIXME(governance-instance-operations): 新契约仅支持单次操作查询，不等价于原操作历史及详情。
-  // TODO(governance-instance-operations): 原历史组件与调用保留，待历史查询能力就绪后迁移。
-
-  const {
-    query,
-    items: pageItems,
-    pagination,
-  } = useCursorPaginatedQuery<InstanceOperation>({
-    errorNotification: {
-      id: withId("instance-operations", instanceId),
-      action: "操作记录加载",
-      fallback: "请求失败，请稍后重试",
-    },
-    queryKey: ["instance-operations", instanceId],
-    initialPageSize: 10,
-    queryFn: async ({ cursor, limit }) => {
-      return listInstanceOperations(instanceId, { limit, cursor });
-    },
-  });
   return (
-    <div className="flex flex-col gap-3">
-      {operationId && (
-        <DataTable
-          data={current.data ? [current.data] : []}
-          loading={current.isFetching}
-          pagination={false}
-          header={{
-            title: "最近操作",
-            extra: (
-              <Button loading={current.isFetching} onClick={() => current.refetch()}>
-                刷新
-              </Button>
-            ),
-          }}
-          columns={[
-            { title: "操作 ID", dataIndex: "id" },
-            { title: "操作", dataIndex: "action" },
-            {
-              title: "状态",
-              render: (_, row) => <StatusBadge status={row.state} reason={row.reason} />,
-            },
-          ]}
-        />
-      )}
-      <DataTable<InstanceOperation>
-        data={pageItems}
+    <div className="flex flex-col gap-6">
+      <DataTable
+        header={{
+          title: "最近操作",
+          extra: (
+            <Button
+              disabled={!operationId}
+              loading={query.isFetching}
+              onClick={() => query.refetch()}
+            >
+              刷新
+            </Button>
+          ),
+        }}
+        data={query.data ? [query.data] : []}
         loading={query.isFetching}
-        pagination={pagination}
+        rowKey="id"
+        pagination={false}
         columns={[
-          {
-            title: "操作时间",
-            width: 180,
-            render: (_, operation) => formatDateTime(operation.created_at),
-          },
-          {
-            title: "操作",
-            width: 140,
-            render: (_, operation) => OPERATION_LABELS[operation.operation] ?? operation.operation,
-          },
+          { title: "操作 ID", dataIndex: "id", ellipsis: true },
+          { title: "操作", render: (_, row) => ACTION_LABELS[row.action] ?? row.action },
           {
             title: "状态",
-            width: 120,
-            render: (_, operation) => (
-              <StatusBadge
-                status={operation.status}
-                reason={operation.failure_reason}
-                message={operation.failure_message}
-              />
-            ),
+            render: (_, row) => <StatusBadge status={row.state} reason={row.reason} />,
           },
+        ]}
+      />
+      {/* FIXME(instance-operation-history): 当前仅支持单次操作查询，没有操作历史列表契约。 */}
+      {/* TODO(instance-operation-history): 后端提供历史列表后接入，不用最近操作伪造完整历史。 */}
+      <DataTable<{ id: string; action: string; state: string }>
+        header={{ title: "操作记录" }}
+        data={[]}
+        pagination={false}
+        rowKey="id"
+        columns={[
+          { title: "操作时间", render: () => "-" },
+          { title: "操作", dataIndex: "action" },
+          { title: "状态", dataIndex: "state" },
         ]}
       />
     </div>

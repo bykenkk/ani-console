@@ -21,7 +21,7 @@ import { getSandboxProviderLabel } from "@/lib/instances";
 import SandboxAccess from "./SandboxAccess";
 import SandboxCheckpoints from "./SandboxCheckpoints";
 import SandboxCodeRunner from "./SandboxCodeRunner";
-import SandboxEnvironment from "./SandboxEnvironment";
+import InstanceConfiguration from "@/components/instances/InstanceConfiguration";
 import SandboxEvents from "./SandboxEvents";
 import SandboxFiles from "./SandboxFiles";
 import { formatDurationSeconds, sandboxEgressLabel, sandboxTimeoutLabel } from "./utils";
@@ -193,7 +193,8 @@ export default function SandboxDetailPage({
         {
           key: "env",
           label: "环境变量",
-          content: <SandboxEnvironment sandbox={sandbox} />,
+          // TODO(sandbox-instance-detail): 对应 Governance 数据和实例 ID 尚未对齐，先使用公共组件空态；契约支持并联调验证后传入数据，再移除此标记。
+          content: <InstanceConfiguration />,
         },
         {
           key: "files",
@@ -237,12 +238,14 @@ export default function SandboxDetailPage({
         {
           key: "metrics",
           label: "资源监控",
-          content: <InstanceMetrics instanceId={instanceId} instanceKind="sandbox" />,
+          // TODO(sandbox-instance-detail): 对应 Governance 数据和实例 ID 尚未对齐，先使用公共组件空态；契约支持并联调验证后传入数据，再移除此标记。
+          content: <InstanceMetrics />,
         },
         {
           key: "logs",
           label: "日志",
-          content: <InstanceLogs instanceId={instanceId} active />,
+          // TODO(sandbox-instance-detail): 对应 Governance 数据和实例 ID 尚未对齐，先使用公共组件空态；契约支持并联调验证后传入数据，再移除此标记。
+          content: <InstanceLogs active />,
         },
         {
           key: "events",
@@ -252,7 +255,8 @@ export default function SandboxDetailPage({
         {
           key: "operations",
           label: "操作记录",
-          content: <InstanceOperations instanceId={instanceId} />,
+          // TODO(sandbox-instance-detail): 对应 Governance 数据和实例 ID 尚未对齐，先使用公共组件空态；契约支持并联调验证后传入数据，再移除此标记。
+          content: <InstanceOperations />,
         },
       ]}
 

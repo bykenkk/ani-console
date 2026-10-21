@@ -1,377 +1,175 @@
-// FIXME(governance-migration): CPU/GPU 指标及 query_range 未对齐，保留原指标组件、筛选入口和调用。
-// TODO(governance-migration): 等指标契约对齐后迁移，不影响沙箱、虚拟机等复用方。
-import {
-  getInstanceMetrics,
-  queryObservabilityRange,
-  type InstanceRecord,
-  type ObservabilityRangeQueryResponse,
-} from "@/api/instances/legacy";
-import { Card, Empty, Grid, Statistic, Tooltip } from "@arco-design/web-react";
+// TODO(instance-detail-migration): 云主机、沙箱先统一使用实例公共组件；对应字段、契约及运行时联调验证完成后移除此标记。
+import { Button, Card, Descriptions, Empty, Select, Space } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import type { EChartsOption } from "echarts";
-import { useEffect, useMemo } from "react";
-import { CoreLineBarChart } from "@/components/common";
-import { formatTime, getPreviousHoursDateTimeRange } from "@/lib/date";
-import { closeNotification, showNotification } from "@/lib/feedback";
-import { withId } from "@/lib/id";
+import {
+  getInstanceLatestMetrics,
+  queryInstanceMetrics,
+  type InstanceMetricSeries,
+} from "@/api/instances";
+import { CoreLineBarChart, StatusBadge } from "@/components/common";
+import { getPreviousHoursDateTimeRange, formatTime } from "@/lib/date";
 import { formatBytes } from "@/lib/format";
+import { withId } from "@/lib/id";
 
 type InstanceMetricsProps = {
-  instanceId: string;
-  instanceKind: InstanceKind;
+  instanceId?: string;
   gpuOnly?: boolean;
-  gpuModel?: string | null;
-  gpuCount?: number | null;
+  gpuModel?: string;
+  gpuCount?: number;
 };
+const METRIC_LABELS = { "cpu.usage_cores": "CPU 使用量", "memory.working_set_bytes": "内存使用量" };
+const STATUS_LABELS = { OK: "正常", PARTIAL: "部分数据缺失", NO_DATA: "无数据" };
 
-type InstanceKind = InstanceRecord["kind"];
-type RangeMetrics = ObservabilityRangeQueryResponse;
-type MonitoringTrendSeries = {
-  name: string;
-  values: RangeMetrics["results"][number]["values"];
-  error?: string;
-};
-type MonitoringTrendQuery = {
-  name: string;
-  promql: string;
-  scale?: number;
-};
-
-function percent(value?: number | null) {
+function metricValue(series?: InstanceMetricSeries) {
+  const value = series?.points[0]?.value;
   if (value == null) return "-";
-  return `${Number.isInteger(value) ? value : value.toFixed(1)}%`;
+  return series?.unit === "bytes" ? formatBytes(value) : `${Number(value.toFixed(3))} 核`;
 }
 
-function percentTooltip(value: unknown) {
-  const number = Number(value);
-  return Number.isFinite(number) ? `${Number(number.toFixed(2))}%` : "-";
-}
-
-function memory(value?: number | null) {
-  return value == null ? "-" : formatBytes(value * 1024 * 1024);
-}
-
-function gpuMemory(used?: number | null, total?: number | null) {
-  if (used == null || total == null) return "-";
-  const formatGiB = (value: number) =>
-    Number.isInteger(value / 1024) ? String(value / 1024) : (value / 1024).toFixed(1);
-  return `${formatGiB(used)} / ${formatGiB(total)} GiB`;
+function metricChart(series: InstanceMetricSeries): EChartsOption {
+  return {
+    tooltip: { trigger: "axis" },
+    grid: { left: 65, right: 20, top: 35, bottom: 35 },
+    xAxis: {
+      type: "category",
+      boundaryGap: false,
+      data: series.points.map((point) => formatTime(point.timestamp)),
+    },
+    yAxis: {
+      type: "value",
+      min: 0,
+      name: series.unit === "bytes" ? "字节" : "核",
+      axisLabel:
+        series.unit === "bytes" ? { formatter: (value: number) => formatBytes(value) } : undefined,
+    },
+    series: [
+      {
+        type: "line",
+        showSymbol: false,
+        connectNulls: false,
+        data: series.points.map((point) => point.value),
+      },
+    ],
+  };
 }
 
 export default function InstanceMetrics({
   instanceId,
-  instanceKind,
   gpuOnly = false,
   gpuModel,
   gpuCount,
 }: InstanceMetricsProps) {
-  const hasGpuMetrics = instanceKind === "gpu_container";
-  const metrics = useQuery({
+  const [hours, setHours] = useState(1);
+  // TODO(instance-metrics): 联调核对时间边界、空数据、部分缺失及手动刷新；缺失点保留 null，不补零。
+  const latest = useQuery({
+    queryKey: ["governance-instance-metrics-latest", instanceId],
+    enabled: Boolean(instanceId) && !gpuOnly,
+    queryFn: ({ signal }) => getInstanceLatestMetrics(instanceId!, signal),
     meta: {
       errorNotification: {
-        id: withId("instance-metrics", instanceId, gpuOnly ? "gpu" : "all"),
+        id: withId("instance-metrics-latest", instanceId),
         action: "监控指标加载",
-        fallback: "请求失败，请稍后重试",
       },
-    },
-    queryKey: ["instance-metrics", instanceId],
-    queryFn: () => getInstanceMetrics(instanceId),
-  });
-  const gpuTrend = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("gpu-trend", instanceId),
-        action: "GPU 利用率趋势加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["instance-gpu-utilization-trend", instanceId],
-    enabled: gpuOnly && hasGpuMetrics,
-    queryFn: async () => {
-      const { start, end } = getPreviousHoursDateTimeRange(1);
-      return queryObservabilityRange({
-        query: `avg(DCGM_FI_DEV_GPU_UTIL{namespace="${instanceId}",pod="${instanceId}"})`,
-        start,
-        end,
-        step: "1m",
-      });
     },
   });
-  const monitoringTrend = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("resource-trend", instanceId),
-        action: "资源利用率趋势加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["instance-resource-trend", instanceId, instanceKind],
-    enabled: !gpuOnly,
-    queryFn: async () => {
-      const { start, end } = getPreviousHoursDateTimeRange(1);
-      const queries: MonitoringTrendQuery[] =
-        instanceKind === "vm"
-          ? [
-              {
-                name: "CPU 利用率",
-                promql: `rate(kubevirt_vmi_cpu_usage_seconds_total{namespace="${instanceId}",name="${instanceId}"}[5m])`,
-                scale: 100,
-              },
-              {
-                name: "内存利用率",
-                promql: `(kubevirt_vmi_memory_domain_bytes{namespace="${instanceId}",name="${instanceId}"} - kubevirt_vmi_memory_usable_bytes{namespace="${instanceId}",name="${instanceId}"}) / kubevirt_vmi_memory_domain_bytes{namespace="${instanceId}",name="${instanceId}"}`,
-                scale: 100,
-              },
-            ]
-          : instanceKind === "sandbox"
-            ? [
-                {
-                  name: "CPU 利用率",
-                  promql: `100 * sum(rate(container_cpu_usage_seconds_total{namespace="${instanceId}",pod="${instanceId}",container="",id!~"/kata_overhead/.*"}[5m]))`,
-                },
-                {
-                  name: "内存利用率",
-                  promql: `100 * (1 - sum(kata_guest_meminfo{item="mem_available",cri_namespace="${instanceId}",cri_name="${instanceId}"}) / sum(kata_guest_meminfo{item="mem_total",cri_namespace="${instanceId}",cri_name="${instanceId}"}))`,
-                },
-              ]
-            : [
-                {
-                  name: "CPU 利用率",
-                  promql: `100 * avg(rate(container_cpu_usage_seconds_total{namespace="${instanceId}",pod="${instanceId}",container!="",container!="POD"}[5m]))`,
-                },
-                {
-                  name: "内存利用率",
-                  promql: `100 * (container_memory_working_set_bytes{namespace="${instanceId}",pod="${instanceId}",container!="",container!="POD"} / container_spec_memory_limit_bytes{namespace="${instanceId}",pod="${instanceId}",container!="",container!="POD"})`,
-                },
-                ...(hasGpuMetrics
-                  ? [
-                      {
-                        name: "GPU 利用率",
-                        promql: `avg(DCGM_FI_DEV_GPU_UTIL{namespace="${instanceId}",pod="${instanceId}"})`,
-                      },
-                    ]
-                  : []),
-              ];
-
-      return Promise.all(
-        queries.map(async ({ name, promql, scale }): Promise<MonitoringTrendSeries> => {
-          try {
-            const result = await queryObservabilityRange({
-              query: promql,
-              start,
-              end,
-              step: "30s",
-            });
-            if (!result.dev_profile.real_provider) {
-              return {
-                name,
-                values: [],
-                error: result.dev_profile.reason ?? `${name}趋势查询已降级`,
-              };
-            }
-            return {
-              name,
-              values: result.results
-                .flatMap((series) => series.values)
-                .map((point) => ({
-                  ...point,
-                  value: point.value * (scale ?? 1),
-                })),
-            };
-          } catch (error) {
-            return {
-              name,
-              values: [],
-              error:
-                error instanceof Error && error.message.trim()
-                  ? error.message
-                  : `${name}趋势查询失败`,
-            };
-          }
-        }),
-      );
-    },
-  });
-  const gpuTrendPoints = useMemo(
-    () => gpuTrend.data?.results.flatMap((series) => series.values) ?? [],
-    [gpuTrend.data],
-  );
-  const trendLabels = gpuTrendPoints.map((point) => formatTime(point.timestamp));
-  const utilizationTrendOption = useMemo<EChartsOption>(
-    () => ({
-      tooltip: { trigger: "axis", valueFormatter: percentTooltip },
-      grid: { left: 48, right: 16, top: 16, bottom: 30 },
-      xAxis: { type: "category", boundaryGap: false, data: trendLabels },
-      yAxis: {
-        type: "value",
-        min: 0,
-        max: 100,
-        axisLabel: { formatter: "{value}%" },
-      },
-      series: [
+  const range = useQuery({
+    queryKey: ["governance-instance-metrics-range", instanceId, hours],
+    enabled: Boolean(instanceId) && !gpuOnly,
+    queryFn: ({ signal }) =>
+      queryInstanceMetrics(
+        instanceId!,
         {
-          type: "line",
-          smooth: true,
-          showSymbol: gpuTrendPoints.length < 2,
-          data: gpuTrendPoints.map((point) => point.value),
+          ...getPreviousHoursDateTimeRange(hours),
+          metric_codes: ["cpu.usage_cores", "memory.working_set_bytes"],
+          step_seconds: 60,
         },
-      ],
-    }),
-    [gpuTrendPoints, trendLabels],
-  );
-  const monitoringTrendOption = useMemo<EChartsOption>(() => {
-    return {
-      tooltip: { trigger: "axis", valueFormatter: percentTooltip },
-      legend: { bottom: 0 },
-      grid: { left: 48, right: 16, top: 16, bottom: 48 },
-      xAxis: { type: "time", boundaryGap: false },
-      yAxis: {
-        type: "value",
-        min: 0,
-        max: 100,
-        axisLabel: { formatter: "{value}%" },
+        signal,
+      ),
+    meta: {
+      errorNotification: {
+        id: withId("instance-metrics-range", instanceId),
+        action: "监控趋势加载",
       },
-      series: (monitoringTrend.data ?? []).map((series) => ({
-        name: series.name,
-        type: "line",
-        smooth: true,
-        showSymbol: series.values.length < 2,
-        data: series.values.map((point) => [point.timestamp, point.value]),
-      })),
-    };
-  }, [monitoringTrend.data]);
-  const hasMonitoringTrend = monitoringTrend.data?.some((series) => series.values.length > 0);
-  const monitoringTrendErrors = (monitoringTrend.data ?? [])
-    .filter((series) => series.error)
-    .map((series) => `${series.name}：${series.error}`);
-  const monitoringTrendErrorMessage = monitoringTrendErrors.join("；");
-  const monitoringTrendPartialError = useMemo(
-    () => (monitoringTrendErrorMessage ? new Error(monitoringTrendErrorMessage) : undefined),
-    [monitoringTrendErrorMessage],
-  );
-  useEffect(() => {
-    const id = `instance-resource-trend-partial:${instanceId}`;
-    if (!monitoringTrendPartialError) {
-      closeNotification(id);
-      return;
-    }
-    showNotification({
-      id,
-      state: "error",
-      action: "部分资源利用率趋势加载",
-      content: { error: monitoringTrendPartialError, fallback: "部分指标暂时不可用" },
-    });
-  }, [instanceId, monitoringTrendPartialError]);
-  if (gpuOnly && hasGpuMetrics) {
-    if (!metrics.data) return <Empty description="暂无监控指标" />;
-    const data = metrics.data;
-    const gpuModelSummary = gpuModel ? `${gpuModel}×${gpuCount ?? 1}` : "-";
+    },
+  });
+  // TODO(instance-gpu-metrics): Governance 当前只提供 CPU/内存指标；GPU 专属指标契约对齐并联调通过后启用。
+  if (gpuOnly)
     return (
-      <Grid.Row gutter={[16, 16]}>
-        <Grid.Col span={24}>
-          <Card size="small">
-            <Grid.Row gutter={16}>
-              <Grid.Col span={8}>
-                <div className="px-3 py-2">
-                  <Statistic title="GPU 利用率" value={percent(data.gpu_utilization_pct)} />
-                </div>
-              </Grid.Col>
-              <Grid.Col span={8}>
-                <div className="px-3 py-2">
-                  <Statistic
-                    title="显存"
-                    value={gpuMemory(data.gpu_memory_used_mb, data.gpu_memory_total_mb)}
-                  />
-                </div>
-              </Grid.Col>
-              <Grid.Col span={8}>
-                <Tooltip content={gpuModelSummary} disabled={!gpuModel}>
-                  <div className="min-w-0 overflow-hidden px-3 py-2">
-                    <Statistic
-                      title="型号 × 数量"
-                      className="w-full"
-                      value={gpuModelSummary}
-                      styleValue={{
-                        display: "block",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    />
-                  </div>
-                </Tooltip>
-              </Grid.Col>
-            </Grid.Row>
-          </Card>
-        </Grid.Col>
-        <Grid.Col span={24}>
-          <Card title="GPU 利用率趋势" size="small">
-            {gpuTrendPoints.length ? (
-              <CoreLineBarChart option={utilizationTrendOption} style={{ height: 240 }} />
+      <Card title="GPU 指标">
+        <Descriptions
+          column={2}
+          data={[
+            { label: "GPU 型号", value: gpuModel || "-" },
+            { label: "设备数量", value: gpuCount ?? "-" },
+          ]}
+        />
+        <Empty description="暂无 GPU 监控数据" />
+      </Card>
+    );
+  return (
+    <Space direction="vertical" size={24} className="w-full">
+      <div className="flex items-center gap-3">
+        <Select
+          aria-label="监控时间范围"
+          value={hours}
+          onChange={setHours}
+          style={{ width: 150 }}
+          options={[
+            { value: 1, label: "最近 1 小时" },
+            { value: 6, label: "最近 6 小时" },
+            { value: 24, label: "最近 24 小时" },
+          ]}
+        />
+        <Button
+          disabled={!instanceId}
+          loading={latest.isFetching || range.isFetching}
+          onClick={() => Promise.all([latest.refetch(), range.refetch()])}
+        >
+          刷新
+        </Button>
+      </div>
+      <Descriptions
+        column={2}
+        data={[
+          {
+            label: "CPU 使用量",
+            value: metricValue(
+              latest.data?.data.series.find((series) => series.metric_code === "cpu.usage_cores"),
+            ),
+          },
+          {
+            label: "内存使用量",
+            value: metricValue(
+              latest.data?.data.series.find(
+                (series) => series.metric_code === "memory.working_set_bytes",
+              ),
+            ),
+          },
+        ]}
+      />
+      {(["cpu.usage_cores", "memory.working_set_bytes"] as const).map((code) => {
+        const series = range.data?.data.series.find((item) => item.metric_code === code);
+        return (
+          <Card
+            key={code}
+            title={METRIC_LABELS[code]}
+            extra={
+              series && (
+                <StatusBadge status={series.status}>{STATUS_LABELS[series.status]}</StatusBadge>
+              )
+            }
+            loading={range.isLoading}
+          >
+            {series?.points.some((point) => point.value !== null) ? (
+              <CoreLineBarChart option={metricChart(series)} style={{ height: 260 }} />
             ) : (
-              <Empty description="暂无 GPU 利用率趋势数据" />
+              <Empty description="暂无监控数据" />
             )}
           </Card>
-        </Grid.Col>
-      </Grid.Row>
-    );
-  }
-
-  const data = metrics.data;
-  return (
-    <Grid.Row gutter={[16, 16]}>
-      <Grid.Col span={24}>
-        <Card size="small">
-          {data ? (
-            <Grid.Row gutter={[16, 16]}>
-              <Grid.Col span={hasGpuMetrics ? 6 : 8}>
-                <div className="px-3 py-2">
-                  <Statistic title="CPU 利用率" value={percent(data.cpu_utilization_pct)} />
-                </div>
-              </Grid.Col>
-              <Grid.Col span={hasGpuMetrics ? 6 : 8}>
-                <div className="px-3 py-2">
-                  <Statistic
-                    title="内存"
-                    value={memory(data.memory_used_mb)}
-                    suffix={`/ ${memory(data.memory_total_mb)}`}
-                  />
-                </div>
-              </Grid.Col>
-              {hasGpuMetrics ? (
-                <Grid.Col span={6}>
-                  <div className="px-3 py-2">
-                    <Statistic title="GPU 利用率" value={percent(data.gpu_utilization_pct)} />
-                  </div>
-                </Grid.Col>
-              ) : null}
-              <Grid.Col span={hasGpuMetrics ? 6 : 8}>
-                <div className="px-3 py-2">
-                  <Statistic
-                    title="网络入 / 出"
-                    className="w-full"
-                    styleValue={{ whiteSpace: "normal", overflowWrap: "anywhere" }}
-                    value={`${formatBytes(
-                      data.network_rx_bytes ?? undefined,
-                    )} / ${formatBytes(data.network_tx_bytes ?? undefined)}`}
-                  />
-                </div>
-              </Grid.Col>
-            </Grid.Row>
-          ) : (
-            <Empty description="暂无监控指标" />
-          )}
-        </Card>
-      </Grid.Col>
-      <Grid.Col span={24}>
-        <Card title="资源利用率趋势" size="small">
-          {hasMonitoringTrend ? (
-            <CoreLineBarChart option={monitoringTrendOption} style={{ height: 280 }} />
-          ) : (
-            <Empty description="暂无资源利用率趋势数据" />
-          )}
-        </Card>
-      </Grid.Col>
-    </Grid.Row>
+        );
+      })}
+    </Space>
   );
 }

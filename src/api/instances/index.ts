@@ -18,6 +18,13 @@ import type {
   InstanceExecSession,
   CreateInstanceExecSessionInput,
   CreateInstanceExecSessionRequest,
+  MountablePvcListParams,
+  MountablePvcListResponse,
+  InstanceConfigurationData,
+  InstanceMetricsInput,
+  InstanceMetricsRequest,
+  InstanceMetricsRangeResponse,
+  InstanceMetricsLatestResponse,
 } from "./types";
 
 const createScope = createIdempotencyScope("governance-instance-create", ["POST"]);
@@ -35,20 +42,28 @@ export function getInstance(id: string, signal?: AbortSignal) {
   return coreRequest<InstanceRecord>(instancePath(id), { method: "GET", signal });
 }
 export function listInstancePresets(params: InstancePresetListParams = {}, signal?: AbortSignal) {
-  return coreRequest<InstancePresetListResponse>("/instance-presets", {
+  // 容器创建固定使用实例用途，不与训练、推理目录共享授权范围。
+  // TODO(instance-presets): 联调验证用途授权、分页及 GPU 目录降级反馈。
+  return coreRequest<InstancePresetListResponse>("/compute-presets", {
     method: "GET",
-    params,
+    params: { ...params, usage: "CONTAINER_INSTANCE" },
     signal,
   });
 }
 export function createInstance(input: CreateInstanceInput): Promise<void> {
-  // FIXME(governance-instance-create): 创建以新契约为准，不发送 preset_version 或旧配置字段。
-  // TODO(governance-instance-create): 网络/存储等配置管理待后端提供等价契约后对接。
+  // TODO(governance-instance-create): 联调验证配置保存、卷引用、网络门禁和幂等重试。
   return runIdempotentRequest(createScope, input, async (data) => {
     await coreRequest<void, CreateInstanceRequest>("/instances", {
       method: "POST",
       data: { data },
     });
+  });
+}
+export function listMountablePvcs(params: MountablePvcListParams = {}, signal?: AbortSignal) {
+  return coreRequest<MountablePvcListResponse>("/instances/mountable-pvcs", {
+    method: "GET",
+    params,
+    signal,
   });
 }
 export function startInstance(id: string, input: ChangeInstanceInput): Promise<void> {
@@ -99,6 +114,34 @@ export function getInstanceOperation(id: string, signal?: AbortSignal) {
 }
 export function getInstanceRuntime(id: string, signal?: AbortSignal) {
   return coreRequest<InstanceRuntime>(`${instancePath(id)}/runtime`, { method: "GET", signal });
+}
+export function getInstanceConfiguration(id: string, signal?: AbortSignal) {
+  // TODO(instance-configuration): 联调核对冻结配置回显和 no-store 响应，不写入持久缓存。
+  return coreRequest<InstanceConfigurationData>(`${instancePath(id)}/configuration`, {
+    method: "GET",
+    signal,
+  });
+}
+export function queryInstanceMetrics(
+  id: string,
+  input: InstanceMetricsInput,
+  signal?: AbortSignal,
+) {
+  // 只读 POST，后端未声明幂等键；不自行追加。保留指标合同自身的 data 结构。
+  return coreRequest<InstanceMetricsRangeResponse, InstanceMetricsRequest>(
+    `${instancePath(id)}/metrics/query`,
+    {
+      method: "POST",
+      data: { data: input },
+      signal,
+    },
+  );
+}
+export function getInstanceLatestMetrics(id: string, signal?: AbortSignal) {
+  return coreRequest<InstanceMetricsLatestResponse>(`${instancePath(id)}/metrics/latest`, {
+    method: "GET",
+    signal,
+  });
 }
 export function listInstanceEvents(id: string, signal?: AbortSignal) {
   return coreRequest<InstanceEventsResponse>(`${instancePath(id)}/events`, {

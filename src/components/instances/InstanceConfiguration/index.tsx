@@ -1,178 +1,74 @@
-// FIXME(governance-migration): 环境来源已接新 runtime，环境变量值、密钥引用及解绑继续保留原组件、入口和调用。
-// TODO(governance-migration): 等配置读写契约补齐后再迁移，不以 environmentSources 伪造旧环境变量值。
-import {
-  type InstanceEnvVar,
-  type InstanceRecord,
-  applyInstanceLifecycle,
-} from "@/api/instances/legacy";
-import type { InstanceRuntime } from "@/api/instances";
-import { DataTable, type RowAction } from "@/components/common";
-import { Space, Tooltip, Modal } from "@arco-design/web-react";
-import { type ReactNode } from "react";
-import { useMutation } from "@tanstack/react-query";
+// TODO(instance-detail-migration): 云主机、沙箱先统一使用实例公共组件；对应字段、契约及运行时联调验证完成后移除此标记。
+import { Descriptions, Space } from "@arco-design/web-react";
+import { DataTable } from "@/components/common";
+import type { InstanceConfigurationData, InstanceRuntime } from "@/api/instances";
 
 type InstanceConfigurationProps = {
-  instance?: Instance;
+  configuration?: InstanceConfigurationData;
   runtime?: InstanceRuntime;
   loading?: boolean;
-  onChanged: () => void;
-  secretAction?: ReactNode;
 };
-
-type Instance = InstanceRecord;
-
-type SecretRow = {
-  reference: string;
-  id: string;
-  purpose: string;
-};
-
-function secretReferences(instance?: Instance) {
-  if (!instance) return [];
-  const refs = [instance.ssh?.key_ref, ...(instance.resource_refs ?? [])].filter(
-    (ref): ref is string => Boolean(ref),
-  );
-  return Array.from(new Set(refs.filter((ref) => /secret|key|credential/i.test(ref))));
-}
-
-function secretId(reference: string) {
-  return reference.replace(/^(secret|key|credential)[/:]/i, "");
-}
-
-function secretPurpose(reference: string) {
-  return /pull|image|img/i.test(reference) ? "镜像拉取" : "实例密钥";
-}
 
 export default function InstanceConfiguration({
-  instance,
+  configuration,
   runtime,
   loading = false,
-  onChanged,
-  secretAction,
 }: InstanceConfigurationProps) {
-  const environmentVariables = instance?.container?.env ?? [];
-  const secretRefs = secretReferences(instance);
-  const secretRows: SecretRow[] = secretRefs.map((reference) => ({
-    reference,
-    id: secretId(reference),
-    purpose: secretPurpose(reference),
-  }));
-
-  const unbindSecret = useMutation({
-    meta: {
-      feedback: {
-        channel: "notification",
-        id: "secret-unbind",
-        action: "密钥解绑",
-        successText: "密钥解绑已提交",
-        errorFallback: "操作失败，请稍后重试",
-      },
-    },
-    mutationFn: async (reference: string) => {
-      if (!instance) throw new Error("实例密钥信息尚未加载");
-      const submitData = {
-        action: "unbind_secret" as const,
-        secret_id: reference.replace(/^(secret|key|credential)[/:]/i, ""),
-      };
-      await applyInstanceLifecycle(instance.id, submitData);
-    },
-    onSuccess: () => {
-      onChanged();
-    },
-  });
-  const actions: RowAction<SecretRow>[] = [
-    {
-      key: "unbind",
-      label: "解绑",
-      intent: "danger",
-      loading: (secret) => unbindSecret.isPending && unbindSecret.variables === secret.reference,
-      onClick: (secret) => {
-        Modal.confirm({
-          title: "解绑密钥",
-          content: `确定解绑「${secret.id}」？`,
-          okButtonProps: { status: "danger" },
-          onOk: () => unbindSecret.mutateAsync(secret.reference),
-        });
-      },
-    },
-  ];
-
+  const metadata = (record?: Record<string, string>) =>
+    Object.entries(record ?? {}).map(([name, value]) => ({ name, value }));
   return (
     <Space direction="vertical" size={24} className="w-full">
-      {runtime && (
-        <section>
-          <DataTable
-            header={{ title: "环境变量来源" }}
-            data={runtime.pod?.environmentSources ?? []}
-            rowKey="name"
-            pagination={false}
-            columns={[
-              { title: "名称", dataIndex: "name", width: 240, ellipsis: true },
-              { title: "来源类型", dataIndex: "sourceType", width: 200, ellipsis: true },
-            ]}
-          />
-        </section>
-      )}
-      <section>
-        <DataTable<InstanceEnvVar>
-          header={{ title: "环境变量" }}
-          data={environmentVariables}
+      <Descriptions
+        column={1}
+        data={[{ label: "工作目录", value: configuration?.workspace_mount_path ?? "-" }]}
+      />
+      <DataTable
+        header={{ title: "环境变量来源" }}
+        data={runtime?.pod?.environmentSources ?? []}
+        rowKey="name"
+        pagination={false}
+        columns={[
+          { title: "名称", dataIndex: "name", ellipsis: true },
+          { title: "来源类型", dataIndex: "sourceType", ellipsis: true },
+        ]}
+      />
+      {[
+        { title: "环境变量", rows: configuration?.env ?? [] },
+        { title: "标签", rows: metadata(configuration?.labels) },
+        { title: "注解", rows: metadata(configuration?.annotations) },
+      ].map(({ title, rows }) => (
+        <DataTable
+          key={title}
+          header={{ title }}
+          data={rows}
           loading={loading}
           rowKey="name"
           pagination={false}
           columns={[
-            { title: "名称", dataIndex: "name", ellipsis: true },
-            // {
-            //   title: "类型",
-            //   width: 120,
-            //   render: (_, environmentVariable) =>
-            //     environmentVariable.secret_ref ? (
-            //       <Tag color="purple">密钥引用</Tag>
-            //     ) : (
-            //       <Tag color="gray">普通值</Tag>
-            //     ),
-            // },
+            { title: "名称", dataIndex: "name", width: 240, ellipsis: true },
             {
               title: "值",
-              render: (_, environmentVariable) =>
-                environmentVariable.secret_ref ? (
-                  <Tooltip content="该变量引用密钥，不显示明文">
-                    <span className="font-mono">******</span>
-                  </Tooltip>
-                ) : environmentVariable.value === "" ? (
-                  <span className="font-mono">&quot;&quot;</span>
-                ) : (
-                  <Tooltip content={environmentVariable.value ?? "-"}>
-                    <span className="block min-w-0 truncate font-mono">
-                      {environmentVariable.value ?? "-"}
-                    </span>
-                  </Tooltip>
-                ),
+              render: (_, row) => (
+                <span className="whitespace-pre-wrap break-all font-mono">
+                  {row.value === "" ? '""' : row.value}
+                </span>
+              ),
             },
-            // {
-            //   title: "密钥引用",
-            //   dataIndex: "secret_ref",
-            //   placeholder: "-",
-            //   ellipsis: true,
-            // },
           ]}
         />
-      </section>
-
-      <section>
-        <DataTable<SecretRow>
-          header={{ title: "绑定密钥", extra: secretAction }}
-          data={secretRows}
-          loading={loading}
-          rowKey="reference"
-          pagination={false}
-          rowActions={actions}
-          columns={[
-            { title: "密钥", dataIndex: "id", ellipsis: true },
-            { title: "用途", dataIndex: "purpose" },
-          ]}
-        />
-      </section>
+      ))}
+      {/* FIXME(instance-secrets): 新配置仅包含字面环境变量，不能据此补造密钥引用或调用未提供的解绑接口。 */}
+      {/* TODO(instance-secrets): 保留绑定密钥区块，待 Governance 提供读写契约后接入。 */}
+      <DataTable<{ id: string; purpose: string }>
+        header={{ title: "绑定密钥" }}
+        data={[]}
+        pagination={false}
+        rowKey="id"
+        columns={[
+          { title: "密钥", dataIndex: "id" },
+          { title: "用途", dataIndex: "purpose" },
+        ]}
+      />
     </Space>
   );
 }

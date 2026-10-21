@@ -14,8 +14,13 @@ const subnetPath = (subnetId: string) => `/networks/subnets/${encodeURIComponent
 
 export function listNetworkSubnets(
   params: NetworkSubnetListParams = {},
+  signal?: AbortSignal,
 ): Promise<NetworkSubnetListResponse> {
-  return coreRequest<NetworkSubnetListResponse>("/networks/subnets", { method: "GET", params });
+  return coreRequest<NetworkSubnetListResponse>("/networks/subnets", {
+    method: "GET",
+    params,
+    signal,
+  });
 }
 
 // TODO(submit-result): 接入 governance 后按实际契约确认提交返回值；普通创建、操作默认丢弃响应，并清理无用回传及创建后跳转。

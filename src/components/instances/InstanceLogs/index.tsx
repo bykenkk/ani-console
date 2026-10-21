@@ -1,33 +1,14 @@
-import { streamInstanceLogs } from "@/api/instances/legacy";
-import * as legacy from "@/api/instances/legacy";
-import { streamInstanceLogs as streamCurrentLogs } from "@/api/instances";
+import { streamInstanceLogs } from "@/api/instances";
 import { useEffect, useRef, useState } from "react";
 import { Button, Empty, Select, Space, Spin, Typography } from "@arco-design/web-react";
 import { closeNotification, showNotification } from "@/lib/feedback";
 import { withId } from "@/lib/id";
 
-type InstanceLogsProps = {
-  instanceId: string;
-  active: boolean;
-  instanceKind?: legacy.InstanceKind;
-  container?: string;
-};
-
-type LogLevel = "debug" | "info" | "warn" | "error";
-type LevelFilter = LogLevel | "all";
+type InstanceLogsProps = { instanceId?: string; active: boolean };
 type StreamStatus = "idle" | "connecting" | "connected";
-
-type InstanceLog = {
-  timestamp: string;
-  level: string;
-  message: string;
-  container: string;
-  stream: string;
-};
-
 type StreamResult = { type: "done"; reason: string } | { type: "closed" };
 
-const LEVEL_OPTIONS: Array<{ label: string; value: LevelFilter }> = [
+const LEVEL_OPTIONS = [
   { label: "全部级别", value: "all" },
   { label: "debug", value: "debug" },
   { label: "info", value: "info" },
@@ -35,43 +16,17 @@ const LEVEL_OPTIONS: Array<{ label: string; value: LevelFilter }> = [
   { label: "error", value: "error" },
 ];
 const LOG_LIMIT = 1000;
-const LOG_INTERVAL_SECONDS = 2;
 const AUTO_SCROLL_THRESHOLD_PX = 24;
 const TIMEOUT_RECONNECT_DELAY_MS = 500;
-
-function parseInstanceLog(payload: string): InstanceLog {
-  const value = JSON.parse(payload) as Partial<InstanceLog>;
-  if (typeof value.message !== "string") throw new Error("日志流返回了无法识别的日志数据");
-  return {
-    timestamp: typeof value.timestamp === "string" ? value.timestamp : "",
-    level: typeof value.level === "string" ? value.level : "",
-    message: value.message,
-    container: typeof value.container === "string" ? value.container : "",
-    stream: typeof value.stream === "string" ? value.stream : "",
-  };
-}
-
-function logIdentity(log: InstanceLog): string {
-  return [log.timestamp, log.container, log.stream, log.level, log.message].join("\u0000");
-}
-
-function formatLog(log: InstanceLog): string {
-  const metadata = [log.timestamp, log.container, log.level, log.stream]
-    .filter(Boolean)
-    .map((item) => `[${item}]`);
-  return metadata.length ? `${metadata.join(" ")} ${log.message}` : log.message;
-}
 
 async function readLogStream(
   stream: ReadableStream<Uint8Array>,
   signal: AbortSignal,
-  appendLog: (log: InstanceLog) => void,
-  textChunks = false,
+  appendLog: (text: string) => void,
 ): Promise<StreamResult> {
   const reader = stream.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
-
   const consumeFrame = (rawFrame: string): StreamResult | undefined => {
     let eventType = "message";
     const dataLines: string[] = [];
@@ -80,26 +35,22 @@ async function readLogStream(
       else if (line.startsWith("data:")) dataLines.push(line.slice(5).trimStart());
     }
     if (!dataLines.length) return;
-
     const payload = dataLines.join("\n");
     if (eventType === "log") {
-      if (textChunks) {
-        const value = JSON.parse(payload) as { text?: unknown };
-        if (typeof value.text !== "string") throw new Error("日志流返回了无法识别的文本数据");
-        appendLog({ message: value.text, timestamp: "", level: "", container: "", stream: "" });
-      } else appendLog(parseInstanceLog(payload));
+      const value = JSON.parse(payload) as { text?: unknown };
+      if (typeof value.text !== "string") throw new Error("日志流返回了无法识别的文本数据");
+      appendLog(value.text);
       return;
     }
     if (eventType === "error") {
       const error = JSON.parse(payload) as { message?: string; reason?: string };
       throw new Error(error.message || error.reason || "日志流发生错误");
     }
-    if (eventType === (textChunks ? "end" : "done")) {
+    if (eventType === "end") {
       const done = JSON.parse(payload) as { reason?: string };
       return { type: "done", reason: done.reason || "closed" };
     }
   };
-
   try {
     while (!signal.aborted) {
       const { value, done } = await reader.read();
@@ -120,88 +71,58 @@ async function readLogStream(
 
 async function connectLogStream({
   instanceId,
-  level,
-  textChunks,
   signal,
   appendLog,
   onConnected,
 }: {
   instanceId: string;
-  level: LevelFilter;
-  textChunks: boolean;
   signal: AbortSignal;
-  appendLog: (log: InstanceLog) => void;
+  appendLog: (text: string) => void;
   onConnected: () => void;
 }): Promise<StreamResult> {
-  const data = textChunks
-    ? await streamCurrentLogs(instanceId, { tailLines: LOG_LIMIT, follow: true }, signal)
-    : await streamInstanceLogs(
-        instanceId,
-        {
-          limit: LOG_LIMIT,
-          interval_seconds: LOG_INTERVAL_SECONDS,
-          level: level === "all" ? undefined : level,
-        },
-        signal,
-      );
-
+  const data = await streamInstanceLogs(instanceId, { tailLines: LOG_LIMIT, follow: true }, signal);
   onConnected();
-  return readLogStream(data, signal, appendLog, textChunks);
+  return readLogStream(data, signal, appendLog);
 }
 
-export default function InstanceLogs({ instanceId, active, instanceKind }: InstanceLogsProps) {
-  const [level, setLevel] = useState<LevelFilter>("all");
-  // FIXME(governance-instance-logs): 新接口只返回 text，级别筛选依赖原结构化日志，保留入口和旧调用。
-  // TODO(governance-instance-logs): 待结构化日志与级别筛选对齐后迁移，文本块不可补造时间/级别或去重。
-  const textChunks =
-    (instanceKind === "container" || instanceKind === "gpu_container") && level === "all";
+export default function InstanceLogs({ instanceId, active }: InstanceLogsProps) {
+  // TODO(instance-detail-migration): 云主机、沙箱日志契约和实例 ID 对齐并联调验证后，在调用方传入 ID，再移除对应标记。
+  // FIXME(governance-instance-logs): 当前协议只返回 text，级别筛选暂不可用。
+  // TODO(governance-instance-logs): 结构化日志与级别筛选契约对齐并验证后启用；文本块不补造时间/级别，不去重。
   const [reconnectVersion, setReconnectVersion] = useState(0);
-  const [logs, setLogs] = useState<InstanceLog[]>([]);
+  const [logs, setLogs] = useState<string[]>([]);
   const [streamStatus, setStreamStatus] = useState<StreamStatus>("idle");
   const outputRef = useRef<HTMLDivElement | null>(null);
   const shouldAutoScrollRef = useRef(true);
-  const knownLogsRef = useRef(new Set<string>());
   useEffect(() => {
     const output = outputRef.current;
-    if (!output || !shouldAutoScrollRef.current) return;
-    output.scrollTop = output.scrollHeight;
+    if (output && shouldAutoScrollRef.current) output.scrollTop = output.scrollHeight;
   }, [logs]);
-
   useEffect(() => {
-    if (!active) {
+    if (!active || !instanceId) {
       setStreamStatus("idle");
+      if (!instanceId) setLogs([]);
       return;
     }
-
+    const id = instanceId;
     let cancelled = false;
     const controller = new AbortController();
-    knownLogsRef.current.clear();
     setLogs([]);
-
-    const appendLog = (log: InstanceLog) => {
-      if (cancelled) return;
-      if (!textChunks) {
-        const identity = logIdentity(log);
-        if (knownLogsRef.current.has(identity)) return;
-        knownLogsRef.current.add(identity);
-      }
-      setLogs((current) => [...current, log]);
+    const appendLog = (text: string) => {
+      if (!cancelled) setLogs((current) => [...current, text]);
     };
-
     async function connect() {
-      closeNotification(withId("instance-logs", instanceId));
+      closeNotification(withId("instance-logs", id));
       while (!cancelled && !controller.signal.aborted) {
         setStreamStatus("connecting");
         try {
           const result = await connectLogStream({
-            instanceId,
-            level,
-            textChunks,
+            instanceId: id,
             signal: controller.signal,
             appendLog,
             onConnected: () => {
               if (!cancelled) {
-                closeNotification(withId("instance-logs", instanceId));
+                closeNotification(withId("instance-logs", id));
                 setStreamStatus("connected");
               }
             },
@@ -211,57 +132,57 @@ export default function InstanceLogs({ instanceId, active, instanceKind }: Insta
             return;
           }
           await new Promise((resolve) => setTimeout(resolve, TIMEOUT_RECONNECT_DELAY_MS));
-        } catch (nextError) {
+        } catch (error) {
           if (!cancelled && !controller.signal.aborted) {
             setStreamStatus("idle");
             showNotification({
-              id: withId("instance-logs", instanceId),
+              id: withId("instance-logs", id),
               state: "error",
               action: "日志流连接",
-              content: { error: nextError, fallback: "日志流连接失败" },
+              content: { error, fallback: "日志流连接失败" },
             });
           }
           return;
         }
       }
     }
-
     connect();
     return () => {
       cancelled = true;
       controller.abort();
     };
-  }, [active, instanceId, level, reconnectVersion, textChunks]);
-
+  }, [active, instanceId, reconnectVersion]);
   const handleScroll = () => {
     const output = outputRef.current;
-    if (!output) return;
-    const distanceToBottom = output.scrollHeight - output.scrollTop - output.clientHeight;
-    shouldAutoScrollRef.current = distanceToBottom <= AUTO_SCROLL_THRESHOLD_PX;
+    if (output)
+      shouldAutoScrollRef.current =
+        output.scrollHeight - output.scrollTop - output.clientHeight <= AUTO_SCROLL_THRESHOLD_PX;
   };
-
   if (!active) return <Empty description="打开日志 Tab 后连接日志流" />;
-
   return (
     <div className="flex flex-col gap-3 h-full">
       <Space>
         <Typography.Text type="secondary">级别过滤</Typography.Text>
-        <Select value={level} onChange={setLevel} style={{ width: 140 }}>
+        <Select value="all" style={{ width: 140 }}>
           {LEVEL_OPTIONS.map((item) => (
-            <Select.Option key={item.value} value={item.value}>
+            <Select.Option key={item.value} value={item.value} disabled={item.value !== "all"}>
               {item.label}
             </Select.Option>
           ))}
         </Select>
         <Button
+          disabled={!instanceId}
           loading={streamStatus === "connecting"}
           onClick={() => setReconnectVersion((version) => version + 1)}
         >
           重新连接
         </Button>
         <Typography.Text type="secondary">
-          {streamStatus === "connected" ? "日志流已连接" : null}
-          {streamStatus === "connecting" ? "正在连接日志流…" : null}
+          {streamStatus === "connected"
+            ? "日志流已连接"
+            : streamStatus === "connecting"
+              ? "正在连接日志流…"
+              : null}
         </Typography.Text>
       </Space>
       <div
@@ -279,7 +200,7 @@ export default function InstanceLogs({ instanceId, active, instanceKind }: Insta
           </div>
         ) : (
           <pre className="m-0 whitespace-pre-wrap wrap-break-word p-3 font-mono text-xs leading-5 text-[#f7f8fa]">
-            {logs.map(formatLog).join(textChunks ? "" : "\n")}
+            {logs.join("")}
           </pre>
         )}
       </div>

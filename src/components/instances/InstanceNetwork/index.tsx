@@ -1,44 +1,49 @@
-// FIXME(governance-migration): Pod IP 已接新 runtime，私网 IP、VPC/子网及访问地址仍保留原字段和旧调用。
-// TODO(governance-migration): 等网络关联契约齐备后迁移，沙箱、虚拟机等继续原数据及调用。
-import { type InstanceRecord } from "@/api/instances/legacy";
-import type { InstanceRuntime } from "@/api/instances";
-import { DataTable } from "@/components/common";
-import { getInstanceDisplayIp, getInstanceNetworkValue } from "@/lib/instances";
+// TODO(instance-detail-migration): 云主机、沙箱先统一使用实例公共组件；对应字段、契约及运行时联调验证完成后移除此标记。
+import { DataTable, StatusBadge } from "@/components/common";
+import type { InstanceConfigurationData, InstanceRuntime } from "@/api/instances";
+import type { ReactNode } from "react";
 
 type InstanceNetworkProps = {
-  instance?: InstanceRecord;
+  configuration?: InstanceConfigurationData;
+  networkState?: string;
+  networkReason?: string;
   runtime?: InstanceRuntime;
   loading?: boolean;
 };
 
-type NetworkRow = {
-  type: string;
-  name: string;
-};
-
 export default function InstanceNetwork({
-  instance,
+  configuration,
+  networkState,
+  networkReason,
   runtime,
   loading = false,
 }: InstanceNetworkProps) {
-  const rows: NetworkRow[] = [
-    ...(runtime ? [{ type: "Pod IP", name: runtime.pod?.podIp ?? "-" }] : []),
-    { type: "VPC", name: getInstanceNetworkValue(instance, "vpc_id") },
-    { type: "子网", name: getInstanceNetworkValue(instance, "subnet_id") },
-    { type: "私网 IP", name: getInstanceDisplayIp(instance) || "-" },
-    { type: "访问地址", name: instance?.endpoint ?? "-" },
+  const rows: Array<{ name: string; value: ReactNode }> = [
+    {
+      name: "网络状态",
+      value: (
+        <StatusBadge status={networkState} reason={networkReason}>
+          {networkState === "not_requested" ? "未配置" : undefined}
+        </StatusBadge>
+      ),
+    },
+    { name: "VPC", value: configuration?.network?.vpc_id ?? "-" },
+    { name: "子网", value: configuration?.network?.subnet_id ?? "-" },
+    { name: "Pod IP", value: runtime?.pod?.podIp ?? "-" },
+    // FIXME(instance-network-address): Pod IP 不等价于私网 IP 或访问地址；当前契约没有返回这两个字段。
+    // TODO(instance-network-address): 保留字段位置，待 Governance 开放等价数据后接入。
+    { name: "私网 IP", value: "-" },
+    { name: "访问地址", value: "-" },
   ];
-
   return (
-    <DataTable<NetworkRow>
+    <DataTable
       data={rows}
-      loading={loading && !runtime}
-      rowKey="type"
+      loading={loading}
+      rowKey="name"
       pagination={false}
-      tableLabel="实例网络信息"
       columns={[
-        { title: "类型", dataIndex: "type", width: 160 },
-        { title: "名称", dataIndex: "name", ellipsis: true },
+        { title: "类型", dataIndex: "name", width: 160 },
+        { title: "名称", dataIndex: "value" },
       ]}
     />
   );

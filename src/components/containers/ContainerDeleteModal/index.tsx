@@ -33,12 +33,10 @@ export default function ContainerDeleteModal({
     onSuccess: async () => {
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-        qc.invalidateQueries({ queryKey: ["legacy-instances"] }),
         qc.invalidateQueries({
           queryKey: ["governance-instance", instance.id],
           refetchType: "none",
         }),
-        qc.invalidateQueries({ queryKey: ["legacy-instance", instance.id], refetchType: "none" }),
       ]);
       onSubmitted();
     },

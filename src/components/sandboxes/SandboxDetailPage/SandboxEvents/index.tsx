@@ -43,7 +43,10 @@ export default function SandboxEvents({ instanceId }: SandboxEventsProps) {
       </div>
       <div className="mt-4" role="tabpanel">
         {activeTab === "all" ? (
-          <InstanceEvents instanceId={instanceId} />
+          <>
+            {/* TODO(sandbox-instance-events): 普通事件已迁移公共组件；Governance 沙箱事件及实例 ID 对齐并联调后传入 ID，再移除此标记。 */}
+            <InstanceEvents />
+          </>
         ) : (
           <SandboxSecurityEvents instanceId={instanceId} />
         )}

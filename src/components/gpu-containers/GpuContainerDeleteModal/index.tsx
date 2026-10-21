@@ -1,10 +1,10 @@
 import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { getInstance, deleteInstance } from "@/api/instances";
+import { deleteInstance, type InstanceRecord } from "@/api/instances";
 import { withId } from "@/lib/id";
 
 type GpuContainerDeleteModalProps = {
-  instance: { id: string; name: string; version?: string };
+  instance: Pick<InstanceRecord, "id" | "name" | "version">;
   onCancel: () => void;
   onSubmitted: () => void;
 };
@@ -16,10 +16,7 @@ export default function GpuContainerDeleteModal({
 }: GpuContainerDeleteModalProps) {
   const qc = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async () => {
-      const version = instance.version ?? (await getInstance(instance.id)).version;
-      return deleteInstance(instance.id, { expected_version: version });
-    },
+    mutationFn: () => deleteInstance(instance.id, { expected_version: instance.version }),
     meta: {
       feedback: {
         channel: "notification",
@@ -29,16 +26,15 @@ export default function GpuContainerDeleteModal({
         errorFallback: "删除失败，请刷新后重试",
       },
     },
+    // TODO(gpu-container-delete): 联调验证删除受理、最终 GPU 释放与退额、工作空间清理和用户卷保留。
     // TODO(container-task): 删除任务跟踪后续统一接入，当前仅提交请求并提示。
     onSuccess: async () => {
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-        qc.invalidateQueries({ queryKey: ["legacy-instances"] }),
         qc.invalidateQueries({
           queryKey: ["governance-instance", instance.id],
           refetchType: "none",
         }),
-        qc.invalidateQueries({ queryKey: ["legacy-instance", instance.id], refetchType: "none" }),
       ]);
       onSubmitted();
     },
@@ -54,7 +50,7 @@ export default function GpuContainerDeleteModal({
         if (!mutation.isPending) onCancel();
       }}
     >
-      确认删除“{instance.name}”？实例及工作空间数据将被清理，无法恢复。
+      确认删除“{instance.name}”？实例及工作空间数据将被清理，无法恢复。已挂载的用户存储卷会保留。
     </Modal>
   );
 }

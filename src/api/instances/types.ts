@@ -42,6 +42,10 @@ export interface InstanceRecord {
   computeCleaned?: boolean;
   workspaceCleaned?: boolean;
   quotaReturned?: boolean;
+  networkState?: string;
+  networkReason?: string;
+  networkCleaned?: boolean;
+  volumeReferencesReleased?: boolean;
 }
 export interface InstanceListParams extends PageParams {
   instance_kind?: "container";
@@ -77,7 +81,7 @@ export interface InstancePresetListParams extends PageParams {
 export interface InstancePresetListResponse {
   items: InstancePreset[];
   total: string;
-  gpu_catalog_status: string;
+  gpu_catalog_status: "OK" | "NO_PERMISSION" | "UNAVAILABLE";
   gpu_catalog_reason?: string;
 }
 export interface CreateInstanceInput {
@@ -86,6 +90,87 @@ export interface CreateInstanceInput {
   image_scope: "tenant" | "platform";
   preset_id: string;
   scheduling?: SchedulingOptions;
+  workspace_mount_path?: string;
+  volume_mounts?: InstanceVolumeMount[];
+  network?: InstanceNetworkSelection;
+  labels?: Record<string, string>;
+  annotations?: Record<string, string>;
+  env?: InstanceEnvVar[];
+}
+export interface InstanceVolumeMount {
+  pvc_name: string;
+  mount_path: string;
+  read_only: boolean;
+}
+export interface InstanceNetworkSelection {
+  vpc_id: string;
+  subnet_id: string;
+}
+export interface InstanceEnvVar {
+  name: string;
+  value: string;
+}
+export interface InstanceConfigurationData {
+  instance_id: string;
+  instance_contract_version: number;
+  workspace_mount_path: string;
+  volume_mounts: InstanceVolumeMount[];
+  network: InstanceNetworkSelection | null;
+  labels: Record<string, string>;
+  annotations: Record<string, string>;
+  env: InstanceEnvVar[];
+}
+export type InstanceMetricCode = "cpu.usage_cores" | "memory.working_set_bytes";
+export interface InstanceMetricsInput {
+  metric_codes: InstanceMetricCode[];
+  start: string;
+  end: string;
+  step_seconds?: number;
+}
+export interface InstanceMetricsRequest {
+  data: InstanceMetricsInput;
+}
+export interface InstanceMetricSeries {
+  metric_code: InstanceMetricCode;
+  unit: "cores" | "bytes";
+  status: "OK" | "PARTIAL" | "NO_DATA";
+  points: Array<{
+    timestamp: string;
+    value: number | null;
+    gap_reason?: "NO_DATA" | "AMBIGUOUS_SOURCE" | "INVALID_VALUE";
+  }>;
+}
+export interface InstanceMetricsRangeResponse {
+  data: {
+    instance_id: string;
+    start: string;
+    end: string;
+    step_seconds: number;
+    series: InstanceMetricSeries[];
+  };
+}
+export interface InstanceMetricsLatestResponse {
+  data: {
+    instance_id: string;
+    evaluated_at: string;
+    series: InstanceMetricSeries[];
+  };
+}
+export interface MountablePvc {
+  pvc_name: string;
+  phase: string;
+  requested_capacity: string;
+  access_modes: string[];
+  volume_mode: string;
+  selectable: boolean;
+  unavailable_reason?: string;
+}
+export interface MountablePvcListParams extends PageParams {
+  name?: string;
+}
+export interface MountablePvcListResponse {
+  items: MountablePvc[];
+  total: string;
 }
 export type CreateInstanceRequest = { data: CreateInstanceInput & { idempotency_key: string } };
 export interface ChangeInstanceInput {

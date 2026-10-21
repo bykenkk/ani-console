@@ -33,13 +33,11 @@ export default function ContainerStopModal({
     onSuccess: async () => {
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-        qc.invalidateQueries({ queryKey: ["legacy-instances"] }),
         qc.invalidateQueries({ queryKey: ["governance-instance-runtime", instance.id] }),
         qc.invalidateQueries({
           queryKey: ["governance-instance", instance.id],
           refetchType: "active",
         }),
-        qc.invalidateQueries({ queryKey: ["legacy-instance", instance.id], refetchType: "active" }),
       ]);
       onSubmitted();
     },
