@@ -1,7 +1,6 @@
-// FIXME(modeldev-integration): 补充说明使用 /admin/v1、page_size/page_token、presets/input_versions；当前 governance 实现使用 /api/v1、limit/cursor、items/total。
-// TODO(modeldev-integration): 请后端统一部署契约与交接文档后再调整此模块；不得仅按旧说明切换路径或混用响应字段。
+// TODO(modeldev-integration): 当前 Governance 已采用 /api/v1、page/pageSize、items/total；联调核对预设、READY 筛选和空页，并同步旧交接说明。
 import { coreRequest } from "@/api/request";
-import type { CursorPageParams } from "@/api/types";
+import type { PageParams } from "@/api/types";
 import type {
   ModelDevPresetListResponse,
   ModelDevInputVersionListParams,
@@ -10,7 +9,7 @@ import type {
 } from "./types";
 
 export function listModelDevPresets(
-  params: CursorPageParams = {},
+  params: PageParams = {},
   signal?: AbortSignal,
 ): Promise<ModelDevPresetListResponse> {
   return coreRequest<ModelDevPresetListResponse>("/modeldev/presets", {

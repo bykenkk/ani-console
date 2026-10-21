@@ -20,7 +20,7 @@ export default function KnowledgeModelSelect({
   onChange,
   required = false,
 }: KnowledgeModelSelectProps) {
-  // FIXME(inference-contract): 目标推理路由待确认，用户同意保留原分支调用。
+  // FIXME(inference-contract): 当前推理调用对应的目标路由仍待确认。
   // TODO(inference-contract): 路由恢复后验证 capability/status 筛选及可调用模型选项。
   const models = useQuery({
     queryKey: ["governance-inference-services", "options", capability, "running"],

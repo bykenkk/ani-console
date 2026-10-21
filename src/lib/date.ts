@@ -58,6 +58,10 @@ export function isDateTimeExpired(value?: string | null): boolean {
   return isValid(date) && isPast(date);
 }
 
+export function getCurrentIsoDateTime(): string {
+  return formatISO(constructNow(undefined));
+}
+
 export function getCurrentTimestamp(): number {
   return getTime(constructNow(undefined));
 }

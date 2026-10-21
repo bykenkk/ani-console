@@ -27,7 +27,7 @@ export default function CreateVectorStoreModal({
   const [embeddingModel, setEmbeddingModel] = useState("");
   const [dimension, setDimension] = useState(1536);
   const [metric, setMetric] = useState<VectorMetric>("cosine");
-  // FIXME(inference-contract): 目标推理路由待确认，用户同意保留原分支调用。
+  // FIXME(inference-contract): 当前推理调用对应的目标路由仍待确认。
   // TODO(inference-contract): 路由恢复后验证 capability/status 筛选及可调用模型选项。
   const models = useQuery({
     meta: {

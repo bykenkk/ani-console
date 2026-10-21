@@ -1,4 +1,4 @@
-import type { PageParams } from "@/api/types";
+import type { CursorPageParams, PageParams } from "@/api/types";
 
 export interface ModelVersion {
   id: string;
@@ -35,22 +35,25 @@ export interface Model {
   model_id?: string;
   versions?: ModelVersion[];
 }
-// FIXME(model-contract): 当前索引为游标分页；用户确认本次保留原分支页码契约。
-// TODO(model-contract): 目标版本确认后核对分页与响应类型并联调。
-export type ModelPageParams = PageParams;
+// TODO(pagination-migration): 当前模型列表与版本列表采用 page.limit/page.cursor、models/versions 与 meta；后端提供正式页码契约后再迁移 PageParams。
+export type ModelPageParams = CursorPageParams;
 export interface ModelListParams extends ModelPageParams {
   keyword?: string;
   source?: string;
   capability?: string;
   status?: string;
 }
+export interface ModelCursorMeta {
+  next_cursor?: string;
+  has_more?: boolean;
+}
 export interface ModelListResponse {
-  items: Model[];
-  total: number | string;
+  models: Model[];
+  meta?: ModelCursorMeta;
 }
 export interface ModelVersionListResponse {
-  items: ModelVersion[];
-  total: number | string;
+  versions: ModelVersion[];
+  meta?: ModelCursorMeta;
 }
 export interface ModelVersionResponse {
   model: Model;

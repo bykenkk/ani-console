@@ -1,8 +1,8 @@
-// TODO(pagination-migration): 已通过公共 Hook 原样回传 next_cursor；后端提供 page/pageSize 后移除临时游标分页兼容。
 import { Button } from "@arco-design/web-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { listModelDevExecutionArtifacts, type ModelDevArtifact } from "@/api/modeldev";
 import { DataTable } from "@/components/common";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useListPagination } from "@/hooks/useListPagination";
 import { withId } from "@/lib/id";
 import { formatDateTime } from "@/lib/date";
 import TrainingArtifactDownload from "./TrainingArtifactDownload";
@@ -10,15 +10,34 @@ import TrainingArtifactDownload from "./TrainingArtifactDownload";
 type TrainingTaskArtifactsProps = { executionId: string };
 
 export default function TrainingTaskArtifacts({ executionId }: TrainingTaskArtifactsProps) {
-  const { query, pagination, refresh } = useCursorPaginatedQuery({
-    queryKey: ["training-artifacts", executionId],
-    errorNotification: {
-      id: withId("training-artifacts", executionId),
-      action: "训练产物加载",
-      fallback: "请稍后重试",
+  const qc = useQueryClient();
+  const paging = useListPagination(executionId, 10);
+  const { page, pageSize } = paging;
+  const query = useQuery({
+    queryKey: ["training-artifacts", executionId, { page, pageSize }],
+    queryFn: ({ signal }) =>
+      listModelDevExecutionArtifacts(executionId, { page, pageSize }, signal),
+    meta: {
+      errorNotification: {
+        id: withId("training-artifacts", executionId),
+        action: "训练产物加载",
+        fallback: "请稍后重试",
+      },
     },
-    queryFn: (params, signal) => listModelDevExecutionArtifacts(executionId, params, signal),
   });
+  const refresh = () => {
+    paging.resetPagination();
+    qc.invalidateQueries({ queryKey: ["training-artifacts", executionId] });
+  };
+  const pagination = {
+    mode: "total" as const,
+    page,
+    pageSize,
+    total: Number(query.data?.total ?? 0),
+    disabled: query.isFetching,
+    onPageChange: paging.setPage,
+    onPageSizeChange: paging.setPageSize,
+  };
   return (
     <>
       <Button className="mb-4" loading={query.isFetching} onClick={refresh}>

@@ -64,7 +64,7 @@ export default function CreateInferenceModal({
       const latest = await getModelVersion(input.model_version_id);
       if (latest.version.status.toLowerCase() !== "ready")
         throw new Error("模型版本尚未就绪，请重新选择");
-      // FIXME(inference-contract): 用户确认保留原分支提交契约；推理管理路由尚待后端恢复。
+      // FIXME(inference-contract): 当前提交契约仍待与目标版本对齐，推理管理路由尚待后端恢复。
       // TODO(inference-model-config): 目标版本就绪后联调模型参数预填、用户修改及切换版本；提交采用用户确认的表单值，不以最新模型配置覆盖。
       return createInferenceService(input);
     },

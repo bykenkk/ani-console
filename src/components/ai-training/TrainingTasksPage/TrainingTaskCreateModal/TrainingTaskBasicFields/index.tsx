@@ -1,5 +1,4 @@
-// FIXME(modeldev-integration): 预设和 READY 数据集只查询第一页，返回 next_cursor 时后续候选不可选择。
-// TODO(modeldev-integration): 契约统一后为两个下拉接入按需分页，不通过一次性拉取全部候选规避分页。
+import { withFirst100 } from "@/api/pagination";
 import { useQuery } from "@tanstack/react-query";
 import { Card, Form, Input, Select } from "@arco-design/web-react";
 import {
@@ -8,6 +7,9 @@ import {
   type ModelDevPreset,
   type ModelDevInputVersion,
 } from "@/api/modeldev";
+
+const listPresetOptions = withFirst100(listModelDevPresets);
+const listDatasetOptions = withFirst100(listModelDevInputVersions);
 
 type TrainingTaskBasicFieldsProps = {
   preset?: ModelDevPreset;
@@ -23,15 +25,15 @@ export default function TrainingTaskBasicFields({
   onDatasetChange,
 }: TrainingTaskBasicFieldsProps) {
   const presets = useQuery({
-    queryKey: ["training-presets"],
-    queryFn: ({ signal }) => listModelDevPresets({}, signal),
+    queryKey: ["training-presets", "options"],
+    queryFn: ({ signal }) => listPresetOptions({}, signal),
     meta: {
       errorNotification: { id: "training-presets", action: "训练预设加载", fallback: "请稍后重试" },
     },
   });
   const datasets = useQuery({
-    queryKey: ["training-inputs"],
-    queryFn: ({ signal }) => listModelDevInputVersions({ state: "READY" }, signal),
+    queryKey: ["training-inputs", "options", { state: "READY" }],
+    queryFn: ({ signal }) => listDatasetOptions({ state: "READY" }, signal),
     meta: {
       errorNotification: {
         id: "training-inputs",
@@ -41,7 +43,7 @@ export default function TrainingTaskBasicFields({
     },
   });
   const presetOptions = presets.data?.items ?? [];
-  const datasetOptions = (datasets.data?.items ?? []).filter((item) => item.state === "READY");
+  const datasetOptions = datasets.data?.items ?? [];
   return (
     <Card bordered={false}>
       <Form.Item
@@ -58,6 +60,7 @@ export default function TrainingTaskBasicFields({
       >
         <Select
           placeholder="请选择训练预设"
+          filterOption={false}
           loading={presets.isFetching}
           options={[
             ...(preset && !presetOptions.some((p) => p.preset_id === preset.preset_id)
@@ -85,6 +88,7 @@ export default function TrainingTaskBasicFields({
       >
         <Select
           placeholder="请选择已就绪的数据集"
+          filterOption={false}
           loading={datasets.isFetching}
           options={[
             ...(dataset &&

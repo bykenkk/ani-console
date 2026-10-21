@@ -9,7 +9,7 @@ import type { RowAction } from "@/components/common";
 export function useModelActions(onDeleted?: () => void) {
   const qc = useQueryClient();
   const [deployModel, setDeployModel] = useState<Model | null>(null);
-  // FIXME(model-contract): 用户确认保留原分支删除契约及反馈，目标版本的删除完成语义待核对。
+  // FIXME(model-contract): 当前删除契约及反馈尚待与目标版本的删除完成语义核对。
   // TODO(model-contract): 确认同步/异步语义后复核反馈和删除后列表、详情刷新。
   const remove = useMutation({
     mutationFn: (item: Model) => deleteModel(item.id),

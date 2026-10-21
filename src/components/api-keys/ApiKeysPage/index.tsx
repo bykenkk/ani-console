@@ -9,10 +9,10 @@ import {
 import { ListDataTable, ListPageFrame, type ListColumn } from "@/components/common";
 import { ApiKeyCredentialsModal } from "@/components/api-keys/ApiKeyCredentialsModal";
 import { CreateApiKeyModal } from "@/components/api-keys/CreateApiKeyModal";
-import { formatDateTime, isDateTimeExpired } from "@/lib/date";
+import { formatDateTime, isDateTimeExpired, getCurrentIsoDateTime } from "@/lib/date";
 import { Modal, Select, Tag } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 type StatusFilter = "all" | "active" | "disabled";
 type ExpirationFilter = "all" | "never" | "valid" | "expired";
@@ -20,6 +20,26 @@ type SearchField = "name" | "access_key";
 
 function isExpired(item: ApiKeyRecord): boolean {
   return Boolean(item.expires_at && isDateTimeExpired(item.expires_at));
+}
+
+function buildApiKeyFilter(
+  status: StatusFilter,
+  expiration: ExpirationFilter,
+  field: SearchField,
+  keyword: string,
+  now: string,
+) {
+  const conditions: string[] = [];
+  const timestamp = JSON.stringify(now);
+  if (status === "active")
+    conditions.push('status = "ON"', "(isNull(expires_at) OR expires_at >= " + timestamp + ")");
+  if (status === "disabled") conditions.push('status = "OFF"');
+  if (expiration === "never") conditions.push("isNull(expires_at)");
+  if (expiration === "valid") conditions.push("expires_at >= " + timestamp);
+  if (expiration === "expired") conditions.push("expires_at < " + timestamp);
+  if (keyword.trim())
+    conditions.push("contains(" + field + ", " + JSON.stringify(keyword.trim()) + ")");
+  return conditions.length ? conditions.join(" AND ") : undefined;
 }
 
 export function ApiKeysPage() {
@@ -32,6 +52,8 @@ export function ApiKeysPage() {
   const [searchText, setSearchText] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  const [filterTime, setFilterTime] = useState(getCurrentIsoDateTime);
+  const filter = buildApiKeyFilter(status, expiration, searchField, searchText, filterTime);
   const apiKeys = useQuery({
     meta: {
       errorNotification: {
@@ -40,9 +62,9 @@ export function ApiKeysPage() {
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["api-keys", { page, pageSize }],
+    queryKey: ["api-keys", { page, pageSize, filter }],
     queryFn: async ({ signal }) => {
-      const data = await listApiKeys({ page, pageSize }, signal);
+      const data = await listApiKeys({ page, pageSize, filter }, signal);
       return { ...data, total: Number(data.total) };
     },
   });
@@ -90,22 +112,7 @@ export function ApiKeysPage() {
     },
   });
 
-  // FIXME(api-key-filters): 分页已走后端 page/pageSize；原状态、有效期和关键字筛选目前仅作用于当前页，不能代表全量筛选。
-  // TODO(api-key-filters): 核对并接入后端筛选表达式后迁移原筛选；保留入口，不遍历分页凑全量。
-  const filteredItems = useMemo(() => {
-    const keyword = searchText.trim().toLowerCase();
-    return (apiKeys.data?.items ?? []).filter((item) => {
-      const expired = isExpired(item);
-      if (status === "active" && (!item.is_active || expired)) return false;
-      if (status === "disabled" && item.is_active) return false;
-      if (expiration === "never" && item.expires_at) return false;
-      if (expiration === "valid" && (!item.expires_at || expired)) return false;
-      if (expiration === "expired" && !expired) return false;
-      if (!keyword) return true;
-      const candidate = searchField === "name" ? item.name : item.access_key;
-      return candidate.toLowerCase().includes(keyword);
-    });
-  }, [apiKeys.data?.items, expiration, searchField, searchText, status]);
+  // TODO(api-key-filters): 联调状态、过期时间与关键词的组合筛选、空结果及真实总数；筛选由后端执行。
   const columns: Array<ListColumn<ApiKeyRecord>> = [
     {
       key: "name",
@@ -155,7 +162,10 @@ export function ApiKeysPage() {
     },
   ];
 
-  const resetPage = () => setPage(1);
+  const resetPage = () => {
+    setPage(1);
+    setFilterTime(getCurrentIsoDateTime());
+  };
   const handleStatusChange = (nextStatus: StatusFilter) => {
     setStatus(nextStatus);
     resetPage();
@@ -225,12 +235,17 @@ export function ApiKeysPage() {
           refresh: {
             label: "刷新",
             spinning: apiKeys.isFetching,
-            onClick: () => apiKeys.refetch(),
+            onClick: () => {
+              const now = getCurrentIsoDateTime();
+              if (buildApiKeyFilter(status, expiration, searchField, searchText, now) === filter)
+                apiKeys.refetch();
+              else setFilterTime(now);
+            },
           },
         }}
       >
         <ListDataTable
-          data={filteredItems}
+          data={apiKeys.data?.items ?? []}
           columns={columns}
           rowActions={[
             {

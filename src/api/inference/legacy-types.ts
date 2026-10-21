@@ -1,4 +1,4 @@
-// FIXME(governance-migration): 旧 ANI Services 响应类型，仅供 legacy.ts 及其存量调用方使用。
+// 旧 ANI Services 响应类型，仅供 legacy.ts 及其存量调用方使用。
 // TODO(governance-migration): 随旧调用方迁移移除；不要把 status/generation/items 强转为新 phase/int64/services 契约。
 import type { CursorPageParams } from "@/api/types";
 

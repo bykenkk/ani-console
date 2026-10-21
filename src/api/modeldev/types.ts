@@ -1,4 +1,4 @@
-import type { CursorPageParams } from "@/api/types";
+import type { PageParams } from "@/api/types";
 
 export interface ModelDevParameter {
   name: string;
@@ -27,7 +27,6 @@ export interface ModelDevPreset {
 export interface ModelDevPresetListResponse {
   items: ModelDevPreset[];
   total: string;
-  next_cursor?: string | null;
 }
 export interface ModelDevInputVersion {
   input_version_id: string;
@@ -39,14 +38,12 @@ export interface ModelDevInputVersion {
   feature_count?: number;
   created_at?: string;
 }
-// TODO(pagination-migration): governance 输入版本列表仍使用 limit/cursor，待后端分页及交接契约统一后迁移 PageParams。
-export interface ModelDevInputVersionListParams extends CursorPageParams {
+export interface ModelDevInputVersionListParams extends PageParams {
   state?: string;
 }
 export interface ModelDevInputVersionListResponse {
   items: ModelDevInputVersion[];
   total: string;
-  next_cursor?: string | null;
 }
 export interface CreateModelDevExecutionInput {
   name: string;
@@ -94,7 +91,6 @@ export interface ModelDevExecution extends ModelDevExecutionStates {
 export interface ModelDevExecutionListResponse {
   items: ModelDevExecution[];
   total: string;
-  next_cursor?: string | null;
 }
 export interface ModelDevStopAcceptance {
   operation_id: string;
@@ -126,7 +122,6 @@ export interface ModelDevArtifact {
 export interface ModelDevArtifactListResponse {
   items: ModelDevArtifact[];
   total: string;
-  next_cursor?: string | null;
 }
 export interface ModelDevArtifactDownload {
   artifact: ModelDevArtifact;

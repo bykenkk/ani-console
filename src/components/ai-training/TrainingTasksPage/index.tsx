@@ -1,23 +1,41 @@
-// TODO(pagination-migration): 已通过公共 Hook 原样回传 next_cursor；后端提供 page/pageSize 后移除临时游标分页兼容。
 import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { listModelDevExecutions, type ModelDevExecution } from "@/api/modeldev";
 import { ListDataTable, ListPageFrame } from "@/components/common";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import { useListPagination } from "@/hooks/useListPagination";
 import { useTrainingTaskActions } from "@/hooks/useTrainingTaskActions";
 import { taskColumns } from "./task-config";
 import TrainingTaskCreateModal from "./TrainingTaskCreateModal";
 
 export default function TrainingTasksPage() {
   const [createVisible, setCreateVisible] = useState(false);
-  const { query, pagination, refresh } = useCursorPaginatedQuery({
-    queryKey: ["training-executions"],
-    errorNotification: {
-      id: "training-executions",
-      action: "训练任务加载",
-      fallback: "请稍后重试",
+  const qc = useQueryClient();
+  const paging = useListPagination("training-executions", 10);
+  const { page, pageSize } = paging;
+  const query = useQuery({
+    queryKey: ["training-executions", { page, pageSize }],
+    queryFn: ({ signal }) => listModelDevExecutions({ page, pageSize }, signal),
+    meta: {
+      errorNotification: {
+        id: "training-executions",
+        action: "训练任务加载",
+        fallback: "请稍后重试",
+      },
     },
-    queryFn: listModelDevExecutions,
   });
+  const refresh = () => {
+    paging.resetPagination();
+    qc.invalidateQueries({ queryKey: ["training-executions"] });
+  };
+  const pagination = {
+    mode: "total" as const,
+    page,
+    pageSize,
+    total: Number(query.data?.total ?? 0),
+    disabled: query.isFetching,
+    onPageChange: paging.setPage,
+    onPageSizeChange: paging.setPageSize,
+  };
   const actions = useTrainingTaskActions();
   return (
     <>

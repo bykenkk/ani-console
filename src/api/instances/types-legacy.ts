@@ -1,4 +1,4 @@
-// FIXME(governance-migration): 完整保留原实例类型，含 kind、网络、存储、发布和沙箱字段，不与新契约混用。
+// 完整保留原实例类型，含 kind、网络、存储、发布和沙箱字段，不与新契约混用。
 // TODO(governance-migration): 按能力逐项对齐后再移除旧字段，VM/沙箱等未迁移功能仍依赖这些类型。
 import type { CoreDevProfileInfo, CursorPageParams } from "@/api/types";
 

@@ -1,10 +1,9 @@
 import { useModelActions } from "@/hooks/useModelActions";
 
 import { Select, Space, Tag } from "@arco-design/web-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { listModels, type ModelCapability } from "@/api/models";
-import type { ListPagination } from "@/components/common/DataTable";
 
 import ImportModelModal from "./ImportModelModal";
 import {
@@ -31,7 +30,6 @@ function getApiStatus(status: StatusFilter) {
 }
 
 export default function ModelsPage() {
-  const qc = useQueryClient();
   const [importVisible, setImportVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [searchField, setSearchField] = useState<SearchField>("name");
@@ -44,45 +42,22 @@ export default function ModelsPage() {
     capability: capability === "all" ? undefined : capability,
     status: getApiStatus(status),
   };
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  useEffect(
-    () => setPage(1),
-    [filters.capability, filters.keyword, filters.source, filters.status],
-  );
-  const params = { ...filters, page, pageSize };
-  const models = useQuery({
-    queryKey: ["governance-models", params],
-    queryFn: ({ signal }) => listModels(params, signal),
-    meta: {
-      errorNotification: {
-        id: "models",
-        action: "模型列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
+  // TODO(pagination-migration): 当前后端仅提供游标分页；页码契约开放后改用 useListPagination。
+  const {
+    query: models,
+    items,
+    pagination,
+    refresh,
+    resetPagination,
+  } = useCursorPaginatedQuery({
+    queryKey: ["governance-models", filters],
+    queryFn: async (params, signal) => {
+      const response = await listModels({ ...filters, ...params }, signal);
+      return { items: response.models ?? [], next_cursor: response.meta?.next_cursor };
     },
+    errorNotification: { id: "models", action: "模型列表加载", fallback: "请求失败，请稍后重试" },
   });
-  const items = models.data?.items ?? [];
-  const total = Number(models.data?.total ?? 0);
-  // FIXME(api-contract): 用户确认保留原推理分支页码分页，尚未与当前后端索引对齐。
-  // TODO(api-contract): 对应后端版本就绪后联调列表、筛选及 total，不回退旧分页。
-  const pagination: ListPagination = {
-    mode: "total",
-    page,
-    pageSize,
-    disabled: models.isFetching,
-    total,
-    onPageChange: setPage,
-    onPageSizeChange: (size) => {
-      setPageSize(size);
-      setPage(1);
-    },
-  };
-  const refresh = () => {
-    qc.invalidateQueries({ queryKey: ["governance-models"] });
-    setPage(1);
-  };
-  const { actions, dialogNode } = useModelActions(() => setPage(1));
+  const { actions, dialogNode } = useModelActions(resetPagination);
 
   const columns: Array<ListColumn<Model>> = [
     {

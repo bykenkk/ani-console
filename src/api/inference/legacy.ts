@@ -1,4 +1,4 @@
-// FIXME(governance-migration): 以下仍为 ANI Services 的 /api/v1/svc/inference-services 契约。
+// 以下仍为 ANI Services 的 /api/v1/svc/inference-services 契约。
 // 待逐项确认 governance 的等价能力后迁移调用方；不得直接替换同名函数或混用响应类型。
 // TODO(governance-migration): 候选筛选、启停/扩缩容、日志及策略分别核对新契约；调用方全部迁出后删除此模块。
 import { runIdempotentRequest } from "@/api/idempotency";

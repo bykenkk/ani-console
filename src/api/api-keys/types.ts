@@ -12,7 +12,9 @@ export interface ApiKeyRecord {
   created_at?: string | null;
 }
 
-export type ApiKeyListParams = PageParams;
+export interface ApiKeyListParams extends PageParams {
+  filter?: string;
+}
 
 export interface ApiKeyListResponse {
   items: ApiKeyRecord[];

@@ -37,7 +37,7 @@ export default function KnowledgeChat({
   const [topK, setTopK] = useState(defaultTopK);
   const [inferenceServiceName, setInferenceServiceName] = useState<string>();
   const [citationsVisible, setCitationsVisible] = useState(false);
-  // FIXME(inference-contract): 目标推理路由待确认，用户同意保留原分支调用。
+  // FIXME(inference-contract): 当前推理调用对应的目标路由仍待确认。
   // TODO(inference-contract): 路由恢复后验证生成模型筛选与默认模型回落。
   const inferenceModels = useQuery({
     meta: {

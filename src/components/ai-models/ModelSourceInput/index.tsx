@@ -28,9 +28,9 @@ export default function ModelSourceInput({ value, onChange, disabled }: ModelSou
     const timer = window.setTimeout(() => setSearchKeyword(searchInput.trim()), 300);
     return () => window.clearTimeout(timer);
   }, [searchInput]);
-  // FIXME(model-contract): 用户确认保留原分支外部搜索，目标部署版本尚待确认。
+  // FIXME(model-contract): 当前外部搜索对应的目标部署版本尚待确认。
   // TODO(model-contract): 目标版本就绪后联调来源切换、仓库选择及搜索取消。
-  // 外部模型搜索受第三方接口限制，经确认作为选项分页例外，仅请求第 1 页、30 条，不使用 withFirst100。
+  // 外部模型搜索受第三方接口限制，仅请求第 1 页、30 条，不使用 withFirst100。
   // TODO(external-model-search): 外部接口限制调整后复核此例外；不自动拉取后续页。
   const search = useQuery({
     queryKey: ["external-models", "options", source, searchKeyword, { page: 1, pageSize: 30 }],

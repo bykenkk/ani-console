@@ -62,7 +62,7 @@ export interface InferenceService {
   publication_phase?: string;
   applied_generation?: string;
 }
-// FIXME(inference-contract): 当前索引已移除推理管理路由；用户确认保留原分支列表契约。
+// FIXME(inference-contract): 当前索引已移除推理管理路由，现有列表契约仍待与目标版本对齐。
 // TODO(inference-contract): 后端版本确认后复核筛选、分页与 total 类型并联调。
 export interface InferenceListParams extends PageParams {
   status?: string;

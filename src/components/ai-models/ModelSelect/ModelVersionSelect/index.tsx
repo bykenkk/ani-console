@@ -1,14 +1,7 @@
-import { withFirst100 } from "@/api/pagination";
 import { Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import {
-  getModel,
-  getModelVersion,
-  listModelVersions,
-  type ModelVersion,
-  type ModelPageParams,
-} from "@/api/models";
+import { getModel, getModelVersion, listModelVersions, type ModelVersion } from "@/api/models";
 import { withId } from "@/lib/id";
 
 interface ModelVersionSelectProps {
@@ -17,13 +10,6 @@ interface ModelVersionSelectProps {
   onChange?: (value: string, version?: ModelVersion, modelName?: string) => void;
   disabled?: boolean;
 }
-
-type ModelVersionOptionsParams = ModelPageParams & { modelId: string };
-
-const listVersionOptions = withFirst100(
-  ({ modelId, ...params }: ModelVersionOptionsParams, signal?: AbortSignal) =>
-    listModelVersions(modelId, params, signal),
-);
 
 export default function ModelVersionSelect({
   modelId,
@@ -39,12 +25,12 @@ export default function ModelVersionSelect({
     queryFn: ({ signal }) => getModel(modelId, signal),
     meta: { errorNotification: { id: withId("inference-model", modelId), action: "模型详情加载" } },
   });
-  // FIXME(model-contract): 用户确认保留原分支版本列表，当前索引仍是游标契约。
-  // TODO(model-contract): 目标版本就绪后验证前 100 项选项、版本归属及就绪状态。
+  // TODO(pagination-migration): 当前版本游标接口仅取首批 100 项；正式页码契约开放后改用 withFirst100，不自动遍历后续游标。
+  // TODO(model-contract): 联调版本归属、就绪状态及初始选择回显。
   const versions = useQuery({
     queryKey: ["governance-model-versions", modelId, "options"],
     enabled: Boolean(modelId),
-    queryFn: ({ signal }) => listVersionOptions({ modelId }, signal),
+    queryFn: ({ signal }) => listModelVersions(modelId, { limit: 100 }, signal),
     meta: {
       errorNotification: { id: withId("inference-versions", modelId), action: "模型版本加载" },
     },
@@ -55,7 +41,7 @@ export default function ModelVersionSelect({
     queryFn: ({ signal }) => getModelVersion(value!, signal),
     meta: { errorNotification: { id: withId("inference-version", value), action: "模型版本加载" } },
   });
-  const items = [...(versions.data?.items ?? [])];
+  const items = [...(versions.data?.versions ?? [])];
   if (chosenVersion?.model_id === modelId && !items.some((item) => item.id === chosenVersion.id))
     items.push(chosenVersion);
   const loadedVersion = selectedVersion.data?.version;
@@ -64,7 +50,9 @@ export default function ModelVersionSelect({
   const selected = items.find((item) => item.id === value);
   useEffect(() => {
     if (value || !versions.data || !modelId || disabled) return;
-    const firstReady = versions.data.items?.find((item) => item.status.toLowerCase() === "ready");
+    const firstReady = versions.data.versions?.find(
+      (item) => item.status.toLowerCase() === "ready",
+    );
     if (firstReady) onChange?.(firstReady.id);
   }, [value, versions.data, modelId, disabled, onChange]);
   useEffect(() => {

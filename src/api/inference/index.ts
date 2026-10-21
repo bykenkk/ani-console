@@ -18,7 +18,7 @@ const createScope = createIdempotencyScope("governance-inference-create", ["POST
 const deleteScope = createIdempotencyScope("governance-inference-delete", ["POST"]);
 const servicePath = (id: string) => `/inference/services/${encodeURIComponent(id)}`;
 
-// FIXME(inference-contract): 当前索引已移除推理管理路由；用户确认保留原分支 page/pageSize、status/capability 与 items/total 契约。
+// FIXME(inference-contract): 当前索引已移除推理管理路由；现有列表使用 page/pageSize、status/capability 与 items/total，仍待与目标版本对齐。
 // TODO(inference-contract): 对应后端版本及路由恢复后复核请求/响应、幂等和运行时行为，再移除标记。
 export function listInferenceServices(params: InferenceListParams = {}, signal?: AbortSignal) {
   return coreRequest<InferenceListResponse>("/inference/services", {
@@ -27,7 +27,7 @@ export function listInferenceServices(params: InferenceListParams = {}, signal?:
     signal,
   });
 }
-// FIXME(inference-contract): 当前索引未开放推理详情；用户确认保留原分支详情契约，不回退 legacy。
+// FIXME(inference-contract): 当前索引未开放推理详情，现有详情契约仍待对齐，不回退 legacy。
 // TODO(inference-contract): 对应后端版本及路由恢复后复核请求/响应、幂等和运行时行为，再移除标记。
 export function getInferenceService(id: string, signal?: AbortSignal) {
   return coreRequest<InferenceService>(servicePath(id), {
@@ -35,17 +35,18 @@ export function getInferenceService(id: string, signal?: AbortSignal) {
     signal,
   });
 }
-// FIXME(inference-contract): 当前索引未开放推理创建；用户确认保留原分支请求及幂等机制，不将受理视为完成。
+// FIXME(inference-contract): 当前索引未开放推理创建，现有请求及幂等机制仍待对齐，不将受理视为完成。
 // TODO(inference-contract): 对应后端版本及路由恢复后复核请求/响应、幂等和运行时行为，再移除标记。
 export function createInferenceService(input: CreateInferenceInput): Promise<void> {
   return runIdempotentRequest(createScope, input, async (data) => {
     await coreRequest<InferenceAcceptance, CreateInferenceRequest>("/inference/services", {
       method: "POST",
+      // TODO(inference-contract): 正式路由恢复后核对请求体是否需要 data 包装，同步调整请求类型并联调；确认前保留现有结构。
       data: { data },
     });
   });
 }
-// FIXME(inference-contract): 当前索引未开放推理删除；用户确认保留原分支 :delete、expected_generation 和幂等请求。
+// FIXME(inference-contract): 当前索引未开放推理删除；现有请求使用 :delete、expected_generation 和幂等机制，仍待与目标版本对齐。
 // TODO(inference-contract): 对应后端版本及路由恢复后复核请求/响应、幂等和运行时行为，再移除标记。
 export function deleteInferenceService(
   id: string,
@@ -57,6 +58,7 @@ export function deleteInferenceService(
     async (data) => {
       await coreRequest<InferenceAcceptance, DeleteInferenceRequest>(`${servicePath(id)}:delete`, {
         method: "POST",
+        // TODO(inference-contract): 正式路由恢复后核对请求体是否需要 data 包装，同步调整请求类型并联调；确认前保留现有结构。
         data: { data },
       });
     },

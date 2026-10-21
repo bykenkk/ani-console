@@ -1,4 +1,4 @@
-// FIXME(inference-contract): 当前后端索引已移除详情路由；用户确认保留原推理分支详情及关联入口。
+// FIXME(inference-contract): 当前后端索引已移除详情路由；现有详情及关联入口仍待与目标版本对齐。
 // TODO(inference-contract): 对应后端版本确认后联调详情、删除返回与关联资源。
 // FIXME(governance-migration): governance 尚未提供此页所需的策略、调用地址/测试、监控、日志及事件契约，相关区域保留空态。
 // TODO(governance-migration): 逐项接入新资源对应的公开能力；不得复用 legacy 日志/策略组件查询 governance 服务 ID。
