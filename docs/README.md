@@ -1,6 +1,6 @@
 # ANI Console 文档
 
-本目录集中维护 ANI Console 的工程、UI 与 API 对接文档。仓库仅包含前端；后端迁移期以 `ani-governance` 为目标后端、`ANI` 为存量后端，具体接口的契约归属遵循 [API 对接流程](./API-INTEGRATION.md#迁移期后端归属)。
+本目录集中维护 ANI Console 的工程、UI 与 API 对接文档。
 
 ## 文档职责
 

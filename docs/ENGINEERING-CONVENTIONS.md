@@ -93,6 +93,12 @@ src/api/<domain>/
 
 ## 验证
 
+### 纯文档修改
+
+本次任务仅修改 Markdown 文档时，检查本次修改文档的链接与标题锚点、术语、规则归属及跨文档一致性，并运行 `git diff --check`。无需为纯文档修改运行 lint、全仓格式化、格式检查或 typecheck；同时涉及代码或工程配置时，执行下方完整清单。
+
+### 代码或工程配置修改
+
 ```bash
 pnpm lint
 pnpm fmt
@@ -101,6 +107,10 @@ pnpm typecheck
 git diff --check
 ```
 
-新增或修改代码时，先对本次涉及的代码文件运行 Oxlint，再执行以上完整清单；`pnpm fmt` 必须对全仓运行项目内 oxfmt。完成后通过当前会话接入的 GitNexus `detect_changes` 工具执行变更检测；回归审查与默认分支 `master` 比较。
+新增或修改代码时，先对本次涉及的代码文件运行 Oxlint，再执行以上完整清单；`pnpm fmt` 必须对全仓运行项目内 oxfmt。
+
+### 变更范围检查
+
+纯文档修改与代码或工程配置修改均须执行 GitNexus `detect_changes`，使用方式与检测时机遵循 [AGENTS.md](../AGENTS.md#验证) 及其 [GitNexus 工具规则](../AGENTS.md#gitnexus)。回归审查统一与 `main` 分支比较。
 
 当前快速迭代阶段不保留自动化测试资产，页面与交互由用户手动验证。
