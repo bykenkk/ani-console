@@ -105,7 +105,8 @@ export default function LoadBalancersPage() {
     {
       key: "name",
       title: "名称 / ID",
-      width: 150,
+      fixed: "left",
+      width: 200,
       render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="load-balancer" />,
     },
     {
@@ -122,7 +123,6 @@ export default function LoadBalancersPage() {
       dataIndex: "private_ip",
       width: 100,
       ellipsis: true,
-      placeholder: "-",
     },
     {
       key: "listeners",

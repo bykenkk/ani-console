@@ -49,9 +49,9 @@ export default function TrainingTaskArtifacts({ executionId }: TrainingTaskArtif
         loading={query.isFetching}
         pagination={pagination}
         columns={[
-          { title: "文件名", dataIndex: "filename", width: 220, ellipsis: true },
+          { title: "文件名", dataIndex: "filename", width: 200, ellipsis: true },
           { title: "类型", dataIndex: "role", width: 160, ellipsis: true },
-          { title: "大小（字节）", dataIndex: "size_bytes", width: 150, placeholder: "-" },
+          { title: "大小（字节）", dataIndex: "size_bytes", width: 150 },
           { title: "校验时间", dataIndex: "verified_at", width: 180, render: formatDateTime },
           {
             title: "操作",

@@ -95,18 +95,16 @@ export default function FilesystemMountTargets({
               width: 200,
               ellipsis: true,
               dataIndex: "vpc_id",
-              placeholder: "-",
             },
             {
               title: "子网",
               width: 200,
               ellipsis: true,
               dataIndex: "subnet_id",
-              placeholder: "-",
             },
             {
               title: "创建时间",
-              width: 200,
+              width: 180,
               render: (_, row) => formatDateTime(row.created_at),
             },
           ]}

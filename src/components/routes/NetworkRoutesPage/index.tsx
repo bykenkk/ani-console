@@ -78,6 +78,8 @@ export default function NetworkRoutesPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, item) => (
         <ResourceNameId
           name={item.description?.trim() || item.destination_cidr}
@@ -89,6 +91,7 @@ export default function NetworkRoutesPage() {
     {
       key: "vpc",
       title: "VPC",
+      width: 200,
       render: (_, item) => (
         <Link onClick={() => navigateToResourceDetail(navigate, { type: "vpc", id: item.vpc_id })}>
           {vpcNames.get(item.vpc_id) || item.vpc_id}
@@ -98,20 +101,23 @@ export default function NetworkRoutesPage() {
     {
       key: "destination",
       title: "目标网段",
+      width: 150,
       dataIndex: "destination_cidr",
     },
     {
       key: "nextHop",
       title: "下一跳",
+      width: 150,
       dataIndex: "next_hop_id",
     },
     {
       key: "nextHopType",
       title: "类型",
+      width: 120,
       render: (_, item) =>
         item.next_hop_type === "instance" ? "实例" : item.next_hop_type === "nat" ? "NAT" : "网关",
     },
-    { key: "priority", title: "下一跳优先级", render: () => "-" },
+    { key: "priority", title: "下一跳优先级", width: 120, render: () => "-" },
   ];
 
   return (

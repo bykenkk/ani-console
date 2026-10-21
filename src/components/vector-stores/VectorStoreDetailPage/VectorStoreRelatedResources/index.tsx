@@ -72,6 +72,7 @@ export default function VectorStoreRelatedResources({ store }: VectorStoreRelate
             { title: "类型", dataIndex: "type", width: 160 },
             {
               title: "名称",
+              width: 200,
               render: (_, resource) => (
                 <Link
                   onClick={() =>

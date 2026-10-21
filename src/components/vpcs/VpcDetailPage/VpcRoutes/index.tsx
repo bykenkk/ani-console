@@ -23,10 +23,10 @@ export default function VpcRoutes({ vpcId }: VpcRoutesProps) {
   return (
     <DataTable<NetworkRoute>
       columns={[
-        { title: "目标 CIDR", dataIndex: "destination_cidr" },
-        { title: "下一跳类型", dataIndex: "next_hop_type" },
-        { title: "下一跳", dataIndex: "next_hop_id" },
-        { title: "描述", dataIndex: "description", placeholder: "-" },
+        { title: "目标 CIDR", width: 180, dataIndex: "destination_cidr" },
+        { title: "下一跳类型", width: 140, dataIndex: "next_hop_type" },
+        { title: "下一跳", width: 200, dataIndex: "next_hop_id" },
+        { title: "描述", width: 320, dataIndex: "description" },
       ]}
       data={pageItems}
       loading={routes.isLoading}

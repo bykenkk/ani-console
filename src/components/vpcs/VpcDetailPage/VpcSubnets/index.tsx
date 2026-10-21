@@ -23,9 +23,9 @@ export default function VpcSubnets({ vpcId }: VpcSubnetsProps) {
   return (
     <DataTable<NetworkSubnet>
       columns={[
-        { title: "名称", dataIndex: "name" },
-        { title: "CIDR", dataIndex: "cidr" },
-        { title: "网关", dataIndex: "gateway", placeholder: "-" },
+        { title: "名称", width: 200, dataIndex: "name" },
+        { title: "CIDR", width: 180, dataIndex: "cidr" },
+        { title: "网关", width: 180, dataIndex: "gateway" },
         {
           title: "状态",
           width: 120,

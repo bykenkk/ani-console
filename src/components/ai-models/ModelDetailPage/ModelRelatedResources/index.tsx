@@ -79,6 +79,7 @@ export default function ModelRelatedResources({ model }: ModelRelatedResourcesPr
         columns={[
           {
             title: "推理服务",
+            width: 200,
             fixed: "left",
             render: (_, service) => (
               <ResourceNameId name={service.name} id={service.id} type="inference-service" />
@@ -91,10 +92,12 @@ export default function ModelRelatedResources({ model }: ModelRelatedResourcesPr
           },
           {
             title: "调用健康",
+            width: 120,
             render: (_, service) => <StatusBadge status={service.health} />,
           },
           {
             title: "服务模型名",
+            width: 200,
             dataIndex: "served_model_name",
             ellipsis: true,
           },

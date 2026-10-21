@@ -31,9 +31,9 @@ export default function InstanceStorage({
         rowKey={(mount) => `${mount.name}:${mount.mountPath}`}
         pagination={false}
         columns={[
-          { title: "名称", dataIndex: "name", ellipsis: true },
+          { title: "名称", width: 200, dataIndex: "name", ellipsis: true },
           { title: "类型", dataIndex: "volumeType", width: 150 },
-          { title: "挂载路径", dataIndex: "mountPath", ellipsis: true },
+          { title: "挂载路径", width: 280, dataIndex: "mountPath", ellipsis: true },
           {
             title: "访问模式",
             width: 100,
@@ -57,8 +57,8 @@ export default function InstanceStorage({
         rowKey={(mount) => `${mount.pvc_name}:${mount.mount_path}`}
         pagination={false}
         columns={[
-          { title: "存储卷", dataIndex: "pvc_name", ellipsis: true },
-          { title: "挂载路径", dataIndex: "mount_path", ellipsis: true },
+          { title: "存储卷", width: 200, dataIndex: "pvc_name", ellipsis: true },
+          { title: "挂载路径", width: 280, dataIndex: "mount_path", ellipsis: true },
           {
             title: "访问模式",
             width: 100,
@@ -81,8 +81,8 @@ export default function InstanceStorage({
         pagination={false}
         rowKey="id"
         columns={[
-          { title: "文件系统 ID", dataIndex: "id" },
-          { title: "挂载路径", dataIndex: "mount_path" },
+          { title: "文件系统 ID", width: 280, dataIndex: "id" },
+          { title: "挂载路径", width: 280, dataIndex: "mount_path" },
         ]}
       />
     </Space>

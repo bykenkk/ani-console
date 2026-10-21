@@ -170,7 +170,7 @@ export default function KnowledgeDocuments({ kbId, action }: KnowledgeDocumentsP
   const columns: Array<ListColumn<KBDocument>> = [
     {
       title: "文档 / ID",
-      width: 280,
+      width: 200,
       fixed: "left",
       render: (_, item) => <ResourceNameId name={item.file_name} id={item.id} openable={false} />,
     },

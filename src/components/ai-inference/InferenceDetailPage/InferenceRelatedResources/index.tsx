@@ -30,13 +30,14 @@ export default function InferenceRelatedResources({ service }: InferenceRelatedR
         // TODO(governance-migration): 核对模型访问权限后恢复到 /ai-models/$modelId 的资源跳转。
         {
           title: "模型",
+          width: 200,
           render: (_, item) => (
             <ResourceNameId name={item.model.name} id={item.model.id} openable={false} />
           ),
         },
-        { title: "版本", render: (_, item) => item.version.version },
-        { title: "版本 ID", render: (_, item) => item.version.id, ellipsis: true },
-        { title: "状态", render: (_, item) => item.version.status },
+        { title: "版本", width: 200, render: (_, item) => item.version.version },
+        { title: "版本 ID", width: 280, render: (_, item) => item.version.id, ellipsis: true },
+        { title: "状态", width: 120, render: (_, item) => item.version.status },
       ]}
       tableLabel="推理服务关联模型列表"
     />

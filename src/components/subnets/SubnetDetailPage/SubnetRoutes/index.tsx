@@ -54,11 +54,11 @@ export default function SubnetRoutes({ subnetId, vpcId }: SubnetRoutesProps) {
     <Space direction="vertical" size={12} className="w-full">
       <DataTable<SubnetRouteRow>
         columns={[
-          { title: "目标网段", dataIndex: "destinationCidr" },
-          { title: "下一跳类型", dataIndex: "nextHopType" },
-          { title: "下一跳", dataIndex: "nextHop" },
-          { title: "优先级", dataIndex: "priority" },
-          { title: "来源", dataIndex: "source" },
+          { title: "目标网段", width: 180, dataIndex: "destinationCidr" },
+          { title: "下一跳类型", width: 140, dataIndex: "nextHopType" },
+          { title: "下一跳", width: 200, dataIndex: "nextHop" },
+          { title: "优先级", width: 100, dataIndex: "priority" },
+          { title: "来源", width: 200, dataIndex: "source" },
         ]}
         data={items}
         loading={routes.isLoading}

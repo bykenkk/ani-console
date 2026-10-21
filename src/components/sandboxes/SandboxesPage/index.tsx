@@ -68,6 +68,8 @@ export default function SandboxesPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, item) => (
         <ResourceNameId name={item.name || item.id} id={item.id} type="sandbox-instance" />
       ),
@@ -90,11 +92,10 @@ export default function SandboxesPage() {
     {
       key: "ttl",
       title: "会话时长",
-      width: 110,
+      width: 180,
       dataIndex: "sandbox.session_timeout",
-      placeholder: "-",
     },
-    { key: "idle", title: "空闲剩余", width: 110, render: () => "-" },
+    { key: "idle", title: "空闲剩余", width: 180, render: () => "-" },
     {
       key: "session",
       title: "关联会话",
@@ -106,7 +107,6 @@ export default function SandboxesPage() {
       title: "出口策略",
       width: 130,
       dataIndex: "sandbox.network_egress_policy",
-      placeholder: "-",
     },
     {
       key: "protection",
@@ -117,7 +117,7 @@ export default function SandboxesPage() {
     {
       key: "created",
       title: "创建时间",
-      width: 150,
+      width: 180,
       render: (_, item) => formatDateTime(item.created_at),
     },
   ];

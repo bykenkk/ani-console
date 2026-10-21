@@ -30,6 +30,9 @@ const COMPONENT_CONFIG = {
       position: "bl",
     },
   },
+  Table: {
+    placeholder: "-",
+  },
 } satisfies ConfigProviderProps["componentConfig"];
 
 Modal.config({ simple: false });

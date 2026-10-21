@@ -122,7 +122,7 @@ export default function InstanceResourceAssociations({
           pagination={false}
           columns={[
             { title: "类型", dataIndex: "type", width: 140 },
-            { title: "资源", dataIndex: "name" },
+            { title: "资源", width: 200, dataIndex: "name" },
           ]}
         />
       </section>
@@ -136,6 +136,7 @@ export default function InstanceResourceAssociations({
           columns={[
             {
               title: "镜像",
+              width: 280,
               ellipsis: true,
               render: (_, row) => getImageDisplayName(row.image),
             },
@@ -151,7 +152,7 @@ export default function InstanceResourceAssociations({
           pagination={false}
           columns={[
             { title: "存储类型", dataIndex: "type", width: 160 },
-            { title: "关联对象", dataIndex: "name" },
+            { title: "关联对象", width: 200, dataIndex: "name" },
           ]}
         />
       </section>
@@ -164,7 +165,7 @@ export default function InstanceResourceAssociations({
           pagination={false}
           columns={[
             { title: "关联类型", dataIndex: "type", width: 160 },
-            { title: "关联对象", dataIndex: "name" },
+            { title: "关联对象", width: 200, dataIndex: "name" },
           ]}
         />
       </section>

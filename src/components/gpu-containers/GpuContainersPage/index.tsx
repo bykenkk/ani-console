@@ -65,7 +65,8 @@ export default function GpuContainersPage() {
     {
       key: "name",
       title: "名称 / ID",
-      width: 260,
+      fixed: "left",
+      width: 200,
       render: (_, row) => <ResourceNameId name={row.name} id={row.id} type="gpu-instance" />,
     },
     {
@@ -100,11 +101,11 @@ export default function GpuContainersPage() {
     { key: "image", title: "镜像 ID", dataIndex: "imageId", width: 220, ellipsis: true },
     // FIXME(governance-instance-columns): 新列表缺少副本、发布、节点、访问地址和保护字段，原列保留空占位，不补拉旧列表。
     // TODO(governance-instance-columns): 契约补齐后逐列接入，不能用 observedState/Pod IP 等替代旧字段。
-    { key: "replicas", title: "副本", width: 80, placeholder: "-" },
-    { key: "rollout", title: "发布", width: 120, placeholder: "-" },
-    { key: "node", title: "节点", width: 140, placeholder: "-" },
-    { key: "endpoint", title: "访问地址", width: 160, placeholder: "-" },
-    { key: "protection", title: "终止保护", width: 120, placeholder: "-" },
+    { key: "replicas", title: "副本", width: 80 },
+    { key: "rollout", title: "发布", width: 120 },
+    { key: "node", title: "节点", width: 140 },
+    { key: "endpoint", title: "访问地址", width: 160 },
+    { key: "protection", title: "终止保护", width: 120 },
     {
       key: "created",
       title: "创建时间",

@@ -106,25 +106,28 @@ export default function SecurityGroupRules({
         loading={rules.isLoading}
         rowActions={actions}
         columns={[
-          { title: "优先级", dataIndex: "priority" },
+          { title: "优先级", width: 100, dataIndex: "priority" },
           {
             title: "协议",
+            width: 140,
             render: (_, rule) => (rule.protocol === "all" ? "全部" : rule.protocol.toUpperCase()),
           },
-          { title: "端口范围", dataIndex: "port_range" },
+          { title: "端口范围", width: 100, dataIndex: "port_range" },
           {
             title: direction === "ingress" ? "来源 CIDR" : "目标 CIDR",
+            width: 200,
             dataIndex: "cidr",
           },
           {
             title: "策略",
+            width: 140,
             render: (_, rule) => (
               <Tag color={rule.action === "allow" ? "green" : "red"}>
                 {rule.action === "allow" ? "允许" : "拒绝"}
               </Tag>
             ),
           },
-          { title: "描述", dataIndex: "description", placeholder: "-" },
+          { title: "描述", width: 320, dataIndex: "description" },
         ]}
         data={pageItems}
         pagination={pagination}

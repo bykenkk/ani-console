@@ -48,6 +48,8 @@ export default function VpcsPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, vpc) => <ResourceNameId name={vpc.name} id={vpc.id} type="vpc" />,
     },
     {
@@ -62,7 +64,6 @@ export default function VpcsPage() {
       width: 150,
       ellipsis: true,
       dataIndex: "cidr",
-      placeholder: "-",
     },
     {
       key: "subnets",
@@ -70,7 +71,6 @@ export default function VpcsPage() {
       width: 100,
       ellipsis: true,
       dataIndex: "subnet_count",
-      placeholder: "-",
     },
     {
       key: "createdAt",

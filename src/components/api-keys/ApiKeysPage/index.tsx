@@ -117,6 +117,8 @@ export function ApiKeysPage() {
     {
       key: "name",
       title: "名称",
+      width: 200,
+      fixed: "left",
       dataIndex: "name",
       ellipsis: true,
     },
@@ -130,7 +132,7 @@ export function ApiKeysPage() {
     {
       key: "status",
       title: "状态",
-      width: 110,
+      width: 120,
       render: (_, item) =>
         isExpired(item) ? (
           <Tag color="gray">已过期</Tag>
@@ -145,19 +147,18 @@ export function ApiKeysPage() {
       title: "角色",
       width: 140,
       dataIndex: "role_name",
-      placeholder: "-",
       ellipsis: true,
     },
     {
       key: "expiresAt",
       title: "过期时间",
-      width: 170,
+      width: 180,
       render: (_, item) => (item.expires_at ? formatDateTime(item.expires_at) : "永不过期"),
     },
     {
       key: "lastUsedAt",
       title: "最近使用",
-      width: 170,
+      width: 180,
       render: (_, item) => formatDateTime(item.last_used_at),
     },
   ];

@@ -69,13 +69,12 @@ export default function KnowledgeBaseAuditLogs({ kbId }: KnowledgeBaseAuditLogsP
           {
             title: "操作者",
             dataIndex: "actor_user_id",
-            placeholder: "系统",
             width: 240,
             ellipsis: true,
           },
           {
             title: "结果",
-            width: 100,
+            width: 120,
             render: (_, log) => (
               <StatusBadge status={log.error_code ? "failed" : "succeeded"}>
                 {log.error_code ? "失败" : "成功"}

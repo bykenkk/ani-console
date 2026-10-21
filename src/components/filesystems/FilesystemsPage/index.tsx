@@ -53,6 +53,8 @@ export default function FilesystemsPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="filesystem" />,
     },
     {
@@ -88,7 +90,7 @@ export default function FilesystemsPage() {
     {
       key: "createdAt",
       title: "创建时间",
-      width: 150,
+      width: 180,
       render: (_, item) => formatDateTime(item.created_at),
     },
   ];

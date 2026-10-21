@@ -72,6 +72,8 @@ export default function VmsPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, row) => <ResourceNameId name={row.name} id={row.id} type="vm-instance" />,
     },
     {
@@ -93,14 +95,12 @@ export default function VmsPage() {
       title: "私网 IP",
       width: 100,
       dataIndex: "network.private_ip",
-      placeholder: "-",
     },
     {
       key: "node",
       title: "节点",
       width: 150,
       dataIndex: "compute.node_name",
-      placeholder: "-",
     },
     {
       key: "protection",
@@ -111,7 +111,7 @@ export default function VmsPage() {
     {
       key: "createdAt",
       title: "创建时间",
-      width: 150,
+      width: 180,
       render: (_, row) => formatDateTime(row.created_at),
     },
   ];

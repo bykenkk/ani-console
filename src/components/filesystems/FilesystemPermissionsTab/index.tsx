@@ -31,10 +31,10 @@ export default function FilesystemPermissionsTab() {
             ),
           }}
           columns={[
-            { title: "授权网段", dataIndex: "cidr" },
-            { title: "读写权限", dataIndex: "access" },
-            { title: "用户权限", dataIndex: "squash" },
-            { title: "描述", dataIndex: "description" },
+            { title: "授权网段", width: 180, dataIndex: "cidr" },
+            { title: "读写权限", width: 140, dataIndex: "access" },
+            { title: "用户权限", width: 140, dataIndex: "squash" },
+            { title: "描述", width: 320, dataIndex: "description" },
           ]}
           data={rules}
           pagination={false}

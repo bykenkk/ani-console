@@ -83,6 +83,8 @@ export default function SubnetsPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, subnet) => <ResourceNameId name={subnet.name} id={subnet.id} type="subnet" />,
     },
     {
@@ -94,6 +96,7 @@ export default function SubnetsPage() {
     {
       key: "vpc",
       title: "VPC",
+      width: 200,
       render: (_, subnet) => (
         <Link
           onClick={() => navigateToResourceDetail(navigate, { type: "vpc", id: subnet.vpc_id })}
@@ -105,18 +108,19 @@ export default function SubnetsPage() {
     {
       key: "cidr",
       title: "CIDR",
+      width: 150,
       dataIndex: "cidr",
     },
     {
       key: "gateway",
       title: "网关",
+      width: 150,
       dataIndex: "gateway",
-      placeholder: "-",
     },
     {
       key: "createdAt",
       title: "创建时间",
-      width: 150,
+      width: 180,
       render: (_, subnet) => formatDateTime(subnet.created_at),
     },
   ];

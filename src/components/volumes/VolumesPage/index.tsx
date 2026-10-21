@@ -56,6 +56,8 @@ export default function VolumesPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="volume" />,
     },
     {
@@ -94,7 +96,6 @@ export default function VolumesPage() {
       width: 100,
       dataIndex: "zone",
       ellipsis: true,
-      placeholder: "-",
     },
     {
       key: "mountInstance",
@@ -110,7 +111,7 @@ export default function VolumesPage() {
     {
       key: "createdAt",
       title: "创建时间",
-      width: 150,
+      width: 180,
       render: (_, item) => formatDateTime(item.created_at),
     },
   ];

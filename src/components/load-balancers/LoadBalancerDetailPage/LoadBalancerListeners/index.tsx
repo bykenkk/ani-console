@@ -12,7 +12,7 @@ export default function LoadBalancerListeners({ item }: LoadBalancerListenersPro
         {
           title: "名称 / ID",
           fixed: "left",
-          width: 150,
+          width: 200,
           render: (_, row) => (
             <ResourceNameId name={row.name || "-"} id={row.id} openable={false} />
           ),
@@ -68,7 +68,6 @@ export default function LoadBalancerListeners({ item }: LoadBalancerListenersPro
           width: 180,
           dataIndex: "certificate_ref.name",
           ellipsis: true,
-          placeholder: "-",
         },
       ]}
       data={loadBalancerListeners(item)}

@@ -55,6 +55,8 @@ export default function VectorStoresPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, item) => (
         <ResourceNameId
           name={item.name}
@@ -73,29 +75,32 @@ export default function VectorStoresPage() {
     {
       key: "dimension",
       title: "维度",
+      width: 100,
       dataIndex: "dimension",
     },
     {
       key: "metric",
       title: "度量",
+      width: 120,
       render: (_, item) => item.metric.toUpperCase(),
     },
     {
       key: "embeddingModel",
       title: "向量化模型",
+      width: 200,
       ellipsis: true,
       dataIndex: "embedding_model",
-      placeholder: "-",
     },
     {
       key: "vectorCount",
       title: "向量数",
+      width: 100,
       dataIndex: "vector_count",
-      placeholder: 0,
     },
     {
       key: "knowledgeBase",
       title: "关联知识库",
+      width: 200,
       ellipsis: true,
       render: (_, item) => {
         const knowledgeBase = item.knowledge_base_ref;
@@ -119,7 +124,7 @@ export default function VectorStoresPage() {
     {
       key: "createdAt",
       title: "创建时间",
-      width: 150,
+      width: 180,
       render: (_, item) => formatDateTime(item.created_at),
     },
   ];

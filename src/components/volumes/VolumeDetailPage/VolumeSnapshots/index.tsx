@@ -35,14 +35,14 @@ export default function VolumeSnapshots({ volumeId, onCreateSnapshot }: VolumeSn
             extra: <Button onClick={onCreateSnapshot}>创建快照</Button>,
           }}
           columns={[
-            { title: "名称", dataIndex: "name" },
+            { title: "名称", width: 200, dataIndex: "name" },
             {
               title: "状态",
               width: 120,
               render: (_, row) => <StatusBadge status={row.status} />,
             },
-            { title: "大小", render: (_, row) => formatBytes(row.size_bytes) },
-            { title: "创建时间", render: (_, row) => formatDateTime(row.created_at) },
+            { title: "大小", width: 100, render: (_, row) => formatBytes(row.size_bytes) },
+            { title: "创建时间", width: 180, render: (_, row) => formatDateTime(row.created_at) },
           ]}
           data={pageItems}
           loading={snapshots.isLoading}

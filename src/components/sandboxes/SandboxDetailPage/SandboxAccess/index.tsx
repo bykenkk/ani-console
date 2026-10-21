@@ -120,7 +120,6 @@ export default function SandboxAccess({ instance, onChanged }: SandboxAccessProp
               title: "协议",
               width: 100,
               dataIndex: "protocol",
-              placeholder: "tcp",
             },
             {
               title: "状态",

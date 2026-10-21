@@ -35,6 +35,7 @@ export default function BucketAccess({ bucket }: BucketAccessProps) {
           { title: "类型", dataIndex: "type", width: 240 },
           {
             title: "地址",
+            width: 180,
             render: (_, row) => (
               <Space>
                 <Typography.Text>{row.address}</Typography.Text>

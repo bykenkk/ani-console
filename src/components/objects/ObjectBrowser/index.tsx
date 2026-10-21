@@ -58,6 +58,7 @@ export default function ObjectBrowser({
   const columns: Array<TableColumnProps<BucketEntry>> = [
     {
       title: "名称",
+      width: 200,
       render: (_, entry) => {
         const canNavigate = entry.kind === "prefix";
         const target = entry.key;

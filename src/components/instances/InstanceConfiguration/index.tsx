@@ -28,8 +28,8 @@ export default function InstanceConfiguration({
         rowKey="name"
         pagination={false}
         columns={[
-          { title: "名称", dataIndex: "name", ellipsis: true },
-          { title: "来源类型", dataIndex: "sourceType", ellipsis: true },
+          { title: "名称", width: 200, dataIndex: "name", ellipsis: true },
+          { title: "来源类型", width: 140, dataIndex: "sourceType", ellipsis: true },
         ]}
       />
       {[
@@ -45,9 +45,10 @@ export default function InstanceConfiguration({
           rowKey="name"
           pagination={false}
           columns={[
-            { title: "名称", dataIndex: "name", width: 240, ellipsis: true },
+            { title: "名称", dataIndex: "name", width: 200, ellipsis: true },
             {
               title: "值",
+              width: 320,
               render: (_, row) => (
                 <span className="whitespace-pre-wrap break-all font-mono">
                   {row.value === "" ? '""' : row.value}
@@ -65,8 +66,8 @@ export default function InstanceConfiguration({
         pagination={false}
         rowKey="id"
         columns={[
-          { title: "密钥", dataIndex: "id" },
-          { title: "用途", dataIndex: "purpose" },
+          { title: "密钥", width: 280, dataIndex: "id" },
+          { title: "用途", width: 140, dataIndex: "purpose" },
         ]}
       />
     </Space>

@@ -15,14 +15,15 @@ export default function LoadBalancerBackends({ item }: LoadBalancerBackendsProps
   return (
     <DataTable<NetworkLoadBalancerBackend & { listenerName: string; rowId: string }>
       columns={[
-        { title: "监听器", dataIndex: "listenerName", ellipsis: true },
-        { title: "成员 ID", dataIndex: "id", ellipsis: true },
-        { title: "地址", dataIndex: "address" },
-        { title: "端口", dataIndex: "port" },
-        { title: "权重", dataIndex: "weight" },
-        { title: "子网", dataIndex: "subnet_id", ellipsis: true },
+        { title: "监听器", width: 200, dataIndex: "listenerName", ellipsis: true },
+        { title: "成员 ID", width: 280, dataIndex: "id", ellipsis: true },
+        { title: "地址", width: 180, dataIndex: "address" },
+        { title: "端口", width: 100, dataIndex: "port" },
+        { title: "权重", width: 100, dataIndex: "weight" },
+        { title: "子网", width: 200, dataIndex: "subnet_id", ellipsis: true },
         {
           title: "状态",
+          width: 120,
           render: (_, row) => <StatusBadge status={row.state} reason={row.reason} />,
         },
       ]}

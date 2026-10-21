@@ -43,7 +43,7 @@ export default function InstanceNetwork({
       pagination={false}
       columns={[
         { title: "类型", dataIndex: "name", width: 160 },
-        { title: "名称", dataIndex: "value" },
+        { title: "名称", width: 200, dataIndex: "value" },
       ]}
     />
   );

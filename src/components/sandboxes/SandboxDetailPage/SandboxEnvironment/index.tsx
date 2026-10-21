@@ -21,7 +21,7 @@ export default function SandboxEnvironment({ sandbox }: SandboxEnvironmentProps)
           rowKey="name"
           pagination={false}
           columns={[
-            { title: "名称", dataIndex: "name" },
+            { title: "名称", width: 200, dataIndex: "name" },
             {
               title: "来源",
               width: 160,
@@ -34,8 +34,8 @@ export default function SandboxEnvironment({ sandbox }: SandboxEnvironmentProps)
             },
             {
               title: "密钥引用",
+              width: 280,
               dataIndex: "secret_ref",
-              placeholder: "-",
             },
           ]}
         />

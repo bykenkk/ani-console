@@ -48,8 +48,8 @@ export default function InstanceVersions({ currentImage }: InstanceVersionsProps
         ]}
         columns={[
           { title: "版本", dataIndex: "revision", width: 240, ellipsis: true },
-          { title: "镜像", dataIndex: "image", ellipsis: true },
-          { title: "更新时间", dataIndex: "createdAt" },
+          { title: "镜像", width: 280, dataIndex: "image", ellipsis: true },
+          { title: "更新时间", width: 180, dataIndex: "createdAt" },
         ]}
       />
     </Space>

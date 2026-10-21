@@ -61,7 +61,7 @@ export default function SandboxSecurityEvents({ instanceId }: SandboxSecurityEve
               render: (_, item) => <Tag color={severityColor(item.severity)}>{item.severity}</Tag>,
             },
             { title: "类型", dataIndex: "event_type", width: 180 },
-            { title: "说明", dataIndex: "message" },
+            { title: "说明", width: 320, dataIndex: "message" },
             {
               title: "发生时间",
               width: 180,

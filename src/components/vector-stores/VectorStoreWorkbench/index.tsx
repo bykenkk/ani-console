@@ -138,7 +138,7 @@ export default function VectorStoreWorkbench({ store }: VectorStoreWorkbenchProp
                   </Typography.Text>
                 ),
               },
-              { title: "内容", dataIndex: "content", ellipsis: true },
+              { title: "内容", width: 400, dataIndex: "content", ellipsis: true },
               {
                 title: "来源",
                 width: 180,

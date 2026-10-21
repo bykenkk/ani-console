@@ -48,6 +48,8 @@ export default function ObjectsPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="bucket" />,
     },
     {
@@ -68,7 +70,6 @@ export default function ObjectsPage() {
       dataIndex: "region",
       width: 100,
       ellipsis: true,
-      placeholder: "-",
     },
     {
       key: "objectCount",
@@ -76,7 +77,6 @@ export default function ObjectsPage() {
       dataIndex: "object_count",
       width: 100,
       ellipsis: true,
-      placeholder: 0,
     },
     {
       key: "sizeBytes",
@@ -88,7 +88,7 @@ export default function ObjectsPage() {
     {
       key: "createdAt",
       title: "创建时间",
-      width: 150,
+      width: 180,
       render: (_, item) => formatDateTime(item.created_at),
     },
   ];

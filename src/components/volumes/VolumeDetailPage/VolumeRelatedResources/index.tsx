@@ -44,12 +44,13 @@ export default function VolumeRelatedResources({ volume, onAttach }: VolumeRelat
           columns={[
             {
               title: "实例名称 / ID",
+              width: 200,
               render: (_, item) => (
                 <ResourceNameId name={item.instance_name} id={item.instance_id} openable={false} />
               ),
             },
-            { title: "实例类型", dataIndex: "kind", placeholder: "-" },
-            { title: "状态", render: (_, item) => <StatusBadge status={item.state} /> },
+            { title: "实例类型", width: 140, dataIndex: "kind" },
+            { title: "状态", width: 120, render: (_, item) => <StatusBadge status={item.state} /> },
           ]}
           data={items}
           pagination={false}

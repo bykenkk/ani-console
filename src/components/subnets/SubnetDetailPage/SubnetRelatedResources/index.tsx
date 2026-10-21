@@ -32,8 +32,8 @@ export default function SubnetRelatedResources({ subnetId }: SubnetRelatedResour
   }));
   const columns: Array<ListColumn<RelatedResource>> = [
     { title: "类型", width: 120, render: (_, item) => <Tag>{item.kind}</Tag> },
-    { title: "名称", dataIndex: "name" },
-    { title: "资源 ID", dataIndex: "id" },
+    { title: "名称", width: 200, dataIndex: "name" },
+    { title: "资源 ID", width: 280, dataIndex: "id" },
     { title: "状态", width: 120, render: (_, item) => <StatusBadge status={item.status} /> },
   ];
 

@@ -63,6 +63,8 @@ export default function ModelsPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="model" />,
     },
     {
@@ -74,11 +76,13 @@ export default function ModelsPage() {
     {
       key: "source",
       title: "来源",
+      width: 140,
       render: (_, item) => MODEL_SOURCE_LABELS[item.source ?? ""] ?? item.source ?? "-",
     },
     {
       key: "capabilities",
       title: "任务",
+      width: 180,
       render: (_, item) =>
         item.capabilities?.length ? (
           <Space wrap size={4}>
@@ -99,6 +103,7 @@ export default function ModelsPage() {
     {
       key: "updatedAt",
       title: "更新时间",
+      width: 180,
       render: (_, item) => formatDateTime(item.updated_at),
     },
   ];

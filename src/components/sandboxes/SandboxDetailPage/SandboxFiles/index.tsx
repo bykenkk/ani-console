@@ -145,6 +145,7 @@ export default function SandboxFiles({ instanceId, running, onChanged }: Sandbox
             columns={[
               {
                 title: "路径",
+                width: 280,
                 ellipsis: true,
                 dataIndex: "path",
               },

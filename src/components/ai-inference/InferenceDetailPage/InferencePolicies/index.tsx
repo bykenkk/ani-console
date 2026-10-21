@@ -60,10 +60,10 @@ export default function InferencePolicies({ serviceId }: InferencePoliciesProps)
         pagination={pagination}
         rowKey="id"
         columns={[
-          { title: "策略名称", dataIndex: "name", ellipsis: true },
+          { title: "策略名称", width: 200, dataIndex: "name", ellipsis: true },
           {
             title: "状态",
-            width: 110,
+            width: 120,
             render: (_, policy) => <StatusBadge status={policy.status} />,
           },
           {

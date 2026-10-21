@@ -37,8 +37,8 @@ export default function TrainingTaskSummary({ values, preset }: TrainingTaskSumm
         pagination={false}
         data={parameters}
         columns={[
-          { title: "参数", dataIndex: "name", ellipsis: true },
-          { title: "值", dataIndex: "value" },
+          { title: "参数", width: 200, dataIndex: "name", ellipsis: true },
+          { title: "值", width: 320, dataIndex: "value" },
         ]}
       />
     </Card>

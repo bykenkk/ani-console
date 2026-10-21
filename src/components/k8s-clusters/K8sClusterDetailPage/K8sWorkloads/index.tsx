@@ -39,11 +39,11 @@ export default function K8sWorkloads({ clusterId }: K8sWorkloadsProps) {
       </Grid.Row>
       <DataTable<K8sClusterWorkload>
         columns={[
-          { title: "名称", dataIndex: "name" },
-          { title: "类型", dataIndex: "kind" },
-          { title: "命名空间", dataIndex: "namespace" },
-          { title: "副本", dataIndex: "replicas" },
-          { title: "就绪副本", dataIndex: "ready_replicas" },
+          { title: "名称", width: 200, dataIndex: "name" },
+          { title: "类型", width: 140, dataIndex: "kind" },
+          { title: "命名空间", width: 200, dataIndex: "namespace" },
+          { title: "副本", width: 100, dataIndex: "replicas" },
+          { title: "就绪副本", width: 100, dataIndex: "ready_replicas" },
           {
             title: "状态",
             width: 120,

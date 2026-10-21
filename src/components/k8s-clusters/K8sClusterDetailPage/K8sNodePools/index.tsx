@@ -33,8 +33,8 @@ export default function K8sNodePools({ clusterId, onNodeCountChange }: K8sNodePo
   return (
     <DataTable<K8sClusterNodePool>
       columns={[
-        { title: "名称", dataIndex: "name" },
-        { title: "规格", dataIndex: "instance_type" },
+        { title: "名称", width: 200, dataIndex: "name" },
+        { title: "规格", width: 200, dataIndex: "instance_type" },
         {
           title: "状态",
           width: 120,

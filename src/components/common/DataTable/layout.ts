@@ -1,7 +1,6 @@
 import type { TableColumnProps, TableProps } from "@arco-design/web-react";
 
 const DEFAULT_COLUMN_WIDTH = 200;
-const DEFAULT_NAME_COLUMN_WIDTH = 280;
 const DEFAULT_ACTION_COLUMN_WIDTH = 180;
 const CELL_HORIZONTAL_PADDING = 32;
 const ACTION_BUTTON_HORIZONTAL_PADDING = 8;
@@ -16,7 +15,6 @@ function getTextWidth(text: string) {
 
 function getColumnWidth<T>(column: TableColumnProps<T>) {
   if (typeof column.width === "number") return column.width;
-  if (column.key === "name") return DEFAULT_NAME_COLUMN_WIDTH;
   if (column.key === "__actions" || column.key === "actions") return DEFAULT_ACTION_COLUMN_WIDTH;
   return DEFAULT_COLUMN_WIDTH;
 }

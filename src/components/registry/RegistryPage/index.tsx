@@ -137,7 +137,8 @@ export default function RegistryPage() {
     {
       key: "name",
       title: "名称 / ID",
-      width: 240,
+      fixed: "left",
+      width: 200,
       render: (_, image) => (
         <ResourceNameId name={image.displayName} id={image.image_id} openable={false} />
       ),
@@ -154,7 +155,6 @@ export default function RegistryPage() {
       key: "description",
       title: "描述",
       dataIndex: "description",
-      placeholder: "-",
       ellipsis: true,
       width: 180,
     },
@@ -192,7 +192,7 @@ export default function RegistryPage() {
     {
       key: "created",
       title: "登记时间",
-      width: 170,
+      width: 180,
       render: (_, image) => formatDateTime(image.createdAt),
     },
   ];

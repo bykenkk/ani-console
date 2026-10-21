@@ -59,6 +59,8 @@ export default function K8sClustersPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, cluster) => (
         <ResourceNameId
           name={cluster.name ?? cluster.id ?? "-"}
@@ -76,18 +78,19 @@ export default function K8sClustersPage() {
     {
       key: "version",
       title: "Kubernetes 版本",
+      width: 200,
       dataIndex: "version",
-      placeholder: "-",
     },
     {
       key: "createdAt",
       title: "创建时间",
-      width: 150,
+      width: 180,
       render: (_, cluster) => formatDateTime(cluster.created_at),
     },
     {
       key: "updatedAt",
       title: "更新时间",
+      width: 180,
       render: (_, cluster) => formatDateTime(cluster.updated_at),
     },
   ];

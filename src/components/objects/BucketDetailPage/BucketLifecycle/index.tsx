@@ -101,10 +101,10 @@ export default function BucketLifecycle({ bucketId }: BucketLifecycleProps) {
         </div>
         <DataTable<StorageBucketLifecycleRule>
           columns={[
-            { title: "名称", dataIndex: "name" },
-            { title: "前缀", dataIndex: "prefix", placeholder: "全部" },
-            { title: "转低频天数", dataIndex: "to_infrequent_days" },
-            { title: "过期天数", dataIndex: "expire_days" },
+            { title: "名称", width: 200, dataIndex: "name" },
+            { title: "前缀", width: 200, dataIndex: "prefix" },
+            { title: "转低频天数", width: 180, dataIndex: "to_infrequent_days" },
+            { title: "过期天数", width: 180, dataIndex: "expire_days" },
             {
               title: "状态",
               width: 120,

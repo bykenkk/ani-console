@@ -101,11 +101,13 @@ export default function InstanceReleases({
               },
               {
                 title: "镜像",
+                width: 280,
                 ellipsis: true,
                 render: (_, release) => getImageDisplayName(release.image),
               },
               {
                 title: "更新时间",
+                width: 180,
                 render: (_, release) => formatDateTime(release.created_at),
               },
             ]}
@@ -145,14 +147,16 @@ export default function InstanceReleases({
         rowKey="revision"
         pagination={false}
         columns={[
-          { title: "修订版本", dataIndex: "revision", fixed: "left" },
+          { title: "修订版本", width: 200, dataIndex: "revision", fixed: "left" },
           {
             title: "镜像",
+            width: 280,
             ellipsis: true,
             render: (_, release) => getImageDisplayName(release.image),
           },
           {
             title: "发布时间",
+            width: 180,
             render: (_, release) => formatDateTime(release.created_at),
           },
         ]}

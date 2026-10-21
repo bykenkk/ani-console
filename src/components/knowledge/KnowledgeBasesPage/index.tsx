@@ -48,6 +48,8 @@ export default function KnowledgeBasesPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, item) => (
         <ResourceNameId
           name={item.name}
@@ -68,20 +70,19 @@ export default function KnowledgeBasesPage() {
       title: "文档数",
       dataIndex: "doc_count",
       width: 80,
-      placeholder: 0,
     },
     {
       key: "model",
       title: "向量化模型",
+      width: 200,
       dataIndex: "embedding_model",
-      placeholder: "-",
       ellipsis: true,
     },
     {
       key: "inference-model",
       title: "推理模型",
+      width: 200,
       dataIndex: "default_inference_service",
-      placeholder: "-",
       ellipsis: true,
     },
     {
@@ -89,11 +90,11 @@ export default function KnowledgeBasesPage() {
       title: "TopK",
       dataIndex: "top_k",
       width: 80,
-      placeholder: "-",
     },
     {
       key: "created",
       title: "创建时间",
+      width: 180,
       render: (_, item) => formatDateTime(item.created_at),
     },
   ];

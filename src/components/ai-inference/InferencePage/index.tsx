@@ -56,22 +56,28 @@ export default function InferencePage() {
   const columns: ListColumn<InferenceService>[] = [
     {
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, item) => (
         <ResourceNameId name={item.name} id={item.id} type="inference-service" />
       ),
     },
     {
       title: "运行阶段",
+      width: 120,
+      ellipsis: true,
       render: (_, item) => <StatusBadge status={item.phase} />,
     },
     {
       title: "调用健康",
+      width: 120,
+      ellipsis: true,
       render: (_, item) => <StatusBadge status={item.health} />,
     },
-    { title: "服务模型名", dataIndex: "served_model_name", ellipsis: true },
-    { title: "模型版本", dataIndex: "model_version_id", ellipsis: true },
-    { title: "启动命令", dataIndex: "command", ellipsis: true },
-    { title: "副本", dataIndex: "replicas", width: 80 },
+    { title: "服务模型名", width: 200, dataIndex: "served_model_name", ellipsis: true },
+    { title: "模型版本", width: 220, dataIndex: "model_version_id", ellipsis: true },
+    { title: "启动命令", width: 280, dataIndex: "command", ellipsis: true },
+    { title: "副本", ellipsis: true, dataIndex: "replicas", width: 80 },
     {
       title: "GPU 规格",
       render: (_, item) =>
@@ -80,8 +86,9 @@ export default function InferencePage() {
     },
     {
       title: "观测时间",
+      ellipsis: true,
       render: (_, item) => formatDateTime(item.observed_at),
-      width: 170,
+      width: 180,
     },
   ];
   return (

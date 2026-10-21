@@ -15,10 +15,10 @@ export default function VolumeMountHistory({ items }: VolumeMountHistoryProps) {
   return (
     <DataTable<StorageVolumeMountHistoryEntry>
       columns={[
-        { title: "时间", render: (_, item) => formatDateTime(item.at) },
-        { title: "操作", render: (_, item) => actionText[item.action] },
-        { title: "目标", dataIndex: "target", placeholder: "-" },
-        { title: "结果", render: (_, item) => <StatusBadge status={item.result} /> },
+        { title: "时间", width: 180, render: (_, item) => formatDateTime(item.at) },
+        { title: "操作", width: 200, render: (_, item) => actionText[item.action] },
+        { title: "目标", width: 280, dataIndex: "target" },
+        { title: "结果", width: 120, render: (_, item) => <StatusBadge status={item.result} /> },
       ]}
       data={items}
       pagination={false}

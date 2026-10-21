@@ -55,7 +55,7 @@ export default function InstanceEvents({ instanceId }: InstanceEventsProps) {
             ),
           },
           { title: "原因", dataIndex: "reason", width: 180 },
-          { title: "消息", dataIndex: "message", ellipsis: true },
+          { title: "消息", width: 400, dataIndex: "message", ellipsis: true },
           { title: "次数", dataIndex: "count", width: 80 },
           {
             title: "发生时间",

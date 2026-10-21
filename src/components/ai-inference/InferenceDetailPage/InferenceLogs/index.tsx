@@ -72,17 +72,15 @@ export default function InferenceLogs({ serviceId }: InferenceLogsProps) {
           {
             title: "容器",
             dataIndex: "container",
-            placeholder: "-",
             width: 160,
             ellipsis: true,
           },
           {
             title: "输出流",
             dataIndex: "stream",
-            placeholder: "-",
             width: 100,
           },
-          { title: "消息", dataIndex: "message", ellipsis: true },
+          { title: "消息", width: 400, dataIndex: "message", ellipsis: true },
         ]}
         tableLabel="推理日志列表"
       />

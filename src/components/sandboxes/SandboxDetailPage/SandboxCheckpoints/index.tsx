@@ -133,6 +133,7 @@ export default function SandboxCheckpoints({
             columns={[
               {
                 title: "名称",
+                width: 200,
                 ellipsis: true,
                 dataIndex: "name",
               },

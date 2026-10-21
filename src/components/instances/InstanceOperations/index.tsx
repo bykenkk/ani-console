@@ -46,10 +46,15 @@ export default function InstanceOperations({ operationId }: InstanceOperationsPr
         rowKey="id"
         pagination={false}
         columns={[
-          { title: "操作 ID", dataIndex: "id", ellipsis: true },
-          { title: "操作", render: (_, row) => ACTION_LABELS[row.action] ?? row.action },
+          { title: "操作 ID", width: 280, dataIndex: "id", ellipsis: true },
+          {
+            title: "操作",
+            width: 200,
+            render: (_, row) => ACTION_LABELS[row.action] ?? row.action,
+          },
           {
             title: "状态",
+            width: 120,
             render: (_, row) => <StatusBadge status={row.state} reason={row.reason} />,
           },
         ]}
@@ -62,9 +67,9 @@ export default function InstanceOperations({ operationId }: InstanceOperationsPr
         pagination={false}
         rowKey="id"
         columns={[
-          { title: "操作时间", render: () => "-" },
-          { title: "操作", dataIndex: "action" },
-          { title: "状态", dataIndex: "state" },
+          { title: "操作时间", width: 180, render: () => "-" },
+          { title: "操作", width: 200, dataIndex: "action" },
+          { title: "状态", width: 120, dataIndex: "state" },
         ]}
       />
     </div>

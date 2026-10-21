@@ -40,7 +40,7 @@ export default function ResourceNameId(props: ResourceNameIdProps) {
   };
 
   return (
-    <div className="flex min-w-0 flex-col gap-0.5">
+    <div className="flex w-0 min-w-full flex-col gap-0.5">
       <span className="block max-w-full truncate text-[14px] leading-5 text-app-text" title={name}>
         {canOpen ? (
           <button

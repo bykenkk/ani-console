@@ -10,7 +10,7 @@ export function taskColumns(): ListColumn<ModelDevExecution>[] {
     {
       key: "name",
       title: "名称 / ID",
-      width: 280,
+      width: 200,
       fixed: "left",
       render: (_, task) =>
         createElement(ResourceNameId, {
@@ -29,7 +29,7 @@ export function taskColumns(): ListColumn<ModelDevExecution>[] {
       key,
       title,
       dataIndex: key,
-      width: 140,
+      width: 120,
       ellipsis: true,
     })),
     { title: "当前阶段", dataIndex: "current_step", width: 140, ellipsis: true },

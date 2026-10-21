@@ -83,11 +83,14 @@ export default function SecurityGroupsPage() {
     {
       key: "name",
       title: "名称 / ID",
+      width: 200,
+      fixed: "left",
       render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="security-group" />,
     },
     {
       key: "vpc",
       title: "VPC",
+      width: 200,
       render: (_, item) => {
         const vpcId = item.vpc_id;
         return vpcId ? (
@@ -102,24 +105,25 @@ export default function SecurityGroupsPage() {
     {
       key: "state",
       title: "状态",
-      width: 100,
+      width: 120,
       render: (_, item) => <StatusBadge status={item.state} />,
     },
     {
       key: "rules",
       title: "规则数",
+      width: 100,
       render: (_, item) => item.rule_count ?? item.rules.length,
     },
     {
       key: "instances",
       title: "关联实例",
+      width: 100,
       dataIndex: "bound_instance_count",
-      placeholder: 0,
     },
     {
       key: "createdAt",
       title: "创建时间",
-      width: 150,
+      width: 180,
       render: (_, item) => formatDateTime(item.created_at),
     },
   ];
