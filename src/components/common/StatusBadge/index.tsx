@@ -14,6 +14,8 @@ export interface StatusBadgeProps {
   title?: string;
   tone?: StatusBadgeTone;
   loading?: boolean;
+  /** 是否显示状态点或加载图标。 */
+  showIndicator?: boolean;
   className?: string;
 }
 
@@ -65,6 +67,7 @@ export default function StatusBadge({
   title,
   tone,
   loading,
+  showIndicator = true,
   className,
 }: StatusBadgeProps) {
   const appearance = STATUS_APPEARANCE[status?.toLowerCase() ?? ""];
@@ -74,7 +77,7 @@ export default function StatusBadge({
   const contentTitle = Children.toArray(content)
     .filter((child) => typeof child === "string" || typeof child === "number")
     .join("");
-  const indicatorIcon = resolvedLoading ? (
+  const indicatorIcon = !showIndicator ? undefined : resolvedLoading ? (
     <IconLoading className={styles.loadingIcon} aria-hidden="true" />
   ) : (
     <span className={styles.dot} aria-hidden="true" />

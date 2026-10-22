@@ -3,6 +3,23 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { getModel, getModelVersion, listModelVersions, type ModelVersion } from "@/api/models";
 import { withId } from "@/lib/id";
+import { withFirst100 } from "@/api/pagination";
+import type { ModelPageParams } from "@/api/models";
+import { StatusBadge } from "@/components/common";
+import { formatDateTime } from "@/lib/format";
+
+const VERSION_STATUS_LABELS: Record<string, string> = {
+  ready: "就绪",
+  downloading: "下载中",
+  error: "失败",
+};
+
+const listVersionOptions = withFirst100(
+  (params: ModelPageParams & { modelId: string }, signal?: AbortSignal) => {
+    const { modelId, ...page } = params;
+    return listModelVersions(modelId, page, signal);
+  },
+);
 
 interface ModelVersionSelectProps {
   modelId: string;
@@ -18,19 +35,18 @@ export default function ModelVersionSelect({
   disabled,
 }: ModelVersionSelectProps) {
   const appliedId = useRef("");
-  const [chosenVersion, setChosenVersion] = useState<ModelVersion>();
+  const [chosenVersion, setChosenVersion] = useState<{ modelId: string; version: ModelVersion }>();
   const model = useQuery({
     queryKey: ["governance-model", modelId],
     enabled: Boolean(modelId),
     queryFn: ({ signal }) => getModel(modelId, signal),
     meta: { errorNotification: { id: withId("inference-model", modelId), action: "模型详情加载" } },
   });
-  // TODO(pagination-migration): 当前版本游标接口仅取首批 100 项；正式页码契约开放后改用 withFirst100，不自动遍历后续游标。
   // TODO(model-contract): 联调版本归属、就绪状态及初始选择回显。
   const versions = useQuery({
     queryKey: ["governance-model-versions", modelId, "options"],
     enabled: Boolean(modelId),
-    queryFn: ({ signal }) => listModelVersions(modelId, { limit: 100 }, signal),
+    queryFn: ({ signal }) => listVersionOptions({ modelId }, signal),
     meta: {
       errorNotification: { id: withId("inference-versions", modelId), action: "模型版本加载" },
     },
@@ -41,26 +57,31 @@ export default function ModelVersionSelect({
     queryFn: ({ signal }) => getModelVersion(value!, signal),
     meta: { errorNotification: { id: withId("inference-version", value), action: "模型版本加载" } },
   });
-  const items = [...(versions.data?.versions ?? [])];
-  if (chosenVersion?.model_id === modelId && !items.some((item) => item.id === chosenVersion.id))
-    items.push(chosenVersion);
+  const items = [...(versions.data?.items ?? [])];
+  if (
+    chosenVersion?.modelId === modelId &&
+    !items.some((item) => item.id === chosenVersion.version.id)
+  )
+    items.push(chosenVersion.version);
   const loadedVersion = selectedVersion.data?.version;
-  if (loadedVersion?.model_id === modelId && !items.some((item) => item.id === loadedVersion.id))
+  if (
+    loadedVersion &&
+    selectedVersion.data?.model.id === modelId &&
+    !items.some((item) => item.id === loadedVersion.id)
+  )
     items.push(loadedVersion);
   const selected = items.find((item) => item.id === value);
   useEffect(() => {
     if (value || !versions.data || !modelId || disabled) return;
-    const firstReady = versions.data.versions?.find(
-      (item) => item.status.toLowerCase() === "ready",
-    );
+    const firstReady = versions.data.items.find((item) => item.status.toLowerCase() === "ready");
     if (firstReady) onChange?.(firstReady.id);
   }, [value, versions.data, modelId, disabled, onChange]);
   useEffect(() => {
-    if (!selected || !model.data || appliedId.current === selected.id) return;
+    if (!selected || model.data?.id !== modelId || appliedId.current === selected.id) return;
     appliedId.current = selected.id;
-    setChosenVersion(selected);
+    setChosenVersion({ modelId: model.data.id, version: selected });
     onChange?.(selected.id, selected, model.data.name);
-  }, [selected, model.data, onChange]);
+  }, [selected, model.data, modelId, onChange]);
   return (
     <Select
       aria-label="模型版本"
@@ -70,7 +91,21 @@ export default function ModelVersionSelect({
       placeholder="请选择已就绪的模型版本"
       options={items.map((item) => ({
         value: item.id,
-        label: `${item.version} · ${item.status}`,
+        label: (
+          <span className="inline-flex max-w-full items-center gap-2 align-middle">
+            <span className="truncate">
+              {item.version} · {formatDateTime(item.created_at)}
+            </span>
+            <StatusBadge
+              className="shrink-0"
+              status={item.status}
+              tone={item.status.toLowerCase() === "downloading" ? "primary" : undefined}
+              showIndicator={false}
+            >
+              {VERSION_STATUS_LABELS[item.status.toLowerCase()] ?? item.status}
+            </StatusBadge>
+          </span>
+        ),
         disabled: item.status.toLowerCase() !== "ready",
       }))}
       onChange={(id) => {

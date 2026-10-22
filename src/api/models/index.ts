@@ -28,12 +28,11 @@ const createModelVersionScope = createIdempotencyScope("model-version-create", [
 const importScope = createIdempotencyScope("model-import", ["POST"]);
 const importBundleScope = createIdempotencyScope("model-import-bundle", ["POST"]);
 
-// TODO(model-contract): 联调当前游标分页、筛选、空页及游标失效；后端提供正式页码契约后迁移，不伪造 total。
+// TODO(model-contract): 联调页码分页、筛选、直接跳页和空页的 items/total。
 export function listModels(params: ModelListParams = {}, signal?: AbortSignal) {
-  const { limit, cursor, ...filters } = params;
   return coreRequest<ModelListResponse>("/models", {
     method: "GET",
-    params: { ...filters, "page.limit": limit, "page.cursor": cursor },
+    params,
     signal,
   });
 }
@@ -98,12 +97,11 @@ export function createModelVersion(
   });
 }
 
-// TODO(model-contract): 联调当前版本游标分页、模型归属及空列表；后端提供正式页码契约后迁移。
+// TODO(model-contract): 联调版本页码分页、模型归属、直接跳页及空列表。
 export function listModelVersions(id: string, params: ModelPageParams = {}, signal?: AbortSignal) {
-  const { limit, cursor } = params;
   return coreRequest<ModelVersionListResponse>(`/models/${encodeURIComponent(id)}/versions`, {
     method: "GET",
-    params: { "page.limit": limit, "page.cursor": cursor },
+    params,
     signal,
   });
 }

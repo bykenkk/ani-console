@@ -1,12 +1,44 @@
 import { Modal } from "@arco-design/web-react";
-// FIXME(governance-migration): governance 当前未开放旧启停、重启及调整副本接口，不能将新资源 ID 交给 legacy 写接口。
-// TODO(governance-migration): 新后端提供对应命令与操作状态契约后恢复这些入口，沿用异步受理与完成分离的反馈。
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteInferenceService, type InferenceService } from "@/api/inference";
+import {
+  applyInferenceCommand,
+  deleteInferenceService,
+  type InferenceCommand,
+  type InferenceService,
+} from "@/api/inference";
 import type { RowAction } from "@/components/common";
+
+type InferenceCommandVariables = { item: InferenceService; command: InferenceCommand };
+const commandLabels = { start: "启动", stop: "停止", restart: "重启" };
 
 export function useInferenceActions(onDeleted?: () => void) {
   const qc = useQueryClient();
+  const [editing, setEditing] = useState<InferenceService>();
+  const refresh = async (id: string) => {
+    await Promise.all([
+      qc.invalidateQueries({ queryKey: ["governance-inference-service", id] }),
+      qc.invalidateQueries({ queryKey: ["governance-inference-services"] }),
+    ]);
+  };
+  const lifecycle = useMutation({
+    mutationFn: ({ item, command }: InferenceCommandVariables) =>
+      applyInferenceCommand(item.id, command, { expected_generation: item.generation }),
+    meta: {
+      feedback: (variables) => {
+        const { command } = variables as InferenceCommandVariables;
+        const label = `${commandLabels[command]}推理服务`;
+        return {
+          channel: "notification",
+          id: `inference-${command}`,
+          action: label,
+          successText: `${label}已提交`,
+          errorFallback: `${label}失败`,
+        };
+      },
+    },
+    onSuccess: (_, { item }) => refresh(item.id),
+  });
   const remove = useMutation({
     mutationFn: (item: InferenceService) =>
       deleteInferenceService(item.id, item.gpu ? {} : { expected_generation: item.generation }),
@@ -29,19 +61,44 @@ export function useInferenceActions(onDeleted?: () => void) {
       onDeleted?.();
     },
   });
+  const pending = () => remove.isPending || lifecycle.isPending || Boolean(editing);
+  const unavailable = (item: InferenceService) => pending() || !(Number(item.generation) > 0);
   const actions: RowAction<InferenceService>[] = [
-    ...["启动", "停止", "重启", "调整副本"].map((label) => ({
-      key: label,
-      label,
+    {
+      key: "update",
+      label: "更新配置",
+      disabled: unavailable,
+      onClick: (item) => setEditing(item),
+    },
+    ...(["start", "stop", "restart"] as const).map((command) => ({
+      key: command,
+      label: commandLabels[command],
+      disabled: unavailable,
+      onClick: (item: InferenceService) => {
+        if (command === "start") {
+          lifecycle.mutate({ item, command });
+          return;
+        }
+        Modal.confirm({
+          title: `${commandLabels[command]}推理服务`,
+          content: `确定${commandLabels[command]}「${item.name}」？这可能中断正在处理的调用。`,
+          onOk: () => lifecycle.mutateAsync({ item, command }),
+        });
+      },
+    })),
+    {
+      key: "scale",
+      label: "调整副本",
+      // TODO(governance-migration): 当前更新契约冻结副本及拓扑；开放独立扩缩容接口后接入，不调用 legacy。
       disabled: () => true,
       tooltip: "当前后端尚未开放此操作",
       onClick: () => undefined,
-    })),
+    },
     {
       key: "delete",
       label: "删除",
       intent: "danger",
-      disabled: () => remove.isPending,
+      disabled: pending,
       onClick: (item) => {
         Modal.confirm({
           title: "删除推理服务",
@@ -52,5 +109,13 @@ export function useInferenceActions(onDeleted?: () => void) {
       },
     },
   ];
-  return { actions };
+  return {
+    actions,
+    editing,
+    closeEditor: () => setEditing(undefined),
+    onUpdated: async () => {
+      if (editing) await refresh(editing.id);
+      setEditing(undefined);
+    },
+  };
 }

@@ -2,51 +2,65 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Select } from "@arco-design/web-react";
 import { listInstancePresets, type ComputeType, type InstancePreset } from "@/api/instances";
+import { listInferencePresets } from "@/api/inference";
 import { withId } from "@/lib/id";
 import { withFirst100 } from "@/api/pagination";
 import { closeNotification, showNotification } from "@/lib/feedback";
 
 type InstanceComputePresetSelectProps = {
-  computeType: ComputeType;
+  usage?: "CONTAINER_INSTANCE" | "INFERENCE";
+  computeType?: ComputeType;
   value?: InstancePreset;
   onChange?: (preset?: InstancePreset) => void;
   disabled?: boolean;
 };
 
 const listPresetOptions = withFirst100(listInstancePresets);
+const listInferencePresetOptions = withFirst100(listInferencePresets);
 
 export default function InstanceComputePresetSelect({
+  usage = "CONTAINER_INSTANCE",
   computeType,
   value,
   onChange,
   disabled,
 }: InstanceComputePresetSelectProps) {
+  const label = usage === "INFERENCE" ? "推理算力规格" : "实例预设";
+  const scope = `${usage}-${computeType ?? "all"}`;
   const query = useQuery({
-    queryKey: ["compute-presets", "CONTAINER_INSTANCE", computeType, "options"],
-    queryFn: ({ signal }) => listPresetOptions({ compute_type: computeType }, signal),
+    queryKey: ["compute-presets", usage, computeType, "options"],
+    queryFn: ({ signal }) =>
+      (usage === "INFERENCE" ? listInferencePresetOptions : listPresetOptions)(
+        { compute_type: computeType },
+        signal,
+      ),
     meta: {
-      errorNotification: { id: withId("instance-presets", computeType), action: "实例预设加载" },
+      errorNotification: { id: withId("compute-presets", scope), action: `${label}加载` },
     },
   });
   const catalogStatus = query.data?.gpu_catalog_status;
   useEffect(() => {
-    const id = withId("instance-preset-gpu-catalog", computeType);
+    const id = withId("compute-preset-gpu-catalog", scope);
     if (catalogStatus === "OK") {
       closeNotification(id);
     } else if (catalogStatus === "NO_PERMISSION" || catalogStatus === "UNAVAILABLE") {
       showNotification({
         id,
         state: "error",
-        action: "加载 GPU 实例预设",
+        action: `加载 GPU ${label}`,
         content:
           catalogStatus === "NO_PERMISSION"
-            ? "当前账号无权查看 GPU 实例预设"
-            : "GPU 实例预设暂不可用，请稍后重试",
+            ? `当前账号无权查看 GPU ${label}`
+            : `GPU ${label}暂不可用，请稍后重试`,
       });
     }
-  }, [catalogStatus, computeType, query.dataUpdatedAt]);
+  }, [catalogStatus, scope, label, query.dataUpdatedAt]);
   useEffect(() => {
     const current = query.data?.items.find((item) => item.id === value?.id);
+    if (query.data && value && !current) {
+      onChange?.(undefined);
+      return;
+    }
     // 候选刷新后同步可选状态，使调用方按表单当前值执行校验。
     if (
       value &&
@@ -65,10 +79,10 @@ export default function InstanceComputePresetSelect({
       disabled={disabled}
       showSearch
       loading={query.isFetching}
-      placeholder="请选择实例预设"
+      placeholder={`请选择${label}`}
       options={options.map((item) => ({
         value: item.id,
-        label: `${item.name} · ${Number(item.cpu_millis) / 1000} CPU / ${item.memory_mib} MiB`,
+        label: `${item.name} · ${Number(item.cpu_millis) / 1000} CPU / ${item.memory_mib} MiB${item.gpu ? ` · GPU ${item.gpu.model_key} × ${item.gpu.devices_per_instance}` : ""}`,
         disabled: !item.enabled || !item.selectable,
         extra: item.unavailable_reason,
       }))}

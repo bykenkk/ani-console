@@ -16,12 +16,10 @@ export interface CreateInferenceInput {
   engine_image: string;
   engine_type: string;
   command: string;
-  cpu: string;
-  memory: string;
+  preset_id: string;
   replicas: number;
   runtime_mode: InferenceRuntimeMode;
   worker_replicas?: number;
-  gpu?: InferenceGpuSelection;
 }
 export interface CreateInferenceRequest {
   data: CreateInferenceInput & { idempotency_key: string };
@@ -31,6 +29,30 @@ export interface DeleteInferenceInput {
 }
 export interface DeleteInferenceRequest {
   data: DeleteInferenceInput & { idempotency_key: string };
+}
+export type InferenceCommand = "start" | "stop" | "restart";
+export interface InferenceCommandInput {
+  expected_generation: string;
+}
+export interface InferenceCommandRequest {
+  data: InferenceCommandInput & { resource_id: string; idempotency_key: string };
+}
+export type InferenceUpdateField = "modelVersionId" | "servedModelName" | "engine";
+export interface UpdateInferenceInput {
+  expected_generation: string;
+  update_mask: InferenceUpdateField[];
+  model_version_id?: string;
+  served_model_name?: string;
+  engine_image?: string;
+  engine_type?: string;
+  command?: string;
+}
+export interface UpdateInferenceRequest {
+  data: Omit<UpdateInferenceInput, "update_mask"> & {
+    resource_id: string;
+    idempotency_key: string;
+    update_mask: string;
+  };
 }
 /** A durable acceptance does not imply readiness or completed deletion. */
 export interface InferenceAcceptance {
@@ -62,8 +84,7 @@ export interface InferenceService {
   publication_phase?: string;
   applied_generation?: string;
 }
-// FIXME(inference-contract): 当前索引已移除推理管理路由，现有列表契约仍待与目标版本对齐。
-// TODO(inference-contract): 后端版本确认后复核筛选、分页与 total 类型并联调。
+// TODO(inference-contract): 已静态核对列表筛选和页码分页；待部署后联调 total 的十进制字符串序列化。
 export interface InferenceListParams extends PageParams {
   status?: string;
   capability?: "embedding" | "text-generation" | "speech-to-text";

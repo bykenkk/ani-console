@@ -1,5 +1,4 @@
-// FIXME(inference-contract): 当前后端索引已移除详情路由；现有详情及关联入口仍待与目标版本对齐。
-// TODO(inference-contract): 对应后端版本确认后联调详情、删除返回与关联资源。
+// TODO(inference-contract): Governance 已注册详情及删除路由；待部署后联调详情、删除返回与关联资源。
 // FIXME(governance-migration): governance 尚未提供此页所需的策略、调用地址/测试、监控、日志及事件契约，相关区域保留空态。
 // TODO(governance-migration): 逐项接入新资源对应的公开能力；不得复用 legacy 日志/策略组件查询 governance 服务 ID。
 import { Empty } from "@arco-design/web-react";
@@ -21,6 +20,7 @@ import { withId } from "@/lib/id";
 import InferenceRelatedResources from "./InferenceRelatedResources";
 import InferenceEvents from "./InferenceEvents";
 import InferenceMonitoring from "./InferenceMonitoring";
+import UpdateInferenceModal from "../UpdateInferenceModal";
 
 type InferenceDetailPageProps = {
   serviceId: string;
@@ -34,7 +34,7 @@ export default function InferenceDetailPage({
   onTabChange,
 }: InferenceDetailPageProps) {
   const goBack = useBackOrFallback("inference-service");
-  const { actions } = useInferenceActions(goBack);
+  const { actions, editing, closeEditor, onUpdated } = useInferenceActions(goBack);
   const service = useQuery({
     queryKey: ["governance-inference-service", serviceId],
     queryFn: ({ signal }) => getInferenceService(serviceId, signal),
@@ -92,14 +92,6 @@ export default function InferenceDetailPage({
                 label: "副本 / 每组 Worker",
                 value: `${item.replicas ?? "-"} / ${item.worker_replicas ?? "-"}`,
               },
-              {
-                label: "GPU 规格",
-                value: item.gpu ? `${item.gpu.profile_id} · v${item.gpu.profile_version}` : "CPU",
-              },
-              {
-                label: "GPU 集群 / 资源池",
-                value: item.gpu ? `${item.gpu.cluster_id} / ${item.gpu.pool_id}` : "-",
-              },
             ],
           },
         ]}
@@ -127,6 +119,13 @@ export default function InferenceDetailPage({
         onTabChange={onTabChange}
         onBack={goBack}
       />
+      {editing && (
+        <UpdateInferenceModal
+          serviceId={editing.id}
+          onCancel={closeEditor}
+          onSubmitted={onUpdated}
+        />
+      )}
     </>
   );
 }

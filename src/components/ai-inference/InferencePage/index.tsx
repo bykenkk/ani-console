@@ -12,9 +12,10 @@ import {
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import CreateInferenceModal from "../CreateInferenceModal";
+import UpdateInferenceModal from "../UpdateInferenceModal";
 
 export default function InferencePage() {
-  const { actions } = useInferenceActions(() => setPage(1));
+  const { actions, editing, closeEditor, onUpdated } = useInferenceActions(() => setPage(1));
   const [creating, setCreating] = useState(false);
   const qc = useQueryClient();
   const [page, setPage] = useState(1);
@@ -31,8 +32,7 @@ export default function InferencePage() {
   });
   const items = query.data?.items ?? [];
   const total = Number(query.data?.total ?? 0);
-  // FIXME(api-contract): 当前页码分页尚未与后端索引对齐。
-  // TODO(api-contract): 对应后端版本就绪后联调列表、筛选及 total，不回退旧分页。
+  // TODO(inference-contract): 已静态核对 page/pageSize 和 items/total；待部署后联调翻页、空页及权限过滤。
   const pagination: ListPagination = {
     mode: "total",
     page,
@@ -74,21 +74,35 @@ export default function InferencePage() {
       ellipsis: true,
       render: (_, item) => <StatusBadge status={item.health} />,
     },
-    { title: "服务模型名", width: 200, dataIndex: "served_model_name", ellipsis: true },
-    { title: "模型版本", width: 220, dataIndex: "model_version_id", ellipsis: true },
-    { title: "启动命令", width: 280, dataIndex: "command", ellipsis: true },
-    { title: "副本", ellipsis: true, dataIndex: "replicas", width: 80 },
     {
-      title: "GPU 规格",
-      render: (_, item) =>
-        item.gpu ? `${item.gpu.profile_id} · v${item.gpu.profile_version}` : "CPU",
+      title: "服务模型名",
+      dataIndex: "served_model_name",
+      width: 200,
+      ellipsis: true,
+    },
+    {
+      title: "模型版本",
+      dataIndex: "model_version_id",
+      width: 220,
+      ellipsis: true,
+    },
+    {
+      title: "启动命令",
+      dataIndex: "command",
+      width: 280,
+      ellipsis: true,
+    },
+    {
+      title: "副本",
+      dataIndex: "replicas",
+      width: 80,
       ellipsis: true,
     },
     {
       title: "观测时间",
-      ellipsis: true,
       render: (_, item) => formatDateTime(item.observed_at),
       width: 180,
+      ellipsis: true,
     },
   ];
   return (
@@ -120,6 +134,13 @@ export default function InferencePage() {
         />
       </ListPageFrame>
       {creating && <CreateInferenceModal onCancel={() => setCreating(false)} />}
+      {editing && (
+        <UpdateInferenceModal
+          serviceId={editing.id}
+          onCancel={closeEditor}
+          onSubmitted={onUpdated}
+        />
+      )}
     </>
   );
 }

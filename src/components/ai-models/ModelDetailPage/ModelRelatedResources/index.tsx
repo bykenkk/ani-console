@@ -71,11 +71,7 @@ export default function ModelRelatedResources({ model }: ModelRelatedResourcesPr
 
   return (
     <div>
-      <p className="mb-3 text-(--color-text-3)">
-        按推理服务分页，仅展示当前页中关联此模型的服务；当前页为空时可继续翻页查看。
-      </p>
       <DataTable<InferenceService>
-        header={{ title: "关联推理服务" }}
         columns={[
           {
             title: "推理服务",

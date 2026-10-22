@@ -19,7 +19,7 @@ import {
   StatusBadge,
   type DetailCard,
 } from "@/components/common";
-import { formatBytes, formatDateTime } from "@/lib/format";
+import { formatDateTime } from "@/lib/format";
 import {
   formatModelCapabilities,
   getLatestModelVersion,
@@ -27,6 +27,7 @@ import {
 } from "@/lib/ai-models";
 import ModelRelatedResources from "./ModelRelatedResources";
 import ModelOperationHistory from "./ModelOperationHistory";
+import ModelVersions from "./ModelVersions";
 
 type ModelDetailPageProps = {
   modelId: string;
@@ -82,12 +83,6 @@ export default function ModelDetailPage({ modelId, tab, onTabChange }: ModelDeta
           label: "版本数",
           value: String(item.versions?.length ?? 0) + " 个",
         },
-        {
-          label: "模型大小",
-          value: formatBytes(
-            item.total_size_bytes == null ? undefined : Number(item.total_size_bytes),
-          ),
-        },
         { label: "创建时间", value: formatDateTime(item.created_at) },
         { label: "更新时间", value: formatDateTime(item.updated_at) },
       ],
@@ -108,6 +103,11 @@ export default function ModelDetailPage({ modelId, tab, onTabChange }: ModelDeta
         actions={<ResourceActionMenu record={item} actions={actions} />}
         cards={detailCards}
         tabs={[
+          {
+            key: "versions",
+            label: "模型版本",
+            content: <ModelVersions modelId={item.id} />,
+          },
           {
             key: "related",
             label: "关联资源",

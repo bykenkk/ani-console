@@ -7,6 +7,8 @@ import {
   type InferenceRuntimeMode,
 } from "@/api/inference";
 import { getModelVersion, type ModelVersion } from "@/api/models";
+import type { InstancePreset } from "@/api/instances";
+import InstanceComputePresetSelect from "@/components/instances/InstanceComputePresetSelect";
 import { showMessage } from "@/lib/feedback";
 import { validateForm } from "@/lib/form";
 import { randomString } from "@/lib/random";
@@ -19,8 +21,8 @@ interface CreateInferenceFormValues {
   engine_type: string;
   engine_image: string;
   command: string;
-  cpu: number;
-  memory: number;
+  served_model_name: string;
+  preset?: InstancePreset;
   runtime_mode: InferenceRuntimeMode;
   replicas: number;
   worker_replicas?: number;
@@ -42,19 +44,19 @@ export default function CreateInferenceModal({
   const [form] = Form.useForm<CreateInferenceFormValues>();
   const qc = useQueryClient();
   const submitting = useRef(false);
-  const [modelName, setModelName] = useState("");
+  const [preset, setPreset] = useState<InstancePreset>();
   const [distributed, setDistributed] = useState(false);
   const [modelId, setModelId] = useState(initialModelId ?? "");
   const [version, setVersion] = useState<ModelVersion>();
   const changeVersion = useCallback(
     (id: string, selected?: ModelVersion, modelName?: string) => {
       setVersion(selected);
-      setModelName(modelName ?? "");
       form.setFieldsValue({
         model_version_id: id,
         engine_image: selected?.engine_image ?? "",
         engine_type: selected?.engine_type ?? "",
         command: selected?.startup_command ?? "",
+        served_model_name: modelName ? `${modelName}-${randomString(7)}` : "",
       });
     },
     [form],
@@ -64,8 +66,7 @@ export default function CreateInferenceModal({
       const latest = await getModelVersion(input.model_version_id);
       if (latest.version.status.toLowerCase() !== "ready")
         throw new Error("模型版本尚未就绪，请重新选择");
-      // FIXME(inference-contract): 当前提交契约仍待与目标版本对齐，推理管理路由尚待后端恢复。
-      // TODO(inference-model-config): 目标版本就绪后联调模型参数预填、用户修改及切换版本；提交采用用户确认的表单值，不以最新模型配置覆盖。
+      // TODO(inference-model-config): 联调模型参数预填、用户修改及切换版本；提交采用用户确认的表单值。
       return createInferenceService(input);
     },
     meta: {
@@ -96,15 +97,26 @@ export default function CreateInferenceModal({
         return;
       }
 
+      if (!values.preset?.enabled || !values.preset.selectable) {
+        showMessage({ type: "error", content: "请选择可用的推理算力规格" });
+        return;
+      }
+      if (
+        values.preset.compute_type === "gpu" &&
+        values.runtime_mode === "RUNTIME_MODE_LEADER_WORKER_SET"
+      ) {
+        showMessage({ type: "error", content: "GPU 推理暂不支持 LeaderWorkerSet" });
+        return;
+      }
+
       await create.mutateAsync({
         name: values.name.trim(),
         model_version_id: version.id,
-        served_model_name: `${modelName}-${randomString(7)}`,
+        served_model_name: values.served_model_name.trim(),
         engine_image: values.engine_image.trim(),
         engine_type: values.engine_type.trim(),
         command: values.command,
-        cpu: String(values.cpu),
-        memory: `${values.memory}Gi`,
+        preset_id: values.preset.id,
         replicas: values.replicas,
         runtime_mode: values.runtime_mode,
         ...(distributed ? { worker_replicas: values.worker_replicas } : {}),
@@ -138,8 +150,6 @@ export default function CreateInferenceModal({
           model_id: initialModelId,
           model_version_id: initialModelId ? initialModelVersionId : undefined,
           replicas: 1,
-          cpu: 8,
-          memory: 32,
           runtime_mode: "RUNTIME_MODE_DEPLOYMENT",
           worker_replicas: 1,
         }}
@@ -168,6 +178,14 @@ export default function CreateInferenceModal({
             </Form.Item>
           </Grid.Col>
         </Grid.Row>
+        <Form.Item
+          field="served_model_name"
+          label="服务模型名"
+          rules={required("请输入服务模型名")}
+          extra="请与完整启动命令中的服务模型名保持一致"
+        >
+          <Input placeholder="请输入服务模型名" />
+        </Form.Item>
         <Form.Item label="引擎镜像" required extra="确认引擎类型和镜像">
           <Input.Group compact>
             <Form.Item
@@ -198,22 +216,25 @@ export default function CreateInferenceModal({
         >
           <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} placeholder="请输入完整启动命令" />
         </Form.Item>
-        <div className="grid grid-cols-2 gap-x-4">
-          <Form.Item
-            field="cpu"
-            label="CPU"
-            rules={[{ required: true, message: "请输入 CPU 核数" }]}
-          >
-            <InputNumber min={1} precision={0} step={1} suffix="核" placeholder="请输入 CPU 核数" />
-          </Form.Item>
-          <Form.Item
-            field="memory"
-            label="内存"
-            rules={[{ required: true, message: "请输入内存容量" }]}
-          >
-            <InputNumber min={1} precision={0} step={1} suffix="GiB" placeholder="请输入内存容量" />
-          </Form.Item>
-        </div>
+        <Form.Item
+          field="preset"
+          label="算力规格"
+          rules={[{ required: true, message: "请选择推理算力规格" }]}
+        >
+          <InstanceComputePresetSelect
+            usage="INFERENCE"
+            onChange={(selected) => {
+              setPreset(selected);
+              if (selected?.compute_type === "gpu") {
+                setDistributed(false);
+                form.setFieldsValue({
+                  runtime_mode: "RUNTIME_MODE_DEPLOYMENT",
+                  worker_replicas: undefined,
+                });
+              }
+            }}
+          />
+        </Form.Item>
         <Form.Item
           field="runtime_mode"
           label="运行模式"
@@ -222,7 +243,11 @@ export default function CreateInferenceModal({
           <Select
             options={[
               { value: "RUNTIME_MODE_DEPLOYMENT", label: "Deployment" },
-              { value: "RUNTIME_MODE_LEADER_WORKER_SET", label: "LeaderWorkerSet（分布式）" },
+              {
+                value: "RUNTIME_MODE_LEADER_WORKER_SET",
+                label: "LeaderWorkerSet（分布式）",
+                disabled: preset?.compute_type === "gpu",
+              },
             ]}
             onChange={(value) => setDistributed(value === "RUNTIME_MODE_LEADER_WORKER_SET")}
           />

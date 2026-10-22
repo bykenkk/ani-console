@@ -1,4 +1,4 @@
-import type { CursorPageParams, PageParams } from "@/api/types";
+import type { PageParams } from "@/api/types";
 
 export interface ModelVersion {
   id: string;
@@ -35,25 +35,20 @@ export interface Model {
   model_id?: string;
   versions?: ModelVersion[];
 }
-// TODO(pagination-migration): 当前模型列表与版本列表采用 page.limit/page.cursor、models/versions 与 meta；后端提供正式页码契约后再迁移 PageParams。
-export type ModelPageParams = CursorPageParams;
+export type ModelPageParams = PageParams;
 export interface ModelListParams extends ModelPageParams {
   keyword?: string;
   source?: string;
   capability?: string;
   status?: string;
 }
-export interface ModelCursorMeta {
-  next_cursor?: string;
-  has_more?: boolean;
-}
 export interface ModelListResponse {
-  models: Model[];
-  meta?: ModelCursorMeta;
+  items: Model[];
+  total: string;
 }
 export interface ModelVersionListResponse {
-  versions: ModelVersion[];
-  meta?: ModelCursorMeta;
+  items: ModelVersion[];
+  total: string;
 }
 export interface ModelVersionResponse {
   model: Model;
