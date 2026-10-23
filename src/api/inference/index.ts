@@ -55,13 +55,13 @@ export function getInferenceService(id: string, signal?: AbortSignal) {
     signal,
   });
 }
+// FIXME(inference-contract-doc): 后端 inference-flat-api.md 仍描述旧 data 包装，待同步至当前已核对的顶层 protobuf/HTTP 契约。
 // TODO(inference-contract): 联调 preset_id、CPU/GPU 创建、同意图幂等重试与异步受理。
 export function createInferenceService(input: CreateInferenceInput): Promise<void> {
   return runIdempotentRequest(createScope, input, async (data) => {
     await coreRequest<InferenceAcceptance, CreateInferenceRequest>("/inference/services", {
       method: "POST",
-      // TODO(inference-contract): 待后端统一提交数据格式后移除请求体的 data 包装，并同步调整请求类型；当前遵循现有契约。
-      data: { data },
+      data,
     });
   });
 }
@@ -76,8 +76,7 @@ export function deleteInferenceService(
     async (data) => {
       await coreRequest<InferenceAcceptance, DeleteInferenceRequest>(`${servicePath(id)}:delete`, {
         method: "POST",
-        // TODO(inference-contract): 后端当前要求 data 包装；待统一提交格式后同步调整请求类型并联调。
-        data: { data },
+        data,
       });
     },
     [id],
@@ -109,7 +108,7 @@ export async function getInferenceOperation(
   };
 }
 export type * from "./types";
-// TODO(inference-contract): 后端当前要求 data 包装；待统一提交格式后迁移。联调更新掩码、generation 冲突及幂等重试。
+// TODO(inference-contract): 已核对顶层更新字段；联调更新掩码、generation 冲突及幂等重试。
 export function updateInferenceService(id: string, input: UpdateInferenceInput): Promise<void> {
   return runIdempotentRequest(
     updateScope,
@@ -118,14 +117,14 @@ export function updateInferenceService(id: string, input: UpdateInferenceInput):
       await coreRequest<InferenceAcceptance, UpdateInferenceRequest>(`${servicePath(id)}:update`, {
         method: "POST",
         // ProtoJSON FieldMask 使用逗号分隔的 lowerCamel 路径；engine 必须整组替换。
-        data: { data: { ...data, resource_id: id, update_mask: data.update_mask.join(",") } },
+        data: { ...data, resource_id: id, update_mask: data.update_mask.join(",") },
       });
     },
     [id],
   );
 }
 
-// TODO(inference-contract): 后端当前要求 data 包装；待统一提交格式后迁移。联调启停、重启与异步受理。
+// TODO(inference-contract): 已核对顶层命令字段；联调启停、重启与异步受理。
 export function applyInferenceCommand(
   id: string,
   command: InferenceCommand,
@@ -139,7 +138,7 @@ export function applyInferenceCommand(
         `${servicePath(id)}:${command}`,
         {
           method: "POST",
-          data: { data: { ...data, resource_id: id } },
+          data: { ...data, resource_id: id },
         },
       );
     },
@@ -149,3 +148,4 @@ export function applyInferenceCommand(
 // FIXME(governance-migration): 尚未迁移的 Services 能力保留独立命名空间，逐项迁移后移除。
 // TODO(governance-migration): 迁移完成后移除该旧接口命名空间；不得用于新资源兜底。
 export * as legacyInference from "./legacy";
+export * from "./diagnostics";

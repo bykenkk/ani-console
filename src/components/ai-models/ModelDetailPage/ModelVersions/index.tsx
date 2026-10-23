@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@arco-design/web-react";
+import { Button, Select, Space } from "@arco-design/web-react";
+import { useState } from "react";
 import { IconCopy } from "@arco-design/web-react/icon";
-import { listModelVersions, type ModelVersion } from "@/api/models";
+import { listModelVersions, type ModelVersion, type ModelVersionStatus } from "@/api/models";
 import { DataTable, ResourceNameId, StatusBadge } from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { copyToClipboard } from "@/lib/clipboard";
@@ -19,9 +20,10 @@ const MODEL_FORMAT_LABELS: Record<string, string> = {
 };
 
 export default function ModelVersions({ modelId }: ModelVersionsProps) {
-  const paging = useListPagination(modelId, 10);
+  const [status, setStatus] = useState<ModelVersionStatus | "all">("all");
+  const paging = useListPagination(JSON.stringify([modelId, status]), 10);
   const { page, pageSize } = paging;
-  const params = { page, pageSize };
+  const params = { page, pageSize, status: status === "all" ? undefined : status };
   // TODO(model-contract): 联调当前模型版本列表的分页、空列表和版本大小展示。
   const versions = useQuery({
     queryKey: ["governance-model-versions", modelId, params],
@@ -36,6 +38,31 @@ export default function ModelVersions({ modelId }: ModelVersionsProps) {
 
   return (
     <DataTable<ModelVersion>
+      header={{
+        title: "模型版本",
+        extra: (
+          <Space>
+            <Select
+              aria-label="版本状态"
+              value={status}
+              className="w-32"
+              onChange={setStatus}
+              options={[
+                { value: "all", label: "全部状态" },
+                { value: "pending", label: "等待中" },
+                { value: "importing", label: "导入中" },
+                { value: "downloading", label: "下载中" },
+                { value: "ready", label: "就绪" },
+                { value: "error", label: "错误" },
+                { value: "failed", label: "失败" },
+              ]}
+            />
+            <Button loading={versions.isFetching} onClick={() => versions.refetch()}>
+              刷新
+            </Button>
+          </Space>
+        ),
+      }}
       columns={[
         {
           key: "name",

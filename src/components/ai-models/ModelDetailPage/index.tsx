@@ -1,5 +1,4 @@
-// FIXME(governance-migration): 推荐配置仍隐藏，操作记录仍为空态；当前接入未覆盖这些详情能力。
-// TODO(governance-migration): 确认推荐配置和模型操作记录的权威接口后接入，不能将空态当作已完成查询。
+// TODO(governance-migration): 推荐配置仍未开放，确认权威接口后恢复对应区域。
 import { useModelActions } from "@/hooks/useModelActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
@@ -122,7 +121,7 @@ export default function ModelDetailPage({ modelId, tab, onTabChange }: ModelDeta
           {
             key: "operation-history",
             label: "操作记录",
-            content: <ModelOperationHistory />,
+            content: <ModelOperationHistory modelId={item.id} />,
           },
         ]}
         activeTabKey={tab}

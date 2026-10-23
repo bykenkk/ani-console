@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { getModel, getModelVersion, listModelVersions, type ModelVersion } from "@/api/models";
 import { withId } from "@/lib/id";
 import { withFirst100 } from "@/api/pagination";
-import type { ModelPageParams } from "@/api/models";
+import type { ModelVersionListParams } from "@/api/models";
 import { StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
@@ -12,10 +12,13 @@ const VERSION_STATUS_LABELS: Record<string, string> = {
   ready: "就绪",
   downloading: "下载中",
   error: "失败",
+  failed: "失败",
+  pending: "等待中",
+  importing: "导入中",
 };
 
 const listVersionOptions = withFirst100(
-  (params: ModelPageParams & { modelId: string }, signal?: AbortSignal) => {
+  (params: ModelVersionListParams & { modelId: string }, signal?: AbortSignal) => {
     const { modelId, ...page } = params;
     return listModelVersions(modelId, page, signal);
   },
@@ -44,9 +47,9 @@ export default function ModelVersionSelect({
   });
   // TODO(model-contract): 联调版本归属、就绪状态及初始选择回显。
   const versions = useQuery({
-    queryKey: ["governance-model-versions", modelId, "options"],
+    queryKey: ["governance-model-versions", modelId, "options", { status: "ready" }],
     enabled: Boolean(modelId),
-    queryFn: ({ signal }) => listVersionOptions({ modelId }, signal),
+    queryFn: ({ signal }) => listVersionOptions({ modelId, status: "ready" }, signal),
     meta: {
       errorNotification: { id: withId("inference-versions", modelId), action: "模型版本加载" },
     },
@@ -60,20 +63,21 @@ export default function ModelVersionSelect({
   const items = [...(versions.data?.items ?? [])];
   if (
     chosenVersion?.modelId === modelId &&
+    chosenVersion.version.id === value &&
     !items.some((item) => item.id === chosenVersion.version.id)
   )
     items.push(chosenVersion.version);
   const loadedVersion = selectedVersion.data?.version;
-  if (
-    loadedVersion &&
-    selectedVersion.data?.model.id === modelId &&
-    !items.some((item) => item.id === loadedVersion.id)
-  )
-    items.push(loadedVersion);
+  if (loadedVersion && selectedVersion.data?.model.id === modelId && loadedVersion.id === value) {
+    // 当前选择独立回显真实状态，即使已不在 ready 选项中，也不回退到旧缓存状态。
+    const position = items.findIndex((item) => item.id === loadedVersion.id);
+    if (position < 0) items.push(loadedVersion);
+    else items[position] = loadedVersion;
+  }
   const selected = items.find((item) => item.id === value);
   useEffect(() => {
     if (value || !versions.data || !modelId || disabled) return;
-    const firstReady = versions.data.items.find((item) => item.status.toLowerCase() === "ready");
+    const firstReady = versions.data.items[0];
     if (firstReady) onChange?.(firstReady.id);
   }, [value, versions.data, modelId, disabled, onChange]);
   useEffect(() => {

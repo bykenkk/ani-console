@@ -21,21 +21,22 @@ export interface CreateInferenceInput {
   runtime_mode: InferenceRuntimeMode;
   worker_replicas?: number;
 }
-export interface CreateInferenceRequest {
-  data: CreateInferenceInput & { idempotency_key: string };
+export interface CreateInferenceRequest extends CreateInferenceInput {
+  idempotency_key: string;
 }
 export interface DeleteInferenceInput {
   expected_generation?: string;
 }
-export interface DeleteInferenceRequest {
-  data: DeleteInferenceInput & { idempotency_key: string };
+export interface DeleteInferenceRequest extends DeleteInferenceInput {
+  idempotency_key: string;
 }
 export type InferenceCommand = "start" | "stop" | "restart";
 export interface InferenceCommandInput {
   expected_generation: string;
 }
-export interface InferenceCommandRequest {
-  data: InferenceCommandInput & { resource_id: string; idempotency_key: string };
+export interface InferenceCommandRequest extends InferenceCommandInput {
+  resource_id: string;
+  idempotency_key: string;
 }
 export type InferenceUpdateField = "modelVersionId" | "servedModelName" | "engine";
 export interface UpdateInferenceInput {
@@ -47,12 +48,10 @@ export interface UpdateInferenceInput {
   engine_type?: string;
   command?: string;
 }
-export interface UpdateInferenceRequest {
-  data: Omit<UpdateInferenceInput, "update_mask"> & {
-    resource_id: string;
-    idempotency_key: string;
-    update_mask: string;
-  };
+export interface UpdateInferenceRequest extends Omit<UpdateInferenceInput, "update_mask"> {
+  resource_id: string;
+  idempotency_key: string;
+  update_mask: string;
 }
 /** A durable acceptance does not imply readiness or completed deletion. */
 export interface InferenceAcceptance {
@@ -117,4 +116,52 @@ export interface InferenceOperationResponse {
   errorMessage?: string;
   createdAt?: string;
   completedAt?: string;
+}
+
+export interface InferenceRuntimeInstance {
+  name: string;
+  uid: string;
+  phase: string;
+  containers: string[];
+}
+export interface InferenceRuntimeDiagnostics {
+  invocation_health: string;
+  health_reason?: string;
+  health_observed_at?: string;
+  runtime_observed_at?: string;
+  observed_at?: string;
+  instances: InferenceRuntimeInstance[];
+}
+export interface InferenceLogParams {
+  instance?: string;
+  container?: string;
+  since?: string;
+  until?: string;
+  tail_lines?: number;
+}
+export interface InferenceLogLine {
+  timestamp?: string;
+  message: string;
+}
+export interface InferenceLogsResponse {
+  items: InferenceLogLine[];
+  truncated: boolean;
+}
+export interface InferenceEventParams extends PageParams {
+  since?: string;
+  until?: string;
+  type?: string;
+}
+export interface InferenceRuntimeEvent {
+  id: string;
+  type: string;
+  reason: string;
+  message: string;
+  timestamp?: string;
+  instance?: string;
+  count: string;
+}
+export interface InferenceEventsResponse {
+  items: InferenceRuntimeEvent[];
+  total: string;
 }

@@ -16,6 +16,8 @@ import type {
   ModelListParams,
   ModelListResponse,
   ModelPageParams,
+  ModelVersionListParams,
+  ModelOperationListResponse,
   ModelVersion,
   ModelVersionListResponse,
   ModelVersionResponse,
@@ -67,39 +69,52 @@ export function searchExternalModels(
   });
 }
 
-// FIXME(model-contract): 当前索引的创建响应带 model 包装；现有实现丢弃提交响应，请求契约仍待与目标版本对齐。
-// TODO(model-contract): 目标版本明确后复核创建字段、幂等及受理语义并联调。
+// TODO(model-contract): 已核对顶层业务字段及幂等键；待部署后联调创建、重复提交及错误响应。
 export function createModel(submitData: CreateModelInput, signal?: AbortSignal): Promise<void> {
   return runIdempotentRequest(createModelScope, submitData, async (body) => {
-    await coreRequest<{ model: Model }, { data: CreateModelRequest }>("/models", {
+    await coreRequest<{ model: Model }, CreateModelRequest>("/models", {
       method: "POST",
-      data: { data: body },
+      data: body,
       signal,
     });
   });
 }
 
-// FIXME(model-contract): 模型版本创建尚未与目标部署版本联调；现有实现丢弃提交响应，请求契约仍待验证。
-// TODO(model-contract): 目标版本明确后复核版本字段、幂等及重复提交行为。
+// TODO(model-contract): 已核对版本创建的顶层业务字段；待部署后联调版本字段、幂等及重复提交行为。
 export function createModelVersion(
   submitData: CreateModelVersionInput,
   signal?: AbortSignal,
 ): Promise<void> {
   return runIdempotentRequest(createModelVersionScope, submitData, async (body) => {
-    await coreRequest<{ version: ModelVersion }, { data: CreateModelVersionRequest }>(
-      "/model-versions",
-      {
-        method: "POST",
-        data: { data: body },
-        signal,
-      },
-    );
+    await coreRequest<{ version: ModelVersion }, CreateModelVersionRequest>("/model-versions", {
+      method: "POST",
+      data: body,
+      signal,
+    });
   });
 }
 
-// TODO(model-contract): 联调版本页码分页、模型归属、直接跳页及空列表。
-export function listModelVersions(id: string, params: ModelPageParams = {}, signal?: AbortSignal) {
+// FIXME(model-pagination): 当前后端将 page 误限为 1–100；待解除页码上限后复核直接跳页，不在前端截断 total 或模拟分页。
+// TODO(model-contract): 联调 status 服务端筛选、模型归属及空列表。
+export function listModelVersions(
+  id: string,
+  params: ModelVersionListParams = {},
+  signal?: AbortSignal,
+) {
   return coreRequest<ModelVersionListResponse>(`/models/${encodeURIComponent(id)}/versions`, {
+    method: "GET",
+    params,
+    signal,
+  });
+}
+// FIXME(model-pagination): 当前后端将操作记录的 page 误限为 1–100，超出会返回 400；待后端修复后复核。
+// TODO(model-operations): 联调租户隔离、真实 total、操作人及 accepted/succeeded/failed 结果，不将 accepted 展示为完成。
+export function listModelOperations(
+  id: string,
+  params: ModelPageParams = {},
+  signal?: AbortSignal,
+) {
+  return coreRequest<ModelOperationListResponse>(`/models/${encodeURIComponent(id)}/operations`, {
     method: "GET",
     params,
     signal,
@@ -113,20 +128,18 @@ export function getModelVersion(id: string, signal?: AbortSignal) {
     signal,
   });
 }
-// FIXME(model-contract): 现有导入请求仍待与目标部署版本联调；提交响应不用于任务跟踪。
-// TODO(model-contract): 确认导入字段、幂等及受理语义；任务跟踪后续统一接入。
+// TODO(model-contract): 已核对模型导入的顶层业务字段；待部署后联调幂等及受理语义，任务跟踪后续统一接入。
 export function importModel(submitData: ImportModelInput, signal?: AbortSignal): Promise<void> {
   return runIdempotentRequest(importScope, submitData, async (body) => {
     await coreRequest<{ task: ImportTask }, ImportModelRequest>("/models:import", {
       method: "POST",
-      data: { data: body },
+      data: body,
       signal,
     });
   });
 }
 
-// FIXME(model-contract): 当前索引尚未确认现有 models:import-bundle 组合导入路径和请求结构。
-// TODO(model-contract): 取得对应后端版本后核对组合导入、幂等与失败重试；后续统一接入任务跟踪。
+// TODO(model-contract): 已核对组合导入的顶层 model/version/source 结构；待部署后联调幂等和失败重试，任务跟踪后续统一接入。
 export function importModelBundle(
   submitData: ImportModelBundleInput,
   signal?: AbortSignal,
@@ -136,7 +149,7 @@ export function importModelBundle(
       "/models:import-bundle",
       {
         method: "POST",
-        data: { data: body },
+        data: body,
         signal,
       },
     );

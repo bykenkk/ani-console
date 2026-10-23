@@ -36,6 +36,16 @@ export interface Model {
   versions?: ModelVersion[];
 }
 export type ModelPageParams = PageParams;
+export type ModelVersionStatus =
+  | "pending"
+  | "importing"
+  | "ready"
+  | "error"
+  | "downloading"
+  | "failed";
+export interface ModelVersionListParams extends PageParams {
+  status?: ModelVersionStatus;
+}
 export interface ModelListParams extends ModelPageParams {
   keyword?: string;
   source?: string;
@@ -62,8 +72,8 @@ export interface ImportModelInput {
   model_id: string;
   model_version_id: string;
 }
-export interface ImportModelRequest {
-  data: ImportModelInput & { idempotency_key: string };
+export interface ImportModelRequest extends ImportModelInput {
+  idempotency_key: string;
 }
 
 export interface ImportModelBundleModelInput {
@@ -94,8 +104,8 @@ export interface ImportModelBundleInput {
   source: ImportModelBundleSourceInput;
 }
 
-export interface ImportModelBundleRequest {
-  data: ImportModelBundleInput & { idempotency_key: string };
+export interface ImportModelBundleRequest extends ImportModelBundleInput {
+  idempotency_key: string;
 }
 
 export interface ImportModelBundleResponse {
@@ -158,4 +168,23 @@ export interface ImportTask {
   error_message?: string;
   created_at?: string;
   completed_at?: string;
+}
+
+export interface ModelOperation {
+  id: string;
+  model_id: string;
+  model_version_id?: string;
+  action: string;
+  actor: string;
+  result: "accepted" | "succeeded" | "failed";
+  before_state?: string;
+  after_state?: string;
+  error_class?: string;
+  request_id?: string;
+  created_at: string;
+  task_id?: string;
+}
+export interface ModelOperationListResponse {
+  items: ModelOperation[];
+  total: string;
 }

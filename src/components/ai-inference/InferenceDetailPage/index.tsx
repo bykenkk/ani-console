@@ -1,6 +1,5 @@
 // TODO(inference-contract): Governance 已注册详情及删除路由；待部署后联调详情、删除返回与关联资源。
-// FIXME(governance-migration): governance 尚未提供此页所需的策略、调用地址/测试、监控、日志及事件契约，相关区域保留空态。
-// TODO(governance-migration): 逐项接入新资源对应的公开能力；不得复用 legacy 日志/策略组件查询 governance 服务 ID。
+// FIXME(inference-health): health 完整枚举、unknown 成因及探测更新机制仍待 owner 确认；保留后端原值，不由运行阶段推算。
 import { Empty } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { getInferenceService } from "@/api/inference";
@@ -20,6 +19,7 @@ import { withId } from "@/lib/id";
 import InferenceRelatedResources from "./InferenceRelatedResources";
 import InferenceEvents from "./InferenceEvents";
 import InferenceMonitoring from "./InferenceMonitoring";
+import InferenceRuntimeLogs from "./InferenceRuntimeLogs";
 import UpdateInferenceModal from "../UpdateInferenceModal";
 
 type InferenceDetailPageProps = {
@@ -104,16 +104,26 @@ export default function InferenceDetailPage({
           {
             key: "policies",
             label: "策略",
+            // FIXME(inference-policies): Governance 尚无推理服务访问策略查询、绑定和修改接口；保留空态，不向 legacy 传新资源 ID。
             content: <Empty description="当前后端尚未开放推理访问策略" />,
           },
           {
             key: "invocation-test",
             label: "调用测试",
+            // FIXME(inference-invocation): 已有 Higress 运维验证脚本，但前端的调用地址、凭证获取与浏览器调用契约仍缺失，补齐后接入。
             content: <Empty description="当前后端尚未提供调用地址和调用测试接口" />,
           },
-          { key: "monitoring", label: "监控", content: <InferenceMonitoring /> },
-          { key: "logs", label: "日志", content: <Empty description="当前后端尚未开放推理日志" /> },
-          { key: "events", label: "事件", content: <InferenceEvents /> },
+          {
+            key: "monitoring",
+            label: "监控",
+            content: <InferenceMonitoring serviceId={item.id} />,
+          },
+          {
+            key: "logs",
+            label: "日志",
+            content: <InferenceRuntimeLogs key={item.id} serviceId={item.id} />,
+          },
+          { key: "events", label: "事件", content: <InferenceEvents serviceId={item.id} /> },
         ]}
         activeTabKey={tab}
         onTabChange={onTabChange}
