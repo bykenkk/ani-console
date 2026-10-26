@@ -27,6 +27,7 @@ import { Route as AuthenticatedAppContainersIndexRouteImport } from './routes/_a
 import { Route as AuthenticatedAppContainersInstanceIdRouteImport } from './routes/_authenticated/_app/containers/$instanceId'
 import { Route as AuthenticatedAppDevIndexRouteImport } from './routes/_authenticated/_app/dev/index'
 import { Route as AuthenticatedAppDevResourceRouteImport } from './routes/_authenticated/_app/dev/resource'
+import { Route as AuthenticatedAppEipsIndexRouteImport } from './routes/_authenticated/_app/eips/index'
 import { Route as AuthenticatedAppFilesystemsIndexRouteImport } from './routes/_authenticated/_app/filesystems/index'
 import { Route as AuthenticatedAppFilesystemsFilesystemIdRouteImport } from './routes/_authenticated/_app/filesystems/$filesystemId'
 import { Route as AuthenticatedAppGpuContainersIndexRouteImport } from './routes/_authenticated/_app/gpu-containers/index'
@@ -158,6 +159,12 @@ const AuthenticatedAppDevResourceRoute =
   AuthenticatedAppDevResourceRouteImport.update({
     id: '/dev/resource',
     path: '/dev/resource',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppEipsIndexRoute =
+  AuthenticatedAppEipsIndexRouteImport.update({
+    id: '/eips/',
+    path: '/eips/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppFilesystemsIndexRoute =
@@ -388,6 +395,7 @@ export interface FileRoutesByFullPath {
   '/api-keys/': typeof AuthenticatedAppApiKeysIndexRoute
   '/containers/': typeof AuthenticatedAppContainersIndexRoute
   '/dev/': typeof AuthenticatedAppDevIndexRoute
+  '/eips/': typeof AuthenticatedAppEipsIndexRoute
   '/filesystems/': typeof AuthenticatedAppFilesystemsIndexRoute
   '/gpu-containers/': typeof AuthenticatedAppGpuContainersIndexRoute
   '/gpu-inventory/': typeof AuthenticatedAppGpuInventoryIndexRoute
@@ -437,6 +445,7 @@ export interface FileRoutesByTo {
   '/api-keys': typeof AuthenticatedAppApiKeysIndexRoute
   '/containers': typeof AuthenticatedAppContainersIndexRoute
   '/dev': typeof AuthenticatedAppDevIndexRoute
+  '/eips': typeof AuthenticatedAppEipsIndexRoute
   '/filesystems': typeof AuthenticatedAppFilesystemsIndexRoute
   '/gpu-containers': typeof AuthenticatedAppGpuContainersIndexRoute
   '/gpu-inventory': typeof AuthenticatedAppGpuInventoryIndexRoute
@@ -491,6 +500,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/api-keys/': typeof AuthenticatedAppApiKeysIndexRoute
   '/_authenticated/_app/containers/': typeof AuthenticatedAppContainersIndexRoute
   '/_authenticated/_app/dev/': typeof AuthenticatedAppDevIndexRoute
+  '/_authenticated/_app/eips/': typeof AuthenticatedAppEipsIndexRoute
   '/_authenticated/_app/filesystems/': typeof AuthenticatedAppFilesystemsIndexRoute
   '/_authenticated/_app/gpu-containers/': typeof AuthenticatedAppGpuContainersIndexRoute
   '/_authenticated/_app/gpu-inventory/': typeof AuthenticatedAppGpuInventoryIndexRoute
@@ -544,6 +554,7 @@ export interface FileRouteTypes {
     | '/api-keys/'
     | '/containers/'
     | '/dev/'
+    | '/eips/'
     | '/filesystems/'
     | '/gpu-containers/'
     | '/gpu-inventory/'
@@ -593,6 +604,7 @@ export interface FileRouteTypes {
     | '/api-keys'
     | '/containers'
     | '/dev'
+    | '/eips'
     | '/filesystems'
     | '/gpu-containers'
     | '/gpu-inventory'
@@ -646,6 +658,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/api-keys/'
     | '/_authenticated/_app/containers/'
     | '/_authenticated/_app/dev/'
+    | '/_authenticated/_app/eips/'
     | '/_authenticated/_app/filesystems/'
     | '/_authenticated/_app/gpu-containers/'
     | '/_authenticated/_app/gpu-inventory/'
@@ -798,6 +811,13 @@ declare module '@tanstack/react-router' {
       path: '/dev/resource'
       fullPath: '/dev/resource'
       preLoaderRoute: typeof AuthenticatedAppDevResourceRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/eips/': {
+      id: '/_authenticated/_app/eips/'
+      path: '/eips'
+      fullPath: '/eips/'
+      preLoaderRoute: typeof AuthenticatedAppEipsIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/filesystems/': {
@@ -1079,6 +1099,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppApiKeysIndexRoute: typeof AuthenticatedAppApiKeysIndexRoute
   AuthenticatedAppContainersIndexRoute: typeof AuthenticatedAppContainersIndexRoute
   AuthenticatedAppDevIndexRoute: typeof AuthenticatedAppDevIndexRoute
+  AuthenticatedAppEipsIndexRoute: typeof AuthenticatedAppEipsIndexRoute
   AuthenticatedAppFilesystemsIndexRoute: typeof AuthenticatedAppFilesystemsIndexRoute
   AuthenticatedAppGpuContainersIndexRoute: typeof AuthenticatedAppGpuContainersIndexRoute
   AuthenticatedAppGpuInventoryIndexRoute: typeof AuthenticatedAppGpuInventoryIndexRoute
@@ -1136,6 +1157,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppApiKeysIndexRoute: AuthenticatedAppApiKeysIndexRoute,
   AuthenticatedAppContainersIndexRoute: AuthenticatedAppContainersIndexRoute,
   AuthenticatedAppDevIndexRoute: AuthenticatedAppDevIndexRoute,
+  AuthenticatedAppEipsIndexRoute: AuthenticatedAppEipsIndexRoute,
   AuthenticatedAppFilesystemsIndexRoute: AuthenticatedAppFilesystemsIndexRoute,
   AuthenticatedAppGpuContainersIndexRoute:
     AuthenticatedAppGpuContainersIndexRoute,

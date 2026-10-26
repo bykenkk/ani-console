@@ -4,7 +4,9 @@ import { listNetworkEips } from "@/api/network";
 
 export default function LoadBalancerPublicIpField() {
   const eips = useQuery({
-    queryKey: ["network-eips", "load-balancer-create"],
+    queryKey: ["network-eips", "options", "load-balancer-create"],
+    // TODO(pagination-migration): EIP 仍使用 limit/cursor，暂保留现有单次查询；后端完成 page/pageSize 后改用 withFirst100。
+    // TODO: 当前仅查询当前租户的公网 IP；后端提供未绑定等筛选条件后，再限定可选资源范围。
     queryFn: ({ signal }) => listNetworkEips({}, signal),
     meta: {
       errorNotification: {
@@ -23,14 +25,14 @@ export default function LoadBalancerPublicIpField() {
       <Select
         placeholder="请选择公网 IP"
         loading={eips.isLoading}
-        showSearch
         allowClear
-        options={(eips.data?.items ?? [])
-          .filter((item) => !!item.address)
-          .map((item) => ({
-            value: item.id,
-            label: item.name ? `${item.address} · ${item.name}` : item.address,
-          }))}
+        options={(eips.data?.items ?? []).map((item) => ({
+          value: item.id,
+          label:
+            item.address && item.name
+              ? `${item.address} · ${item.name}`
+              : item.address || item.name || item.id,
+        }))}
       />
     </Form.Item>
   );

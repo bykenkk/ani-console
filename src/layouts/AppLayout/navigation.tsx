@@ -84,6 +84,7 @@ export const menuItems: readonly MenuItem[] = [
         children: [
           { key: "/vpcs", label: "VPC 网络", icon: <AliIcon name="VPCwangluo" /> },
           { key: "/subnets", label: "VPC 子网", icon: <AliIcon name="ziwang" /> },
+          { key: "/eips", label: "公网 IP", icon: <AliIcon name="wangluo" /> },
           {
             key: "/security-groups",
             label: "安全组",
@@ -226,6 +227,7 @@ const PATH_SUBMENU: { prefix: string; key: string }[] = [
   { prefix: "/kb", key: "knowledge-services" },
   { prefix: "/vpcs", key: "network-management" },
   { prefix: "/subnets", key: "network-management" },
+  { prefix: "/eips", key: "network-management" },
   { prefix: "/security-groups", key: "network-management" },
   { prefix: "/routes", key: "network-management" },
   { prefix: "/load-balancers", key: "network-management" },
