@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Empty, Menu, Tooltip } from "@arco-design/web-react";
 import clsx from "clsx";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { AliIcon } from "@/components/common";
 import { isGroupItem, matchSideMenuKey, type MenuItem } from "../navigation";
 
@@ -114,7 +114,29 @@ export function Sidebar({
   );
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [hoverExpanded, setHoverExpanded] = useState(false);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const hoverSuppressedAt = useRef<{ x: number; y: number } | null>(null);
   const menuCollapsed = collapsed && !hoverExpanded;
+
+  useEffect(() => {
+    const releaseHoverSuppression = (event: MouseEvent) => {
+      const position = hoverSuppressedAt.current;
+      if (!position || (event.clientX === position.x && event.clientY === position.y)) return;
+      const bounds = sidebarRef.current?.getBoundingClientRect();
+      if (
+        bounds &&
+        (event.clientX < bounds.left ||
+          event.clientX >= bounds.right ||
+          event.clientY < bounds.top ||
+          event.clientY >= bounds.bottom)
+      ) {
+        hoverSuppressedAt.current = null;
+      }
+    };
+    // Resizing can fire leave/enter without pointer movement; only a real exit unlocks hover.
+    document.addEventListener("mousemove", releaseHoverSuppression, true);
+    return () => document.removeEventListener("mousemove", releaseHoverSuppression, true);
+  }, []);
 
   useEffect(() => {
     if (!items) return;
@@ -133,6 +155,7 @@ export function Sidebar({
 
   return (
     <aside
+      ref={sidebarRef}
       className={clsx("sidebar", collapsed && "is-collapsed", hoverExpanded && "is-hover-expanded")}
       style={{
         width: menuCollapsed ? SIDEBAR_COLLAPSED_WIDTH : SIDEBAR_WIDTH,
@@ -140,7 +163,7 @@ export function Sidebar({
         borderColor: "var(--color-border-2)",
       }}
       onMouseEnter={() => {
-        if (collapsed) setHoverExpanded(true);
+        if (collapsed && !hoverSuppressedAt.current) setHoverExpanded(true);
       }}
       onMouseLeave={() => setHoverExpanded(false)}
     >
@@ -190,7 +213,9 @@ export function Sidebar({
           aria-label={collapseLabel}
           aria-controls="sidebar-navigation-menu"
           aria-expanded={!collapsed}
-          onClick={() => {
+          onClick={(event) => {
+            // Explicit collapse wins over hover until the pointer leaves the sidebar.
+            hoverSuppressedAt.current = collapsed ? null : { x: event.clientX, y: event.clientY };
             setHoverExpanded(false);
             onCollapsedChange(!collapsed);
           }}

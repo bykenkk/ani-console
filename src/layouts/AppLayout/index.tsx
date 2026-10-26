@@ -1,6 +1,7 @@
 import { Layout, Space, Typography } from "@arco-design/web-react";
 import { useRouterState } from "@tanstack/react-router";
-import { useState, type CSSProperties } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
+import { preferenceStorage } from "@/lib/storage";
 import "./index.css";
 import ProductServicesPanel from "./ProductServicesPanel";
 import TopNav from "./TopNav";
@@ -14,6 +15,7 @@ type PageHeaderProps = {
 };
 
 const { Content } = Layout;
+const SIDEBAR_COLLAPSED_STORAGE_KEY = "sidebar-collapsed";
 
 const APP_CONTENT_STYLE = {
   background: "linear-gradient(135deg, #f2f5fb 0%, #f7f9fc 100%)",
@@ -43,12 +45,40 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children }: AppLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState<boolean | null>(null);
   const [productPanelVisible, setProductPanelVisible] = useState(false);
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const topNavKey = activeTopNavKeyForPath(pathname);
   const sidebarNavigation = sidebarNavigationForPath(pathname);
   const showSidebar = pathname !== "/";
+
+  useEffect(() => {
+    let active = true;
+    preferenceStorage
+      .getItem<boolean>(SIDEBAR_COLLAPSED_STORAGE_KEY)
+      .then((collapsed) => {
+        if (active) {
+          setSidebarCollapsed(typeof collapsed === "boolean" ? collapsed : true);
+        }
+      })
+      .catch(() => {
+        // Keep the default state when browser storage is unavailable.
+        if (active) setSidebarCollapsed(true);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const handleSidebarCollapsedChange = (collapsed: boolean) => {
+    setSidebarCollapsed(collapsed);
+    preferenceStorage.setItem(SIDEBAR_COLLAPSED_STORAGE_KEY, collapsed).catch(() => {
+      // The sidebar remains usable even when the preference cannot be saved.
+    });
+  };
+
+  // Mount the layout only after its saved width is known to avoid a collapse/expand flash.
+  if (sidebarCollapsed === null) return null;
 
   return (
     <Layout className="h-screen overflow-hidden" style={{ background: "var(--color-bg-1)" }}>
@@ -71,7 +101,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 label={sidebarNavigation?.label ?? "计算产品与服务"}
                 activePathname={pathname}
                 collapsed={sidebarCollapsed}
-                onCollapsedChange={setSidebarCollapsed}
+                onCollapsedChange={handleSidebarCollapsedChange}
               />
             </div>
             <Content
