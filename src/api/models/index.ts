@@ -38,14 +38,12 @@ export function listModels(params: ModelListParams = {}, signal?: AbortSignal) {
     signal,
   });
 }
-// FIXME(model-contract): 当前索引仍返回 model 包装，与仓库普通详情直返约定存在差异；现有实现读取 response.model，仍待与目标版本对齐。
-// TODO(model-contract): 待目标后端版本确认后复核详情响应及错误语义并联调。
-export async function getModel(id: string, signal?: AbortSignal): Promise<Model> {
-  const response = await coreRequest<{ model: Model }>(`/models/${encodeURIComponent(id)}`, {
+// TODO(model-contract): 已核对 HTTP 直接返回 Model；待部署后联调详情、版本回填及错误语义。
+export function getModel(id: string, signal?: AbortSignal): Promise<Model> {
+  return coreRequest<Model>(`/models/${encodeURIComponent(id)}`, {
     method: "GET",
     signal,
   });
-  return response.model;
 }
 
 // FIXME(model-contract): 当前使用 DELETE 请求；目标部署版本与删除完成语义仍待核对。

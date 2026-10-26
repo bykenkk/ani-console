@@ -125,6 +125,7 @@ export interface InferenceRuntimeInstance {
   containers: string[];
 }
 export interface InferenceRuntimeDiagnostics {
+  invocation_endpoint?: string;
   invocation_health: string;
   health_reason?: string;
   health_observed_at?: string;
@@ -132,7 +133,9 @@ export interface InferenceRuntimeDiagnostics {
   observed_at?: string;
   instances: InferenceRuntimeInstance[];
 }
+export type InferenceLogLevel = "trace" | "debug" | "info" | "warn" | "error" | "fatal" | "unknown";
 export interface InferenceLogParams {
+  level?: InferenceLogLevel;
   instance?: string;
   container?: string;
   since?: string;
@@ -140,6 +143,7 @@ export interface InferenceLogParams {
   tail_lines?: number;
 }
 export interface InferenceLogLine {
+  level?: InferenceLogLevel;
   timestamp?: string;
   message: string;
 }
@@ -164,4 +168,41 @@ export interface InferenceRuntimeEvent {
 export interface InferenceEventsResponse {
   items: InferenceRuntimeEvent[];
   total: string;
+}
+
+export interface InferenceMetricsParams {
+  start?: string;
+  end?: string;
+  step?: number;
+}
+export interface InferenceMetricSeries {
+  name: "cpu" | "memory";
+  unit: "cores" | "bytes";
+  points: { timestamp: string; value: number }[];
+}
+export interface InferenceMetricsResponse {
+  series: InferenceMetricSeries[];
+  start: string;
+  end: string;
+  step: number;
+}
+export interface InferenceRateLimit {
+  requests_per_minute: number;
+  requests_per_hour: number;
+}
+export interface InferenceServicePolicy {
+  resource_id: string;
+  allowed_tenants: string[];
+  rate_limits?: Record<string, InferenceRateLimit>;
+  updated_at?: string;
+}
+export interface InferencePolicyResponse {
+  policy: InferenceServicePolicy;
+}
+export interface UpdateInferencePolicyInput {
+  allowed_tenants: string[];
+  rate_limits?: Record<string, InferenceRateLimit>;
+}
+export interface UpdateInferencePolicyRequest {
+  policy: UpdateInferencePolicyInput;
 }

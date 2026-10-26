@@ -55,7 +55,6 @@ export function getInferenceService(id: string, signal?: AbortSignal) {
     signal,
   });
 }
-// FIXME(inference-contract-doc): 后端 inference-flat-api.md 仍描述旧 data 包装，待同步至当前已核对的顶层 protobuf/HTTP 契约。
 // TODO(inference-contract): 联调 preset_id、CPU/GPU 创建、同意图幂等重试与异步受理。
 export function createInferenceService(input: CreateInferenceInput): Promise<void> {
   return runIdempotentRequest(createScope, input, async (data) => {
@@ -149,3 +148,4 @@ export function applyInferenceCommand(
 // TODO(governance-migration): 迁移完成后移除该旧接口命名空间；不得用于新资源兜底。
 export * as legacyInference from "./legacy";
 export * from "./diagnostics";
+export * from "./policy";

@@ -1,5 +1,4 @@
 import {
-  Alert,
   Button,
   Empty,
   InputNumber,
@@ -10,7 +9,7 @@ import {
 } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { getInferenceLogs, getInferenceRuntime } from "@/api/inference";
+import { getInferenceLogs, getInferenceRuntime, type InferenceLogLevel } from "@/api/inference";
 import { getPreviousHoursDateTimeRange } from "@/lib/date";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
@@ -24,9 +23,11 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
   const [tailLines, setTailLines] = useState(INFERENCE_LOG_LIMIT);
   const [hours, setHours] = useState(0);
   const [since, setSince] = useState<string>();
+  const [level, setLevel] = useState<InferenceLogLevel>();
   const [live, setLive] = useState(false);
   const [connection, setConnection] = useState(0);
   const params = {
+    level,
     instance: instance || undefined,
     container: container || undefined,
     since,
@@ -59,6 +60,19 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
   return (
     <div className="flex flex-col gap-3">
       <Space wrap>
+        <Select
+          aria-label="日志等级"
+          placeholder="全部等级"
+          allowClear
+          value={level}
+          disabled={live}
+          className="w-32"
+          options={["trace", "debug", "info", "warn", "error", "fatal", "unknown"].map((value) => ({
+            value,
+            label: value,
+          }))}
+          onChange={setLevel}
+        />
         <Select
           aria-label="日志实例"
           placeholder="全部实例"
@@ -140,19 +154,18 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
               : streamStatus === "connecting"
                 ? "正在连接"
                 : "连接已结束"
-            : "日志快照"}
+            : logs.data?.truncated
+              ? "日志快照（已截断）"
+              : "日志快照"}
         </Typography.Text>
       </Space>
-      {!live && logs.data?.truncated && (
-        <Alert type="info" content="日志已截断，可缩小时间范围或选择具体实例查看" />
-      )}
       <Spin loading={live ? streamStatus === "connecting" : logs.isFetching}>
         {displayed.length ? (
           <pre className="m-0 max-h-96 min-h-60 overflow-auto whitespace-pre-wrap wrap-break-word rounded bg-(--color-fill-2) p-3 font-mono text-xs leading-5">
             {displayed
               .map(
                 (line) =>
-                  `${line.timestamp ? `${formatDateTime(line.timestamp)} ` : ""}${line.message}`,
+                  `${line.timestamp ? `${formatDateTime(line.timestamp)} ` : ""}${line.level ? `[${line.level}] ` : ""}${line.message}`,
               )
               .join("\n")}
           </pre>
@@ -162,10 +175,6 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
           </div>
         )}
       </Spin>
-      {live && (
-        <Typography.Text type="secondary">仅保留最近 {INFERENCE_LOG_LIMIT} 行日志</Typography.Text>
-      )}
-      {/* TODO(inference-logs): 新协议没有日志级别字段及筛选，待正式契约补齐后再接入，不解析文本伪造级别。 */}
     </div>
   );
 }

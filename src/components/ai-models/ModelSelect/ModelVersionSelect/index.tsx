@@ -1,7 +1,7 @@
 import { Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { getModel, getModelVersion, listModelVersions, type ModelVersion } from "@/api/models";
+import { useEffect, useRef } from "react";
+import { getModel, listModelVersions, type ModelVersion } from "@/api/models";
 import { withId } from "@/lib/id";
 import { withFirst100 } from "@/api/pagination";
 import type { ModelVersionListParams } from "@/api/models";
@@ -38,7 +38,6 @@ export default function ModelVersionSelect({
   disabled,
 }: ModelVersionSelectProps) {
   const appliedId = useRef("");
-  const [chosenVersion, setChosenVersion] = useState<{ modelId: string; version: ModelVersion }>();
   const model = useQuery({
     queryKey: ["governance-model", modelId],
     enabled: Boolean(modelId),
@@ -54,26 +53,7 @@ export default function ModelVersionSelect({
       errorNotification: { id: withId("inference-versions", modelId), action: "模型版本加载" },
     },
   });
-  const selectedVersion = useQuery({
-    queryKey: ["governance-model-version", value],
-    enabled: Boolean(modelId && value),
-    queryFn: ({ signal }) => getModelVersion(value!, signal),
-    meta: { errorNotification: { id: withId("inference-version", value), action: "模型版本加载" } },
-  });
-  const items = [...(versions.data?.items ?? [])];
-  if (
-    chosenVersion?.modelId === modelId &&
-    chosenVersion.version.id === value &&
-    !items.some((item) => item.id === chosenVersion.version.id)
-  )
-    items.push(chosenVersion.version);
-  const loadedVersion = selectedVersion.data?.version;
-  if (loadedVersion && selectedVersion.data?.model.id === modelId && loadedVersion.id === value) {
-    // 当前选择独立回显真实状态，即使已不在 ready 选项中，也不回退到旧缓存状态。
-    const position = items.findIndex((item) => item.id === loadedVersion.id);
-    if (position < 0) items.push(loadedVersion);
-    else items[position] = loadedVersion;
-  }
+  const items = versions.data?.items ?? [];
   const selected = items.find((item) => item.id === value);
   useEffect(() => {
     if (value || !versions.data || !modelId || disabled) return;
@@ -83,7 +63,6 @@ export default function ModelVersionSelect({
   useEffect(() => {
     if (!selected || model.data?.id !== modelId || appliedId.current === selected.id) return;
     appliedId.current = selected.id;
-    setChosenVersion({ modelId: model.data.id, version: selected });
     onChange?.(selected.id, selected, model.data.name);
   }, [selected, model.data, modelId, onChange]);
   return (
@@ -91,7 +70,7 @@ export default function ModelVersionSelect({
       aria-label="模型版本"
       value={value || undefined}
       disabled={disabled || !modelId}
-      loading={versions.isFetching || selectedVersion.isFetching}
+      loading={versions.isFetching}
       placeholder="请选择已就绪的模型版本"
       options={items.map((item) => ({
         value: item.id,

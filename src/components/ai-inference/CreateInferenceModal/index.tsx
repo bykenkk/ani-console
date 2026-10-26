@@ -1,12 +1,8 @@
 import { Form, Grid, Input, InputNumber, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useRef, useState } from "react";
-import {
-  createInferenceService,
-  type CreateInferenceInput,
-  type InferenceRuntimeMode,
-} from "@/api/inference";
-import { getModelVersion, type ModelVersion } from "@/api/models";
+import { createInferenceService, type InferenceRuntimeMode } from "@/api/inference";
+import type { ModelVersion } from "@/api/models";
 import type { InstancePreset } from "@/api/instances";
 import InstanceComputePresetSelect from "@/components/instances/InstanceComputePresetSelect";
 import { showMessage } from "@/lib/feedback";
@@ -62,13 +58,8 @@ export default function CreateInferenceModal({
     [form],
   );
   const create = useMutation({
-    mutationFn: async (input: CreateInferenceInput) => {
-      const latest = await getModelVersion(input.model_version_id);
-      if (latest.version.status.toLowerCase() !== "ready")
-        throw new Error("模型版本尚未就绪，请重新选择");
-      // TODO(inference-model-config): 联调模型参数预填、用户修改及切换版本；提交采用用户确认的表单值。
-      return createInferenceService(input);
-    },
+    // TODO(inference-model-config): 联调模型参数预填、用户修改及切换版本；提交采用用户确认的表单值。
+    mutationFn: createInferenceService,
     meta: {
       feedback: {
         channel: "message",
@@ -186,7 +177,7 @@ export default function CreateInferenceModal({
         >
           <Input placeholder="请输入服务模型名" />
         </Form.Item>
-        <Form.Item label="引擎镜像" required extra="确认引擎类型和镜像">
+        <Form.Item label="引擎镜像" required>
           <Input.Group compact>
             <Form.Item
               field="engine_type"
@@ -208,12 +199,7 @@ export default function CreateInferenceModal({
             </Form.Item>
           </Input.Group>
         </Form.Item>
-        <Form.Item
-          field="command"
-          label="完整启动命令"
-          rules={required("请输入完整启动命令")}
-          extra="确认完整启动命令"
-        >
+        <Form.Item field="command" label="完整启动命令" rules={required("请输入完整启动命令")}>
           <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} placeholder="请输入完整启动命令" />
         </Form.Item>
         <Form.Item

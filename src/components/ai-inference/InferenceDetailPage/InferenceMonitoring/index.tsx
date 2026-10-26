@@ -1,9 +1,10 @@
-import { Button, Descriptions, Empty, Space } from "@arco-design/web-react";
+import { Button, Descriptions, Space } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { getInferenceRuntime, type InferenceRuntimeInstance } from "@/api/inference";
 import { DataTable, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
+import InferenceMetrics from "../InferenceMetrics";
 
 type InferenceMonitoringProps = { serviceId: string };
 
@@ -60,8 +61,7 @@ export default function InferenceMonitoring({ serviceId }: InferenceMonitoringPr
         ]}
         tableLabel="推理运行实例列表"
       />
-      {/* FIXME(inference-metrics): 当前只有运行诊断，缺少请求量、成功率、延迟和资源使用指标接口，补齐后接入图表。 */}
-      <Empty description="暂无监控指标" />
+      <InferenceMetrics serviceId={serviceId} />
     </div>
   );
 }

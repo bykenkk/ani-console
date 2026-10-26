@@ -5,6 +5,8 @@ import type {
   InferenceLogsResponse,
   InferenceEventParams,
   InferenceEventsResponse,
+  InferenceMetricsParams,
+  InferenceMetricsResponse,
 } from "./types";
 
 const servicePath = (id: string) => `/inference/services/${encodeURIComponent(id)}`;
@@ -14,6 +16,19 @@ const servicePath = (id: string) => `/inference/services/${encodeURIComponent(id
 export function getInferenceRuntime(id: string, signal?: AbortSignal) {
   return coreRequest<InferenceRuntimeDiagnostics>(`${servicePath(id)}/runtime`, {
     method: "GET",
+    signal,
+  });
+}
+
+// TODO(inference-metrics): 联调 Prometheus 配置、CPU/内存单位、空序列及 24 小时/1440 区间边界。
+export function getInferenceMetrics(
+  id: string,
+  params: InferenceMetricsParams = {},
+  signal?: AbortSignal,
+) {
+  return coreRequest<InferenceMetricsResponse>(`${servicePath(id)}/metrics`, {
+    method: "GET",
+    params,
     signal,
   });
 }

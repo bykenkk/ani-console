@@ -25,7 +25,7 @@ export function useInferenceLogStream({
 }: InferenceLogStreamOptions) {
   const [status, setStatus] = useState<StreamStatus>("idle");
   const [lines, setLines] = useState<InferenceLogLine[]>([]);
-  const { instance, container, since, until, tail_lines } = params;
+  const { instance, container, since, until, tail_lines, level } = params;
   useEffect(() => {
     if (!enabled) return;
     const notificationId = withId("inference-log-stream", serviceId);
@@ -45,7 +45,7 @@ export function useInferenceLogStream({
       try {
         const stream = await streamInferenceLogs(
           serviceId,
-          { instance, container, since, until, tail_lines },
+          { instance, container, since, until, tail_lines, level },
           controller.signal,
         );
         if (controller.signal.aborted) return;
@@ -70,6 +70,6 @@ export function useInferenceLogStream({
     connect();
     // 切换 Tab、服务或筛选时取消请求和 reader；不自动重连，以免重复回放历史日志。
     return () => controller.abort();
-  }, [serviceId, instance, container, since, until, tail_lines, enabled, connection]);
+  }, [serviceId, instance, container, since, until, tail_lines, level, enabled, connection]);
   return { lines, status: enabled ? status : "idle" };
 }
