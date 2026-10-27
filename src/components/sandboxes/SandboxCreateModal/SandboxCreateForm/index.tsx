@@ -1,16 +1,28 @@
 import { listSandboxTemplates } from "@/api/instances/legacy";
-import { Button, Form, Input, Modal, Space, Typography } from "@arco-design/web-react";
+import { Button, Form, Input, Modal, Space } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { WizardSteps } from "@/components/common";
 import type { SandboxCreateFormValues, SandboxTemplate } from "..";
-import { INITIAL_VALUES } from "../constants";
 import { getTemplateComputeSpec } from "../utils";
 import SandboxConfirmStep from "./SandboxConfirmStep";
 import SandboxResourceStep from "./SandboxResourceStep";
 import SandboxRuntimeStep from "./SandboxRuntimeStep";
 import SandboxTemplateStep from "./SandboxTemplateStep";
 import { validateForm } from "@/lib/form";
+import { DEFAULT_CPU_INSTANCE_COMPUTE_SPEC } from "@/lib/instances";
+
+const INITIAL_VALUES: SandboxCreateFormValues = {
+  name: "",
+  template_id: "",
+  compute_spec: DEFAULT_CPU_INSTANCE_COMPUTE_SPEC,
+  session_timeout: "120m",
+  idle_timeout: "30m",
+  on_timeout: "pause",
+  egress_policy: "allowlist",
+  egress_allowlist: "pypi.org\ngithub.com\nregistry.npmjs.org",
+  auto_start: true,
+};
 
 const STEP_TITLES = ["基础配置", "资源配置", "摘要信息"];
 
@@ -128,9 +140,6 @@ export default function SandboxCreateForm({
           >
             {step === 0 ? (
               <>
-                <Typography.Paragraph type="secondary" className="mb-4!">
-                  为沙箱设置易于识别的名称。
-                </Typography.Paragraph>
                 <Form.Item
                   field="name"
                   label="名称"

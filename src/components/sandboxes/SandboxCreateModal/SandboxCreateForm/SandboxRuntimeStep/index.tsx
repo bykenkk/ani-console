@@ -1,6 +1,9 @@
 import { Form, Input, Select, Switch, Typography } from "@arco-design/web-react";
 import type { SandboxCreateFormValues } from "../..";
-import { IDLE_TIMEOUT_OPTIONS, SESSION_TIMEOUT_OPTIONS } from "../../constants";
+
+const SESSION_TIMEOUT_OPTIONS = ["30m", "45m", "60m", "90m", "120m", "240m"];
+
+const IDLE_TIMEOUT_OPTIONS = ["5m", "10m", "15m", "30m", "60m"];
 
 type SandboxRuntimeStepProps = { values: SandboxCreateFormValues };
 

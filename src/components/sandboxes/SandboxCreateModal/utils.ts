@@ -1,6 +1,9 @@
 import type { CreateInstanceInput } from "@/api/instances/legacy";
-import { CPU_INSTANCE_COMPUTE_SPECS, type CpuInstanceComputeSpec } from "@/lib/instances";
-import { INITIAL_VALUES } from "./constants";
+import {
+  CPU_INSTANCE_COMPUTE_SPECS,
+  DEFAULT_CPU_INSTANCE_COMPUTE_SPEC,
+  type CpuInstanceComputeSpec,
+} from "@/lib/instances";
 import type { SandboxCreateFormValues, SandboxTemplate } from ".";
 
 export function parseEgressAllowlist(value: string) {
@@ -12,14 +15,14 @@ export function parseEgressAllowlist(value: string) {
 
 export function getTemplateComputeSpec(template?: SandboxTemplate): CpuInstanceComputeSpec {
   if (!template?.cpu_cores || !template.memory_gb) {
-    return INITIAL_VALUES.compute_spec;
+    return DEFAULT_CPU_INSTANCE_COMPUTE_SPEC;
   }
 
   return (
     CPU_INSTANCE_COMPUTE_SPECS.find(
       (option) =>
         option.cpu === String(template.cpu_cores) && option.memory === `${template.memory_gb}Gi`,
-    )?.value ?? INITIAL_VALUES.compute_spec
+    )?.value ?? DEFAULT_CPU_INSTANCE_COMPUTE_SPEC
   );
 }
 
