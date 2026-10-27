@@ -58,6 +58,7 @@ export interface NetworkSubnet {
 // FIXME(subnet-pagination): 后端子网目录仍使用 limit/cursor，不能作为页码分页接口使用。
 // TODO(subnet-pagination): 后端完成分页改造后迁移为 PageParams。
 export interface NetworkSubnetListParams extends CursorPageParams {
+  name?: string;
   vpc_id?: string;
   state?: string;
   search_field?: "name" | "id";

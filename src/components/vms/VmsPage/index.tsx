@@ -1,183 +1,115 @@
-import {
-  listInstances,
-  type FilterableInstanceState,
-  type InstanceRecord,
-} from "@/api/instances/legacy";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { listVms, type VirtualMachine } from "@/api/vms";
 import {
   ResourceNameId,
   ListPageFrame,
+  ListDataTable,
   StatusBadge,
   type ListColumn,
-  ListDataTable,
 } from "@/components/common";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
-import { formatDateTime } from "@/lib/format";
-import { getImageDisplayName } from "@/lib/render";
+import { useListPagination } from "@/hooks/useListPagination";
+import { useVmListActions } from "@/hooks/useVmListActions";
 import VmCreateModal from "../VmCreateModal";
-import { useVmActions } from "@/hooks/useVmActions";
-
-type VmInstance = InstanceRecord;
-type StatusFilter = "all" | FilterableInstanceState;
-
-function specLabel(instance: VmInstance) {
-  const cpu = instance.compute?.cpu;
-  const memory = instance.compute?.memory;
-  if (cpu == null || memory == null) return "-";
-  const cpuValue = String(cpu);
-  const memoryValue = String(memory);
-  const cpuText = /^\d+(?:\.\d+)?$/.test(cpuValue) ? `${cpuValue}C` : cpuValue.replace(/c$/i, "C");
-  const memoryText = /^\d+(?:\.\d+)?$/.test(memoryValue)
-    ? `${memoryValue}G`
-    : memoryValue.replace(/gi$/i, "G").replace(/g$/i, "G");
-  return `${cpuText}${memoryText}`;
-}
 
 export default function VmsPage() {
-  const [createVisible, setCreateVisible] = useState(false);
-  const [status, setStatus] = useState<StatusFilter>("all");
-  const [searchText, setSearchText] = useState("");
-  const { query, refresh, items, pagination } = useCursorPaginatedQuery<VmInstance>({
-    errorNotification: {
-      id: "vms",
-      action: "云主机列表加载",
-      fallback: "请求失败，请稍后重试",
-    },
-    queryKey: ["vm-instances", { status, searchText }],
-    queryFn: async ({ cursor, limit }) => {
-      const keyword = searchText.trim();
-      return listInstances({
-        kind: "vm",
-        limit,
-        cursor,
-        state: status === "all" ? undefined : status,
-        keyword: keyword || undefined,
-      });
-    },
+  const [creating, setCreating] = useState(false);
+  const { page, pageSize, setPage, setPageSize, resetPagination } = useListPagination("vms", 20);
+  const query = useQuery({
+    queryKey: ["vms", "list", { page, pageSize }],
+    queryFn: ({ signal }) => listVms({ page, pageSize }, signal),
+    meta: { errorNotification: { id: "vms", action: "云主机列表加载" } },
   });
-
-  const { dialogNode, actions } = useVmActions(refresh);
-
-  const statusTabs = [
-    { value: "all" as const, label: "全部" },
-    { value: "pending" as const, label: "等待中" },
-    { value: "provisioning" as const, label: "配置中" },
-    { value: "starting" as const, label: "启动中" },
-    { value: "running" as const, label: "运行中" },
-    { value: "stopping" as const, label: "停止中" },
-    { value: "stopped" as const, label: "已停止" },
-    { value: "failed" as const, label: "异常" },
-  ];
-  const columns: Array<ListColumn<VmInstance>> = [
+  const { actions } = useVmListActions();
+  const columns: ListColumn<VirtualMachine>[] = [
     {
       key: "name",
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, row) => <ResourceNameId name={row.name} id={row.id} type="vm-instance" />,
+      // TODO(vm-detail): 详情仍使用旧 ANI 契约，待统一组件时迁移。
+      render: (_, vm) => <ResourceNameId type="vm-instance" name={vm.name} id={vm.id} />,
     },
     {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, row) => <StatusBadge status={row.state} reason={row.reason} />,
+      render: (_, vm) => (
+        <StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />
+      ),
     },
-    { key: "spec", title: "规格", width: 80, render: (_, row) => specLabel(row) },
+    { key: "desired", title: "期望状态", width: 120, dataIndex: "desiredState" },
     {
-      key: "image",
-      title: "镜像",
-      width: 100,
-      ellipsis: true,
-      render: (_, row) => getImageDisplayName(row.image),
+      key: "cpu",
+      title: "CPU / 内存",
+      width: 170,
+      render: (_, vm) => `${Number(vm.cpuMillis) / 1000} CPU / ${vm.memoryMib} MiB`,
+    },
+    {
+      key: "os",
+      title: "操作系统",
+      width: 150,
+      render: (_, vm) => `${vm.osFamily} ${vm.osVersion}`,
     },
     {
       key: "ip",
-      title: "私网 IP",
-      width: 100,
-      dataIndex: "network.private_ip",
-    },
-    {
-      key: "node",
-      title: "节点",
-      width: 150,
-      dataIndex: "compute.node_name",
-    },
-    {
-      key: "protection",
-      title: "终止保护",
-      width: 100,
-      render: (_, row) => (row.termination_protection ? "已开启" : "未开启"),
-    },
-    {
-      key: "createdAt",
-      title: "创建时间",
+      title: "IP 地址",
       width: 180,
-      render: (_, row) => formatDateTime(row.created_at),
+      render: (_, vm) => vm.addresses?.map((item) => item.address).join(" · ") || "-",
     },
+    { key: "reason", title: "原因", width: 220, dataIndex: "reason", ellipsis: true },
   ];
-
   return (
     <>
       <ListPageFrame
         header={{
           iconClassName: "icon-yunzhuji",
           title: "云主机 VM",
-          subtitle: "弹性虚拟计算资源，支持生命周期管理、VNC 控制台与运行状态观测",
+          subtitle: "创建虚拟机，管理开关机、重启和 VNC 控制台",
           actions: [
             {
               key: "create",
               label: "创建云主机",
-              iconClassName: "icon-add-1",
               variant: "primary",
-              onClick: () => setCreateVisible(true),
+              iconClassName: "icon-add-1",
+              onClick: () => setCreating(true),
             },
           ],
         }}
-        tabs={{
-          items: statusTabs,
-          value: status,
-          onChange: setStatus,
-        }}
         toolbar={{
-          search: {
-            fields: [
-              {
-                value: "keyword",
-                label: "名称 / ID",
-              },
-            ],
-            field: "keyword",
-            value: searchText,
-            placeholder: "搜索云主机名称或 ID",
-            onFieldChange: () => undefined,
-            onChange: setSearchText,
-          },
           refresh: {
             label: "刷新",
             spinning: query.isFetching,
-            onClick: refresh,
+            onClick: () => {
+              query.refetch();
+            },
           },
         }}
       >
         <ListDataTable
-          data={items}
+          data={query.data?.items ?? []}
           columns={columns}
           rowActions={actions}
-          loading={query.isFetching}
+          loading={query.isLoading}
           tableLabel="云主机 VM 列表"
-          pagination={pagination}
+          pagination={{
+            page,
+            pageSize,
+            total: Number(query.data?.total ?? "0"),
+            onPageChange: setPage,
+            onPageSizeChange: setPageSize,
+          }}
         />
       </ListPageFrame>
-      {createVisible && (
+      {creating && (
         <VmCreateModal
-          onCancel={() => setCreateVisible(false)}
+          onCancel={() => setCreating(false)}
           onCreated={() => {
-            setCreateVisible(false);
-            refresh();
+            setCreating(false);
+            resetPagination();
           }}
         />
       )}
-      {dialogNode}
     </>
   );
 }

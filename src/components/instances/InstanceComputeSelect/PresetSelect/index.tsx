@@ -1,16 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Select, Tooltip } from "@arco-design/web-react";
 import { IconExclamationCircle } from "@arco-design/web-react/icon";
 import { listInstancePresets, type ComputeType, type InstancePreset } from "@/api/instances";
 import { listInferencePresets } from "@/api/inference";
 import { listModelDevComputePresets } from "@/api/modeldev";
+import { listVmPresets } from "@/api/vms";
 import { withId } from "@/lib/id";
 import { withFirst100 } from "@/api/pagination";
 import { closeNotification, showNotification } from "@/lib/feedback";
 
 export type PresetSelectProps = {
-  usage?: "CONTAINER_INSTANCE" | "INFERENCE" | "TRAINING";
+  usage?: "CONTAINER_INSTANCE" | "INFERENCE" | "TRAINING" | "VIRTUAL_MACHINE";
   computeType?: ComputeType;
   value?: InstancePreset;
   onChange?: (preset?: InstancePreset) => void;
@@ -20,10 +21,12 @@ export type PresetSelectProps = {
 const listPresetOptions = withFirst100(listInstancePresets);
 const listInferencePresetOptions = withFirst100(listInferencePresets);
 const listTrainingPresetOptions = withFirst100(listModelDevComputePresets);
+const listVmPresetOptions = withFirst100(listVmPresets);
 const listOptionsByUsage = {
   CONTAINER_INSTANCE: listPresetOptions,
   INFERENCE: listInferencePresetOptions,
   TRAINING: listTrainingPresetOptions,
+  VIRTUAL_MACHINE: listVmPresetOptions,
 };
 
 export default function PresetSelect({
@@ -33,12 +36,32 @@ export default function PresetSelect({
   onChange,
   disabled,
 }: PresetSelectProps) {
+  const [search, setSearch] = useState("");
   const label =
-    usage === "INFERENCE" ? "推理算力规格" : usage === "TRAINING" ? "算力规格" : "实例预设";
+    usage === "INFERENCE"
+      ? "推理算力规格"
+      : usage === "TRAINING"
+        ? "算力规格"
+        : usage === "VIRTUAL_MACHINE"
+          ? "虚拟机算力规格"
+          : "实例预设";
   const scope = `${usage}-${computeType ?? "all"}`;
   const query = useQuery({
-    queryKey: ["compute-presets", usage, computeType, "options"],
-    queryFn: ({ signal }) => listOptionsByUsage[usage]({ compute_type: computeType }, signal),
+    queryKey: [
+      "compute-presets",
+      usage,
+      computeType,
+      "options",
+      ...(usage === "VIRTUAL_MACHINE" ? [search] : []),
+    ],
+    queryFn: ({ signal }) =>
+      listOptionsByUsage[usage](
+        {
+          compute_type: computeType,
+          ...(usage === "VIRTUAL_MACHINE" ? { name: search || undefined } : {}),
+        },
+        signal,
+      ),
     meta: {
       errorNotification: { id: withId("compute-presets", scope), action: `${label}加载` },
     },
@@ -62,7 +85,7 @@ export default function PresetSelect({
   }, [catalogStatus, scope, label, query.dataUpdatedAt]);
   useEffect(() => {
     const current = query.data?.items.find((item) => item.id === value?.id);
-    if (query.data && value && !current) {
+    if (usage !== "VIRTUAL_MACHINE" && query.data && value && !current) {
       onChange?.(undefined);
       return;
     }
@@ -75,7 +98,7 @@ export default function PresetSelect({
         current.compute_type !== value.compute_type)
     )
       onChange?.(current);
-  }, [query.data, value, onChange]);
+  }, [query.data, value, onChange, usage]);
   const items = query.data?.items ?? [];
   const options = value && !items.some((item) => item.id === value.id) ? [value, ...items] : items;
   return (
@@ -84,14 +107,18 @@ export default function PresetSelect({
       disabled={disabled}
       aria-label="具体规格"
       showSearch
-      filterOption={(input, option) =>
-        Boolean(
-          options
-            .find((item) => item.id === option.props.value)
-            ?.name.toLowerCase()
-            .includes(input.toLowerCase()),
-        )
+      filterOption={
+        usage === "VIRTUAL_MACHINE"
+          ? false
+          : (input, option) =>
+              Boolean(
+                options
+                  .find((item) => item.id === option.props.value)
+                  ?.name.toLowerCase()
+                  .includes(input.toLowerCase()),
+              )
       }
+      onSearch={usage === "VIRTUAL_MACHINE" ? setSearch : undefined}
       loading={query.isFetching}
       placeholder={`请选择${label}`}
       options={options.map((item) => {
