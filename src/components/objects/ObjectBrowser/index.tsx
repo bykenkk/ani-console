@@ -8,7 +8,7 @@ import {
   Typography,
   type TableColumnProps,
 } from "@arco-design/web-react";
-import { IconArrowLeft, IconFile, IconFolder } from "@arco-design/web-react/icon";
+import { IconArrowLeft, IconFile, IconFolder, IconRefresh } from "@arco-design/web-react/icon";
 import type { ReactNode } from "react";
 import clsx from "clsx";
 import { DataTable } from "@/components/common";
@@ -36,6 +36,7 @@ type ObjectBrowserProps = {
   rootPrefix?: string;
   readOnly?: boolean;
   onOpenObject?: (entry: ObjectBrowserEntry) => void;
+  onRefresh?: () => void;
   onNavigate: (prefix: string) => void;
   onCreateFolder: () => void;
 };
@@ -67,6 +68,7 @@ export default function ObjectBrowser({
   rootPrefix = "/",
   readOnly = false,
   onOpenObject,
+  onRefresh,
   onNavigate,
   onCreateFolder,
 }: ObjectBrowserProps) {
@@ -158,6 +160,11 @@ export default function ObjectBrowser({
           ) : null}
           <Typography.Text type="secondary">当前路径：{prefix || "/"}</Typography.Text>
           <Tag>{aclLabel}</Tag>
+          {onRefresh ? (
+            <Button icon={<IconRefresh />} loading={loading} onClick={onRefresh}>
+              刷新
+            </Button>
+          ) : null}
           <Button
             onClick={onCreateFolder}
             disabled={readOnly}

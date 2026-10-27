@@ -1,6 +1,10 @@
 import { Alert, Form, InputNumber, Modal, Typography } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { expandVolume, type StorageVolume } from "@/api/storage/volumes";
+import {
+  expandVolume,
+  STORAGE_VOLUME_MAX_CAPACITY_GB,
+  type StorageVolume,
+} from "@/api/storage/volumes";
 import { validateForm } from "@/lib/form";
 type ExpandStorageVolumeModalProps = { volume: StorageVolume; onCancel: () => void };
 type ExpandStorageVolumeFormValues = { capacityGb: number };
@@ -50,16 +54,18 @@ export default function ExpandStorageVolumeModal({
             {
               validator: (value, callback) =>
                 callback(
-                  Number.isSafeInteger(value) && value > currentCapacity
+                  Number.isSafeInteger(value) &&
+                    value > currentCapacity &&
+                    value <= STORAGE_VOLUME_MAX_CAPACITY_GB
                     ? undefined
-                    : "新容量必须是大于当前申请容量的整数",
+                    : `新容量须为大于当前申请容量且不超过 ${STORAGE_VOLUME_MAX_CAPACITY_GB} 的整数`,
                 ),
             },
           ]}
         >
           <InputNumber
             min={currentCapacity + 1}
-            max={Number.MAX_SAFE_INTEGER}
+            max={STORAGE_VOLUME_MAX_CAPACITY_GB}
             precision={0}
             className="w-full"
           />

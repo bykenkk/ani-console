@@ -1,6 +1,11 @@
-import { Form, Input, InputNumber, Modal, Select, Switch } from "@arco-design/web-react";
+import { Form, Input, InputNumber, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createVolume, type StorageVolumeMode } from "@/api/storage/volumes";
+import {
+  createVolume,
+  STORAGE_VOLUME_MAX_CAPACITY_GB,
+  type StorageVolumeAccessMode,
+  type StorageVolumeMode,
+} from "@/api/storage/volumes";
 import { validateForm } from "@/lib/form";
 import StorageVolumeClassField from "@/components/volumes/StorageVolumeClassField";
 
@@ -10,6 +15,7 @@ type CreateStorageVolumeFormValues = {
   sizeGb: number;
   storageClassName: string;
   volumeMode: StorageVolumeMode;
+  accessMode: StorageVolumeAccessMode;
 };
 export default function CreateStorageVolumeModal({ onCancel }: CreateStorageVolumeModalProps) {
   const [form] = Form.useForm<CreateStorageVolumeFormValues>();
@@ -22,6 +28,7 @@ export default function CreateStorageVolumeModal({ onCancel }: CreateStorageVolu
         capacity_gb: String(values.sizeGb),
         storage_class_name: values.storageClassName,
         volume_mode: values.volumeMode,
+        access_modes: [values.accessMode],
       }),
     onSuccess: async () => {
       // TODO(storage-task): 暂缓 task 追踪，创建受理不代表 PVC 已 Bound。
@@ -40,7 +47,12 @@ export default function CreateStorageVolumeModal({ onCancel }: CreateStorageVolu
       <Form
         form={form}
         layout="vertical"
-        initialValues={{ name: "", sizeGb: 40, volumeMode: "Filesystem" }}
+        initialValues={{
+          name: "",
+          sizeGb: 40,
+          volumeMode: "Filesystem",
+          accessMode: "ReadWriteOnce",
+        }}
       >
         <Form.Item
           label="名称"
@@ -69,21 +81,29 @@ export default function CreateStorageVolumeModal({ onCancel }: CreateStorageVolu
             {
               validator: (value, callback) =>
                 callback(
-                  Number.isSafeInteger(value) && value > 0
+                  Number.isSafeInteger(value) &&
+                    value > 0 &&
+                    value <= STORAGE_VOLUME_MAX_CAPACITY_GB
                     ? undefined
-                    : "容量必须是大于 0 的整数（GB）",
+                    : `容量须为 1–${STORAGE_VOLUME_MAX_CAPACITY_GB} 的整数（GB）`,
                 ),
             },
           ]}
         >
-          <InputNumber min={1} max={Number.MAX_SAFE_INTEGER} precision={0} className="w-full" />
+          <InputNumber
+            min={1}
+            max={STORAGE_VOLUME_MAX_CAPACITY_GB}
+            precision={0}
+            className="w-full"
+          />
         </Form.Item>
         <StorageVolumeClassField />
-        {/* TODO(storage-migration): 加密和创建时挂载暂无新契约，旧提交逻辑保留在 CreateVolumeModal，不能混用实例 ID。 */}
-        <Form.Item label="是否加密" extra="暂未支持">
-          <Switch disabled />
-        </Form.Item>
-        <Form.Item label="用途" field="volumeMode" required extra="用途创建后不可修改。">
+        <Form.Item
+          label="用途"
+          field="volumeMode"
+          required
+          extra="用途创建后不可修改；当前容器实例仅支持文件系统卷。"
+        >
           <Select
             options={[
               { value: "Filesystem", label: "文件系统" },
@@ -91,6 +111,22 @@ export default function CreateStorageVolumeModal({ onCancel }: CreateStorageVolu
             ]}
           />
         </Form.Item>
+        <Form.Item
+          label="访问模式"
+          field="accessMode"
+          rules={[{ required: true, message: "请选择访问模式" }]}
+          extra="实际可用模式取决于所选存储类型。"
+        >
+          <Select
+            options={[
+              { value: "ReadWriteOnce", label: "单节点读写（ReadWriteOnce）" },
+              { value: "ReadOnlyMany", label: "多节点只读（ReadOnlyMany）" },
+              { value: "ReadWriteMany", label: "多节点读写（ReadWriteMany）" },
+              { value: "ReadWriteOncePod", label: "单 Pod 读写（ReadWriteOncePod）" },
+            ]}
+          />
+        </Form.Item>
+        {/* TODO(storage-migration): 创建时挂载暂无新契约，旧提交逻辑保留在 CreateVolumeModal，不能混用实例 ID。 */}
         <Form.Item label="挂载实例">
           <Select disabled placeholder="暂未支持创建时挂载" />
         </Form.Item>

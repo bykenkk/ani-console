@@ -1,7 +1,11 @@
 import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { deleteVolume, type StorageVolume } from "@/api/storage/volumes";
+import {
+  deleteVolume,
+  STORAGE_VOLUME_MAX_CAPACITY_GB,
+  type StorageVolume,
+} from "@/api/storage/volumes";
 import type { RowAction } from "@/components/common";
 import ExpandStorageVolumeModal from "@/components/volumes/ExpandStorageVolumeModal";
 
@@ -44,7 +48,10 @@ export function useStorageVolumeActions(onDeleted?: () => void) {
     {
       key: "expand",
       label: "扩容",
-      disabled: (volume) => volume.deleting || remove.isPending,
+      disabled: (volume) =>
+        volume.deleting ||
+        remove.isPending ||
+        Number(volume.requested_capacity_gb) >= STORAGE_VOLUME_MAX_CAPACITY_GB,
       onClick: setExpandTarget,
     },
     unavailable("mount", "挂载"),
@@ -54,7 +61,7 @@ export function useStorageVolumeActions(onDeleted?: () => void) {
       key: "delete",
       label: "删除",
       intent: "danger",
-      disabled: () => remove.isPending,
+      disabled: (volume) => volume.deleting || remove.isPending,
       loading: (volume) => remove.isPending && remove.variables?.uid === volume.uid,
       onClick: (volume) => {
         Modal.confirm({

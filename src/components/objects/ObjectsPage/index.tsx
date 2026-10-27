@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listBuckets, type StorageBucketRecord } from "@/api/storage/buckets";
 import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
@@ -5,10 +6,19 @@ import { useListPagination } from "@/hooks/useListPagination";
 import { storageBucketActions } from "@/components/objects/storageBucketActions";
 
 export default function ObjectsPage() {
-  const { page, pageSize, setPage, setPageSize } = useListPagination("storage-buckets", 20);
+  const [searchField, setSearchField] = useState<"name" | "id">("name");
+  const [searchText, setSearchText] = useState("");
+  const filters = {
+    name: searchField === "name" ? searchText.trim() || undefined : undefined,
+    id: searchField === "id" ? searchText.trim() || undefined : undefined,
+  };
+  const { page, pageSize, setPage, setPageSize } = useListPagination(
+    JSON.stringify(["storage-buckets", filters]),
+    20,
+  );
   const buckets = useQuery({
-    queryKey: ["storage", "buckets", { page, pageSize }],
-    queryFn: ({ signal }) => listBuckets({ page, pageSize }, signal),
+    queryKey: ["storage", "buckets", { page, pageSize, ...filters }],
+    queryFn: ({ signal }) => listBuckets({ page, pageSize, ...filters }, signal),
     meta: { errorNotification: { id: "storage-buckets", action: "对象存储桶列表加载" } },
   });
   // TODO(storage-migration): 新契约只有逻辑桶 id/name；旧列保留位置，待补齐字段后恢复展示。
@@ -47,18 +57,16 @@ export default function ObjectsPage() {
         ],
       }}
       toolbar={{
-        // TODO(storage-filter): 当前桶列表没有搜索参数，不过滤当前页或循环拉取全量桶。
         search: {
           fields: [
             { value: "name", label: "名称" },
             { value: "id", label: "ID" },
           ],
-          field: "name",
-          value: "",
-          disabled: true,
-          placeholder: "暂未支持搜索",
-          onFieldChange: () => {},
-          onChange: () => {},
+          field: searchField,
+          value: searchText,
+          placeholder: searchField === "name" ? "请输入名称关键字" : "请输入桶 ID",
+          onFieldChange: setSearchField,
+          onChange: setSearchText,
         },
         refresh: {
           label: "刷新",

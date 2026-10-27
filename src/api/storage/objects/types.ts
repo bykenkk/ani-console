@@ -7,7 +7,7 @@ export interface StorageObject {
 export interface StorageObjectMeta extends StorageObject {
   content_type: string;
 }
-// TODO(pagination-migration): 当前对象协议仅支持 limit/cursor 且无 total；待后端提供替代契约后迁移，不模拟页码或全量加载。
+// 对象列表使用领域游标，只有 limit/cursor、没有 total，不模拟页码或全量加载。
 export interface StorageObjectListParams {
   prefix?: string;
   limit?: number;

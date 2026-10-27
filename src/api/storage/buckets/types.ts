@@ -3,7 +3,10 @@ export interface StorageBucketRecord {
   id: string;
   name: string;
 }
-export type StorageBucketListParams = PageParams;
+export interface StorageBucketListParams extends PageParams {
+  name?: string;
+  id?: string;
+}
 export interface StorageBucketListResponse {
   items: StorageBucketRecord[];
   total: string;

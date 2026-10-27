@@ -8,7 +8,6 @@ import type {
   StorageObjectRequest,
 } from "./types";
 const bucketPath = (bucketId: string) => `/storage/buckets/${encodeURIComponent(bucketId)}`;
-// TODO(storage-contract): 待目标存储源码合并后复核对象列表、HEAD、下载和特殊 key；浏览器下载证书及可达性仍待联调。
 export function listStorageObjects(
   bucketId: string,
   params: StorageObjectListParams = {},
@@ -16,7 +15,7 @@ export function listStorageObjects(
 ) {
   return coreRequest<StorageObjectListResponse>(`${bucketPath(bucketId)}/objects`, {
     method: "GET",
-    params,
+    params: { ...params, prefix: params.prefix === "" ? undefined : params.prefix },
     signal,
   });
 }

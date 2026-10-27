@@ -6,13 +6,7 @@ import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { withId } from "@/lib/id";
 import { formatBytes } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
-import {
-  AliIcon,
-  DetailPageFrame,
-  DetailPagePlaceholder,
-  ResourceId,
-  StatusBadge,
-} from "@/components/common";
+import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import VolumeConsumers from "./VolumeConsumers";
 import VolumeObservations from "./VolumeObservations";
@@ -35,10 +29,23 @@ export default function VolumeDetailPage({ volumeId, tab, onTabChange }: VolumeD
       <DetailPageFrame
         breadcrumbs={[...navigationBreadcrumbsForPath("/volumes"), { label: volume.display_name }]}
         title={volume.display_name || volume.pvc_name}
-        status={<StatusBadge status={volume.deleting ? "deleting" : volume.phase} />}
+        status={volume.phase}
         icon={<AliIcon name="kuaicunchu" size={28} />}
         headerItems={[{ label: "容量 (GB)", value: volume.requested_capacity_gb }]}
-        actions={<ResourceActionMenu record={volume} actions={actions} />}
+        actions={
+          <ResourceActionMenu
+            record={volume}
+            actions={[
+              {
+                key: "refresh",
+                label: "刷新",
+                loading: () => detail.isFetching,
+                onClick: () => detail.refetch(),
+              },
+              ...actions,
+            ]}
+          />
+        }
         cards={[
           {
             key: "basic",
@@ -68,7 +75,6 @@ export default function VolumeDetailPage({ volumeId, tab, onTabChange }: VolumeD
               },
               // TODO(storage-migration): 新卷没有以下旧扩展字段；保留位置，待正式契约补齐，不用旧详情拼接。
               { label: "可用区 / IOPS", value: "-" },
-              { label: "加密", value: "-" },
               { label: "自动快照", value: "-" },
               { label: "来源快照", value: "-" },
               { label: "挂载实例", value: consumerNames || "-" },

@@ -1,5 +1,6 @@
 import type { PageParams } from "@/api/types";
 export type StorageVolumeMode = "Filesystem" | "Block";
+export type StorageVolumePhase = "Pending" | "Bound" | "Lost";
 export type StorageVolumeAccessMode =
   | "ReadWriteOnce"
   | "ReadOnlyMany"
@@ -46,7 +47,11 @@ export interface StorageVolumeDetail {
   events: StorageVolumeEvent[];
   consumers: StorageVolumeConsumer[];
 }
-export type StorageVolumeListParams = PageParams;
+export interface StorageVolumeListParams extends PageParams {
+  name?: string;
+  id?: string;
+  state?: StorageVolumePhase;
+}
 export interface StorageVolumeListResponse {
   items: StorageVolume[];
   total: string;

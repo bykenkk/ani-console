@@ -12,10 +12,13 @@ import type {
   StorageVolumeListParams,
   StorageVolumeListResponse,
 } from "./types";
+
+// Resource 将十进制 GB 转为 int64 bytes，容量不能超过 MaxInt64 / 1e9。
+export const STORAGE_VOLUME_MAX_CAPACITY_GB = 9_223_372_036;
+
 const createScope = createIdempotencyScope("storage-pvc-create", ["POST"]);
 const volumePath = (pvcName: string) => `/storage/volumes/${encodeURIComponent(pvcName)}`;
-// TODO(storage-contract): 按存储补充契约接入；目标后端源码合并后复核 HTTP 映射、权限、UID 保护及真实环境行为。
-// TODO(storage-filter): 当前仅支持页码分页，无名称、状态、用途和可挂载实例筛选；待后端补齐后恢复对应查询条件。
+// TODO(storage-filter): 用途与可挂载实例筛选仍待后端提供，不对当前页本地过滤。
 export function listVolumes(params: StorageVolumeListParams = {}, signal?: AbortSignal) {
   return coreRequest<StorageVolumeListResponse>("/storage/volumes", {
     method: "GET",

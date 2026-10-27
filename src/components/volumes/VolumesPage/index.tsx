@@ -1,30 +1,32 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { listVolumes, type StorageVolume } from "@/api/storage/volumes";
+import { listVolumes, type StorageVolume, type StorageVolumePhase } from "@/api/storage/volumes";
 import { useListPagination } from "@/hooks/useListPagination";
 import { useStorageVolumeActions } from "@/hooks/useStorageVolumeActions";
 import CreateStorageVolumeModal from "@/components/volumes/CreateStorageVolumeModal";
-import {
-  ResourceNameId,
-  ListPageFrame,
-  ListDataTable,
-  StatusBadge,
-  type ListColumn,
-} from "@/components/common";
+import { ResourceNameId, ListPageFrame, ListDataTable, type ListColumn } from "@/components/common";
 
 export default function VolumesPage() {
   const [createVisible, setCreateVisible] = useState(false);
+  const [state, setState] = useState<"" | StorageVolumePhase>("");
+  const [searchField, setSearchField] = useState<"name" | "id">("name");
+  const [searchText, setSearchText] = useState("");
+  const filters = {
+    name: searchField === "name" ? searchText.trim() || undefined : undefined,
+    id: searchField === "id" ? searchText.trim() || undefined : undefined,
+    state: state || undefined,
+  };
   const { page, pageSize, setPage, setPageSize, resetPagination } = useListPagination(
-    "storage-volumes",
+    JSON.stringify(["storage-volumes", filters]),
     20,
   );
   const volumes = useQuery({
-    queryKey: ["storage", "volumes", { page, pageSize }],
-    queryFn: ({ signal }) => listVolumes({ page, pageSize }, signal),
+    queryKey: ["storage", "volumes", { page, pageSize, ...filters }],
+    queryFn: ({ signal }) => listVolumes({ page, pageSize, ...filters }, signal),
     meta: { errorNotification: { id: "storage-volumes", action: "块存储卷列表加载" } },
   });
   const { actions, dialogNode } = useStorageVolumeActions(resetPagination);
-  // TODO(storage-migration): 新契约暂无加密、可用区、使用方和创建时间，保留列位置但不补造值；旧类型与查询仍在 legacy。
+  // TODO(storage-migration): 新契约暂无可用区、使用方和创建时间，保留列位置但不补造值；旧类型与查询仍在 legacy。
   const columns: ListColumn<StorageVolume>[] = [
     {
       key: "name",
@@ -39,7 +41,7 @@ export default function VolumesPage() {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, item) => <StatusBadge status={item.deleting ? "deleting" : item.phase} />,
+      dataIndex: "phase",
     },
     { key: "size", title: "容量 (GB)", width: 100, dataIndex: "requested_capacity_gb" },
     {
@@ -55,7 +57,6 @@ export default function VolumesPage() {
       width: 120,
       render: (_, item) => (item.volume_mode === "Block" ? "块设备" : "文件系统"),
     },
-    { key: "encrypted", title: "加密", width: 80, render: () => "-" },
     { key: "zone", title: "可用区", width: 100, render: () => "-" },
     { key: "mountInstance", title: "挂载实例", width: 150, render: () => "-" },
     { key: "createdAt", title: "创建时间", width: 180, render: () => "-" },
@@ -77,16 +78,14 @@ export default function VolumesPage() {
             },
           ],
         }}
-        // TODO(storage-filter): 当前只接入全部卷；后端补齐状态、挂载与搜索后恢复筛选，不对当前页本地过滤。
         tabs={{
-          value: "all",
-          onChange: () => {},
+          value: state,
+          onChange: setState,
           items: [
-            { value: "all", label: "全部" },
-            { value: "pending", label: "创建中", disabled: true },
-            { value: "available", label: "可用", disabled: true },
-            { value: "mounted", label: "已挂载", disabled: true },
-            { value: "failed", label: "异常", disabled: true },
+            { value: "", label: "全部" },
+            { value: "Pending", label: "Pending" },
+            { value: "Bound", label: "Bound" },
+            { value: "Lost", label: "Lost" },
           ],
         }}
         toolbar={{
@@ -95,12 +94,11 @@ export default function VolumesPage() {
               { value: "name", label: "名称" },
               { value: "id", label: "ID" },
             ],
-            field: "name",
-            value: "",
-            disabled: true,
-            placeholder: "暂未支持搜索",
-            onFieldChange: () => {},
-            onChange: () => {},
+            field: searchField,
+            value: searchText,
+            placeholder: searchField === "name" ? "请输入名称关键字" : "请输入 PVC 名称或 UID",
+            onFieldChange: setSearchField,
+            onChange: setSearchText,
           },
           refresh: {
             label: "刷新",
@@ -116,7 +114,7 @@ export default function VolumesPage() {
           columns={columns}
           rowKey="pvc_name"
           rowActions={actions}
-          loading={volumes.isFetching}
+          loading={volumes.isLoading}
           tableLabel="块存储卷列表"
           pagination={{
             page,

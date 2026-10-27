@@ -5,13 +5,14 @@ import { listStorageObjects } from "@/api/storage/objects";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { useStorageObjectActions } from "@/hooks/useStorageObjectActions";
 import ObjectBrowser, { type ObjectBrowserEntry } from "@/components/objects/ObjectBrowser";
+import { withId } from "@/lib/id";
 
 type StorageBucketObjectsProps = { bucketId: string; bucketName: string };
 
 export default function StorageBucketObjects({ bucketId, bucketName }: StorageBucketObjectsProps) {
   const [prefix, setPrefix] = useState("");
   const navigate = useNavigate();
-  const { query, items, pagination } = useCursorPaginatedQuery<ObjectBrowserEntry>({
+  const { query, items, pagination, refresh } = useCursorPaginatedQuery<ObjectBrowserEntry>({
     queryKey: ["storage", "objects", bucketId, prefix],
     queryFn: async (params, signal) => {
       const page = await listStorageObjects(bucketId, { ...params, prefix }, signal);
@@ -35,7 +36,7 @@ export default function StorageBucketObjects({ bucketId, bucketName }: StorageBu
       };
     },
     errorNotification: {
-      id: JSON.stringify(["storage-objects", bucketId, prefix]),
+      id: withId("storage-objects", bucketId, JSON.stringify(prefix)),
       action: "对象列表加载",
     },
   });
@@ -59,6 +60,7 @@ export default function StorageBucketObjects({ bucketId, bucketName }: StorageBu
           </Button>
         </Tooltip>
       }
+      onRefresh={refresh}
       onNavigate={setPrefix}
       onCreateFolder={() => {}}
       onOpenObject={(entry) => {

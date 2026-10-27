@@ -6,6 +6,7 @@ import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/c
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatBytes, formatDateTime } from "@/lib/format";
+import { withId } from "@/lib/id";
 
 type ObjectDetailPageProps = { bucketId: string; objectId: string };
 
@@ -17,7 +18,7 @@ export default function ObjectDetailPage({ bucketId, objectId: objectKey }: Obje
     queryFn: ({ signal }) => getStorageObject({ bucket_id: bucketId, key: objectKey }, signal),
     meta: {
       errorNotification: {
-        id: JSON.stringify(["storage-object", bucketId, objectKey]),
+        id: withId("storage-object", bucketId, JSON.stringify(objectKey)),
         action: "对象加载",
       },
     },
