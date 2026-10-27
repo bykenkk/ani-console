@@ -12,6 +12,10 @@ import { withId } from "@/lib/id";
 type InstanceVncProps = {
   instanceId: string;
   protocol?: "vnc" | "novnc";
+  createSession?: (
+    id: string,
+    signal: AbortSignal,
+  ) => Promise<{ connect_url: string; expires_at: string }>;
 };
 
 type ConsoleStatus = "connecting" | "connected" | "disconnected" | "error" | "expired";
@@ -40,7 +44,11 @@ function applyViewMode(rfb: RFB, mode: ViewMode) {
   rfb.focusOnClick = true;
 }
 
-export default function InstanceVnc({ instanceId, protocol = "novnc" }: InstanceVncProps) {
+export default function InstanceVnc({
+  instanceId,
+  protocol = "novnc",
+  createSession,
+}: InstanceVncProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const rfbRef = useRef<RFB | null>(null);
   const expiresAtRef = useRef<string | null>(null);
@@ -71,11 +79,9 @@ export default function InstanceVnc({ instanceId, protocol = "novnc" }: Instance
       if (disposed) return;
 
       try {
-        const data = await createInstanceConsoleSession(
-          instanceId,
-          protocol,
-          abortController.signal,
-        );
+        const data = createSession
+          ? await createSession(instanceId, abortController.signal)
+          : await createInstanceConsoleSession(instanceId, protocol, abortController.signal);
         const connectUrl = data.connect_url;
         if (!connectUrl) throw new Error("控制台连接地址为空");
         expiresAtRef.current = data?.expires_at ?? null;
@@ -147,7 +153,7 @@ export default function InstanceVnc({ instanceId, protocol = "novnc" }: Instance
       rfbRef.current = null;
       rfb?.disconnect();
     };
-  }, [instanceId, protocol, reconnectKey]);
+  }, [instanceId, protocol, createSession, reconnectKey]);
 
   const meta = STATUS_META[status];
   const canReconnect = status === "error" || status === "disconnected" || status === "expired";
