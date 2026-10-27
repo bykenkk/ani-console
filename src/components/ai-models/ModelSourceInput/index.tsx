@@ -16,10 +16,18 @@ export interface ModelSourceInputValue {
 interface ModelSourceInputProps {
   value?: ModelSourceInputValue;
   onChange?: (value: ModelSourceInputValue, candidate?: ExternalModelCandidate) => void;
+  onRepoChange?: (value: ModelSourceInputValue) => void;
+  onProviderChange?: (provider: ExternalModelProvider) => void;
   disabled?: boolean;
 }
 
-export default function ModelSourceInput({ value, onChange, disabled }: ModelSourceInputProps) {
+export default function ModelSourceInput({
+  value,
+  onChange,
+  onRepoChange,
+  onProviderChange,
+  disabled,
+}: ModelSourceInputProps) {
   const provider = value?.provider ?? "modelscope";
   const [searchInput, setSearchInput] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
@@ -71,7 +79,9 @@ export default function ModelSourceInput({ value, onChange, disabled }: ModelSou
           setSelected(undefined);
           setSearchInput("");
           setSearchKeyword("");
+          // 来源切换只更新字段值，编辑或选择仓库 ID 时再触发校验。
           onChange?.({ provider, repo_id: "" });
+          onProviderChange?.(provider);
         }}
       />
       <AutoComplete
@@ -91,7 +101,9 @@ export default function ModelSourceInput({ value, onChange, disabled }: ModelSou
         }))}
         onChange={(repo_id) => {
           if (repo_id !== selected?.repo_id) setSelected(undefined);
-          onChange?.({ provider, repo_id });
+          const nextValue = { provider, repo_id };
+          onChange?.(nextValue);
+          onRepoChange?.(nextValue);
         }}
         onSelect={(repo_id) => {
           const candidate = options.find((item) => item.repo_id === repo_id);

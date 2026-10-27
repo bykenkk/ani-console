@@ -154,6 +154,7 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
           field="source"
           label="模型"
           required
+          validateTrigger="onRepoChange"
           extra="支持手动输入，搜索结果仅供参考"
           rules={[
             {
@@ -164,7 +165,10 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
             },
           ]}
         >
-          <ModelSourceInput onChange={changeModelSource} />
+          <ModelSourceInput
+            onChange={changeModelSource}
+            onProviderChange={() => form.setFields({ source: { error: undefined } })}
+          />
         </Form.Item>
         <Form.Item field="revision" label="版本 / Revision" rules={[{ required: true }]}>
           <Input maxLength={128} placeholder="请输入版本 / Revision" />
