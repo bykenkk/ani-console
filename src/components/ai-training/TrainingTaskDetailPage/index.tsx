@@ -1,7 +1,3 @@
-// FIXME(modeldev-integration): 详情没有刷新入口或持续状态观测，创建/停止后仅获取快照，产物区域也不会随后台发布自动更新。
-// TODO(modeldev-integration): 对齐项目刷新约定与交接文档的轮询要求，补齐状态刷新，并按明确终态结束观测。
-// FIXME(modeldev-integration): 当前仅展示 compute/delivery/close 三轴，接口的 resource_state 未展示。
-// TODO(modeldev-integration): 补齐资源状态、停止意图及必要观测时间，不能用训练完成或停止受理代替 CLOSED/资源释放。
 import { useQuery } from "@tanstack/react-query";
 import { Empty } from "@arco-design/web-react";
 import { getModelDevExecution } from "@/api/modeldev";
@@ -12,6 +8,9 @@ import { useTrainingTaskActions } from "@/hooks/useTrainingTaskActions";
 import { withId } from "@/lib/id";
 import TrainingTaskLogs from "./TrainingTaskLogs";
 import TrainingTaskArtifacts from "./TrainingTaskArtifacts";
+import TrainingExecutionSnapshot from "./TrainingExecutionSnapshot";
+import { formatDateTime } from "@/lib/date";
+import { shouldObserveModelDevExecution } from "@/lib/modeldev";
 
 type TrainingTaskDetailPageProps = {
   executionId: string;
@@ -29,6 +28,12 @@ export default function TrainingTaskDetailPage({
   const detail = useQuery({
     queryKey: ["training-execution", executionId],
     queryFn: ({ signal }) => getModelDevExecution(executionId, signal),
+    refetchInterval: (query) =>
+      query.state.status !== "error" &&
+      query.state.data &&
+      shouldObserveModelDevExecution(query.state.data)
+        ? 5000
+        : false,
     meta: {
       errorNotification: {
         id: withId("training-execution", executionId),
@@ -57,10 +62,17 @@ export default function TrainingTaskDetailPage({
             { label: "计算状态", value: task.compute_state || "-" },
             { label: "发布状态", value: task.delivery_state || "-" },
             { label: "关闭状态", value: task.close_state || "-" },
-            { label: "训练预设", value: task.preset_id || "-" },
-            { label: "发布版本", value: task.release_id || "-" },
+            { label: "资源状态", value: task.resource_state || "-" },
+            { label: "任务类型", value: task.kind || "-" },
+            { label: "训练实现", value: task.implementation_id || "-" },
+            { label: "算力规格", value: <ResourceId value={task.compute_preset_id} /> },
             { label: "数据集版本", value: task.input_version_id || "-" },
             { label: "镜像版本", value: task.image_version_id || "-" },
+            { label: "当前阶段", value: task.current_step || "-" },
+            { label: "停止已请求", value: task.stop_requested ? "是" : "否" },
+            { label: "受理时间", value: formatDateTime(task.accepted_at) },
+            { label: "截止时间", value: formatDateTime(task.deadline_at) },
+            { label: "观测时间", value: formatDateTime(task.observed_at) },
           ],
         },
       ]}
@@ -68,12 +80,18 @@ export default function TrainingTaskDetailPage({
         {
           key: "logs",
           label: "日志",
-          content:
-            task.close_state === "CLOSED" ? (
-              <Empty description="日志已不可用" />
-            ) : (
-              <TrainingTaskLogs key={executionId} executionId={executionId} />
-            ),
+          content: (
+            <TrainingTaskLogs
+              key={executionId}
+              executionId={executionId}
+              observing={!detail.isError && shouldObserveModelDevExecution(task)}
+            />
+          ),
+        },
+        {
+          key: "snapshot",
+          label: "配置与记录",
+          content: <TrainingExecutionSnapshot task={task} />,
         },
         {
           key: "artifacts",

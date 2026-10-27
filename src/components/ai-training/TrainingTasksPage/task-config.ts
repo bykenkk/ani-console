@@ -1,5 +1,3 @@
-// FIXME(modeldev-integration): 列表尚未展示四轴状态中的 resource_state，无法在列表区分计算结束与资源关闭情况。
-// TODO(modeldev-integration): 核对后端状态枚举后补齐资源状态展示，与详情采用一致语义。
 import { createElement } from "react";
 import { ResourceNameId, type ListColumn } from "@/components/common";
 import type { ModelDevExecution } from "@/api/modeldev";
@@ -21,9 +19,11 @@ export function taskColumns(): ListColumn<ModelDevExecution>[] {
     },
     ...(
       [
+        ["kind", "任务类型"],
         ["compute_state", "计算状态"],
         ["delivery_state", "发布状态"],
         ["close_state", "关闭状态"],
+        ["resource_state", "资源状态"],
       ] as const
     ).map(([key, title]) => ({
       key,

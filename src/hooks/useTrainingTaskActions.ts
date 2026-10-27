@@ -1,15 +1,39 @@
-// FIXME(modeldev-integration): 停止受理后只失效并刷新一次缓存，尚未跟踪 stop_requested 到 CLOSED 的最终关闭结果。
-// TODO(modeldev-integration): 与详情状态刷新统一观察停止进展，保留“停止已提交”语义，不将 202 当作资源已关闭。
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Modal } from "@arco-design/web-react";
-import { stopModelDevExecution, type ModelDevExecution } from "@/api/modeldev";
+import {
+  getModelDevExecution,
+  stopModelDevExecution,
+  type ModelDevExecution,
+} from "@/api/modeldev";
 import type { RowAction } from "@/components/common/DataTable";
 import { withId } from "@/lib/id";
 
 export function useTrainingTaskActions(): RowAction<ModelDevExecution>[] {
   const qc = useQueryClient();
+  const refresh = async (executionId: string) => {
+    const queryKey = ["training-execution", executionId];
+    // 中止操作前尚未完成的读请求，确保随后获取的是操作后的原执行快照。
+    await qc.cancelQueries({ queryKey, exact: true });
+    await qc.invalidateQueries({ queryKey, exact: true, refetchType: "none" });
+    // 列表入口可能尚无详情缓存；查询失败由 QueryCache 通知，不改变写入结果。
+    await Promise.allSettled([
+      qc.fetchQuery({
+        queryKey,
+        queryFn: ({ signal }) => getModelDevExecution(executionId, signal),
+        meta: {
+          errorNotification: {
+            id: withId("training-execution", executionId),
+            action: "训练任务详情加载",
+            fallback: "请稍后重试",
+          },
+        },
+      }),
+      qc.invalidateQueries({ queryKey: ["training-executions"] }),
+    ]);
+  };
   const stop = useMutation({
     mutationFn: (executionId: string) => stopModelDevExecution(executionId),
+    retry: false,
     meta: {
       feedback: (variables) => ({
         channel: "notification",
@@ -19,14 +43,10 @@ export function useTrainingTaskActions(): RowAction<ModelDevExecution>[] {
         errorFallback: "停止失败，请稍后重试",
       }),
     },
-    onSuccess: async (_, executionId) => {
-      await Promise.all([
-        qc.invalidateQueries({ queryKey: ["training-execution", executionId] }),
-        qc.invalidateQueries({ queryKey: ["training-executions"] }),
-      ]);
-    },
+    onSettled: (_, __, executionId) => refresh(executionId),
   });
   return [
+    { key: "refresh", label: "刷新状态", onClick: (task) => refresh(task.execution_id) },
     {
       key: "stop",
       label: "停止训练",

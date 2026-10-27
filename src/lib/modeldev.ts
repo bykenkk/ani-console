@@ -1,5 +1,14 @@
-import type { ModelDevInputVersion, ModelDevParameterRule } from "@/api/modeldev";
+import type {
+  ModelDevExecution,
+  ModelDevInputVersion,
+  ModelDevParameterRule,
+} from "@/api/modeldev";
 import type { InstancePreset } from "@/api/instances";
+
+/** CLOSED 已关闭，NEEDS_REVIEW 等待人工处理；停止观测不代表已释放算力。 */
+export function shouldObserveModelDevExecution(task: ModelDevExecution): boolean {
+  return task.close_state !== "CLOSED" && task.close_state !== "NEEDS_REVIEW";
+}
 
 const PARAMETER_LABELS: Record<string, string> = {
   epochs: "训练轮次",

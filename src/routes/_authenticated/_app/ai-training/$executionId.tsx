@@ -3,7 +3,10 @@ import TrainingTaskDetailPage from "@/components/ai-training/TrainingTaskDetailP
 
 export const Route = createFileRoute("/_authenticated/_app/ai-training/$executionId")({
   validateSearch: (search: Record<string, unknown>): { tab?: string } => ({
-    tab: search.tab === "logs" || search.tab === "artifacts" ? search.tab : undefined,
+    tab:
+      search.tab === "logs" || search.tab === "artifacts" || search.tab === "snapshot"
+        ? search.tab
+        : undefined,
   }),
   component: function TrainingTaskDetailRoute() {
     const { executionId } = Route.useParams();
