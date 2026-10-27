@@ -1,5 +1,5 @@
 import type { CoreDevProfileInfo } from "@/api/types";
-import type { StorageResourceState } from "@/api/storage/volumes";
+import type { StorageResourceState } from "@/api/storage/volumes/legacy";
 
 export interface StorageFilesystem {
   id: string;

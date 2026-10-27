@@ -1,121 +1,65 @@
-import { useVolumeActions } from "@/hooks/useVolumeActions";
-
 import { useState } from "react";
-
+import { useQuery } from "@tanstack/react-query";
 import { listVolumes, type StorageVolume } from "@/api/storage/volumes";
-
-import CreateVolumeModal from "@/components/volumes/CreateVolumeModal";
-
+import { useListPagination } from "@/hooks/useListPagination";
+import { useStorageVolumeActions } from "@/hooks/useStorageVolumeActions";
+import CreateStorageVolumeModal from "@/components/volumes/CreateStorageVolumeModal";
 import {
   ResourceNameId,
   ListPageFrame,
-  type ListColumn,
-  StatusBadge,
   ListDataTable,
+  StatusBadge,
+  type ListColumn,
 } from "@/components/common";
-import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
-import { formatDateTime } from "@/lib/format";
-import { VOLUME_MODE_LABELS } from "@/lib/volumes";
-
-type Volume = StorageVolume;
-type StatusFilter = "all" | "pending" | "available" | "mounted" | "failed";
-type SearchField = "name" | "id";
 
 export default function VolumesPage() {
   const [createVisible, setCreateVisible] = useState(false);
-
-  const [status, setStatus] = useState<StatusFilter>("all");
-  const [searchField, setSearchField] = useState<SearchField>("name");
-  const [searchText, setSearchText] = useState("");
-  const {
-    query: volumes,
-    resetPagination,
-    refresh,
-    items,
-    pagination,
-  } = useClientPaginatedQuery<Volume>({
-    errorNotification: {
-      id: "volumes",
-      action: "块存储卷列表加载",
-      fallback: "请求失败，请稍后重试",
-    },
-    queryKey: ["volumes", { status, searchField, searchText }],
-    queryFn: async () => {
-      const keyword = searchText.trim();
-      return listVolumes({
-        state: status === "all" || status === "mounted" ? undefined : status,
-        in_use: status === "mounted" ? true : undefined,
-        search_field: keyword ? searchField : undefined,
-        keyword: keyword || undefined,
-      });
-    },
+  const { page, pageSize, setPage, setPageSize, resetPagination } = useListPagination(
+    "storage-volumes",
+    20,
+  );
+  const volumes = useQuery({
+    queryKey: ["storage", "volumes", { page, pageSize }],
+    queryFn: ({ signal }) => listVolumes({ page, pageSize }, signal),
+    meta: { errorNotification: { id: "storage-volumes", action: "块存储卷列表加载" } },
   });
-  const { actions, dialogNode } = useVolumeActions(resetPagination);
-
-  const columns: Array<ListColumn<Volume>> = [
+  const { actions, dialogNode } = useStorageVolumeActions(resetPagination);
+  // TODO(storage-migration): 新契约暂无加密、可用区、使用方和创建时间，保留列位置但不补造值；旧类型与查询仍在 legacy。
+  const columns: ListColumn<StorageVolume>[] = [
     {
       key: "name",
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="volume" />,
+      render: (_, item) => (
+        <ResourceNameId name={item.display_name} id={item.pvc_name} type="volume" />
+      ),
     },
     {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, item) => <StatusBadge status={item.state} />,
+      render: (_, item) => <StatusBadge status={item.deleting ? "deleting" : item.phase} />,
     },
-    {
-      key: "size",
-      title: "容量 (GiB)",
-      width: 100,
-      dataIndex: "size_gib",
-    },
+    { key: "size", title: "容量 (GB)", width: 100, dataIndex: "requested_capacity_gb" },
     {
       key: "storageClass",
       title: "类型",
       width: 100,
-      dataIndex: "storage_class",
+      dataIndex: "storage_class_name",
+      ellipsis: true,
     },
     {
       key: "volumeMode",
       title: "用途",
       width: 120,
-      render: (_, item) => VOLUME_MODE_LABELS[item.volume_mode] ?? "-",
+      render: (_, item) => (item.volume_mode === "Block" ? "块设备" : "文件系统"),
     },
-    {
-      key: "encrypted",
-      title: "加密",
-      width: 80,
-      render: (_, item) => (item.encrypted ? "是" : "否"),
-    },
-    {
-      key: "zone",
-      title: "可用区",
-      width: 100,
-      dataIndex: "zone",
-      ellipsis: true,
-    },
-    {
-      key: "mountInstance",
-      title: "挂载实例",
-      width: 150,
-      ellipsis: true,
-      render: (_, item) =>
-        item.used_by
-          ?.map((instance) => instance.instance_name)
-          .filter(Boolean)
-          .join("、") || "-",
-    },
-    {
-      key: "createdAt",
-      title: "创建时间",
-      width: 180,
-      render: (_, item) => formatDateTime(item.created_at),
-    },
+    { key: "encrypted", title: "加密", width: 80, render: () => "-" },
+    { key: "zone", title: "可用区", width: 100, render: () => "-" },
+    { key: "mountInstance", title: "挂载实例", width: 150, render: () => "-" },
+    { key: "createdAt", title: "创建时间", width: 180, render: () => "-" },
   ];
-
   return (
     <>
       <ListPageFrame
@@ -133,66 +77,57 @@ export default function VolumesPage() {
             },
           ],
         }}
+        // TODO(storage-filter): 当前只接入全部卷；后端补齐状态、挂载与搜索后恢复筛选，不对当前页本地过滤。
         tabs={{
-          value: status,
-          onChange: setStatus,
+          value: "all",
+          onChange: () => {},
           items: [
-            {
-              value: "all",
-              label: "全部",
-            },
-            {
-              value: "pending",
-              label: "创建中",
-            },
-            {
-              value: "available",
-              label: "可用",
-            },
-            {
-              value: "mounted",
-              label: "已挂载",
-            },
-            {
-              value: "failed",
-              label: "异常",
-            },
+            { value: "all", label: "全部" },
+            { value: "pending", label: "创建中", disabled: true },
+            { value: "available", label: "可用", disabled: true },
+            { value: "mounted", label: "已挂载", disabled: true },
+            { value: "failed", label: "异常", disabled: true },
           ],
         }}
         toolbar={{
           search: {
             fields: [
-              {
-                value: "name",
-                label: "名称",
-              },
-              {
-                value: "id",
-                label: "ID",
-              },
+              { value: "name", label: "名称" },
+              { value: "id", label: "ID" },
             ],
-            field: searchField,
-            value: searchText,
-            onFieldChange: setSearchField,
-            onChange: setSearchText,
+            field: "name",
+            value: "",
+            disabled: true,
+            placeholder: "暂未支持搜索",
+            onFieldChange: () => {},
+            onChange: () => {},
           },
           refresh: {
             label: "刷新",
             spinning: volumes.isFetching,
-            onClick: refresh,
+            onClick: () => {
+              volumes.refetch();
+            },
           },
         }}
       >
         <ListDataTable
-          data={items}
+          data={volumes.data?.items ?? []}
           columns={columns}
+          rowKey="pvc_name"
           rowActions={actions}
           loading={volumes.isFetching}
           tableLabel="块存储卷列表"
-          pagination={pagination}
+          pagination={{
+            page,
+            pageSize,
+            total: Number(volumes.data?.total ?? "0"),
+            onPageChange: setPage,
+            onPageSizeChange: setPageSize,
+          }}
         />
       </ListPageFrame>
-      {createVisible && <CreateVolumeModal onCancel={() => setCreateVisible(false)} />}
+      {createVisible && <CreateStorageVolumeModal onCancel={() => setCreateVisible(false)} />}
       {dialogNode}
     </>
   );

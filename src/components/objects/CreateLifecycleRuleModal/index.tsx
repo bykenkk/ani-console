@@ -1,7 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Form, Input, InputNumber, Modal, Select } from "@arco-design/web-react";
 import { useState } from "react";
-import { createBucketLifecycleRule, type StorageBucketLifecycleRule } from "@/api/storage/buckets";
+import {
+  createBucketLifecycleRule,
+  type StorageBucketLifecycleRule,
+} from "@/api/storage/buckets/legacy";
 
 type CreateLifecycleRuleModalProps = {
   bucketId: string;

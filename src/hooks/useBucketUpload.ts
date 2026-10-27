@@ -1,4 +1,4 @@
-import { uploadStorageObjectFile } from "@/api/storage/objects";
+import { uploadStorageObjectFile } from "@/api/storage/objects/legacy";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 export function useBucketUpload(
   bucketId: string | undefined,

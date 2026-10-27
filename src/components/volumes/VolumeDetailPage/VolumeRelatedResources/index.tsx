@@ -1,6 +1,6 @@
 import { useVolumeDetach } from "@/hooks/useVolumeDetach";
 
-import type { StorageVolume } from "@/api/storage/volumes";
+import type { StorageVolume } from "@/api/storage/volumes/legacy";
 import { DataTable, ResourceNameId, StatusBadge, type RowAction } from "@/components/common";
 
 import { Button } from "@arco-design/web-react";

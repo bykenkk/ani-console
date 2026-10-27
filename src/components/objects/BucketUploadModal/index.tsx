@@ -1,5 +1,5 @@
 import { useBucketUpload } from "@/hooks/useBucketUpload";
-import type { StorageBucketRecord } from "@/api/storage/buckets";
+import type { StorageBucketRecord } from "@/api/storage/buckets/legacy";
 
 import { Button, Modal, Space, Typography, Upload } from "@arco-design/web-react";
 

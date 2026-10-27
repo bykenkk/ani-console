@@ -1,3 +1,4 @@
+export * from "./classes";
 export * from "./buckets";
 export * from "./filesystems";
 export * from "./objects";

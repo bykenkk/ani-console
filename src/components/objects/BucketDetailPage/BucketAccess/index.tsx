@@ -1,4 +1,4 @@
-import type { StorageBucketRecord } from "@/api/storage/buckets";
+import type { StorageBucketRecord } from "@/api/storage/buckets/legacy";
 import { DataTable } from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
 import { Button, Space, Typography } from "@arco-design/web-react";

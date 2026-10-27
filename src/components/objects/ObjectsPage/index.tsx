@@ -1,50 +1,18 @@
-import { useBucketActions } from "@/hooks/useBucketActions";
-import { useQueryClient } from "@tanstack/react-query";
-
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { listBuckets, type StorageBucketRecord } from "@/api/storage/buckets";
-
-import CreateBucketModal from "@/components/objects/CreateBucketModal";
 import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
-import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
-import { formatBytes, formatDateTime } from "@/lib/format";
-
-type Bucket = StorageBucketRecord;
-type SearchField = "name" | "id";
+import { useListPagination } from "@/hooks/useListPagination";
+import { storageBucketActions } from "@/components/objects/storageBucketActions";
 
 export default function ObjectsPage() {
-  const queryClient = useQueryClient();
-  const [createVisible, setCreateVisible] = useState(false);
-
-  const [searchField, setSearchField] = useState<SearchField>("name");
-  const [searchText, setSearchText] = useState("");
-  const {
-    query: buckets,
-    resetPagination,
-    refresh,
-    items,
-    pagination,
-  } = useClientPaginatedQuery<Bucket>({
-    errorNotification: {
-      id: "buckets",
-      action: "对象存储桶列表加载",
-      fallback: "请求失败，请稍后重试",
-    },
-    queryKey: ["buckets", { searchField, searchText }],
-    queryFn: async () => {
-      const keyword = searchText.trim();
-      return listBuckets({
-        search_field: keyword ? searchField : undefined,
-        keyword: keyword || undefined,
-      });
-    },
+  const { page, pageSize, setPage, setPageSize } = useListPagination("storage-buckets", 20);
+  const buckets = useQuery({
+    queryKey: ["storage", "buckets", { page, pageSize }],
+    queryFn: ({ signal }) => listBuckets({ page, pageSize }, signal),
+    meta: { errorNotification: { id: "storage-buckets", action: "对象存储桶列表加载" } },
   });
-  const { actions, dialogNode } = useBucketActions(() => {
-    resetPagination();
-    queryClient.invalidateQueries({ queryKey: ["buckets"] });
-  });
-
-  const columns: Array<ListColumn<Bucket>> = [
+  // TODO(storage-migration): 新契约只有逻辑桶 id/name；旧列保留位置，待补齐字段后恢复展示。
+  const columns: ListColumn<StorageBucketRecord>[] = [
     {
       key: "name",
       title: "名称 / ID",
@@ -52,99 +20,69 @@ export default function ObjectsPage() {
       fixed: "left",
       render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="bucket" />,
     },
-    {
-      key: "acl",
-      title: "权限",
-      width: 100,
-      render: (_, item) => (item.acl === "tenant_read" ? "租户内读" : "私有"),
-    },
-    {
-      key: "storageClass",
-      title: "存储类型",
-      width: 100,
-      render: (_, item) => (item.storage_class === "infrequent_access" ? "低频" : "标准"),
-    },
-    {
-      key: "region",
-      title: "Region",
-      dataIndex: "region",
-      width: 100,
-      ellipsis: true,
-    },
-    {
-      key: "objectCount",
-      title: "对象数",
-      dataIndex: "object_count",
-      width: 100,
-      ellipsis: true,
-    },
-    {
-      key: "sizeBytes",
-      title: "总大小",
-      width: 100,
-      ellipsis: true,
-      render: (_, item) => formatBytes(item.size_bytes),
-    },
-    {
-      key: "createdAt",
-      title: "创建时间",
-      width: 180,
-      render: (_, item) => formatDateTime(item.created_at),
-    },
+    { key: "acl", title: "权限", width: 100, render: () => "-" },
+    { key: "storageClass", title: "存储类型", width: 100, render: () => "-" },
+    { key: "region", title: "Region", width: 100, render: () => "-" },
+    { key: "objectCount", title: "对象数", width: 100, render: () => "-" },
+    { key: "sizeBytes", title: "总大小", width: 100, render: () => "-" },
+    { key: "createdAt", title: "创建时间", width: 180, render: () => "-" },
   ];
-
   return (
-    <>
-      <ListPageFrame
-        header={{
-          iconClassName: "icon-duixiangcunchu1",
-          title: "对象存储",
-          subtitle: "S3 兼容存储桶，用于保存非结构化对象数据",
-          actions: [
-            {
-              key: "create",
-              label: "创建存储桶",
-              iconClassName: "icon-add-1",
-              variant: "primary",
-              onClick: () => setCreateVisible(true),
-            },
+    <ListPageFrame
+      header={{
+        iconClassName: "icon-duixiangcunchu1",
+        title: "对象存储",
+        subtitle: "S3 兼容存储桶，用于保存非结构化对象数据",
+        // TODO(storage-migration): 创建桶保留 CreateBucketModal 旧实现，待新接口补齐后恢复入口。
+        actions: [
+          {
+            key: "create",
+            label: "创建存储桶",
+            iconClassName: "icon-add-1",
+            variant: "primary",
+            disabled: true,
+            tooltip: "暂未支持",
+            onClick: () => {},
+          },
+        ],
+      }}
+      toolbar={{
+        // TODO(storage-filter): 当前桶列表没有搜索参数，不过滤当前页或循环拉取全量桶。
+        search: {
+          fields: [
+            { value: "name", label: "名称" },
+            { value: "id", label: "ID" },
           ],
-        }}
-        toolbar={{
-          search: {
-            fields: [
-              {
-                value: "name",
-                label: "名称",
-              },
-              {
-                value: "id",
-                label: "ID",
-              },
-            ],
-            field: searchField,
-            value: searchText,
-            onFieldChange: setSearchField,
-            onChange: setSearchText,
+          field: "name",
+          value: "",
+          disabled: true,
+          placeholder: "暂未支持搜索",
+          onFieldChange: () => {},
+          onChange: () => {},
+        },
+        refresh: {
+          label: "刷新",
+          spinning: buckets.isFetching,
+          onClick: () => {
+            buckets.refetch();
           },
-          refresh: {
-            label: "刷新",
-            spinning: buckets.isFetching,
-            onClick: refresh,
-          },
+        },
+      }}
+    >
+      <ListDataTable
+        data={buckets.data?.items ?? []}
+        columns={columns}
+        rowActions={storageBucketActions}
+        loading={buckets.isFetching}
+        tableLabel="对象存储桶列表"
+        pagination={{
+          page,
+          pageSize,
+          total: Number(buckets.data?.total ?? "0"),
+          onPageChange: setPage,
+          onPageSizeChange: setPageSize,
         }}
-      >
-        <ListDataTable
-          data={items}
-          columns={columns}
-          rowActions={actions}
-          loading={buckets.isFetching}
-          tableLabel="对象存储桶列表"
-          pagination={pagination}
-        />
-      </ListPageFrame>
-      {createVisible && <CreateBucketModal onCancel={() => setCreateVisible(false)} />}
-      {dialogNode}
-    </>
+      />
+    </ListPageFrame>
   );
 }

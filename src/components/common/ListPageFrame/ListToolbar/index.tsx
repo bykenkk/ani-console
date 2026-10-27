@@ -52,6 +52,7 @@ export type SearchField<T extends string> = {
 };
 
 type ToolbarSearchProps<T extends string> = {
+  disabled?: boolean;
   fields: Array<SearchField<T>>;
   field: T;
   value: string;
@@ -61,6 +62,7 @@ type ToolbarSearchProps<T extends string> = {
 };
 
 export function ToolbarSearch<T extends string>({
+  disabled,
   fields,
   field,
   value,
@@ -73,6 +75,7 @@ export function ToolbarSearch<T extends string>({
   return (
     <div className={styles.searchControl}>
       <Select
+        disabled={disabled}
         aria-label="搜索字段"
         className={styles.searchField}
         value={field}
@@ -84,6 +87,7 @@ export function ToolbarSearch<T extends string>({
         搜索内容
       </label>
       <input
+        disabled={disabled}
         id={inputId}
         className={styles.searchInput}
         value={value}

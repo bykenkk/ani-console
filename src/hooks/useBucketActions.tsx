@@ -1,7 +1,7 @@
 import { Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { deleteBucket, type StorageBucketRecord } from "@/api/storage/buckets";
+import { deleteBucket, type StorageBucketRecord } from "@/api/storage/buckets/legacy";
 import BucketAclModal from "@/components/objects/BucketAclModal";
 import BucketUploadModal from "@/components/objects/BucketUploadModal";
 import BucketStorageClassModal from "@/components/objects/BucketStorageClassModal";

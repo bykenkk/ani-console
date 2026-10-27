@@ -2,6 +2,7 @@ import clsx from "clsx";
 import styles from "./index.module.css";
 
 export type ListStatusTab<T extends string> = {
+  disabled?: boolean;
   value: T;
   label: string;
 };
@@ -28,6 +29,7 @@ export default function StatusTabs<T extends string>({
             key={item.value}
             type="button"
             role="tab"
+            disabled={item.disabled}
             aria-selected={active}
             className={clsx(styles.statusTab, active && styles.statusTabActive)}
             onClick={() => onChange(item.value)}

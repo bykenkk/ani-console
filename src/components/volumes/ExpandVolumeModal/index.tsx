@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Alert, Form, InputNumber, Modal, Typography } from "@arco-design/web-react";
 import { useState } from "react";
-import { expandVolume, type StorageVolume } from "@/api/storage/volumes";
+import { expandVolume, type StorageVolume } from "@/api/storage/volumes/legacy";
 
 type ExpandVolumeModalProps = {
   volume: Volume;

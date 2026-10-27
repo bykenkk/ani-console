@@ -1,7 +1,7 @@
 import {
   updateVolumeAutoSnapshotPolicy,
   type StorageVolumeAutoSnapshotPolicy,
-} from "@/api/storage/volumes";
+} from "@/api/storage/volumes/legacy";
 import { validateForm } from "@/lib/form";
 import { Form, Input, InputNumber, Modal, Switch } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

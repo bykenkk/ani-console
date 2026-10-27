@@ -1,4 +1,4 @@
-import { createBucketPrefix } from "@/api/storage/buckets";
+import { createBucketPrefix } from "@/api/storage/buckets/legacy";
 import { Input, Modal, Typography } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";

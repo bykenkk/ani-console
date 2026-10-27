@@ -1,152 +1,64 @@
 import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
-import type { AsyncTask } from "@/api/tasks";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
   CreateStorageVolumeInput,
   CreateStorageVolumeRequest,
-  CreateVolumeSnapshotInput,
-  CreateVolumeSnapshotRequest,
-  StorageVolume,
-  StorageVolumeAutoSnapshotPolicyUpdateInput,
-  StorageVolumeAutoSnapshotPolicyUpdateRequest,
+  StorageVolumeDeleteInput,
+  StorageVolumeDeleteRequest,
+  StorageVolumeDetail,
   StorageVolumeExpandInput,
   StorageVolumeExpandRequest,
   StorageVolumeListParams,
   StorageVolumeListResponse,
-  VolumeOSInitCompleteInput,
-  VolumeOSInitCompleteRequest,
-  VolumeOSInitGuide,
-  VolumeSnapshotListResponse,
 } from "./types";
-
-const createScope = createIdempotencyScope("storage-volume-create", ["POST"]);
-const expandScope = createIdempotencyScope("storage-volume-expand", ["POST"]);
-const autoSnapshotScope = createIdempotencyScope("storage-volume-auto-snapshot-policy", ["PUT"]);
-const snapshotScope = createIdempotencyScope("storage-volume-snapshot-create", ["POST"]);
-const osInitScope = createIdempotencyScope("storage-volume-os-init-complete", ["POST"]);
-const volumePath = (volumeId: string) => `/volumes/${encodeURIComponent(volumeId)}`;
-
-export function listVolumes(
-  params: StorageVolumeListParams = {},
-): Promise<StorageVolumeListResponse> {
-  return coreRequest<StorageVolumeListResponse>("/volumes", { method: "GET", params });
+const createScope = createIdempotencyScope("storage-pvc-create", ["POST"]);
+const volumePath = (pvcName: string) => `/storage/volumes/${encodeURIComponent(pvcName)}`;
+// TODO(storage-contract): 按存储补充契约接入；目标后端源码合并后复核 HTTP 映射、权限、UID 保护及真实环境行为。
+// TODO(storage-filter): 当前仅支持页码分页，无名称、状态、用途和可挂载实例筛选；待后端补齐后恢复对应查询条件。
+export function listVolumes(params: StorageVolumeListParams = {}, signal?: AbortSignal) {
+  return coreRequest<StorageVolumeListResponse>("/storage/volumes", {
+    method: "GET",
+    params,
+    signal,
+  });
 }
-
-// TODO(submit-result): 接入 governance 后按实际契约确认提交返回值；普通创建、操作默认丢弃响应，并清理无用回传及创建后跳转。
-export function createVolume(submitData: CreateStorageVolumeInput): Promise<StorageVolume> {
-  return runIdempotentRequest(createScope, submitData, (body) =>
-    coreRequest<StorageVolume, CreateStorageVolumeRequest>("/volumes", {
+export function getVolume(pvcName: string, signal?: AbortSignal) {
+  return coreRequest<StorageVolumeDetail>(volumePath(pvcName), { method: "GET", signal });
+}
+export async function createVolume(
+  submitData: CreateStorageVolumeInput,
+  signal?: AbortSignal,
+): Promise<void> {
+  await runIdempotentRequest(createScope, submitData, ({ idempotency_key, ...data }) =>
+    coreRequest<unknown, CreateStorageVolumeRequest>("/storage/volumes", {
       method: "POST",
-      data: body,
+      data: { data: { ...data, create_token: idempotency_key } },
+      signal,
     }),
   );
 }
-
-export function getVolume(volumeId: string): Promise<StorageVolume> {
-  return coreRequest<StorageVolume>(volumePath(volumeId), { method: "GET" });
-}
-
-export function deleteVolume(volumeId: string): Promise<StorageVolume> {
-  return coreRequest<StorageVolume>(volumePath(volumeId), { method: "DELETE" });
-}
-
-export function listVolumeSnapshots(volumeId: string): Promise<VolumeSnapshotListResponse> {
-  return coreRequest<VolumeSnapshotListResponse>(`${volumePath(volumeId)}/snapshots`, {
-    method: "GET",
+// 扩容与删除未声明幂等键；expected_uid 是资源身份前置条件，不附加通用 key。
+export async function expandVolume(
+  pvcName: string,
+  input: StorageVolumeExpandInput,
+  signal?: AbortSignal,
+): Promise<void> {
+  await coreRequest<unknown, StorageVolumeExpandRequest>(`${volumePath(pvcName)}:update`, {
+    method: "POST",
+    data: { data: { ...input, pvc_name: pvcName }, update_mask: "capacityGb" },
+    signal,
   });
 }
-
-export function createVolumeSnapshot(
-  volumeId: string,
-  submitData: CreateVolumeSnapshotInput,
-): Promise<AsyncTask> {
-  return runIdempotentRequest(
-    snapshotScope,
-    submitData,
-    (body) =>
-      coreRequest<AsyncTask, CreateVolumeSnapshotRequest>(`${volumePath(volumeId)}/snapshots`, {
-        method: "POST",
-        data: body,
-      }),
-    [volumeId],
-  );
-}
-
-export function expandVolume(
-  volumeId: string,
-  submitData: StorageVolumeExpandInput,
-): Promise<AsyncTask> {
-  return runIdempotentRequest(
-    expandScope,
-    submitData,
-    (body) =>
-      coreRequest<AsyncTask, StorageVolumeExpandRequest>(`${volumePath(volumeId)}/expand`, {
-        method: "POST",
-        data: body,
-      }),
-    [volumeId],
-  );
-}
-
-export function updateVolumeAutoSnapshotPolicy(
-  volumeId: string,
-  submitData: StorageVolumeAutoSnapshotPolicyUpdateInput,
-): Promise<StorageVolume> {
-  return runIdempotentRequest(
-    autoSnapshotScope,
-    submitData,
-    (body) =>
-      coreRequest<StorageVolume, StorageVolumeAutoSnapshotPolicyUpdateRequest>(
-        `${volumePath(volumeId)}/auto-snapshot-policy`,
-        { method: "PUT", data: body },
-      ),
-    [volumeId],
-  );
-}
-
-export function getVolumeOSInitGuide(volumeId: string): Promise<VolumeOSInitGuide> {
-  return coreRequest<VolumeOSInitGuide>(`${volumePath(volumeId)}/os-init-guide`, {
-    method: "GET",
+export async function deleteVolume(
+  pvcName: string,
+  input: StorageVolumeDeleteInput,
+  signal?: AbortSignal,
+): Promise<void> {
+  await coreRequest<unknown, StorageVolumeDeleteRequest>(`${volumePath(pvcName)}:delete`, {
+    method: "POST",
+    data: { data: { ...input, pvc_name: pvcName } },
+    signal,
   });
 }
-
-export function completeVolumeOSInit(
-  volumeId: string,
-  submitData: VolumeOSInitCompleteInput,
-): Promise<StorageVolume> {
-  return runIdempotentRequest(
-    osInitScope,
-    submitData,
-    (body) =>
-      coreRequest<StorageVolume, VolumeOSInitCompleteRequest>(
-        `${volumePath(volumeId)}/os-init-complete`,
-        { method: "POST", data: body },
-      ),
-    [volumeId],
-  );
-}
-
-export type {
-  CreateStorageVolumeInput,
-  CreateStorageVolumeRequest,
-  CreateVolumeSnapshotInput,
-  CreateVolumeSnapshotRequest,
-  StorageResourceState,
-  StorageVolume,
-  StorageVolumeAutoSnapshotPolicy,
-  StorageVolumeAutoSnapshotPolicyUpdateInput,
-  StorageVolumeAutoSnapshotPolicyUpdateRequest,
-  StorageVolumeExpandInput,
-  StorageVolumeExpandRequest,
-  StorageVolumeListParams,
-  StorageVolumeListResponse,
-  StorageVolumeMountHistoryEntry,
-  StorageVolumeMode,
-  VolumeOSInitCompleteInput,
-  VolumeOSInitCompleteRequest,
-  VolumeOSInitGuide,
-  VolumeOSInitStep,
-  VolumeSnapshotListResponse,
-  VolumeSnapshotRecord,
-} from "./types";
+export type * from "./types";

@@ -1,5 +1,5 @@
 import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
-import { listVolumeSnapshots, type VolumeSnapshotRecord } from "@/api/storage/volumes";
+import { listVolumeSnapshots, type VolumeSnapshotRecord } from "@/api/storage/volumes/legacy";
 import { DataTable, StatusBadge } from "@/components/common";
 
 import { formatBytes, formatDateTime } from "@/lib/format";

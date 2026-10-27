@@ -2,7 +2,7 @@ import VolumeOSInitGuideModal from "@/components/volumes/VolumeOSInitGuideModal"
 import { useVolumeDetach } from "@/hooks/useVolumeDetach";
 import { useResourceDelete } from "@/hooks/useResourceDelete";
 import { useState } from "react";
-import { type StorageVolume } from "@/api/storage/volumes";
+import { type StorageVolume } from "@/api/storage/volumes/legacy";
 import CreateVolumeSnapshotModal from "@/components/volumes/CreateVolumeSnapshotModal";
 import ExpandVolumeModal from "@/components/volumes/ExpandVolumeModal";
 import AttachVolumeModal from "@/components/volumes/AttachVolumeModal";

@@ -1,4 +1,4 @@
-import type { StorageVolumeAutoSnapshotPolicy } from "@/api/storage/volumes";
+import type { StorageVolumeAutoSnapshotPolicy } from "@/api/storage/volumes/legacy";
 import EditVolumeAutoSnapshotPolicyModal from "@/components/volumes/EditVolumeAutoSnapshotPolicyModal";
 import { Button, Descriptions, Empty, Space } from "@arco-design/web-react";
 import { useState } from "react";

@@ -5,7 +5,7 @@ import { deleteNetworkSubnet } from "@/api/network";
 import { deleteNetworkSecurityGroup } from "@/api/network";
 import { deleteNetworkRoute } from "@/api/network";
 import { deleteNetworkLoadBalancer } from "@/api/network";
-import { deleteVolume } from "@/api/storage/volumes";
+import { deleteVolume } from "@/api/storage/volumes/legacy";
 import { deleteFilesystem } from "@/api/storage/filesystems";
 import { deleteVectorStore } from "@/api/storage/vector-stores";
 // FIXME(governance-migration): 此旧删除配置仅适用于 ANI 资源；新推理页已使用 useInferenceActions 的异步治理删除。

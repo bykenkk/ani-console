@@ -1,75 +1,55 @@
-import { useObjectActions } from "@/hooks/useObjectActions";
-import ResourceActionMenu from "@/components/common/ResourceActionMenu";
-import { withId } from "@/lib/id";
-import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { useQuery } from "@tanstack/react-query";
-
-import { getStorageObject, type StorageObject } from "@/api/storage/objects";
-
-import {
-  AliIcon,
-  DetailPageFrame,
-  DetailPagePlaceholder,
-  ResourceId,
-  StatusBadge,
-} from "@/components/common";
+import { getStorageObject } from "@/api/storage/objects";
+import { useStorageObjectActions } from "@/hooks/useStorageObjectActions";
+import { useBackOrFallback } from "@/hooks/useBackOrFallback";
+import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
+import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
-
 import { formatBytes, formatDateTime } from "@/lib/format";
 
-type ObjectDetailPageProps = {
-  bucketId: string;
-  objectId: string;
-};
+type ObjectDetailPageProps = { bucketId: string; objectId: string };
 
-export default function ObjectDetailPage({ bucketId, objectId }: ObjectDetailPageProps) {
+export default function ObjectDetailPage({ bucketId, objectId: objectKey }: ObjectDetailPageProps) {
   const goBack = useBackOrFallback("object", bucketId);
-
+  // 路由 params 已解码；objectId 路由槽承载原始 key，不再次 decode/trim。
   const detail = useQuery({
+    queryKey: ["storage", "object", bucketId, objectKey],
+    queryFn: ({ signal }) => getStorageObject({ bucket_id: bucketId, key: objectKey }, signal),
     meta: {
       errorNotification: {
-        id: withId("object", objectId),
+        id: JSON.stringify(["storage-object", bucketId, objectKey]),
         action: "对象加载",
-        fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["object", objectId],
-    queryFn: () => getStorageObject(objectId),
   });
-  const { actions } = useObjectActions(bucketId, goBack);
+  const { actions } = useStorageObjectActions(bucketId);
   if (!detail.data) return <DetailPagePlaceholder loading={detail.isLoading} />;
-
-  const object = detail.data as StorageObject;
-  const objectStatus = <StatusBadge status={object.state} reason={object.reason} />;
-
+  const object = detail.data;
   return (
     <DetailPageFrame
       breadcrumbs={[
         ...navigationBreadcrumbsForPath("/objects"),
-        {
-          label: object.bucket,
-          to: "/objects/$bucketId",
-          params: { bucketId },
-        },
+        { label: bucketId, to: "/objects/$bucketId", params: { bucketId } },
         { label: object.key },
       ]}
       title={object.key}
-      status={objectStatus}
       icon={<AliIcon name="file" size={28} />}
-      headerItems={[{ label: "大小", value: formatBytes(object.size_bytes) }]}
+      headerItems={[{ label: "大小", value: formatBytes(Number(object.size)) }]}
       actions={<ResourceActionMenu record={object} actions={actions} />}
+      // TODO(storage-migration): HEAD 未返回旧对象 ID、状态和创建时间，不伪造旧字段。
       cards={[
         {
           key: "basic",
           title: "基本信息",
           fields: [
-            { label: "ID", value: <ResourceId value={object.id} /> },
-            { label: "Bucket", value: object.bucket },
+            { label: "ID", value: "-" },
+            { label: "Bucket", value: <ResourceId value={bucketId} /> },
             { label: "Key", value: object.key },
-            { label: "大小", value: formatBytes(object.size_bytes) },
-            { label: "类型", value: object.content_type },
-            { label: "创建时间", value: formatDateTime(object.created_at) },
-            { label: "更新时间", value: formatDateTime(object.updated_at) },
+            { label: "大小", value: formatBytes(Number(object.size)) },
+            { label: "类型", value: object.content_type || "-" },
+            { label: "ETag", value: object.etag || "-" },
+            { label: "创建时间", value: "-" },
+            { label: "更新时间", value: formatDateTime(object.last_modified) },
           ],
         },
       ]}

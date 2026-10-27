@@ -1,102 +1,44 @@
-import { runIdempotentRequest } from "@/api/idempotency";
-import { coreRequest, externalAxios, toApiError } from "@/api/request";
-import { createIdempotencyScope } from "@/lib/idempotency";
+import { coreRequest } from "@/api/request";
 import type {
-  StorageObject,
-  StorageObjectCompleteRequest,
   StorageObjectDownloadInfo,
-  StorageObjectUploadInput,
-  StorageObjectUploadRequest,
-  StorageObjectUploadResponse,
-  UploadStorageObjectFileInput,
+  StorageObjectInput,
+  StorageObjectListParams,
+  StorageObjectListResponse,
+  StorageObjectMeta,
+  StorageObjectRequest,
 } from "./types";
-
-const reserveScope = createIdempotencyScope("storage-object-upload-reserve", ["POST"]);
-const completeScope = createIdempotencyScope("storage-object-upload-complete", ["POST"]);
-const objectPath = (objectId: string) => `/objects/${encodeURIComponent(objectId)}`;
-
-export function reserveStorageObjectUpload(
-  submitData: StorageObjectUploadInput,
-  runtimeDependencies: readonly unknown[] = [],
-): Promise<StorageObjectUploadResponse> {
-  return runIdempotentRequest(
-    reserveScope,
-    submitData,
-    (body) =>
-      coreRequest<StorageObjectUploadResponse, StorageObjectUploadRequest>("/objects/upload", {
-        method: "POST",
-        data: body,
-      }),
-    runtimeDependencies,
-  );
-}
-
-export function getStorageObject(objectId: string): Promise<StorageObject> {
-  return coreRequest<StorageObject>(objectPath(objectId), { method: "GET" });
-}
-
-export function deleteStorageObject(objectId: string): Promise<StorageObject> {
-  return coreRequest<StorageObject>(objectPath(objectId), { method: "DELETE" });
-}
-
-export function completeStorageObjectUpload(objectId: string): Promise<StorageObject> {
-  return runIdempotentRequest(
-    completeScope,
-    {},
-    (body) =>
-      coreRequest<StorageObject, StorageObjectCompleteRequest>(`${objectPath(objectId)}/complete`, {
-        method: "POST",
-        data: body,
-      }),
-    [objectId],
-  );
-}
-
-export function getStorageObjectDownload(
-  objectId: string,
-  expiresSeconds?: number,
-): Promise<StorageObjectDownloadInfo> {
-  return coreRequest<StorageObjectDownloadInfo>(`${objectPath(objectId)}/download`, {
+const bucketPath = (bucketId: string) => `/storage/buckets/${encodeURIComponent(bucketId)}`;
+// TODO(storage-contract): 待目标存储源码合并后复核对象列表、HEAD、下载和特殊 key；浏览器下载证书及可达性仍待联调。
+export function listStorageObjects(
+  bucketId: string,
+  params: StorageObjectListParams = {},
+  signal?: AbortSignal,
+) {
+  return coreRequest<StorageObjectListResponse>(`${bucketPath(bucketId)}/objects`, {
     method: "GET",
-    params: { expires_seconds: expiresSeconds },
+    params,
+    signal,
   });
 }
-
-export async function uploadStorageObjectFile({
-  bucketId,
-  file,
-  prefix,
-  signal,
-}: UploadStorageObjectFileInput): Promise<StorageObject> {
-  const key = prefix && prefix !== "/" ? `${prefix}${file.name}` : file.name;
-  const reservation = await reserveStorageObjectUpload(
+// 两个 POST 均为查询能力，契约未声明幂等字段，保留返回值且不追加 key。
+export function getStorageObject(input: StorageObjectInput, signal?: AbortSignal) {
+  return coreRequest<StorageObjectMeta, StorageObjectRequest>(
+    `${bucketPath(input.bucket_id)}/objects:head`,
     {
-      bucket_id: bucketId,
-      key,
-      content_type: file.type || "application/octet-stream",
-    },
-    [bucketId, key, file.size, file.type, file.lastModified],
-  );
-  if (!reservation.upload_url || !reservation.object_id) throw new Error("上传地址无效");
-
-  try {
-    await externalAxios.put(reservation.upload_url, file, {
+      method: "POST",
+      data: { data: input },
       signal,
-      headers: file.type ? { "Content-Type": file.type } : undefined,
-    });
-  } catch (error) {
-    throw toApiError(error);
-  }
-
-  return completeStorageObjectUpload(reservation.object_id);
+    },
+  );
 }
-
-export type {
-  StorageObject,
-  StorageObjectCompleteRequest,
-  StorageObjectDownloadInfo,
-  StorageObjectUploadInput,
-  StorageObjectUploadRequest,
-  StorageObjectUploadResponse,
-  UploadStorageObjectFileInput,
-} from "./types";
+export function getStorageObjectDownload(input: StorageObjectInput, signal?: AbortSignal) {
+  return coreRequest<StorageObjectDownloadInfo, StorageObjectRequest>(
+    `${bucketPath(input.bucket_id)}/objects:download-url`,
+    {
+      method: "POST",
+      data: { data: input },
+      signal,
+    },
+  );
+}
+export type * from "./types";

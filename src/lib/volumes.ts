@@ -1,4 +1,4 @@
-import type { StorageVolumeMode } from "@/api/storage/volumes";
+import type { StorageVolumeMode } from "@/api/storage/volumes/legacy";
 
 export const VOLUME_MODE_LABELS: Record<StorageVolumeMode, string> = {
   block: "VM 数据盘",

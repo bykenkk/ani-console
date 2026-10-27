@@ -9,7 +9,7 @@ import {
   type StorageBucketAcl,
   type StorageBucketClass,
   type StorageBucketRecord,
-} from "@/api/storage/buckets";
+} from "@/api/storage/buckets/legacy";
 
 import { bucketNamePattern } from "@/lib/validators";
 

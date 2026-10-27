@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert, Button, Empty, Modal, Space, Spin, Typography } from "@arco-design/web-react";
-import { completeVolumeOSInit, getVolumeOSInitGuide } from "@/api/storage/volumes";
+import { completeVolumeOSInit, getVolumeOSInitGuide } from "@/api/storage/volumes/legacy";
 
 import { copyToClipboard } from "@/lib/clipboard";
 import { withId } from "@/lib/id";

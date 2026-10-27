@@ -13,6 +13,7 @@ type ListPageTabsConfig<TStatus extends string> = {
 };
 
 type ListPageSearchConfig<TSearchField extends string> = {
+  disabled?: boolean;
   fields: Array<SearchField<TSearchField>>;
   field: TSearchField;
   value: string;

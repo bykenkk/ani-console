@@ -2,7 +2,7 @@ import {
   updateBucketStorageClass,
   type StorageBucketClass,
   type StorageBucketRecord,
-} from "@/api/storage/buckets";
+} from "@/api/storage/buckets/legacy";
 import { Modal, Select, Space, Typography } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";

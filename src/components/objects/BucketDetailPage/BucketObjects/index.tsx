@@ -1,7 +1,7 @@
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { useBucketUpload } from "@/hooks/useBucketUpload";
 import { useObjectActions } from "@/hooks/useObjectActions";
-import { listBucketObjects, type StorageBucketRecord } from "@/api/storage/buckets";
+import { listBucketObjects, type StorageBucketRecord } from "@/api/storage/buckets/legacy";
 import ObjectBrowser from "@/components/objects/ObjectBrowser";
 import { withId } from "@/lib/id";
 import { Button, Upload } from "@arco-design/web-react";

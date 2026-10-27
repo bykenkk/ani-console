@@ -1,4 +1,4 @@
-import type { StorageVolumeMountHistoryEntry } from "@/api/storage/volumes";
+import type { StorageVolumeMountHistoryEntry } from "@/api/storage/volumes/legacy";
 import { DataTable, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 

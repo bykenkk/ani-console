@@ -1,7 +1,7 @@
 // FIXME(governance-migration): governance 尚无等价云盘挂载契约，保留原挂载弹窗、入口与 legacy 调用。
 // TODO(governance-migration): 待挂载契约齐备后迁移，挂载观测字段不能替代操作。
 import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
-import { listVolumes, type StorageVolume } from "@/api/storage/volumes";
+import { listVolumes, type StorageVolume } from "@/api/storage/volumes/legacy";
 import { validateForm } from "@/lib/form";
 import { withId } from "@/lib/id";
 import { Checkbox, Form, Input, Modal, Select } from "@arco-design/web-react";

@@ -1,5 +1,5 @@
 import { type InstanceRecord } from "@/api/instances/legacy";
-import type { StorageVolumeMode } from "@/api/storage/volumes";
+import type { StorageVolumeMode } from "@/api/storage/volumes/legacy";
 import { VOLUME_MODE_LABELS } from "@/lib/volumes";
 import { Form, Select } from "@arco-design/web-react";
 

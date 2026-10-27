@@ -2,7 +2,7 @@ import {
   updateBucketAcl,
   type StorageBucketAcl,
   type StorageBucketRecord,
-} from "@/api/storage/buckets";
+} from "@/api/storage/buckets/legacy";
 import { Button, Radio, Space, Typography } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";

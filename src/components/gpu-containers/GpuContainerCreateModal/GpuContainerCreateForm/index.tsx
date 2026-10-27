@@ -7,7 +7,7 @@ import { getGpuSpecAvailability, listGpuSchedulingQueues } from "@/api/gpu-inven
 import { listNetworkSecurityGroups, listNetworkSubnets, listNetworkVpcs } from "@/api/network";
 import { listRegistryImages } from "@/api/registry";
 import { listFilesystems } from "@/api/storage/filesystems";
-import { listVolumes } from "@/api/storage/volumes";
+import { listVolumes } from "@/api/storage/volumes/legacy";
 import { WizardSteps } from "@/components/common";
 import type { ContainerNetworkItem } from "@/components/instances/ContainerNetworkFields";
 import { hasDuplicateContainerMountPath } from "@/components/instances/ContainerStorageFields/storage";

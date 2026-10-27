@@ -1,11 +1,11 @@
 import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteBucketObject, generateBucketObjectPresignedUrl } from "@/api/storage/buckets";
+import { deleteBucketObject, generateBucketObjectPresignedUrl } from "@/api/storage/buckets/legacy";
 import {
   completeStorageObjectUpload,
   deleteStorageObject,
   getStorageObjectDownload,
-} from "@/api/storage/objects";
+} from "@/api/storage/objects/legacy";
 import { openExternalUrl } from "@/lib/browser";
 import { copyToClipboard } from "@/lib/clipboard";
 import type { RowAction } from "@/components/common";

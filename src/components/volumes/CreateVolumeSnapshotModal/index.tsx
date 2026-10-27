@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Form, Input, Modal, Typography } from "@arco-design/web-react";
 import { useState } from "react";
-import { createVolumeSnapshot } from "@/api/storage/volumes";
+import { createVolumeSnapshot } from "@/api/storage/volumes/legacy";
 
 type CreateVolumeSnapshotModalProps = {
   volumeId: string;

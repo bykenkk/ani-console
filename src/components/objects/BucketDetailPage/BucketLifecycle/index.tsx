@@ -3,7 +3,7 @@ import {
   listBucketLifecycleRules,
   type StorageBucketLifecycleRule,
   deleteBucketLifecycleRule,
-} from "@/api/storage/buckets";
+} from "@/api/storage/buckets/legacy";
 import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 import { withId } from "@/lib/id";
 import { Button, Space, Typography, Modal } from "@arco-design/web-react";
