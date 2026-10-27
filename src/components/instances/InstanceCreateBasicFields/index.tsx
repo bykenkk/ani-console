@@ -1,18 +1,14 @@
-import { Descriptions, Form, Input } from "@arco-design/web-react";
+import { Form, Input } from "@arco-design/web-react";
 import type { ComputeType, InstancePreset } from "@/api/instances";
 import InstanceImageSelect from "@/components/instances/InstanceImageSelect";
-import InstanceComputePresetSelect from "@/components/instances/InstanceComputePresetSelect";
-import { getGpuPresetSummaryItems } from "@/components/instances/InstanceCreateSummary/utils";
+import InstanceComputeSelect from "@/components/instances/InstanceComputeSelect";
 
 type InstanceCreateBasicFieldsProps = {
   computeType: ComputeType;
-  preset?: InstancePreset;
 };
 
-export default function InstanceCreateBasicFields({
-  computeType,
-  preset,
-}: InstanceCreateBasicFieldsProps) {
+export default function InstanceCreateBasicFields({ computeType }: InstanceCreateBasicFieldsProps) {
+  const { form } = Form.useFormContext();
   return (
     <>
       <Form.Item
@@ -31,13 +27,17 @@ export default function InstanceCreateBasicFields({
       <Form.Item
         field="image"
         label="镜像"
+        validateTrigger="onSelect"
         rules={[{ type: "object", required: true, message: "请选择已注册的镜像" }]}
       >
-        <InstanceImageSelect />
+        <InstanceImageSelect
+          onScopeChange={() => form.setFields({ image: { error: undefined } })}
+        />
       </Form.Item>
       <Form.Item
         field="preset"
         label="实例预设"
+        validateTrigger="onSelect"
         rules={[
           { type: "object", required: true, message: "请选择实例预设" },
           {
@@ -53,11 +53,8 @@ export default function InstanceCreateBasicFields({
           },
         ]}
       >
-        <InstanceComputePresetSelect computeType={computeType} />
+        <InstanceComputeSelect computeType={computeType} />
       </Form.Item>
-      {computeType === "gpu" && preset?.gpu && (
-        <Descriptions column={2} border data={getGpuPresetSummaryItems(preset)} />
-      )}
     </>
   );
 }

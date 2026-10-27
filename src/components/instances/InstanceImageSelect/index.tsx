@@ -11,12 +11,16 @@ import { withId } from "@/lib/id";
 type InstanceImageSelectProps = {
   value?: ImageRegistration;
   onChange?: (image?: ImageRegistration) => void;
+  onSelect?: (image?: ImageRegistration) => void;
+  onScopeChange?: (scope: ImageRegistrationScope) => void;
   disabled?: boolean;
 };
 
 export default function InstanceImageSelect({
   value,
   onChange,
+  onSelect,
+  onScopeChange,
   disabled,
 }: InstanceImageSelectProps) {
   const [selectedScope, setSelectedScope] = useState<ImageRegistrationScope>(
@@ -46,7 +50,9 @@ export default function InstanceImageSelect({
         ]}
         onChange={(scope: ImageRegistrationScope) => {
           setSelectedScope(scope);
+          // 来源切换只更新字段值，选择具体镜像后再触发校验。
           onChange?.(undefined);
+          onScopeChange?.(scope);
         }}
       />
       <Select
@@ -61,7 +67,11 @@ export default function InstanceImageSelect({
           value: item.image_id,
           label: item.displayName || item.image_id,
         }))}
-        onChange={(id) => onChange?.(options.find((item) => item.image_id === id))}
+        onChange={(id) => {
+          const image = options.find((item) => item.image_id === id);
+          onChange?.(image);
+          onSelect?.(image);
+        }}
       />
     </Input.Group>
   );

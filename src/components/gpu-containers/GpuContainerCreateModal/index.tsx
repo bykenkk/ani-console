@@ -197,7 +197,7 @@ export default function GpuContainerCreateModal({
         onValuesChange={(changed) => setValues((current) => ({ ...current, ...changed }))}
       >
         <div hidden={step !== 0}>
-          <InstanceCreateBasicFields computeType="gpu" preset={values.preset} />
+          <InstanceCreateBasicFields computeType="gpu" />
         </div>
         <div hidden={step !== 1}>
           <InstanceCreateResourceFields

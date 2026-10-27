@@ -55,8 +55,6 @@ export type GpuInstanceComputeSpec = (typeof GPU_INSTANCE_COMPUTE_SPECS)[number]
 
 export const DEFAULT_GPU_INSTANCE_COMPUTE_SPEC = GPU_INSTANCE_COMPUTE_SPECS[0].value;
 
-export const INSTANCE_COMPUTE_SPEC_BY_VALUE = INSTANCE_COMPUTE_SPEC_CATALOG;
-
 function openInstanceRemoteWindow(view: "vnc" | "terminal", instanceId: string) {
   const remoteWindow = window.open(
     `/${view}?instanceId=${encodeURIComponent(instanceId)}`,

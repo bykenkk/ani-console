@@ -1,5 +1,6 @@
 // TODO(modeldev-integration): 当前 Governance 已采用 /api/v1、page/pageSize、items/total；联调核对预设、READY 筛选和空页，并同步旧交接说明。
 import { coreRequest } from "@/api/request";
+import type { InstancePresetListParams, InstancePresetListResponse } from "@/api/instances";
 import type { PageParams } from "@/api/types";
 import type {
   ModelDevPresetListResponse,
@@ -15,6 +16,16 @@ export function listModelDevPresets(
   return coreRequest<ModelDevPresetListResponse>("/modeldev/presets", {
     method: "GET",
     params,
+    signal,
+  });
+}
+export function listModelDevComputePresets(
+  params: InstancePresetListParams = {},
+  signal?: AbortSignal,
+): Promise<InstancePresetListResponse> {
+  return coreRequest<InstancePresetListResponse>("/compute-presets", {
+    method: "GET",
+    params: { ...params, usage: "TRAINING" },
     signal,
   });
 }

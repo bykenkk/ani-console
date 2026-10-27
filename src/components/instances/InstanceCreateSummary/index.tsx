@@ -1,7 +1,6 @@
 import { Descriptions } from "@arco-design/web-react";
 import type { InstanceEnvVar, InstancePreset, InstanceVolumeMount } from "@/api/instances";
 import type { ImageRegistration } from "@/api/images";
-import { getGpuPresetSummaryItems } from "./utils";
 
 type InstanceCreateSummaryProps = {
   values: {
@@ -37,7 +36,6 @@ export default function InstanceCreateSummary({ values }: InstanceCreateSummaryP
             ? `${preset.name} · ${Number(preset.cpu_millis) / 1000} CPU / ${preset.memory_mib} MiB`
             : "-",
         },
-        ...getGpuPresetSummaryItems(preset),
         { label: "VPC", value: values.vpc_id || "-" },
         { label: "子网", value: values.subnet_id || "-" },
         { label: "工作目录", value: values.workspace_mount_path },
