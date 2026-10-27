@@ -120,7 +120,11 @@ export interface InstanceConfigurationData {
   annotations: Record<string, string>;
   env: InstanceEnvVar[];
 }
-export type InstanceMetricCode = "cpu.usage_cores" | "memory.working_set_bytes";
+export type InstanceMetricCode =
+  | "cpu.usage_cores"
+  | "memory.working_set_bytes"
+  | "network.receive_bytes_per_second"
+  | "network.transmit_bytes_per_second";
 export interface InstanceMetricsInput {
   metric_codes: InstanceMetricCode[];
   start: string;
@@ -132,7 +136,7 @@ export interface InstanceMetricsRequest {
 }
 export interface InstanceMetricSeries {
   metric_code: InstanceMetricCode;
-  unit: "cores" | "bytes";
+  unit: "cores" | "bytes" | "bytes_per_second";
   status: "OK" | "PARTIAL" | "NO_DATA";
   points: Array<{
     timestamp: string;

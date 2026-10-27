@@ -1,6 +1,6 @@
-import { Empty } from "@arco-design/web-react";
+import { Button, Empty, Space } from "@arco-design/web-react";
 import { getInstance, getInstanceConfiguration, getInstanceRuntime } from "@/api/instances";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import {
   AliIcon,
@@ -28,12 +28,6 @@ type ContainerDetailPageProps = {
   tab?: string;
   onTabChange: (tab: string) => void;
 };
-const completion = (value?: boolean) => (value === undefined ? "-" : value ? "已完成" : "未完成");
-const PLACEMENT_LABELS = {
-  NONE: "无偏好",
-  COLOCATE_PREFERRED: "优先集中",
-  SPREAD_PREFERRED: "优先分散",
-};
 
 export default function ContainerDetailPage({
   instanceId,
@@ -41,7 +35,6 @@ export default function ContainerDetailPage({
   onTabChange,
 }: ContainerDetailPageProps) {
   const goBack = useBackOrFallback("container-instance");
-  const qc = useQueryClient();
   const current = useQuery({
     queryKey: ["governance-instance", instanceId],
     queryFn: ({ signal }) => getInstance(instanceId, signal),
@@ -70,14 +63,7 @@ export default function ContainerDetailPage({
     },
   });
   const { actions, dialogNode } = useContainerActions(() => {}, goBack);
-  const refreshInstance = async () => {
-    await Promise.all([
-      current.refetch(),
-      runtime.refetch(),
-      configuration.refetch(),
-      qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-    ]);
-  };
+  const primaryAction = actions.find((action) => action.key === "terminal");
   if (!current.data) return <DetailPagePlaceholder loading={current.isLoading} />;
   const record = current.data;
   if (!isContainer) return <Empty description="当前资源不是普通容器" />;
@@ -88,12 +74,27 @@ export default function ContainerDetailPage({
         title={record.name}
         icon={<AliIcon name="icon-rongqishili" size={28} />}
         status={<StatusBadge status={record.observedState} reason={record.reason} />}
-        headerItems={[{ label: "期望状态", value: record.desiredState }]}
+        headerItems={[
+          { label: "镜像", value: record.imageId || "-" },
+          { label: "规格", value: record.preset_name || record.preset_code || record.presetId },
+          // TODO(container-private-ip): 当前契约未返回私网 IP，待正式字段补齐后接入，不以 Pod IP 替代。
+          { label: "私网 IP", value: "-" },
+        ]}
         actions={
-          <ResourceActionMenu
-            record={record}
-            actions={[...actions, { key: "refresh", label: "刷新", onClick: refreshInstance }]}
-          />
+          <Space>
+            <Button
+              type="primary"
+              disabled={!primaryAction || primaryAction.disabled?.(record)}
+              loading={primaryAction?.loading?.(record)}
+              onClick={() => primaryAction?.onClick(record)}
+            >
+              远程终端
+            </Button>
+            <ResourceActionMenu
+              record={record}
+              actions={actions.filter((action) => action.key !== "terminal")}
+            />
+          </Space>
         }
         cards={[
           {
@@ -107,19 +108,6 @@ export default function ContainerDetailPage({
               // TODO(container-basic): 后端提供正式字段后接入，保留现有字段位置。
               { label: "更新时间", value: "-" },
               { label: "终止保护", value: "-" },
-              {
-                label: "实例预设",
-                value: record.preset_name || record.preset_code || record.presetId,
-              },
-              { label: "CPU / 内存", value: `${record.cpu} / ${record.memory}` },
-              { label: "工作空间容量", value: record.workspaceSize || "-" },
-              {
-                label: "调度偏好",
-                value: record.scheduling?.pod_placement
-                  ? PLACEMENT_LABELS[record.scheduling.pod_placement]
-                  : "-",
-              },
-              { label: "优先级", value: record.scheduling?.priority_class_name || "-" },
             ],
           },
           {
@@ -137,19 +125,6 @@ export default function ContainerDetailPage({
               { label: "访问地址", value: "-" },
               { label: "VPC", value: configuration.data?.network?.vpc_id ?? "-" },
               { label: "子网", value: configuration.data?.network?.subnet_id ?? "-" },
-              {
-                label: "网络状态",
-                value: (
-                  <StatusBadge status={record.networkState} reason={record.networkReason}>
-                    {record.networkState === "not_requested" ? "未配置" : undefined}
-                  </StatusBadge>
-                ),
-              },
-              { label: "计算清理", value: completion(record.computeCleaned) },
-              { label: "工作空间清理", value: completion(record.workspaceCleaned) },
-              { label: "网络清理", value: completion(record.networkCleaned) },
-              { label: "用户卷引用解除", value: completion(record.volumeReferencesReleased) },
-              { label: "配额归还", value: completion(record.quotaReturned) },
             ],
           },
         ]}
@@ -165,7 +140,6 @@ export default function ContainerDetailPage({
             content: (
               <InstanceConfiguration
                 configuration={configuration.data}
-                runtime={runtime.data}
                 loading={configuration.isFetching}
               />
             ),
@@ -176,7 +150,6 @@ export default function ContainerDetailPage({
             content: (
               <InstanceStorage
                 configuration={configuration.data}
-                workspaceSize={record.workspaceSize}
                 runtime={runtime.data}
                 loading={configuration.isFetching}
               />
@@ -188,9 +161,6 @@ export default function ContainerDetailPage({
             content: (
               <InstanceNetwork
                 configuration={configuration.data}
-                networkState={record.networkState}
-                networkReason={record.networkReason}
-                runtime={runtime.data}
                 loading={configuration.isFetching}
               />
             ),
@@ -198,7 +168,7 @@ export default function ContainerDetailPage({
           {
             key: "monitoring",
             label: "资源监控",
-            content: <InstanceMetrics instanceId={instanceId} />,
+            content: <InstanceMetrics instanceId={instanceId} computeType={record.compute_type} />,
           },
           {
             key: "logs",

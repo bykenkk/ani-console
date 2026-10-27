@@ -1,88 +1,76 @@
-// TODO(instance-detail-migration): 云主机、沙箱先统一使用实例公共组件；对应字段、契约及运行时联调验证完成后移除此标记。
-import { Button, Descriptions, Space } from "@arco-design/web-react";
+import { Button, Space } from "@arco-design/web-react";
 import { DataTable } from "@/components/common";
 import type { InstanceConfigurationData, InstanceRuntime } from "@/api/instances";
 
 type InstanceStorageProps = {
   configuration?: InstanceConfigurationData;
-  workspaceSize?: string;
   runtime?: InstanceRuntime;
   loading?: boolean;
+};
+type FilesystemRow = {
+  id: string;
+  name: string;
+  mount_path: string;
+  access_mode: string;
+  status: string;
 };
 
 export default function InstanceStorage({
   configuration,
-  workspaceSize,
   runtime,
   loading = false,
 }: InstanceStorageProps) {
+  // 冻结配置的挂载路径唯一；运行态卷名不是 PVC 名，按同一实例的容器内路径对应。
+  const runtimeMounts =
+    runtime?.instance_id === configuration?.instance_id ? (runtime?.pod?.mounts ?? []) : [];
+  // TODO(instance-volume-management): 创建后挂载、卸载操作待正式契约补齐并联调后接入。
+  // TODO(instance-volume-type): 联调核对运行态类型；无观测、路径不唯一或只读属性不一致时保留占位。
   return (
     <Space direction="vertical" size={24} className="w-full">
-      <Descriptions
-        column={1}
-        data={[
-          { label: "工作目录", value: configuration?.workspace_mount_path ?? "-" },
-          { label: "工作空间容量", value: workspaceSize || "-" },
-        ]}
-      />
-      <DataTable
-        header={{ title: "运行时挂载" }}
-        data={runtime?.pod?.mounts ?? []}
-        rowKey={(mount) => `${mount.name}:${mount.mountPath}`}
-        pagination={false}
-        columns={[
-          { title: "名称", width: 200, dataIndex: "name", ellipsis: true },
-          { title: "类型", dataIndex: "volumeType", width: 150 },
-          { title: "挂载路径", width: 280, dataIndex: "mountPath", ellipsis: true },
-          {
-            title: "访问模式",
-            width: 100,
-            render: (_, mount) => (mount.readOnly ? "只读" : "读写"),
-          },
-        ]}
-      />
-      {/* FIXME(instance-volume-management): 冻结 PVC 配置仅供回显，不代表支持创建后的挂载或卸载。 */}
-      {/* TODO(instance-volume-management): 等 Governance 提供管理契约后启用按钮。 */}
       <DataTable
         header={{
           title: "挂载点",
-          extra: (
-            <Button disabled title="实例创建后的挂载操作暂未开放">
-              挂载云盘
-            </Button>
-          ),
+          extra: <Button disabled>挂载云盘</Button>,
         }}
         data={configuration?.volume_mounts ?? []}
         loading={loading}
-        rowKey={(mount) => `${mount.pvc_name}:${mount.mount_path}`}
+        rowKey={(volume) => `${volume.pvc_name}:${volume.mount_path}`}
         pagination={false}
         columns={[
-          { title: "存储卷", width: 200, dataIndex: "pvc_name", ellipsis: true },
+          { title: "名称", width: 200, dataIndex: "pvc_name", ellipsis: true },
+          {
+            title: "类型",
+            width: 150,
+            render: (_, volume) => {
+              const mounts = runtimeMounts.filter((mount) => mount.mountPath === volume.mount_path);
+              return mounts.length === 1 && mounts[0].readOnly === volume.read_only
+                ? mounts[0].volumeType || "-"
+                : "-";
+            },
+          },
           { title: "挂载路径", width: 280, dataIndex: "mount_path", ellipsis: true },
           {
             title: "访问模式",
             width: 100,
-            render: (_, mount) => (mount.read_only ? "只读" : "读写"),
+            render: (_, volume) => (volume.read_only ? "只读" : "读写"),
           },
         ]}
       />
-      {/* FIXME(instance-nfs): PVC 配置不能推断旧文件系统 ID，不用 PVC 名替代 NFS 资源身份。 */}
-      {/* TODO(instance-nfs): 待文件存储关联契约补齐后恢复数据与管理操作。 */}
-      <DataTable<{ id: string; mount_path: string }>
+      {/* TODO(instance-nfs): 新接口未提供 NFS 关联与管理能力，保留原表格和按钮，待契约补齐并联调后接入。 */}
+      <DataTable<FilesystemRow>
         header={{
           title: "文件存储 NFS",
-          extra: (
-            <Button disabled title="NFS 挂载管理暂未开放">
-              挂载 NFS
-            </Button>
-          ),
+          extra: <Button disabled>挂载 NFS</Button>,
         }}
         data={[]}
         pagination={false}
         rowKey="id"
         columns={[
+          { title: "文件存储", width: 200, dataIndex: "name" },
           { title: "文件系统 ID", width: 280, dataIndex: "id" },
-          { title: "挂载路径", width: 280, dataIndex: "mount_path" },
+          { title: "挂载路径", width: 280, dataIndex: "mount_path", ellipsis: true },
+          { title: "访问模式", width: 100, dataIndex: "access_mode" },
+          { title: "状态", width: 120, dataIndex: "status" },
         ]}
       />
     </Space>

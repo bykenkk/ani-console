@@ -1,6 +1,6 @@
 import { getInstance, getInstanceConfiguration, getInstanceRuntime } from "@/api/instances";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Empty, Tooltip } from "@arco-design/web-react";
+import { useQuery } from "@tanstack/react-query";
+import { Button, Empty, Space, Tooltip } from "@arco-design/web-react";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import {
   AliIcon,
@@ -36,7 +36,6 @@ export default function GpuContainerDetailPage({
   onTabChange,
 }: GpuContainerDetailPageProps) {
   const goBack = useBackOrFallback("gpu-instance");
-  const qc = useQueryClient();
   const current = useQuery({
     queryKey: ["governance-instance", instanceId],
     queryFn: ({ signal }) => getInstance(instanceId, signal),
@@ -63,15 +62,8 @@ export default function GpuContainerDetailPage({
       },
     },
   });
-  const refreshInstance = async () => {
-    await Promise.all([
-      current.refetch(),
-      runtime.refetch(),
-      configuration.refetch(),
-      qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-    ]);
-  };
   const { actions, dialogNode } = useGpuContainerActions(() => {}, goBack);
+  const primaryAction = actions.find((action) => action.key === "terminal");
   if (!current.data) return <DetailPagePlaceholder loading={current.isLoading} />;
   const record = current.data;
   if (!isGpu) return <Empty description="当前资源不是 GPU 容器" />;
@@ -93,12 +85,29 @@ export default function GpuContainerDetailPage({
         title={record.name}
         icon={<AliIcon name="icon-GPUrongqishili" size={28} />}
         status={<StatusBadge status={record.observedState} reason={record.reason} />}
-        headerItems={[{ label: "期望状态", value: record.desiredState }]}
+        headerItems={[
+          {
+            label: "GPU",
+            value: record.gpu_summary
+              ? `${record.gpu_summary.model_key} × ${record.gpu_summary.devices_per_instance}`
+              : "-",
+          },
+        ]}
         actions={
-          <ResourceActionMenu
-            record={record}
-            actions={[...actions, { key: "refresh", label: "刷新", onClick: refreshInstance }]}
-          />
+          <Space>
+            <Button
+              type="primary"
+              disabled={!primaryAction || primaryAction.disabled?.(record)}
+              loading={primaryAction?.loading?.(record)}
+              onClick={() => primaryAction?.onClick(record)}
+            >
+              远程终端
+            </Button>
+            <ResourceActionMenu
+              record={record}
+              actions={actions.filter((action) => action.key !== "terminal")}
+            />
+          </Space>
         }
         cards={[
           {
@@ -174,7 +183,6 @@ export default function GpuContainerDetailPage({
             content: (
               <InstanceConfiguration
                 configuration={configuration.data}
-                runtime={runtime.data}
                 loading={configuration.isFetching}
               />
             ),
@@ -185,7 +193,6 @@ export default function GpuContainerDetailPage({
             content: (
               <InstanceStorage
                 configuration={configuration.data}
-                workspaceSize={record.workspaceSize}
                 runtime={runtime.data}
                 loading={configuration.isFetching}
               />
@@ -197,9 +204,6 @@ export default function GpuContainerDetailPage({
             content: (
               <InstanceNetwork
                 configuration={configuration.data}
-                networkState={record.networkState}
-                networkReason={record.networkReason}
-                runtime={runtime.data}
                 loading={configuration.isFetching}
               />
             ),
@@ -207,7 +211,7 @@ export default function GpuContainerDetailPage({
           {
             key: "monitoring",
             label: "资源监控",
-            content: <InstanceMetrics instanceId={instanceId} />,
+            content: <InstanceMetrics instanceId={instanceId} computeType={record.compute_type} />,
           },
           {
             key: "gpu-metrics",
@@ -215,13 +219,22 @@ export default function GpuContainerDetailPage({
             content: (
               <InstanceMetrics
                 gpuOnly
+                computeType={record.compute_type}
                 gpuModel={record.gpu_summary?.model_key}
                 gpuCount={record.gpu_summary?.devices_per_instance}
               />
             ),
           },
-          { key: "logs", label: "日志", content: <InstanceLogs instanceId={instanceId} active /> },
-          { key: "events", label: "事件", content: <InstanceEvents instanceId={instanceId} /> },
+          {
+            key: "logs",
+            label: "日志",
+            content: <InstanceLogs instanceId={instanceId} active />,
+          },
+          {
+            key: "events",
+            label: "事件",
+            content: <InstanceEvents instanceId={instanceId} />,
+          },
           {
             key: "operations",
             label: "操作记录",

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { listInstanceEvents } from "@/api/instances";
-import { Button, Space, Alert, Tag } from "@arco-design/web-react";
+import { Alert, Tag } from "@arco-design/web-react";
 import { withId } from "@/lib/id";
 import { DataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
@@ -8,7 +8,7 @@ import { formatDateTime } from "@/lib/format";
 type InstanceEventsProps = { instanceId?: string };
 
 export default function InstanceEvents({ instanceId }: InstanceEventsProps) {
-  // TODO(instance-detail-migration): 云主机、沙箱事件契约和实例 ID 对齐并联调验证后，在调用方传入 ID，再移除对应标记。
+  // TODO(instance-events): 云主机、沙箱的新事件契约尚未提供，保留模板空态，待接口补齐后接入。
   const current = useQuery({
     queryKey: ["governance-instance-events", instanceId],
     enabled: Boolean(instanceId),
@@ -21,23 +21,9 @@ export default function InstanceEvents({ instanceId }: InstanceEventsProps) {
       },
     },
   });
-  // FIXME(governance-instance-events): 当前仅有事件快照，历史事件入口暂不可用。
-  // TODO(governance-instance-events): 完整历史契约对齐并验证后启用历史入口。
+  // TODO(governance-instance-events): 当前仅返回事件快照，待完整历史契约补齐并联调后接入分页。
   return (
     <div className="flex flex-col gap-3">
-      <Space>
-        <Button type="primary">当前事件</Button>
-        <Button disabled title="历史事件暂未开放">
-          历史事件
-        </Button>
-        <Button
-          disabled={!instanceId}
-          loading={current.isFetching}
-          onClick={() => current.refetch()}
-        >
-          刷新
-        </Button>
-      </Space>
       {current.data?.truncated && <Alert type="info" content="当前事件较多，仅展示部分结果" />}
       <DataTable
         data={current.data?.events ?? []}

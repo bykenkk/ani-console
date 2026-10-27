@@ -44,7 +44,7 @@ export default function SandboxEvents({ instanceId }: SandboxEventsProps) {
       <div className="mt-4" role="tabpanel">
         {activeTab === "all" ? (
           <>
-            {/* TODO(sandbox-instance-events): 普通事件已迁移公共组件；Governance 沙箱事件及实例 ID 对齐并联调后传入 ID，再移除此标记。 */}
+            {/* TODO(sandbox-instance-events): 新接口尚未提供沙箱普通事件，保留表格空态，待契约补齐后接入。 */}
             <InstanceEvents />
           </>
         ) : (

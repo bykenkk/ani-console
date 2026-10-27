@@ -262,7 +262,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
           {
             key: "storage",
             label: "存储挂载",
-            // TODO(vm-instance-detail): 对应 Governance 数据和实例 ID 尚未对齐，先使用公共组件空态；契约支持并联调验证后传入数据，再移除此标记。
+            // TODO(vm-instance-detail): 新接口尚未提供对应能力，保留原模板空态，待契约补齐并联调后接入。
             content: <InstanceStorage />,
           },
           {
@@ -279,25 +279,25 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
           {
             key: "monitoring",
             label: "资源监控",
-            // TODO(vm-instance-detail): 对应 Governance 数据和实例 ID 尚未对齐，先使用公共组件空态；契约支持并联调验证后传入数据，再移除此标记。
+            // TODO(vm-instance-detail): 新接口尚未提供对应能力，保留原模板空态，待契约补齐并联调后接入。
             content: <InstanceMetrics />,
           },
           {
             key: "logs",
             label: "日志",
-            // TODO(vm-instance-detail): 对应 Governance 数据和实例 ID 尚未对齐，先使用公共组件空态；契约支持并联调验证后传入数据，再移除此标记。
+            // TODO(vm-instance-detail): 新接口尚未提供对应能力，保留原模板空态，待契约补齐并联调后接入。
             content: <InstanceLogs active={tab === "logs"} />,
           },
           {
             key: "events",
             label: "事件",
-            // TODO(vm-instance-detail): 对应 Governance 数据和实例 ID 尚未对齐，先使用公共组件空态；契约支持并联调验证后传入数据，再移除此标记。
+            // TODO(vm-instance-detail): 新接口尚未提供对应能力，保留原模板空态，待契约补齐并联调后接入。
             content: <InstanceEvents />,
           },
           {
             key: "operations",
             label: "操作记录",
-            // TODO(vm-instance-detail): 对应 Governance 数据和实例 ID 尚未对齐，先使用公共组件空态；契约支持并联调验证后传入数据，再移除此标记。
+            // TODO(vm-instance-detail): 新接口尚未提供对应能力，保留原模板空态，待契约补齐并联调后接入。
             content: <InstanceOperations />,
           },
         ]}

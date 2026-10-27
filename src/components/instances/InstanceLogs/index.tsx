@@ -86,7 +86,7 @@ async function connectLogStream({
 }
 
 export default function InstanceLogs({ instanceId, active }: InstanceLogsProps) {
-  // TODO(instance-detail-migration): 云主机、沙箱日志契约和实例 ID 对齐并联调验证后，在调用方传入 ID，再移除对应标记。
+  // TODO(instance-logs): 云主机、沙箱的新日志契约尚未提供，保留模板空态，待接口补齐后接入。
   // FIXME(governance-instance-logs): 当前协议只返回 text，级别筛选暂不可用。
   // TODO(governance-instance-logs): 结构化日志与级别筛选契约对齐并验证后启用；文本块不补造时间/级别，不去重。
   const [reconnectVersion, setReconnectVersion] = useState(0);
