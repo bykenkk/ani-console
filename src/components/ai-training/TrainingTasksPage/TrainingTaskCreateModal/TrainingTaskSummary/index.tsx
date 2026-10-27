@@ -1,46 +1,42 @@
-import { Card, Descriptions, Table } from "@arco-design/web-react";
-import type { ModelDevPreset } from "@/api/modeldev";
+import type { ModelDevImplementation, ModelDevInputVersion } from "@/api/modeldev";
+import type { InstancePreset } from "@/api/instances";
+import ModelDevSummary from "@/components/ai-training/ModelDevSummary";
+import { formatModelDevComputeResources, formatModelDevInputVersion } from "@/lib/modeldev";
+import type { TrainingTaskCreateFormValues } from "../index";
 
 type TrainingTaskSummaryProps = {
   values: TrainingTaskCreateFormValues;
-  preset?: ModelDevPreset;
+  implementation?: ModelDevImplementation;
+  computePreset?: InstancePreset;
+  inputVersion?: ModelDevInputVersion;
+  onEdit: (step: number) => void;
 };
 
-export interface TrainingTaskCreateFormValues {
-  name: string;
-  preset_id: string;
-  dataset_version_id: string;
-  image_version_id?: string;
-  parameters: string[];
-}
-
-export default function TrainingTaskSummary({ values, preset }: TrainingTaskSummaryProps) {
-  const parameters = (preset?.parameter_rules ?? []).map((rule, index) => ({
-    name: rule.name,
-    value: values.parameters[index] || "未指定",
-  }));
+export default function TrainingTaskSummary({
+  values,
+  implementation,
+  computePreset,
+  inputVersion,
+  onEdit,
+}: TrainingTaskSummaryProps) {
   return (
-    <Card bordered={false}>
-      <Descriptions
-        column={1}
-        data={[
-          { label: "任务名称", value: values.name },
-          { label: "训练预设", value: preset?.name ?? "-" },
-          { label: "任务类型", value: preset?.kind ?? "-" },
-          { label: "数据集版本", value: values.dataset_version_id },
-          { label: "镜像版本", value: values.image_version_id || "未指定" },
-          { label: "发布版本", value: preset?.active_release_id || "-" },
-        ]}
-      />
-      <Table
-        rowKey="name"
-        pagination={false}
-        data={parameters}
-        columns={[
-          { title: "参数", width: 200, dataIndex: "name", ellipsis: true },
-          { title: "值", width: 320, dataIndex: "value" },
-        ]}
-      />
-    </Card>
+    <ModelDevSummary
+      basicInfo={[
+        { label: "名称", value: values.name },
+        { label: "算力类型", value: computePreset?.compute_type.toUpperCase() ?? "-" },
+        { label: "算力规格", value: computePreset?.name ?? "-" },
+        { label: "资源配置", value: formatModelDevComputeResources(computePreset) },
+        { label: "训练方法", value: implementation?.name ?? "-" },
+        {
+          label: "数据集版本",
+          value: inputVersion
+            ? formatModelDevInputVersion(inputVersion)
+            : values.dataset_version_id || "-",
+        },
+      ]}
+      implementation={implementation}
+      parameters={values.parameters}
+      onEdit={onEdit}
+    />
   );
 }

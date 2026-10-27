@@ -1,19 +1,20 @@
-// TODO(modeldev-integration): 当前 Governance 已采用 /api/v1、page/pageSize、items/total；联调核对预设、READY 筛选和空页，并同步旧交接说明。
+// TODO(modeldev-integration): 部署后验证实现目录、TRAINING 规格、READY 筛选、权限及空页；静态核对不代表可提交。
 import { coreRequest } from "@/api/request";
 import type { InstancePresetListParams, InstancePresetListResponse } from "@/api/instances";
-import type { PageParams } from "@/api/types";
 import type {
-  ModelDevPresetListResponse,
+  ModelDevImplementationListResponse,
+  ModelDevImplementationListParams,
   ModelDevInputVersionListParams,
   ModelDevInputVersionListResponse,
   ModelDevInputVersion,
 } from "./types";
 
-export function listModelDevPresets(
-  params: PageParams = {},
+export function listModelDevImplementations(
+  params: ModelDevImplementationListParams = {},
   signal?: AbortSignal,
-): Promise<ModelDevPresetListResponse> {
-  return coreRequest<ModelDevPresetListResponse>("/modeldev/presets", {
+): Promise<ModelDevImplementationListResponse> {
+  // TODO(modeldev-kind): 按 kind 服务端筛选接入；待验证分页 total、空页及部署版本。
+  return coreRequest<ModelDevImplementationListResponse>("/modeldev/implementations", {
     method: "GET",
     params,
     signal,

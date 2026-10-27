@@ -13,20 +13,28 @@ export interface ModelDevParameterRule {
   allowed_values?: ModelDevParameter[] | null;
   minimum?: ModelDevParameter | null;
   maximum?: ModelDevParameter | null;
+  numeric_representation?: string;
+  validation_description?: string;
 }
-export interface ModelDevPreset {
-  preset_id: string;
+export interface ModelDevImplementation {
+  implementation_id: string;
   name: string;
   kind: string;
-  active_release_id?: string;
-  image_version_ids?: string[];
+  version: string;
+  parameter_contract_version: string;
   parameter_rules?: ModelDevParameterRule[];
-  binding_generation?: string;
-  new_submissions_enabled?: boolean;
+  supported_device_modes?: string[];
+  available: boolean;
+  execution_timeout_default_seconds: string;
+  execution_timeout_max_seconds: string;
+  step_timeout_seconds: string;
 }
-export interface ModelDevPresetListResponse {
-  items: ModelDevPreset[];
+export interface ModelDevImplementationListResponse {
+  items: ModelDevImplementation[];
   total: string;
+}
+export interface ModelDevImplementationListParams extends PageParams {
+  kind?: "GENERAL_TRAINING";
 }
 export interface ModelDevInputVersion {
   input_version_id: string;
@@ -45,32 +53,11 @@ export interface ModelDevInputVersionListResponse {
   items: ModelDevInputVersion[];
   total: string;
 }
-export interface CreateModelDevExecutionInput {
-  name: string;
-  // FIXME(modeldev-integration): 当前 CPU-P01 仅接受此 kind，交接文档又要求跟随 preset.kind 扩展，二者适用阶段待明确。
-  // TODO(modeldev-integration): 后端开放并确认新 kind 后统一扩展类型、预设可选条件和提交校验，不直接放宽为任意字符串。
-  kind: "GENERAL_TRAINING";
-  preset_id: string;
-  dataset_version_id: string;
-  image_version_id?: string;
-  /** Omission and [] are distinct intents. Null is not supported. */
-  general_parameters?: ModelDevParameter[];
-}
-export type CreateModelDevExecutionRequest = CreateModelDevExecutionInput & {
-  idempotency_key: string;
-};
 export interface ModelDevExecutionStates {
   compute_state: string;
   delivery_state: string;
   close_state: string;
   resource_state: string;
-}
-/** A durable 202 acceptance is not evidence that training has started. */
-export interface ModelDevExecutionAcceptance extends ModelDevExecutionStates {
-  operation_id: string;
-  execution_id: string;
-  resolved_release_id: string;
-  replayed?: boolean;
 }
 export interface ModelDevExecution extends ModelDevExecutionStates {
   operation_id: string;
