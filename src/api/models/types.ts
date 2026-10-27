@@ -19,9 +19,11 @@ export interface ModelVersion {
 }
 export type ModelFormat = "safetensors" | "gguf" | "pytorch";
 export type ModelCapability = "text-generation" | "embedding" | "speech-to-text";
+export type ExternalModelProvider = "huggingface" | "modelscope";
 export interface Model {
   id: string;
   name: string;
+  /** @deprecated 前端不采用此字段，模型名称统一读取 name。 */
   display_name?: string;
   description?: string;
   source?: string;
@@ -65,7 +67,7 @@ export interface ModelVersionResponse {
   version: ModelVersion;
 }
 export interface ImportModelInput {
-  source: "huggingface" | "modelscope";
+  source: ExternalModelProvider;
   repo_id: string;
   revision: string;
   webhook_url?: string;
@@ -93,7 +95,7 @@ export interface ImportModelBundleVersionInput {
 }
 
 export interface ImportModelBundleSourceInput {
-  provider: ImportModelInput["source"];
+  provider: ExternalModelProvider;
   repo_id: string;
   revision: string;
 }
@@ -114,9 +116,10 @@ export interface ImportModelBundleResponse {
   task: ImportTask;
 }
 export interface ExternalModelCandidate {
-  source: "huggingface" | "modelscope";
+  source: ExternalModelProvider;
   repo_id: string;
   name: string;
+  /** @deprecated 前端不采用此字段，模型名称统一读取 name。 */
   display_name?: string;
   description?: string;
   revision: string;
@@ -125,7 +128,7 @@ export interface ExternalModelCandidate {
   updated_at?: string;
 }
 export interface SearchExternalModelsParams extends PageParams {
-  source: "huggingface" | "modelscope";
+  source: ExternalModelProvider;
   keyword: string;
   owner?: string;
   task?: string;

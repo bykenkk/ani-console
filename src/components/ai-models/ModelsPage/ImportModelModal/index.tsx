@@ -1,12 +1,13 @@
 import {
   EngineSelect,
   ModelSourceInput,
-  type ModelSourceValue,
+  type ModelSourceInputValue,
   type EngineType,
 } from "@/components/ai-models";
 import {
   importModelBundle,
   type ExternalModelCandidate,
+  type ExternalModelProvider,
   type ModelCapability,
   type ModelFormat,
 } from "@/api/models";
@@ -16,9 +17,8 @@ import { useRef } from "react";
 import { validateForm } from "@/lib/form";
 
 interface ImportModelFormValues {
-  model_source: ModelSourceValue;
-  model_name: string;
-  display_name: string;
+  source: ModelSourceInputValue;
+  name: string;
   description: string;
   revision: string;
   format: ModelFormat;
@@ -37,32 +37,30 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
   const [form] = Form.useForm<ImportModelFormValues>();
   const submitting = useRef(false);
   const selectedModel = useRef<ExternalModelCandidate>();
-  const source = useRef<ModelSourceValue["source"]>("modelscope");
-  const changeModelSource = (value: ModelSourceValue, candidate?: ExternalModelCandidate) => {
-    const sourceChanged = source.current !== value.source;
+  const provider = useRef<ExternalModelProvider>("modelscope");
+  const changeModelSource = (value: ModelSourceInputValue, candidate?: ExternalModelCandidate) => {
+    const providerChanged = provider.current !== value.provider;
     const selectionCleared =
       selectedModel.current && selectedModel.current.repo_id !== value.repo_id;
-    source.current = value.source;
+    provider.current = value.provider;
     if (candidate) {
       selectedModel.current = candidate;
       form.setFieldsValue({
-        model_name:
+        name:
           candidate.name
             .toLowerCase()
             .replace(/[^a-z0-9.-]+/g, "-")
             .replace(/^[.-]+|[.-]+$/g, "")
             .slice(0, 63) || "model",
-        display_name: candidate.display_name || candidate.name,
         description: candidate.description || "",
         revision: candidate.revision,
       });
-    } else if (sourceChanged || selectionCleared) {
+    } else if (providerChanged || selectionCleared) {
       selectedModel.current = undefined;
       form.setFieldsValue({
-        ...(sourceChanged ? { model_name: "" } : {}),
-        display_name: "",
+        ...(providerChanged ? { name: "" } : {}),
         description: "",
-        revision: value.source === "modelscope" ? "master" : "main",
+        revision: value.provider === "modelscope" ? "master" : "main",
       });
     }
   };
@@ -78,11 +76,11 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
     mutationFn: (values: ImportModelFormValues) =>
       importModelBundle({
         model: {
-          name: values.model_name.trim(),
-          display_name: values.display_name?.trim() || undefined,
+          name: values.name.trim(),
+          display_name: values.name.trim(),
           description: values.description?.trim() || undefined,
           capabilities: values.capabilities,
-          external_model_id: values.model_source.repo_id.trim(),
+          external_model_id: values.source.repo_id.trim(),
         },
         version: {
           version: values.revision,
@@ -92,8 +90,8 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
           startup_command: values.startup_command,
         },
         source: {
-          provider: values.model_source.source,
-          repo_id: values.model_source.repo_id.trim(),
+          provider: values.source.provider,
+          repo_id: values.source.repo_id.trim(),
           revision: values.revision,
         },
       }),
@@ -132,7 +130,7 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
         layout="vertical"
         disabled={submit.isPending}
         initialValues={{
-          model_source: { source: "modelscope", repo_id: "" },
+          source: { provider: "modelscope", repo_id: "" },
           revision: "master",
           format: "safetensors",
           capabilities: ["text-generation"],
@@ -140,7 +138,7 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
         }}
       >
         <Form.Item
-          field="model_name"
+          field="name"
           label="名称"
           rules={[
             { required: true, message: "请输入模型名称" },
@@ -153,14 +151,14 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
           <Input maxLength={63} placeholder="请输入名称" />
         </Form.Item>
         <Form.Item
-          field="model_source"
+          field="source"
           label="模型"
           required
           extra="支持手动输入，搜索结果仅供参考"
           rules={[
             {
-              validator: (value: ModelSourceValue | undefined, callback) => {
-                if (!value?.source) callback("请选择来源");
+              validator: (value: ModelSourceInputValue | undefined, callback) => {
+                if (!value?.provider) callback("请选择来源");
                 else if (!value.repo_id?.trim()) callback("请输入外部模型仓库 ID");
               },
             },

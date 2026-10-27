@@ -1,21 +1,11 @@
-import { Select } from "@arco-design/web-react";
+import { Select, Space, Typography } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 import { getModel, listModelVersions, type ModelVersion } from "@/api/models";
 import { withId } from "@/lib/id";
 import { withFirst100 } from "@/api/pagination";
 import type { ModelVersionListParams } from "@/api/models";
-import { StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
-
-const VERSION_STATUS_LABELS: Record<string, string> = {
-  ready: "就绪",
-  downloading: "下载中",
-  error: "失败",
-  failed: "失败",
-  pending: "等待中",
-  importing: "导入中",
-};
 
 const listVersionOptions = withFirst100(
   (params: ModelVersionListParams & { modelId: string }, signal?: AbortSignal) => {
@@ -55,11 +45,15 @@ export default function ModelVersionSelect({
   });
   const items = versions.data?.items ?? [];
   const selected = items.find((item) => item.id === value);
+  const modelName = model.data?.id === modelId ? model.data.name : undefined;
   useEffect(() => {
     if (value || !versions.data || !modelId || disabled) return;
     const firstReady = versions.data.items[0];
-    if (firstReady) onChange?.(firstReady.id);
-  }, [value, versions.data, modelId, disabled, onChange]);
+    if (firstReady) {
+      appliedId.current = modelName === undefined ? "" : firstReady.id;
+      onChange?.(firstReady.id, firstReady, modelName);
+    }
+  }, [value, versions.data, modelId, modelName, disabled, onChange]);
   useEffect(() => {
     if (!selected || model.data?.id !== modelId || appliedId.current === selected.id) return;
     appliedId.current = selected.id;
@@ -71,29 +65,25 @@ export default function ModelVersionSelect({
       value={value || undefined}
       disabled={disabled || !modelId}
       loading={versions.isFetching}
-      placeholder="请选择已就绪的模型版本"
+      placeholder="请选择模型版本"
       options={items.map((item) => ({
         value: item.id,
         label: (
-          <span className="inline-flex max-w-full items-center gap-2 align-middle">
-            <span className="truncate">
-              {item.version} · {formatDateTime(item.created_at)}
-            </span>
-            <StatusBadge
-              className="shrink-0"
-              status={item.status}
-              tone={item.status.toLowerCase() === "downloading" ? "primary" : undefined}
-              showIndicator={false}
-            >
-              {VERSION_STATUS_LABELS[item.status.toLowerCase()] ?? item.status}
-            </StatusBadge>
-          </span>
+          <Space size={8} align="baseline">
+            <span>{item.version}</span>
+            <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+              {formatDateTime(item.created_at)}
+            </Typography.Text>
+          </Space>
         ),
-        disabled: item.status.toLowerCase() !== "ready",
       }))}
       onChange={(id) => {
-        appliedId.current = "";
-        onChange?.(id);
+        appliedId.current = modelName === undefined ? "" : id;
+        onChange?.(
+          id,
+          items.find((item) => item.id === id),
+          modelName,
+        );
       }}
     />
   );

@@ -5,22 +5,22 @@ import { useEffect, useState } from "react";
 import {
   searchExternalModels,
   type ExternalModelCandidate,
-  type ImportModelInput,
+  type ExternalModelProvider,
 } from "@/api/models";
 
-export interface ModelSourceValue {
-  source: ImportModelInput["source"];
+export interface ModelSourceInputValue {
+  provider: ExternalModelProvider;
   repo_id: string;
 }
 
 interface ModelSourceInputProps {
-  value?: ModelSourceValue;
-  onChange?: (value: ModelSourceValue, candidate?: ExternalModelCandidate) => void;
+  value?: ModelSourceInputValue;
+  onChange?: (value: ModelSourceInputValue, candidate?: ExternalModelCandidate) => void;
   disabled?: boolean;
 }
 
 export default function ModelSourceInput({ value, onChange, disabled }: ModelSourceInputProps) {
-  const source = value?.source ?? "modelscope";
+  const provider = value?.provider ?? "modelscope";
   const [searchInput, setSearchInput] = useState("");
   const [searchKeyword, setSearchKeyword] = useState("");
   const [selected, setSelected] = useState<ExternalModelCandidate>();
@@ -33,10 +33,13 @@ export default function ModelSourceInput({ value, onChange, disabled }: ModelSou
   // 外部模型搜索受第三方接口限制，仅请求第 1 页、30 条，不使用 withFirst100。
   // TODO(external-model-search): 外部接口限制调整后复核此例外；不自动拉取后续页。
   const search = useQuery({
-    queryKey: ["external-models", "options", source, searchKeyword, { page: 1, pageSize: 30 }],
+    queryKey: ["external-models", "options", provider, searchKeyword, { page: 1, pageSize: 30 }],
     enabled: searchKeyword.length >= 2,
     queryFn: ({ signal }) =>
-      searchExternalModels({ source, keyword: searchKeyword, page: 1, pageSize: 30 }, signal),
+      searchExternalModels(
+        { source: provider, keyword: searchKeyword, page: 1, pageSize: 30 },
+        signal,
+      ),
     meta: {
       errorNotification: {
         id: "external-model-search",
@@ -58,21 +61,21 @@ export default function ModelSourceInput({ value, onChange, disabled }: ModelSou
         aria-label="来源"
         placeholder="请选择来源"
         style={{ width: 140 }}
-        value={source}
+        value={provider}
         disabled={disabled}
         options={[
           { value: "modelscope", label: "ModelScope" },
           { value: "huggingface", label: "HuggingFace" },
         ]}
-        onChange={(source) => {
+        onChange={(provider) => {
           setSelected(undefined);
           setSearchInput("");
           setSearchKeyword("");
-          onChange?.({ source, repo_id: "" });
+          onChange?.({ provider, repo_id: "" });
         }}
       />
       <AutoComplete
-        key={source}
+        key={provider}
         style={{ width: "calc(100% - 140px)" }}
         inputProps={{ "aria-label": "外部模型" }}
         value={value?.repo_id ?? ""}
@@ -84,17 +87,17 @@ export default function ModelSourceInput({ value, onChange, disabled }: ModelSou
         onSearch={setSearchInput}
         data={options.map((candidate) => ({
           value: candidate.repo_id,
-          name: (candidate.display_name || candidate.name) + " · " + candidate.repo_id,
+          name: candidate.name + " · " + candidate.repo_id,
         }))}
         onChange={(repo_id) => {
           if (repo_id !== selected?.repo_id) setSelected(undefined);
-          onChange?.({ source, repo_id });
+          onChange?.({ provider, repo_id });
         }}
         onSelect={(repo_id) => {
           const candidate = options.find((item) => item.repo_id === repo_id);
           if (!candidate) return;
           setSelected(candidate);
-          onChange?.({ source, repo_id }, candidate);
+          onChange?.({ provider, repo_id }, candidate);
         }}
       />
     </Input.Group>
