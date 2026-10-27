@@ -70,15 +70,20 @@ export default function ListPageFrame<
         ) : null}
       </>
     ) : undefined;
+  const hasToolbar = Boolean(toolbar?.actions || toolbarFilters || toolbarTools);
 
   return (
     <ResourcePageFrame header={header}>
       <section className={styles.contentPanel}>
         {tabs ? <StatusTabs {...tabs} /> : null}
-        {toolbar ? (
-          <ListToolbar actions={toolbar.actions} filters={toolbarFilters} tools={toolbarTools} />
-        ) : null}
-        {children}
+        {hasToolbar ? (
+          <>
+            <ListToolbar actions={toolbar?.actions} filters={toolbarFilters} tools={toolbarTools} />
+            {children}
+          </>
+        ) : (
+          <div className="flex min-h-0 flex-1 flex-col pt-4">{children}</div>
+        )}
       </section>
     </ResourcePageFrame>
   );
