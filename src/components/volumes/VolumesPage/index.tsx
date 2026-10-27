@@ -4,7 +4,13 @@ import { listVolumes, type StorageVolume, type StorageVolumePhase } from "@/api/
 import { useListPagination } from "@/hooks/useListPagination";
 import { useStorageVolumeActions } from "@/hooks/useStorageVolumeActions";
 import CreateStorageVolumeModal from "@/components/volumes/CreateStorageVolumeModal";
-import { ResourceNameId, ListPageFrame, ListDataTable, type ListColumn } from "@/components/common";
+import {
+  ResourceNameId,
+  ListPageFrame,
+  ListDataTable,
+  StatusBadge,
+  type ListColumn,
+} from "@/components/common";
 
 export default function VolumesPage() {
   const [createVisible, setCreateVisible] = useState(false);
@@ -41,7 +47,7 @@ export default function VolumesPage() {
       key: "state",
       title: "状态",
       width: 120,
-      dataIndex: "phase",
+      render: (_, item) => <StatusBadge status={item.phase} />,
     },
     { key: "size", title: "容量 (GB)", width: 100, dataIndex: "requested_capacity_gb" },
     {
