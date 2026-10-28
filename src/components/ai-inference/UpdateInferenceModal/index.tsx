@@ -15,7 +15,6 @@ import { withId } from "@/lib/id";
 
 type UpdateInferenceFormValues = {
   model_version_id: string;
-  served_model_name: string;
   engine_type: string;
   engine_image: string;
   command: string;
@@ -60,7 +59,6 @@ export default function UpdateInferenceModal({
     setSnapshot(item);
     form.setFieldsValue({
       model_version_id: item.model_version_id,
-      served_model_name: item.served_model_name,
       engine_type: item.engine_type,
       engine_image: item.engine_image,
       command: item.command,
@@ -97,11 +95,6 @@ export default function UpdateInferenceModal({
       if (values.model_version_id !== snapshot.model_version_id) {
         input.model_version_id = values.model_version_id;
         input.update_mask.push("modelVersionId");
-      }
-      const servedName = values.served_model_name.trim();
-      if (servedName !== snapshot.served_model_name) {
-        input.served_model_name = servedName;
-        input.update_mask.push("servedModelName");
       }
       const engineType = values.engine_type.trim();
       const engineImage = values.engine_image.trim();
@@ -157,20 +150,13 @@ export default function UpdateInferenceModal({
         >
           <ModelVersionSelect key={modelId} modelId={modelId} />
         </Form.Item>
-        <Form.Item
-          field="served_model_name"
-          label="服务模型名"
-          rules={required("请输入服务模型名")}
-          extra="请与完整启动命令中的服务模型名保持一致"
-        >
-          <Input />
-        </Form.Item>
         <Form.Item field="engine_type" label="引擎类型" rules={required("请选择引擎类型")}>
           <EngineSelect />
         </Form.Item>
         <Form.Item field="engine_image" label="运行镜像" rules={required("请输入运行镜像地址")}>
           <Input />
         </Form.Item>
+        {/* FIXME(inference-model-name): 命令中的模型名可能与自动生成的服务模型名不一致；若网关未做名称映射，外部调用可能失败，待核对后处理。 */}
         <Form.Item field="command" label="完整启动命令" rules={required("请输入完整启动命令")}>
           <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} />
         </Form.Item>

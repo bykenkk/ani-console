@@ -40,6 +40,7 @@ export function useInferenceActions(onDeleted?: () => void) {
     onSuccess: (_, { item }) => refresh(item.id),
   });
   const remove = useMutation({
+    // TODO(inference-delete): 删除入口暂时禁用；待后端确认 CPU/GPU 删除传参差异及 expected_generation 是否必填后再调整接入。
     mutationFn: (item: InferenceService) =>
       deleteInferenceService(item.id, item.gpu ? {} : { expected_generation: item.generation }),
     meta: {
@@ -98,7 +99,9 @@ export function useInferenceActions(onDeleted?: () => void) {
       key: "delete",
       label: "删除",
       intent: "danger",
-      disabled: pending,
+      // TODO(inference-delete): 待后端确认删除参数并完成接入调整后再开放。
+      disabled: () => true,
+      tooltip: "删除功能暂不可用",
       onClick: (item) => {
         Modal.confirm({
           title: "删除推理服务",

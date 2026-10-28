@@ -21,7 +21,7 @@ import InferenceMonitoring from "./InferenceMonitoring";
 import InferenceRuntimeLogs from "./InferenceRuntimeLogs";
 import UpdateInferenceModal from "../UpdateInferenceModal";
 import InferencePolicies from "./InferencePolicies";
-import InferenceInvocationAddress from "./InferenceInvocationAddress";
+import InferenceInvocationTest from "./InferenceInvocationTest";
 
 type InferenceDetailPageProps = {
   serviceId: string;
@@ -110,7 +110,13 @@ export default function InferenceDetailPage({
           {
             key: "invocation-test",
             label: "调用测试",
-            content: <InferenceInvocationAddress serviceId={item.id} />,
+            content: (
+              <InferenceInvocationTest
+                key={item.id}
+                servedModelName={item.served_model_name}
+                status={item.phase}
+              />
+            ),
           },
           {
             key: "monitoring",

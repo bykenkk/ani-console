@@ -4,7 +4,7 @@ import { useCallback, useRef, useState } from "react";
 import { createInferenceService, type InferenceRuntimeMode } from "@/api/inference";
 import type { ModelVersion } from "@/api/models";
 import type { InstancePreset } from "@/api/instances";
-import InstanceComputePresetSelect from "@/components/instances/InstanceComputePresetSelect";
+import InstanceComputeSelect from "@/components/instances/InstanceComputeSelect";
 import { showMessage } from "@/lib/feedback";
 import { validateForm } from "@/lib/form";
 import { randomString } from "@/lib/random";
@@ -17,7 +17,6 @@ interface CreateInferenceFormValues {
   engine_type: string;
   engine_image: string;
   command: string;
-  served_model_name: string;
   preset?: InstancePreset;
   runtime_mode: InferenceRuntimeMode;
   replicas: number;
@@ -40,19 +39,21 @@ export default function CreateInferenceModal({
   const [form] = Form.useForm<CreateInferenceFormValues>();
   const qc = useQueryClient();
   const submitting = useRef(false);
+  const servedModelName = useRef<{ modelId: string; modelName: string; value: string }>();
   const [preset, setPreset] = useState<InstancePreset>();
   const [distributed, setDistributed] = useState(false);
   const [modelId, setModelId] = useState(initialModelId ?? "");
+  const [modelName, setModelName] = useState("");
   const [version, setVersion] = useState<ModelVersion>();
   const changeVersion = useCallback(
     (id: string, selected?: ModelVersion, modelName?: string) => {
       setVersion(selected);
+      setModelName(modelName ?? "");
       form.setFieldsValue({
         model_version_id: id,
         engine_image: selected?.engine_image ?? "",
         engine_type: selected?.engine_type ?? "",
         command: selected?.startup_command ?? "",
-        served_model_name: modelName ? `${modelName}-${randomString(7)}` : "",
       });
     },
     [form],
@@ -87,6 +88,10 @@ export default function CreateInferenceModal({
         showMessage({ type: "error", content: "请选择已就绪的模型版本" });
         return;
       }
+      if (!modelName) {
+        showMessage({ type: "error", content: "模型名称尚未加载，请稍后重试" });
+        return;
+      }
 
       if (!values.preset?.enabled || !values.preset.selectable) {
         showMessage({ type: "error", content: "请选择可用的推理算力规格" });
@@ -100,10 +105,22 @@ export default function CreateInferenceModal({
         return;
       }
 
+      // 同一次部署失败后再次提交时复用名称，避免改变幂等请求内容。
+      if (
+        servedModelName.current?.modelId !== modelId ||
+        servedModelName.current.modelName !== modelName
+      ) {
+        servedModelName.current = {
+          modelId,
+          modelName,
+          value: `${modelName}-${randomString(7)}`,
+        };
+      }
+
       await create.mutateAsync({
         name: values.name.trim(),
         model_version_id: version.id,
-        served_model_name: values.served_model_name.trim(),
+        served_model_name: servedModelName.current.value,
         engine_image: values.engine_image.trim(),
         engine_type: values.engine_type.trim(),
         command: values.command,
@@ -169,14 +186,6 @@ export default function CreateInferenceModal({
             </Form.Item>
           </Grid.Col>
         </Grid.Row>
-        <Form.Item
-          field="served_model_name"
-          label="服务模型名"
-          rules={required("请输入服务模型名")}
-          extra="请与完整启动命令中的服务模型名保持一致"
-        >
-          <Input placeholder="请输入服务模型名" />
-        </Form.Item>
         <Form.Item label="引擎镜像" required>
           <Input.Group compact>
             <Form.Item
@@ -199,16 +208,19 @@ export default function CreateInferenceModal({
             </Form.Item>
           </Input.Group>
         </Form.Item>
+        {/* FIXME(inference-model-name): 命令中的模型名可能与自动生成的服务模型名不一致；若网关未做名称映射，外部调用可能失败，待核对后处理。 */}
         <Form.Item field="command" label="完整启动命令" rules={required("请输入完整启动命令")}>
           <Input.TextArea autoSize={{ minRows: 3, maxRows: 6 }} placeholder="请输入完整启动命令" />
         </Form.Item>
         <Form.Item
           field="preset"
           label="算力规格"
+          validateTrigger="onSelect"
           rules={[{ required: true, message: "请选择推理算力规格" }]}
         >
-          <InstanceComputePresetSelect
+          <InstanceComputeSelect
             usage="INFERENCE"
+            onTypeChange={() => form.setFields({ preset: { error: undefined } })}
             onChange={(selected) => {
               setPreset(selected);
               if (selected?.compute_type === "gpu") {
