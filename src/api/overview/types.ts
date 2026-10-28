@@ -2,14 +2,11 @@ export interface InstanceOverviewStatistics {
   total: number;
   by_state: {
     pending: number;
-    provisioning: number;
-    starting: number;
     running: number;
-    stopping: number;
     stopped: number;
     failed: number;
-    deleting: number;
   };
+  other: number;
 }
 
 export interface InferenceServiceOverviewStatistics {
@@ -22,16 +19,18 @@ export interface InferenceServiceOverviewStatistics {
     stopped: number;
     failed: number;
   };
+  other: number;
 }
 
 export interface ModelOverviewStatistics {
   total: number;
   by_status: {
     pending: number;
-    downloading: number;
+    importing: number;
     ready: number;
     error: number;
   };
+  other: number;
 }
 
 export interface KnowledgeBaseOverviewStatistics {
@@ -40,6 +39,7 @@ export interface KnowledgeBaseOverviewStatistics {
     active: number;
     rebuilding: number;
   };
+  other: number;
 }
 
 export interface ConsoleOverviewStatistics {

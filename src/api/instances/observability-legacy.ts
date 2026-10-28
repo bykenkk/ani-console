@@ -2,7 +2,7 @@
 // TODO(governance-migration): 仅 CPU/GPU 当前事件和基础文本日志迁移，其余实例及能力继续旧接口。
 import type { CursorPageParams } from "@/api/types";
 import { coreRequest } from "@/api/request";
-export { queryObservabilityRange } from "@/api/observability";
+export { queryObservabilityRange } from "@/api/observability/legacy";
 import { instancePath } from "./records-legacy";
 import type { InstanceEvent, InstanceMetrics, InstanceSecurityEvent } from "./types-legacy";
 type ListResponse<T> = { items: T[]; total: number; next_cursor?: string | null };

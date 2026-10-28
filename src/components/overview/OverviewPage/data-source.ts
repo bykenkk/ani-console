@@ -1,12 +1,7 @@
 import { queryResourceTrend } from "@/api/observability";
 import { getConsoleOverview, type ConsoleOverviewStatistics } from "@/api/overview";
 import { getTask, listTasks, type AsyncTask, type AsyncTaskStatus } from "@/api/tasks";
-import {
-  formatDateTime,
-  formatTrendTime,
-  getPreviousHoursDateTimeRange,
-  isValidDateTime,
-} from "@/lib/date";
+import { formatDateTime, formatTrendTime } from "@/lib/date";
 import type {
   HomeOverviewDataSource,
   HomeResourceTrendMetric,
@@ -16,7 +11,6 @@ import type {
   HomeTaskFilter,
   HomeTimeRange,
   HomeTrendConfig,
-  HomeTrendHeadline,
   HomeTrendSnapshot,
 } from ".";
 
@@ -41,48 +35,48 @@ export const homeSummaryPlaceholders: HomeSummaryCard[] = [
   {
     id: "instances",
     label: "实例总数",
-    value: 0,
+    value: null,
     icon: "yunzhuji",
     route: "/vms",
     statuses: [
-      { label: "运行中", value: 0, tone: "success" },
-      { label: "异常", value: 0, tone: "danger" },
-      { label: "其他", value: 0, tone: "neutral" },
+      { label: "运行中", value: null, tone: "success" },
+      { label: "异常", value: null, tone: "danger" },
+      { label: "其他", value: null, tone: "neutral" },
     ],
   },
   {
     id: "inference-services",
     label: "推理服务",
-    value: 0,
+    value: null,
     icon: "tuili",
     route: "/ai-inference",
     statuses: [
-      { label: "运行中", value: 0, tone: "success" },
-      { label: "异常", value: 0, tone: "danger" },
-      { label: "其他", value: 0, tone: "neutral" },
+      { label: "运行中", value: null, tone: "success" },
+      { label: "异常", value: null, tone: "danger" },
+      { label: "其他", value: null, tone: "neutral" },
     ],
   },
   {
     id: "models",
     label: "模型仓库",
-    value: 0,
+    value: null,
     icon: "moxing",
     route: "/ai-models",
     statuses: [
-      { label: "可用", value: 0, tone: "success" },
-      { label: "失败", value: 0, tone: "danger" },
-      { label: "其他", value: 0, tone: "neutral" },
+      { label: "可用", value: null, tone: "success" },
+      { label: "失败", value: null, tone: "danger" },
+      { label: "其他", value: null, tone: "neutral" },
     ],
   },
   {
     id: "knowledge-bases",
     label: "知识库",
-    value: 0,
+    value: null,
     icon: "zhishiku",
     route: "/kb",
     statuses: [
-      { label: "活跃", value: 0, tone: "success" },
-      { label: "其他", value: 0, tone: "neutral" },
+      { label: "活跃", value: null, tone: "success" },
+      { label: "其他", value: null, tone: "neutral" },
     ],
   },
 ];
@@ -116,9 +110,9 @@ export const homeQuickCreateItems: HomeShortcut[] = [
 ];
 
 export const homeTrendConfigs: Record<HomeResourceTrendMetric, HomeTrendConfig> = {
-  gpu: { title: "GPU资源趋势", yMax: 100, yInterval: 20 },
-  cpu: { title: "CPU资源趋势", yMax: 100, yInterval: 20 },
-  memory: { title: "内存资源趋势", yMax: 100, yInterval: 20 },
+  gpu: { title: "GPU 显存使用量趋势" },
+  cpu: { title: "CPU 使用量趋势" },
+  memory: { title: "内存使用量趋势" },
 };
 
 const taskDomainLabels: Record<string, string> = {
@@ -143,10 +137,6 @@ const taskActionLabels: Record<string, string> = {
   import: "导入",
 };
 
-function getOtherCount(total: number, ...displayedCounts: number[]): number {
-  return total - displayedCounts.reduce((sum, count) => sum + count, 0);
-}
-
 function toHomeSummaries(overview: ConsoleOverviewStatistics): HomeSummaryCard[] {
   const instanceRunning = overview.instances.by_state.running;
   const instanceFailed = overview.instances.by_state.failed;
@@ -168,7 +158,7 @@ function toHomeSummaries(overview: ConsoleOverviewStatistics): HomeSummaryCard[]
         { label: "异常", value: instanceFailed, tone: "danger" },
         {
           label: "其他",
-          value: getOtherCount(overview.instances.total, instanceRunning, instanceFailed),
+          value: overview.instances.other,
           tone: "neutral",
         },
       ],
@@ -184,11 +174,7 @@ function toHomeSummaries(overview: ConsoleOverviewStatistics): HomeSummaryCard[]
         { label: "异常", value: inferenceFailed, tone: "danger" },
         {
           label: "其他",
-          value: getOtherCount(
-            overview.inference_services.total,
-            inferenceRunning,
-            inferenceFailed,
-          ),
+          value: overview.inference_services.other,
           tone: "neutral",
         },
       ],
@@ -204,7 +190,7 @@ function toHomeSummaries(overview: ConsoleOverviewStatistics): HomeSummaryCard[]
         { label: "失败", value: modelFailed, tone: "danger" },
         {
           label: "其他",
-          value: getOtherCount(overview.models.total, modelReady, modelFailed),
+          value: overview.models.other,
           tone: "neutral",
         },
       ],
@@ -219,7 +205,7 @@ function toHomeSummaries(overview: ConsoleOverviewStatistics): HomeSummaryCard[]
         { label: "活跃", value: knowledgeBaseActive, tone: "success" },
         {
           label: "其他",
-          value: getOtherCount(overview.knowledge_bases.total, knowledgeBaseActive),
+          value: overview.knowledge_bases.other,
           tone: "neutral",
         },
       ],
@@ -227,31 +213,15 @@ function toHomeSummaries(overview: ConsoleOverviewStatistics): HomeSummaryCard[]
   ];
 }
 
-// FIXME(governance-migration): 模型/推理卡片已跳转新页面，统计仍来自既有 overview 聚合，尚未确认与 governance 资源口径一致。
-// TODO(governance-migration): 后端明确概览统计归属及状态映射后核对数量与状态分布，不在前端拼接两套统计。
-async function getSummaries(): Promise<HomeSummaryCard[]> {
-  return toHomeSummaries(await getConsoleOverview());
+async function getSummaries(signal?: AbortSignal): Promise<HomeSummaryCard[]> {
+  return toHomeSummaries(await getConsoleOverview(signal));
 }
 
 const resourceTrendMeta: Record<HomeResourceTrendMetric, { name: string }> = {
-  gpu: { name: "GPU 利用率" },
-  cpu: { name: "CPU 利用率" },
-  memory: { name: "内存利用率" },
+  gpu: { name: "GPU 显存使用量" },
+  cpu: { name: "CPU 使用量" },
+  memory: { name: "内存使用量" },
 };
-
-const rangeQueryConfig: Record<HomeTimeRange, { hours: number; step: string }> = {
-  "1d": { hours: 24, step: "5m" },
-  "7d": { hours: 7 * 24, step: "30m" },
-  "30d": { hours: 30 * 24, step: "2h" },
-};
-
-function snapshot(
-  labels: string[],
-  headlines: HomeTrendHeadline[],
-  series: HomeTrendSnapshot["series"],
-): HomeTrendSnapshot {
-  return { labels, headlines, series };
-}
 
 function getTaskResultText(task: AsyncTask, key: string): string | undefined {
   const value = task.result?.[key];
@@ -317,35 +287,33 @@ async function getTasks(filter: HomeTaskFilter): Promise<HomeTask[]> {
 async function getResourceTrend(
   metric: HomeResourceTrendMetric,
   range: HomeTimeRange,
+  signal?: AbortSignal,
 ): Promise<HomeTrendSnapshot> {
-  const config = rangeQueryConfig[range];
-  const { start, end } = getPreviousHoursDateTimeRange(config.hours);
-  const response = await queryResourceTrend({ metric, start, end, step: config.step });
-  const points = response.results
-    .flatMap((series) => series.values)
-    .filter((point) => Number.isFinite(point.value) && isValidDateTime(point.timestamp));
+  const response = await queryResourceTrend({ metric, range }, signal);
+  const trend = response.data.series[0];
+  const points = trend.points;
   const latest = points.at(-1);
 
-  return snapshot(
-    points.map((point) => formatTrendTime(point.timestamp, range !== "1d")),
-    latest
-      ? [
-          {
-            label: "当前",
-            value: Number(latest.value.toFixed(2)),
-            unit: "%",
-            color: BLUE,
-          },
-        ]
-      : [],
-    [
+  return {
+    labels: points.map((point) => formatTrendTime(point.timestamp, range !== "1d")),
+    unit: trend.unit,
+    status: trend.status,
+    headlines: [
+      {
+        label: "当前",
+        value: latest?.value ?? null,
+        unit: trend.unit,
+        color: BLUE,
+      },
+    ],
+    series: [
       {
         name: resourceTrendMeta[metric].name,
         color: BLUE,
         values: points.map((point) => point.value),
       },
     ],
-  );
+  };
 }
 
 export const homeOverviewDataSource: HomeOverviewDataSource = {

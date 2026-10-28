@@ -5,6 +5,9 @@ import type { EChartsOption, LineSeriesOption } from "echarts";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { CoreLineBarChart } from "@/components/common";
+import { ApiError } from "@/api/request";
+import type { ResourceTrendUnit } from "@/api/observability";
+import { formatBytes } from "@/lib/format";
 import type {
   HomeOverviewDataSource,
   HomeResourceTrendMetric,
@@ -29,11 +32,13 @@ const emptyTrend: HomeTrendSnapshot = {
   labels: [],
   headlines: [],
   series: [],
+  unit: "cores",
+  status: "NO_DATA",
 };
 
-function percentTooltip(value: unknown) {
-  const number = Number(value);
-  return Number.isFinite(number) ? `${Number(number.toFixed(2))}%` : "-";
+function formatResourceTrendValue(value: unknown, unit: ResourceTrendUnit): string {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "-";
+  return unit === "bytes" ? formatBytes(value) : `${Number(value.toFixed(4))} 核`;
 }
 
 export default function TrendCard({ config, dataSource, metric }: TrendCardProps) {
@@ -46,19 +51,30 @@ export default function TrendCard({ config, dataSource, metric }: TrendCardProps
         fallback: "数据服务暂不可用",
       },
     },
-    queryKey: ["home-resource-trend", metric, range],
-    queryFn: () => dataSource.getResourceTrend(metric, range),
+    queryKey: ["governance-resource-trend", metric, range],
+    queryFn: ({ signal }) => dataSource.getResourceTrend(metric, range, signal),
     staleTime: 60_000,
+    refetchInterval: ({ state }) =>
+      state.error instanceof ApiError && [400, 401, 403].includes(state.error.status ?? 0)
+        ? false
+        : 60_000,
+    refetchIntervalInBackground: false,
   });
   const current = trendQuery.data ?? emptyTrend;
-  const hasData = current.series.some((series) => series.values.length > 0);
+  const hasData =
+    current.status !== "NO_DATA" &&
+    current.series.some((series) => series.values.some((value) => value !== null));
 
   const option = useMemo<EChartsOption>(() => {
     const series: LineSeriesOption[] = current.series.map((item) => ({
       name: item.name,
       type: "line",
       data: item.values,
-      showSymbol: false,
+      showSymbol: item.values.some(
+        (value, index, values) =>
+          value !== null && values[index - 1] == null && values[index + 1] == null,
+      ),
+      connectNulls: false,
       symbol: "circle",
       symbolSize: 7,
       lineStyle: { color: item.color, width: 1.5 },
@@ -81,10 +97,10 @@ export default function TrendCard({ config, dataSource, metric }: TrendCardProps
 
     return {
       animation: false,
-      grid: { left: 40, right: 16, top: 8, bottom: 30 },
+      grid: { left: 8, right: 16, top: 8, bottom: 12, containLabel: true },
       tooltip: {
         trigger: "axis",
-        valueFormatter: percentTooltip,
+        valueFormatter: (value) => formatResourceTrendValue(value, current.unit),
         backgroundColor: "rgba(255, 255, 255, 0.94)",
         borderColor: "#fff",
         borderWidth: 2,
@@ -102,20 +118,18 @@ export default function TrendCard({ config, dataSource, metric }: TrendCardProps
       yAxis: {
         type: "value",
         min: 0,
-        max: config.yMax,
-        interval: config.yInterval,
         axisLine: { show: false },
         axisTick: { show: false },
         axisLabel: {
           color: "rgba(0, 0, 0, 0.4)",
           fontSize: 12,
-          formatter: "{value}%",
+          formatter: (value: number) => formatResourceTrendValue(value, current.unit),
         },
         splitLine: { lineStyle: { color: "rgba(0, 0, 0, 0.08)", width: 0.5 } },
       },
       series,
     };
-  }, [config.yInterval, config.yMax, current]);
+  }, [current]);
 
   return (
     <section className={clsx(styles.panel, styles.trendPanel)}>
@@ -131,8 +145,6 @@ export default function TrendCard({ config, dataSource, metric }: TrendCardProps
           <Spin />
           <span>正在加载趋势数据...</span>
         </div>
-      ) : trendQuery.isError ? (
-        <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-4 text-(--home-text-secondary)" />
       ) : !hasData ? (
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-4 text-(--home-text-secondary)">
           <Empty description="暂无数据" />
@@ -147,8 +159,9 @@ export default function TrendCard({ config, dataSource, metric }: TrendCardProps
                   style={{ background: headline.color }}
                 />
                 <span className="text-(--home-text-secondary)">{headline.label}</span>
-                <strong className="text-[24px] leading-8 font-semibold!">{headline.value}</strong>
-                <span className="-ml-1.5 text-(--home-text-secondary)">{headline.unit}</span>
+                <strong className="text-[24px] leading-8 font-semibold!">
+                  {formatResourceTrendValue(headline.value, headline.unit)}
+                </strong>
               </div>
             ))}
           </div>

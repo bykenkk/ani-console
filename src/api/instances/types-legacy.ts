@@ -2,7 +2,7 @@
 // TODO(governance-migration): 按能力逐项对齐后再移除旧字段，VM/沙箱等未迁移功能仍依赖这些类型。
 import type { CoreDevProfileInfo, CursorPageParams } from "@/api/types";
 
-export type { ObservabilityRangeQueryResponse } from "@/api/observability";
+export type { ObservabilityRangeQueryResponse } from "@/api/observability/legacy";
 
 export type InstanceKind =
   | "vm"

@@ -1,7 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+// import { useState } from "react";
+import { ApiError } from "@/api/request";
+import type {
+  ResourceTrendMetric,
+  ResourceTrendRange,
+  ResourceTrendStatus,
+  ResourceTrendUnit,
+} from "@/api/observability";
 import SummaryOverview from "./SummaryOverview";
-import TasksPanel from "./TasksPanel";
+// import TasksPanel from "./TasksPanel";
 import TrendCard from "./TrendCard";
 import WelcomePanel from "./WelcomePanel";
 import {
@@ -17,9 +24,9 @@ type OverviewPageProps = {
   dataSource?: HomeOverviewDataSource;
 };
 
-export type HomeTimeRange = "1d" | "7d" | "30d";
+export type HomeTimeRange = ResourceTrendRange;
 
-export type HomeResourceTrendMetric = "gpu" | "cpu" | "memory";
+export type HomeResourceTrendMetric = ResourceTrendMetric;
 
 type HomeTaskStatus = "done" | "failed" | "current";
 
@@ -42,14 +49,14 @@ type HomeRoute =
 
 type HomeSummaryStatus = {
   label: string;
-  value: number;
+  value: number | null;
   tone: "success" | "danger" | "neutral";
 };
 
 export type HomeSummaryCard = {
   id: string;
   label: string;
-  value: number;
+  value: number | null;
   icon: string;
   route: HomeRoute;
   statuses: HomeSummaryStatus[];
@@ -65,13 +72,13 @@ export type HomeShortcut = {
 type HomeTrendSeries = {
   name: string;
   color: string;
-  values: number[];
+  values: Array<number | null>;
 };
 
 export type HomeTrendHeadline = {
   label: string;
-  value: number;
-  unit: string;
+  value: number | null;
+  unit: ResourceTrendUnit;
   color: string;
 };
 
@@ -79,12 +86,12 @@ export type HomeTrendSnapshot = {
   labels: string[];
   headlines: HomeTrendHeadline[];
   series: HomeTrendSeries[];
+  unit: ResourceTrendUnit;
+  status: ResourceTrendStatus;
 };
 
 export type HomeTrendConfig = {
   title: string;
-  yMax: number;
-  yInterval: number;
 };
 
 export type HomeTask = {
@@ -97,16 +104,17 @@ export type HomeTask = {
 };
 
 export interface HomeOverviewDataSource {
-  getSummaries(): Promise<HomeSummaryCard[]>;
+  getSummaries(signal?: AbortSignal): Promise<HomeSummaryCard[]>;
   getTasks(filter: HomeTaskFilter): Promise<HomeTask[]>;
   getResourceTrend(
     metric: HomeResourceTrendMetric,
     range: HomeTimeRange,
+    signal?: AbortSignal,
   ): Promise<HomeTrendSnapshot>;
 }
 
 export default function OverviewPage({ dataSource = homeOverviewDataSource }: OverviewPageProps) {
-  const [taskFilter, setTaskFilter] = useState<HomeTaskFilter>("done");
+  // const [taskFilter, setTaskFilter] = useState<HomeTaskFilter>("done");
   const summariesQuery = useQuery({
     meta: {
       errorNotification: {
@@ -115,24 +123,33 @@ export default function OverviewPage({ dataSource = homeOverviewDataSource }: Ov
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["resource-summaries"],
-    queryFn: () => dataSource.getSummaries(),
+    queryKey: ["governance-resource-summaries"],
+    queryFn: ({ signal }) => dataSource.getSummaries(signal),
+    staleTime: 60_000,
+    refetchInterval: ({ state }) =>
+      state.error instanceof ApiError && [400, 401, 403].includes(state.error.status ?? 0)
+        ? false
+        : 60_000,
+    refetchIntervalInBackground: false,
   });
-  const tasksQuery = useQuery({
-    meta: {
-      errorNotification: {
-        id: "tasks",
-        action: "任务中心加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["tasks", taskFilter],
-    queryFn: () => dataSource.getTasks(taskFilter),
-  });
+  // const tasksQuery = useQuery({
+  //   meta: {
+  //     errorNotification: {
+  //       id: "tasks",
+  //       action: "任务中心加载",
+  //       fallback: "请求失败，请稍后重试",
+  //     },
+  //   },
+  //   queryKey: ["tasks", taskFilter],
+  //   queryFn: () => dataSource.getTasks(taskFilter),
+  // });
   return (
     <main className={styles.homePage}>
       <div className={styles.twoColumnRow}>
-        <SummaryOverview items={summariesQuery.data ?? homeSummaryPlaceholders} />
+        <SummaryOverview
+          items={summariesQuery.data ?? homeSummaryPlaceholders}
+          loading={summariesQuery.isLoading}
+        />
         <WelcomePanel quickCreateItems={homeQuickCreateItems} />
       </div>
 
@@ -143,14 +160,14 @@ export default function OverviewPage({ dataSource = homeOverviewDataSource }: Ov
 
       <div className={styles.bottomGrid}>
         <TrendCard config={homeTrendConfigs.memory} dataSource={dataSource} metric="memory" />
-        <TasksPanel
+        {/* <TasksPanel
           items={tasksQuery.data ?? []}
           filter={taskFilter}
           loading={tasksQuery.isLoading}
           refreshing={tasksQuery.isFetching && !tasksQuery.isLoading}
           onFilterChange={setTaskFilter}
           onRefresh={() => tasksQuery.refetch()}
-        />
+        /> */}
       </div>
     </main>
   );
