@@ -1,11 +1,13 @@
 import { Card, Descriptions, Table } from "@arco-design/web-react";
-import type { ModelDevExecution } from "@/api/modeldev";
+import type { ModelDevExecutionDetail } from "@/api/modeldev";
 import { ResourceId } from "@/components/common";
 import { formatDateTime } from "@/lib/date";
+import TrainingFineTuningConfiguration from "../TrainingFineTuningConfiguration";
 
-type TrainingExecutionSnapshotProps = { task: ModelDevExecution };
+type TrainingExecutionSnapshotProps = { task: ModelDevExecutionDetail };
 
 export default function TrainingExecutionSnapshot({ task }: TrainingExecutionSnapshotProps) {
+  const registration = task.model_registration;
   const history = task.history;
   const explicit = task.explicit_parameters;
   return (
@@ -56,6 +58,41 @@ export default function TrainingExecutionSnapshot({ task }: TrainingExecutionSna
                   ? String(explicit[row.name as keyof typeof explicit])
                   : "未指定",
             },
+          ]}
+        />
+      </Card>
+      {task.kind === "FINETUNING" && (
+        <TrainingFineTuningConfiguration
+          baseModel={task.base_model}
+          managedSettings={task.managed_settings}
+        />
+      )}
+      <Card title="模型登记" bordered={false}>
+        <Descriptions
+          column={1}
+          data={[
+            { label: "登记状态", value: registration?.state || "无登记记录" },
+            {
+              label: "登记 ID",
+              value: registration?.registration_id ? (
+                <ResourceId value={registration.registration_id} />
+              ) : (
+                "-"
+              ),
+            },
+            {
+              label: "模型 ID",
+              value: registration?.model_id ? <ResourceId value={registration.model_id} /> : "-",
+            },
+            {
+              label: "版本 ID",
+              value: registration?.model_version_id ? (
+                <ResourceId value={registration.model_version_id} />
+              ) : (
+                "-"
+              ),
+            },
+            { label: "失败原因", value: registration?.failure_code || "-" },
           ]}
         />
       </Card>

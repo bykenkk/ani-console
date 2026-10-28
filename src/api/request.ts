@@ -119,13 +119,13 @@ function payloadRecord(value: unknown): ApiErrorPayload | undefined {
   return value && typeof value === "object" ? (value as ApiErrorPayload) : undefined;
 }
 
-export function toApiError(error: unknown): ApiError {
+export function toApiError(error: unknown, responseData?: unknown): ApiError {
   if (error instanceof ApiError) return error;
   if (!axios.isAxiosError(error)) {
     return new ApiError(error instanceof Error ? error.message : "请求失败", { cause: error });
   }
 
-  const responsePayload = payloadRecord(error.response?.data);
+  const responsePayload = payloadRecord(responseData ?? error.response?.data);
   const payload = payloadRecord(responsePayload?.error) ?? responsePayload;
   const metadata = payloadRecord(payload?.metadata) ?? payloadRecord(responsePayload?.metadata);
   const message =
@@ -154,6 +154,30 @@ export function toApiError(error: unknown): ApiError {
     response: error.response,
     cause: error,
   });
+}
+
+async function decodeResponseError(error: unknown): Promise<ApiError> {
+  if (!axios.isAxiosError(error)) return toApiError(error);
+  const data: unknown = error.response?.data;
+  if (
+    typeof Blob !== "undefined" &&
+    data instanceof Blob &&
+    data.size <= 1_048_576 &&
+    typeof data.text === "function"
+  ) {
+    const contentType = error.response?.headers["content-type"] || data.type;
+    if (
+      typeof contentType === "string" &&
+      /^application\/(?:json|[\w.+-]+\+json)(?:\s*;|$)/i.test(contentType)
+    ) {
+      try {
+        return toApiError(error, JSON.parse(await data.text()));
+      } catch {
+        // 非法 JSON 或 Blob 读取失败时保留原始 HTTP 错误。
+      }
+    }
+  }
+  return toApiError(error);
 }
 
 export async function initializeCsrfToken(): Promise<string> {
@@ -319,13 +343,13 @@ function installAuthInterceptors(instance: AxiosInstance): void {
         if (error.response?.status === 401 && isProtected && config?.aniRetried && !loggingOut) {
           expireAuthSession();
         }
-        throw toApiError(error);
+        throw await decodeResponseError(error);
       }
 
       const currentAuthState = useAuthStore.getState();
       if (!currentAuthState.tokens?.access_token) {
         expireAuthSession();
-        throw toApiError(error);
+        throw await decodeResponseError(error);
       }
 
       config.aniRetried = true;

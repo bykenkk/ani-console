@@ -23,10 +23,10 @@ export default function ModelDevImplementationField({
   selectedId,
   onResolve,
 }: ModelDevImplementationFieldProps) {
-  const label = "训练方法";
+  const label = kind === "FINETUNING" ? "微调技术" : "训练方法";
   const query = useQuery({
     queryKey: ["training-implementations", "options", { kind }],
-    // TODO(modeldev-kind): 待联调验证 GENERAL_TRAINING 的筛选及空结果。
+    // TODO(modeldev-kind): 待联调验证 GENERAL_TRAINING / FINETUNING 的筛选及空结果。
     queryFn: ({ signal }) => listOptions({ kind }, signal),
     meta: {
       errorNotification: {

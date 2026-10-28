@@ -1,19 +1,35 @@
-// TODO(modeldev-integration): 文档已声明部署；仍需前端联调验证停止、分页、日志、产物及下载。
+// TODO(modeldev-integration): 文档已声明部署；仍需前端联调验证停止、登记恢复、分页、日志、产物及下载。
 import { coreRequest } from "@/api/request";
+import { runIdempotentRequest } from "@/api/idempotency";
+import { createIdempotencyScope } from "@/lib/idempotency";
 import type { PageParams } from "@/api/types";
 import type {
+  CreateFineTuningInput,
+  CreateFineTuningRequest,
+  ModelDevExecutionListParams,
   ModelDevExecutionListResponse,
-  ModelDevExecution,
+  ModelDevExecutionDetail,
   ModelDevLogParams,
   ModelDevExecutionLogs,
   ModelDevArtifactListResponse,
-  ModelDevArtifactDownload,
 } from "./types";
 
+const createFineTuningScope = createIdempotencyScope("finetuning-create", ["POST"]);
 const executionPath = (id: string) => `/modeldev/executions/${encodeURIComponent(id)}`;
 
+// TODO(finetuning-create): 联调三种登记模式、CPU/GPU 准入、失败后同意图重试及 202 异步受理。
+export function createFineTuningExecution(input: CreateFineTuningInput): Promise<void> {
+  return runIdempotentRequest(createFineTuningScope, input, async (data) => {
+    await coreRequest<unknown, CreateFineTuningRequest>("/modeldev/executions", {
+      method: "POST",
+      data,
+    });
+  });
+}
+
+// TODO(modeldev-list): 待联调验证 executions 接受 kind，并在分页前与名称、状态条件组合筛选，total 返回筛选后的总数。
 export function listModelDevExecutions(
-  params: PageParams = {},
+  params: ModelDevExecutionListParams = {},
   signal?: AbortSignal,
 ): Promise<ModelDevExecutionListResponse> {
   return coreRequest<ModelDevExecutionListResponse>("/modeldev/executions", {
@@ -22,8 +38,18 @@ export function listModelDevExecutions(
     signal,
   });
 }
-export function getModelDevExecution(id: string, signal?: AbortSignal): Promise<ModelDevExecution> {
-  return coreRequest<ModelDevExecution>(executionPath(id), { method: "GET", signal });
+export function getModelDevExecution(
+  id: string,
+  signal?: AbortSignal,
+): Promise<ModelDevExecutionDetail> {
+  return coreRequest<ModelDevExecutionDetail>(executionPath(id), { method: "GET", signal });
+}
+/** 沿用原执行的登记意图。严格空 body，无新参数或幂等 key。响应只代表观测快照。 */
+export async function resumeModelDevRegistration(id: string, signal?: AbortSignal): Promise<void> {
+  await coreRequest<unknown>(`${executionPath(id)}:resume-model-registration`, {
+    method: "POST",
+    signal,
+  });
 }
 export async function stopModelDevExecution(id: string, signal?: AbortSignal): Promise<void> {
   await coreRequest<unknown>(`${executionPath(id)}:stop`, {
@@ -53,13 +79,12 @@ export function listModelDevExecutionArtifacts(
     signal,
   });
 }
-/** Short-lived download authorization. Do not persist the returned URL. */
-export function authorizeModelDevArtifactDownload(
-  id: string,
-  signal?: AbortSignal,
-): Promise<ModelDevArtifactDownload> {
-  return coreRequest<ModelDevArtifactDownload>(
-    `/modeldev/artifacts/${encodeURIComponent(id)}/content`,
-    { method: "GET", signal },
-  );
+/** 经平台鉴权代理文件字节，传输窗口与后端的 30 分钟上限保持一致。 */
+export function downloadModelDevArtifact(id: string, signal?: AbortSignal): Promise<Blob> {
+  return coreRequest<Blob>(`/modeldev/artifacts/${encodeURIComponent(id)}/download`, {
+    method: "GET",
+    responseType: "blob",
+    timeout: 30 * 60 * 1000,
+    signal,
+  });
 }

@@ -1,21 +1,17 @@
 import { useEffect, useRef } from "react";
 import { Button } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
-import { authorizeModelDevArtifactDownload, type ModelDevArtifact } from "@/api/modeldev";
-import { reserveExternalWindow } from "@/lib/browser";
-import { isDateTimeExpired, isValidDateTime } from "@/lib/date";
+import { downloadModelDevArtifact, type ModelDevArtifact } from "@/api/modeldev";
+import { downloadBlob } from "@/lib/browser";
 import { withId } from "@/lib/id";
-import { showMessage } from "@/lib/feedback";
 
 type TrainingArtifactDownloadProps = { artifact: ModelDevArtifact };
 
 export default function TrainingArtifactDownload({ artifact }: TrainingArtifactDownloadProps) {
-  const pending = useRef<ReturnType<typeof reserveExternalWindow> | null>(null);
   const controller = useRef<AbortController | null>(null);
   useEffect(
     () => () => {
       controller.current?.abort();
-      pending.current?.close();
     },
     [],
   );
@@ -30,30 +26,18 @@ export default function TrainingArtifactDownload({ artifact }: TrainingArtifactD
         errorFallback: "下载失败，请重试",
       },
     },
-    mutationFn: async () => {
+    mutationFn: async (downloadController: AbortController) => {
       try {
-        controller.current = new AbortController();
-        const result = await authorizeModelDevArtifactDownload(
+        const blob = await downloadModelDevArtifact(
           artifact.artifact_id,
-          controller.current.signal,
+          downloadController.signal,
         );
-        if (!pending.current || controller.current.signal.aborted) return;
-        if (
-          !result.expires_at ||
-          !isValidDateTime(result.expires_at) ||
-          isDateTimeExpired(result.expires_at)
-        )
-          throw new Error("下载地址已过期，请重试");
-        if (new URL(result.download_url).protocol !== "https:") throw new Error("下载地址无效");
-        // 短期凭据只用于即时导航，不进入 mutation 返回值或持久化存储。
-        pending.current.open(result.download_url);
-        pending.current = null;
-      } catch (error) {
-        pending.current?.close();
-        pending.current = null;
-        throw error;
+        if (downloadController.signal.aborted) throw new Error("下载已取消");
+        const filename = artifact.filename.split(/[\\/]/).pop() || artifact.artifact_id;
+        // Blob 仅交给公共下载适配器，不复制文件字节或放入 mutation 缓存。
+        downloadBlob(blob, filename);
       } finally {
-        controller.current = null;
+        if (controller.current === downloadController) controller.current = null;
       }
     },
   });
@@ -63,13 +47,10 @@ export default function TrainingArtifactDownload({ artifact }: TrainingArtifactD
       loading={download.isPending}
       disabled={artifact.delivery_state !== "PUBLISHED"}
       onClick={() => {
-        if (pending.current || download.isPending) return;
-        try {
-          pending.current = reserveExternalWindow();
-          download.mutate();
-        } catch {
-          showMessage({ type: "error", content: "请允许弹出窗口后重试" });
-        }
+        if (controller.current || download.isPending) return;
+        const downloadController = new AbortController();
+        controller.current = downloadController;
+        download.mutate(downloadController);
       }}
     >
       下载

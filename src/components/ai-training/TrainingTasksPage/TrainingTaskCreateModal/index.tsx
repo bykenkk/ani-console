@@ -157,7 +157,6 @@ export default function TrainingTaskCreateModal({ onCancel }: TrainingTaskCreate
           implementation={implementation}
           computePreset={values.preset}
           inputVersion={inputVersion}
-          onEdit={(index) => changeStep(index + 1)}
         />
       )}
     </WizardModal>

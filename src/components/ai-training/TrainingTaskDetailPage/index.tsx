@@ -9,6 +9,8 @@ import { withId } from "@/lib/id";
 import TrainingTaskLogs from "./TrainingTaskLogs";
 import TrainingTaskArtifacts from "./TrainingTaskArtifacts";
 import TrainingExecutionSnapshot from "./TrainingExecutionSnapshot";
+import TrainingTaskPipeline from "./TrainingTaskPipeline";
+import TrainingTaskMetrics from "./TrainingTaskMetrics";
 import { formatDateTime } from "@/lib/date";
 import { shouldObserveModelDevExecution } from "@/lib/modeldev";
 
@@ -77,6 +79,16 @@ export default function TrainingTaskDetailPage({
         },
       ]}
       tabs={[
+        {
+          key: "pipeline",
+          label: "流水线",
+          content: <TrainingTaskPipeline steps={task.steps} failure={task.failure} />,
+        },
+        {
+          key: "metrics",
+          label: "训练曲线",
+          content: <TrainingTaskMetrics metrics={task.metrics} />,
+        },
         {
           key: "logs",
           label: "日志",

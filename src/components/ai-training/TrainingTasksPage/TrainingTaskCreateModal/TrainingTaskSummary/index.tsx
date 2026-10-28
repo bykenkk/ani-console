@@ -9,7 +9,6 @@ type TrainingTaskSummaryProps = {
   implementation?: ModelDevImplementation;
   computePreset?: InstancePreset;
   inputVersion?: ModelDevInputVersion;
-  onEdit: (step: number) => void;
 };
 
 export default function TrainingTaskSummary({
@@ -17,7 +16,6 @@ export default function TrainingTaskSummary({
   implementation,
   computePreset,
   inputVersion,
-  onEdit,
 }: TrainingTaskSummaryProps) {
   return (
     <ModelDevSummary
@@ -36,7 +34,6 @@ export default function TrainingTaskSummary({
       ]}
       implementation={implementation}
       parameters={values.parameters}
-      onEdit={onEdit}
     />
   );
 }

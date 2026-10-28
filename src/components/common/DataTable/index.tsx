@@ -88,9 +88,8 @@ export function DataTable<T>({
   const resolvedColumns = hasRowActions
     ? normalizeDataTableColumns(columnsWithActions)
     : columnsWithActions;
-  const resolvedScroll = hasRowActions
-    ? resolveDataTableScroll(resolvedColumns, scroll)
-    : { x: "max-content" as const, ...scroll };
+  // 固定表头与表体必须共用明确的宽度，避免 max-content 分别按内容撑宽。
+  const resolvedScroll = resolveDataTableScroll(resolvedColumns, scroll);
   const tablePagination =
     pagination === false || pagination.mode === "legacy-cursor"
       ? false

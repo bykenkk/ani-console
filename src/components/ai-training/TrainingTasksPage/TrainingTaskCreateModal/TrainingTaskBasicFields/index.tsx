@@ -53,7 +53,7 @@ export default function TrainingTaskBasicFields({
         selectedId={values.implementation_id}
         onResolve={onImplementationSelect}
       />
-      <ModelDevInputField field="dataset_version_id" onSelect={onInputSelect} />
+      <ModelDevInputField field="dataset_version_id" format="CSV" onSelect={onInputSelect} />
     </Card>
   );
 }

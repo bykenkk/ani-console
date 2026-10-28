@@ -2,6 +2,7 @@ import { createElement } from "react";
 import { ResourceNameId, type ListColumn } from "@/components/common";
 import type { ModelDevExecution } from "@/api/modeldev";
 import { formatDateTime } from "@/lib/date";
+import { formatModelDevComputeResources, formatModelDevExecutionDuration } from "@/lib/modeldev";
 
 export function taskColumns(): ListColumn<ModelDevExecution>[] {
   return [
@@ -19,8 +20,7 @@ export function taskColumns(): ListColumn<ModelDevExecution>[] {
     },
     ...(
       [
-        ["kind", "任务类型"],
-        ["compute_state", "计算状态"],
+        ["compute_state", "任务状态"],
         ["delivery_state", "发布状态"],
         ["close_state", "关闭状态"],
         ["resource_state", "资源状态"],
@@ -32,8 +32,22 @@ export function taskColumns(): ListColumn<ModelDevExecution>[] {
       width: 120,
       ellipsis: true,
     })),
-    { title: "当前阶段", dataIndex: "current_step", width: 140, ellipsis: true },
-    { title: "受理时间", dataIndex: "accepted_at", width: 180, render: formatDateTime },
+    { title: "当前步骤", dataIndex: "current_step", width: 140, ellipsis: true },
+    {
+      key: "resources",
+      title: "资源配置",
+      width: 240,
+      ellipsis: true,
+      render: (_, task) => formatModelDevComputeResources(task.compute),
+    },
+    { title: "创建时间", dataIndex: "accepted_at", width: 180, render: formatDateTime },
+    {
+      key: "duration",
+      title: "运行时长",
+      width: 180,
+      ellipsis: true,
+      render: (_, task) => formatModelDevExecutionDuration(task),
+    },
     { title: "截止时间", dataIndex: "deadline_at", width: 180, render: formatDateTime },
   ];
 }
