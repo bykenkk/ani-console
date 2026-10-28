@@ -1,21 +1,11 @@
-import { type InstanceRecord } from "@/api/instances/legacy";
-import { StatusBadge } from "@/components/common";
-import { copyToClipboard } from "@/lib/clipboard";
-import { Button, Descriptions, Space, Typography } from "@arco-design/web-react";
+import type { VirtualMachine } from "@/api/vms";
+import { Button, Descriptions, Space } from "@arco-design/web-react";
+import { vmIsClosed } from "@/lib/vms";
 
-type VmSshAccessProps = {
-  instance: VmInstance;
-  onOpenConsole: () => void;
-};
+type VmSshAccessProps = { vm: VirtualMachine; onOpenConsole: () => void };
 
-type VmInstance = InstanceRecord;
-
-export default function VmSshAccess({ instance, onOpenConsole }: VmSshAccessProps) {
-  const ssh = instance.ssh;
-  const privateIp = instance.network?.private_ip ?? instance.private_ip;
-  const available = instance.access?.ssh_available !== false && ssh?.ready === true;
-  const command = privateIp && ssh ? `ssh -p ${ssh.port} ${ssh.username}@${privateIp}` : "";
-
+export default function VmSshAccess({ vm, onOpenConsole }: VmSshAccessProps) {
+  // TODO(vm-ssh): 新契约未提供 SSH 用户名、端口、密钥和就绪状态，保留字段与入口，补齐后恢复连接命令。
   return (
     <Space direction="vertical" className="w-full">
       <Descriptions
@@ -23,41 +13,19 @@ export default function VmSshAccess({ instance, onOpenConsole }: VmSshAccessProp
         column={1}
         labelStyle={{ width: "120px" }}
         data={[
-          {
-            label: "连接状态",
-            value: (
-              <StatusBadge tone={available ? "success" : "warning"}>
-                {available ? "可连接" : "未就绪"}
-              </StatusBadge>
-            ),
-          },
-          { label: "用户名", value: ssh?.username ?? "-" },
-          {
-            label: "地址",
-            value: privateIp && ssh ? `${privateIp}:${ssh.port}` : "-",
-          },
-          { label: "登录密钥", value: ssh?.key_ref ?? "-" },
+          { label: "连接状态", value: "-" },
+          { label: "用户名", value: "-" },
+          { label: "地址", value: "-" },
+          { label: "登录密钥", value: "-" },
         ]}
       />
-      {command ? (
-        <div>
-          <Typography.Title heading={6} className="mt-0! mb-3!">
-            连接命令
-          </Typography.Title>
-          <pre className="m-0 overflow-auto rounded bg-app--fillsecondary text-sm">{command}</pre>
-        </div>
-      ) : null}
       <Space>
-        <Button
-          type="primary"
-          disabled={!available || !command}
-          onClick={() => {
-            copyToClipboard(command, "SSH 命令");
-          }}
-        >
+        <Button type="primary" disabled title="SSH 连接信息暂不可用">
           复制 SSH 命令
         </Button>
-        <Button onClick={onOpenConsole}>打开控制台</Button>
+        <Button disabled={vmIsClosed(vm) || vm.observedState !== "Running"} onClick={onOpenConsole}>
+          打开控制台
+        </Button>
       </Space>
     </Space>
   );

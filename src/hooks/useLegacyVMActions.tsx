@@ -40,7 +40,11 @@ const BUSY_STATES = new Set<VmInstance["state"]>([
   "deleting",
 ]);
 
-export function useVmActions(onChanged?: (operationId: string) => void, onDeleted?: () => void) {
+// 旧系统操作保留为迁移参考，不接收 Governance VM ID。
+export function useLegacyVMActions(
+  onChanged?: (operationId: string) => void,
+  onDeleted?: () => void,
+) {
   const [dialog, setDialog] = useState<DialogState>();
   const start = useMutation({
     meta: {

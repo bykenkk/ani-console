@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { getInstance, startInstance, type InstanceRecord } from "@/api/instances";
-import type { RowAction } from "@/components/common";
+import { unavailableAction, type RowAction } from "@/components/common/DataTable/RowActions";
 import { openInstanceTerminalWindow } from "@/lib/instances";
 import ContainerStopModal from "@/components/containers/ContainerStopModal";
 import ContainerDeleteModal from "@/components/containers/ContainerDeleteModal";
@@ -70,13 +70,7 @@ export function useContainerActions(onChanged: () => void, onDeleted?: () => voi
       },
     },
     // TODO(container-actions): 当前缺少对应正式契约，入口保持禁用；后端开放后逐项接入，不使用其他实例契约补齐。
-    ...UNAVAILABLE_ACTIONS.map(({ key, label }): RowAction<InstanceRecord> => ({
-      key,
-      label,
-      disabled: () => true,
-      tooltip: "该操作暂未开放",
-      onClick: () => undefined,
-    })),
+    ...UNAVAILABLE_ACTIONS.map(({ key, label }) => unavailableAction<InstanceRecord>(key, label)),
     {
       key: "terminal",
       label: "远程终端",

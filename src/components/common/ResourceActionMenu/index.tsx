@@ -25,6 +25,7 @@ export default function ResourceActionMenu<T>({ record, actions }: ResourceActio
               <Menu.Item
                 key={action.key}
                 disabled={disabled}
+                title={typeof action.title === "function" ? action.title(record) : action.title}
                 style={
                   action.intent === "danger" && !disabled
                     ? { color: "rgb(var(--danger-6))" }

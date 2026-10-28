@@ -94,6 +94,29 @@ export interface CreateVmInput {
 export interface VmChangeInput {
   expected_version: string;
 }
+export interface VmForceStopInput extends VmChangeInput {
+  destructive_confirmation: boolean;
+}
+export interface VmDiskCreateInput extends VmChangeInput {
+  name: string;
+  size_gb: string;
+}
+export interface VmDiskDetachInput extends VmChangeInput {
+  guest_prepared_confirmation: boolean;
+}
+export interface VmMediaSetInput extends VmChangeInput {
+  media_key: string;
+}
+export interface VmBootDeviceInput extends VmChangeInput {
+  boot_device: VmBootDevice;
+}
+export interface VmSnapshotCreateInput extends VmChangeInput {
+  name: string;
+}
+export interface VmSnapshotRestoreInput extends VmChangeInput {
+  preview_digest: string;
+  destructive_confirmation: boolean;
+}
 export interface VmOperation {
   id: string;
   vmId: string;

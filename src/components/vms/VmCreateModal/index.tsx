@@ -1,17 +1,19 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  Alert,
   Checkbox,
   Collapse,
   Form,
   Input,
   InputNumber,
   Modal,
+  Radio,
   Select,
+  Space,
   Switch,
+  Tag,
 } from "@arco-design/web-react";
-import { createVm, getVmDnsDefaults, listVmMedia, type VmInitialDisk, type VmDns } from "@/api/vms";
+import { createVm, listVmMedia, type VmInitialDisk, type VmDns, type VmMedia } from "@/api/vms";
 import type { InstancePreset } from "@/api/instances";
 import InstanceComputePresetSelect from "@/components/instances/InstanceComputeSelect/PresetSelect";
 import VmInitialDiskEditor from "../VmInitialDiskEditor";
@@ -36,6 +38,11 @@ type VmCreateFormValues = {
   password: string;
   ssh_public_key: string;
 };
+const MEDIA_KIND_LABELS: Record<VmMedia["kind"], string> = {
+  DISK_IMAGE: "磁盘镜像",
+  INSTALL_ISO: "安装 ISO",
+  DRIVER_ISO: "驱动 ISO",
+};
 const INITIAL: VmCreateFormValues = {
   name: "",
   media_key: "",
@@ -59,11 +66,6 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
     queryKey: ["vm-media"],
     queryFn: ({ signal }) => listVmMedia(signal),
     meta: { errorNotification: { id: "vm-media", action: "虚拟机介质加载" } },
-  });
-  const dns = useQuery({
-    queryKey: ["vm-dns-defaults"],
-    queryFn: ({ signal }) => getVmDnsDefaults(signal),
-    meta: { errorNotification: { id: "vm-dns-defaults", action: "默认 DNS 加载" } },
   });
   const selected = media.data?.items.find((item) => item.mediaKey === values.media_key);
   const canInitialize =
@@ -130,7 +132,6 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
       }}
       onOk={submit}
       confirmLoading={create.isPending}
-      maskClosable={!create.isPending}
     >
       <Form<VmCreateFormValues>
         form={form}
@@ -161,11 +162,17 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
           <Select
             loading={media.isFetching}
             placeholder="选择磁盘镜像或安装 ISO"
-            options={media.data?.items.map((item) => ({
-              value: item.mediaKey,
-              label: `${item.name} · ${item.osFamily} ${item.osVersion} · ${item.kind}`,
-              disabled: item.kind === "DRIVER_ISO",
-            }))}
+            options={media.data?.items
+              .filter((item) => item.kind === "DISK_IMAGE" || item.kind === "INSTALL_ISO")
+              .map((item) => ({
+                value: item.mediaKey,
+                label: (
+                  <Space size={8}>
+                    <Tag size="small">{MEDIA_KIND_LABELS[item.kind]}</Tag>
+                    <span>{item.name}</span>
+                  </Space>
+                ),
+              }))}
             onChange={() => {
               form.setFieldsValue({
                 initialize_guest: false,
@@ -177,13 +184,6 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
             }}
           />
         </Form.Item>
-        {selected && (
-          <Alert
-            type="info"
-            content={`${selected.architecture} · ${selected.firmware} · 系统盘 ${selected.rootBus} · 网卡 ${selected.nicModel}${selected.driverMediaKey ? ` · 驱动盘 ${selected.driverMediaKey}` : ""}`}
-            className="mb-4"
-          />
-        )}
         <Form.Item
           field="system_disk_size_gb"
           label="系统盘容量 (GB)"
@@ -198,48 +198,44 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
         <Form.Item field="start_after_create" label="创建后开机" triggerPropName="checked">
           <Switch />
         </Form.Item>
-        <Collapse>
-          <Collapse.Item name="disks" header="数据盘">
-            <Form.Item
-              field="data_disks"
-              label="初始数据盘"
-              rules={[
-                {
-                  validator: (disks: VmInitialDisk[] | undefined, cb) =>
-                    cb(
-                      disks?.some((disk) => !disk.name.trim() || !Number(disk.size_gb))
-                        ? "请填写数据盘名称和容量"
-                        : undefined,
-                    ),
-                },
-              ]}
-            >
-              <VmInitialDiskEditor />
-            </Form.Item>
-          </Collapse.Item>
-          <Collapse.Item name="dns" header="DNS">
-            <Form.Item field="dns_mode" label="DNS 模式">
-              <Select
-                options={[
-                  { value: "PLATFORM_DEFAULT", label: "平台默认" },
-                  { value: "CUSTOM", label: "自定义" },
-                ]}
-              />
-            </Form.Item>
-            {values.dns_mode === "CUSTOM" ? (
-              <Form.Item
-                field="nameservers"
-                label="DNS 服务器"
-                extra="填写 1–3 个 IP 地址，以逗号或空格分隔"
-                rules={[{ required: true, message: "请输入 DNS 服务器" }]}
-              >
-                <Input />
-              </Form.Item>
-            ) : (
-              <div>默认 DNS：{dns.data?.nameservers.join(" · ") || "-"}</div>
-            )}
-          </Collapse.Item>
-          {canInitialize && (
+        <Form.Item
+          field="data_disks"
+          label="初始数据盘"
+          rules={[
+            {
+              validator: (disks: VmInitialDisk[] | undefined, cb) =>
+                cb(
+                  disks?.some((disk) => !disk.name.trim() || !Number(disk.size_gb))
+                    ? "请填写数据盘名称和容量"
+                    : undefined,
+                ),
+            },
+          ]}
+        >
+          <VmInitialDiskEditor />
+        </Form.Item>
+        <Form.Item field="dns_mode" label="DNS 模式">
+          <Radio.Group
+            type="button"
+            aria-label="DNS 模式"
+            options={[
+              { value: "PLATFORM_DEFAULT", label: "平台默认" },
+              { value: "CUSTOM", label: "自定义" },
+            ]}
+          />
+        </Form.Item>
+        {values.dns_mode === "CUSTOM" && (
+          <Form.Item
+            field="nameservers"
+            label="DNS 服务器"
+            extra="填写 1–3 个 IP 地址，以逗号或空格分隔"
+            rules={[{ required: true, message: "请输入 DNS 服务器" }]}
+          >
+            <Input />
+          </Form.Item>
+        )}
+        {canInitialize && (
+          <Collapse>
             <Collapse.Item name="guest" header="来宾系统初始化">
               <Form.Item field="initialize_guest" triggerPropName="checked">
                 <Checkbox>初始化登录用户</Checkbox>
@@ -278,8 +274,8 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
                 </>
               )}
             </Collapse.Item>
-          )}
-        </Collapse>
+          </Collapse>
+        )}
       </Form>
     </Modal>
   );

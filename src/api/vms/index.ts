@@ -1,6 +1,6 @@
 import { coreRequest } from "@/api/request";
 import { runIdempotentRequest } from "@/api/idempotency";
-import { createIdempotencyScope } from "@/lib/idempotency";
+import { createIdempotencyScope, type IdempotencyScope } from "@/lib/idempotency";
 import type { InstancePresetListParams, InstancePresetListResponse } from "@/api/instances";
 import type {
   CreateVmInput,
@@ -14,12 +14,33 @@ import type {
   VmSnapshot,
   VmRestorePreview,
   VmMediaSlot,
-  VmBootDevice,
+  VmForceStopInput,
+  VmDiskCreateInput,
+  VmDiskDetachInput,
+  VmMediaSetInput,
+  VmBootDeviceInput,
+  VmSnapshotCreateInput,
+  VmSnapshotRestoreInput,
   VmConsoleSession,
 } from "./types";
 
 const createScope = createIdempotencyScope("vm-create", ["POST"]);
-const changeScope = createIdempotencyScope("vm-change", []);
+const startScope = createIdempotencyScope("vm-start", ["POST"]);
+const stopScope = createIdempotencyScope("vm-stop", ["POST"]);
+const restartScope = createIdempotencyScope("vm-restart", ["POST"]);
+const forceStopScope = createIdempotencyScope("vm-force-stop", ["POST"]);
+// VM DELETE 契约明确要求 body 内的 idempotency_key 和 expected_version。
+const deleteScope = createIdempotencyScope("vm-delete", ["DELETE"]);
+const createDiskScope = createIdempotencyScope("vm-disk-create", ["POST"]);
+const attachDiskScope = createIdempotencyScope("vm-disk-attach", ["POST"]);
+const detachDiskScope = createIdempotencyScope("vm-disk-detach", ["POST"]);
+const deleteDiskScope = createIdempotencyScope("vm-disk-delete", ["DELETE"]);
+const setMediaScope = createIdempotencyScope("vm-media-set", ["PUT"]);
+const ejectMediaScope = createIdempotencyScope("vm-media-eject", ["DELETE"]);
+const bootScope = createIdempotencyScope("vm-boot", ["PUT"]);
+const createSnapshotScope = createIdempotencyScope("vm-snapshot-create", ["POST"]);
+const deleteSnapshotScope = createIdempotencyScope("vm-snapshot-delete", ["DELETE"]);
+const restoreSnapshotScope = createIdempotencyScope("vm-snapshot-restore", ["POST"]);
 const consoleScope = createIdempotencyScope("vm-console", ["POST"]);
 const vmPath = (id: string) => `/virtual-machines/${encodeURIComponent(id)}`;
 const diskPath = (id: string, diskId: string) =>
@@ -42,6 +63,7 @@ export function listVmPresets(params: InstancePresetListParams = {}, signal?: Ab
   });
 }
 export function listVmMedia(signal?: AbortSignal) {
+  // TODO(pagination-migration): 介质目录暂为无分页 items；后端补齐正式分页后迁移选项加载。
   return coreRequest<{ items: VmMedia[] }>("/virtual-machine-media", { method: "GET", signal });
 }
 export function getVmDnsDefaults(signal?: AbortSignal) {
@@ -56,36 +78,35 @@ export function createVm(input: CreateVmInput): Promise<void> {
   });
 }
 function changeVm(
+  scope: IdempotencyScope,
   path: string,
   method: "POST" | "PUT" | "DELETE",
   input: VmChangeInput & object,
+  resourceIds: string[],
 ): Promise<void> {
   return runIdempotentRequest(
-    changeScope,
+    scope,
     input,
     async (data) => {
       await coreRequest(path, { method, data: { data } });
     },
-    [method, path],
+    resourceIds,
   );
 }
 export function startVm(id: string, input: VmChangeInput) {
-  return changeVm(`${vmPath(id)}/start`, "POST", input);
+  return changeVm(startScope, `${vmPath(id)}/start`, "POST", input, [id]);
 }
 export function stopVm(id: string, input: VmChangeInput) {
-  return changeVm(`${vmPath(id)}/stop`, "POST", input);
+  return changeVm(stopScope, `${vmPath(id)}/stop`, "POST", input, [id]);
 }
 export function restartVm(id: string, input: VmChangeInput) {
-  return changeVm(`${vmPath(id)}/restart`, "POST", input);
+  return changeVm(restartScope, `${vmPath(id)}/restart`, "POST", input, [id]);
 }
-export function forceStopVm(
-  id: string,
-  input: VmChangeInput & { destructive_confirmation: boolean },
-) {
-  return changeVm(`${vmPath(id)}/force-stop`, "POST", input);
+export function forceStopVm(id: string, input: VmForceStopInput) {
+  return changeVm(forceStopScope, `${vmPath(id)}/force-stop`, "POST", input, [id]);
 }
 export function deleteVm(id: string, input: VmChangeInput) {
-  return changeVm(vmPath(id), "DELETE", input);
+  return changeVm(deleteScope, vmPath(id), "DELETE", input, [id]);
 }
 export function getVmOperation(id: string, operationId: string, signal?: AbortSignal) {
   return coreRequest<VmOperation>(`${vmPath(id)}/operations/${encodeURIComponent(operationId)}`, {
@@ -94,48 +115,54 @@ export function getVmOperation(id: string, operationId: string, signal?: AbortSi
   });
 }
 export function listVmDisks(id: string, signal?: AbortSignal) {
+  // TODO(pagination-migration): VM 磁盘暂按无分页 items 查询；后端补齐后迁移，不伪造 total。
   return coreRequest<{ items: VmDisk[] }>(`${vmPath(id)}/disks`, { method: "GET", signal });
 }
-export function createVmDisk(id: string, input: VmChangeInput & { name: string; size_gb: string }) {
-  return changeVm(`${vmPath(id)}/disks`, "POST", input);
+export function createVmDisk(id: string, input: VmDiskCreateInput) {
+  return changeVm(createDiskScope, `${vmPath(id)}/disks`, "POST", input, [id]);
 }
 export function attachVmDisk(id: string, diskId: string, input: VmChangeInput) {
-  return changeVm(`${diskPath(id, diskId)}/attach`, "POST", input);
+  return changeVm(attachDiskScope, `${diskPath(id, diskId)}/attach`, "POST", input, [id, diskId]);
 }
-export function detachVmDisk(
-  id: string,
-  diskId: string,
-  input: VmChangeInput & { guest_prepared_confirmation: boolean },
-) {
-  return changeVm(`${diskPath(id, diskId)}/detach`, "POST", input);
+export function detachVmDisk(id: string, diskId: string, input: VmDiskDetachInput) {
+  return changeVm(detachDiskScope, `${diskPath(id, diskId)}/detach`, "POST", input, [id, diskId]);
 }
 export function deleteVmDisk(id: string, diskId: string, input: VmChangeInput) {
-  return changeVm(diskPath(id, diskId), "DELETE", input);
+  return changeVm(deleteDiskScope, diskPath(id, diskId), "DELETE", input, [id, diskId]);
 }
-export function setVmMedia(
-  id: string,
-  slot: VmMediaSlot,
-  input: VmChangeInput & { media_key: string },
-) {
-  return changeVm(`${vmPath(id)}/media/${encodeURIComponent(slot)}`, "PUT", input);
+export function setVmMedia(id: string, slot: VmMediaSlot, input: VmMediaSetInput) {
+  return changeVm(setMediaScope, `${vmPath(id)}/media/${encodeURIComponent(slot)}`, "PUT", input, [
+    id,
+    slot,
+  ]);
 }
 export function ejectVmMedia(id: string, slot: VmMediaSlot, input: VmChangeInput) {
-  return changeVm(`${vmPath(id)}/media/${encodeURIComponent(slot)}`, "DELETE", input);
+  return changeVm(
+    ejectMediaScope,
+    `${vmPath(id)}/media/${encodeURIComponent(slot)}`,
+    "DELETE",
+    input,
+    [id, slot],
+  );
 }
-export function setVmBootDevice(id: string, input: VmChangeInput & { boot_device: VmBootDevice }) {
-  return changeVm(`${vmPath(id)}/boot`, "PUT", input);
+export function setVmBootDevice(id: string, input: VmBootDeviceInput) {
+  return changeVm(bootScope, `${vmPath(id)}/boot`, "PUT", input, [id]);
 }
 export function listVmSnapshots(id: string, signal?: AbortSignal) {
+  // TODO(pagination-migration): VM 快照暂按无分页 items 查询；后端补齐后迁移，不伪造 total。
   return coreRequest<{ items: VmSnapshot[] }>(`${vmPath(id)}/snapshots`, { method: "GET", signal });
 }
 export function getVmSnapshot(id: string, snapshotId: string, signal?: AbortSignal) {
   return coreRequest<VmSnapshot>(snapshotPath(id, snapshotId), { method: "GET", signal });
 }
-export function createVmSnapshot(id: string, input: VmChangeInput & { name: string }) {
-  return changeVm(`${vmPath(id)}/snapshots`, "POST", input);
+export function createVmSnapshot(id: string, input: VmSnapshotCreateInput) {
+  return changeVm(createSnapshotScope, `${vmPath(id)}/snapshots`, "POST", input, [id]);
 }
 export function deleteVmSnapshot(id: string, snapshotId: string, input: VmChangeInput) {
-  return changeVm(snapshotPath(id, snapshotId), "DELETE", input);
+  return changeVm(deleteSnapshotScope, snapshotPath(id, snapshotId), "DELETE", input, [
+    id,
+    snapshotId,
+  ]);
 }
 export function previewVmRestore(id: string, snapshotId: string, signal?: AbortSignal) {
   // 只读预览不使用幂等键；提交恢复必须使用该预览的 version 和 digest。
@@ -144,12 +171,11 @@ export function previewVmRestore(id: string, snapshotId: string, signal?: AbortS
     { method: "POST", data: { data: {} }, signal },
   );
 }
-export function restoreVmSnapshot(
-  id: string,
-  snapshotId: string,
-  input: VmChangeInput & { preview_digest: string; destructive_confirmation: boolean },
-) {
-  return changeVm(`${snapshotPath(id, snapshotId)}/restore`, "POST", input);
+export function restoreVmSnapshot(id: string, snapshotId: string, input: VmSnapshotRestoreInput) {
+  return changeVm(restoreSnapshotScope, `${snapshotPath(id, snapshotId)}/restore`, "POST", input, [
+    id,
+    snapshotId,
+  ]);
 }
 export async function createVmConsoleSession(id: string, signal?: AbortSignal) {
   const vm = await getVm(id, signal);

@@ -1,4 +1,4 @@
-import { createInstanceConsoleSession } from "@/api/instances/legacy";
+import { createVmConsoleSession } from "@/api/vms";
 import { StatusBadge, type StatusBadgeTone } from "@/components/common";
 import { useEffect, useRef, useState } from "react";
 import RFB from "@novnc/novnc/lib/rfb";
@@ -11,11 +11,6 @@ import { withId } from "@/lib/id";
 
 type InstanceVncProps = {
   instanceId: string;
-  protocol?: "vnc" | "novnc";
-  createSession?: (
-    id: string,
-    signal: AbortSignal,
-  ) => Promise<{ connect_url: string; expires_at: string }>;
 };
 
 type ConsoleStatus = "connecting" | "connected" | "disconnected" | "error" | "expired";
@@ -44,11 +39,7 @@ function applyViewMode(rfb: RFB, mode: ViewMode) {
   rfb.focusOnClick = true;
 }
 
-export default function InstanceVnc({
-  instanceId,
-  protocol = "novnc",
-  createSession,
-}: InstanceVncProps) {
+export default function InstanceVnc({ instanceId }: InstanceVncProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const rfbRef = useRef<RFB | null>(null);
   const expiresAtRef = useRef<string | null>(null);
@@ -79,13 +70,11 @@ export default function InstanceVnc({
       if (disposed) return;
 
       try {
-        const data = createSession
-          ? await createSession(instanceId, abortController.signal)
-          : await createInstanceConsoleSession(instanceId, protocol, abortController.signal);
-        const connectUrl = data.connect_url;
+        const data = await createVmConsoleSession(instanceId, abortController.signal);
+        const connectUrl = data.wsUrl;
         if (!connectUrl) throw new Error("控制台连接地址为空");
-        expiresAtRef.current = data?.expires_at ?? null;
-        if (isExpired(data?.expires_at)) {
+        expiresAtRef.current = data.expiresAt ?? null;
+        if (isExpired(data.expiresAt)) {
           throw new Error("控制台会话已过期，请重新申请");
         }
         if (disposed) return;
@@ -153,7 +142,7 @@ export default function InstanceVnc({
       rfbRef.current = null;
       rfb?.disconnect();
     };
-  }, [instanceId, protocol, createSession, reconnectKey]);
+  }, [instanceId, reconnectKey]);
 
   const meta = STATUS_META[status];
   const canReconnect = status === "error" || status === "disconnected" || status === "expired";

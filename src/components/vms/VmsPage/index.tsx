@@ -9,7 +9,7 @@ import {
   type ListColumn,
 } from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
-import { useVmListActions } from "@/hooks/useVmListActions";
+import { useVMActions } from "@/hooks/useVMActions";
 import VmCreateModal from "../VmCreateModal";
 
 export default function VmsPage() {
@@ -20,14 +20,24 @@ export default function VmsPage() {
     queryFn: ({ signal }) => listVms({ page, pageSize }, signal),
     meta: { errorNotification: { id: "vms", action: "云主机列表加载" } },
   });
-  const { actions } = useVmListActions();
+  const { actions, dialogNode } = useVMActions(query.data?.items ?? []);
+  // TODO(vm-filter): 新列表仅支持分页；状态与名称 / ID 搜索保留禁用，待正式筛选契约补齐。
+  const statusTabs = [
+    { value: "all", label: "全部" },
+    { value: "pending", label: "等待中", disabled: true },
+    { value: "provisioning", label: "配置中", disabled: true },
+    { value: "starting", label: "启动中", disabled: true },
+    { value: "running", label: "运行中", disabled: true },
+    { value: "stopping", label: "停止中", disabled: true },
+    { value: "stopped", label: "已停止", disabled: true },
+    { value: "failed", label: "异常", disabled: true },
+  ];
   const columns: ListColumn<VirtualMachine>[] = [
     {
       key: "name",
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      // TODO(vm-detail): 详情仍使用旧 ANI 契约，待统一组件时迁移。
       render: (_, vm) => <ResourceNameId type="vm-instance" name={vm.name} id={vm.id} />,
     },
     {
@@ -38,33 +48,44 @@ export default function VmsPage() {
         <StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />
       ),
     },
-    { key: "desired", title: "期望状态", width: 120, dataIndex: "desiredState" },
     {
-      key: "cpu",
-      title: "CPU / 内存",
+      key: "spec",
+      title: "规格",
       width: 170,
-      render: (_, vm) => `${Number(vm.cpuMillis) / 1000} CPU / ${vm.memoryMib} MiB`,
+      render: (_, vm) =>
+        vm.cpuMillis && vm.memoryMib
+          ? `${Number(vm.cpuMillis) / 1000}C / ${Number(vm.memoryMib) / 1024} GiB`
+          : "-",
     },
     {
-      key: "os",
-      title: "操作系统",
-      width: 150,
-      render: (_, vm) => `${vm.osFamily} ${vm.osVersion}`,
+      key: "systemDiskSizeGb",
+      title: "系统盘",
+      width: 140,
+      render: (_, vm) => (vm.systemDiskSizeGb ? `${vm.systemDiskSizeGb} GB` : "-"),
     },
+    { key: "image", title: "镜像", width: 180, dataIndex: "mediaKey", ellipsis: true },
     {
       key: "ip",
       title: "IP 地址",
       width: 180,
-      render: (_, vm) => vm.addresses?.map((item) => item.address).join(" · ") || "-",
+      ellipsis: true,
+      render: (_, vm) =>
+        vm.addresses
+          ?.map((item) => item.address)
+          .filter(Boolean)
+          .join(" · ") || "-",
     },
-    { key: "reason", title: "原因", width: 220, dataIndex: "reason", ellipsis: true },
+    // TODO(vm-list-fields): 新契约缺少节点、终止保护和创建时间，保留原列默认占位。
+    { key: "node", title: "节点", width: 150 },
+    { key: "protection", title: "终止保护", width: 120 },
+    { key: "createdAt", title: "创建时间", width: 180 },
   ];
   return (
     <>
       <ListPageFrame
         header={{
           iconClassName: "icon-yunzhuji",
-          title: "云主机 VM",
+          title: "云主机",
           subtitle: "创建虚拟机，管理开关机、重启和 VNC 控制台",
           actions: [
             {
@@ -76,7 +97,17 @@ export default function VmsPage() {
             },
           ],
         }}
+        tabs={{ items: statusTabs, value: "all", onChange: () => undefined }}
         toolbar={{
+          search: {
+            disabled: true,
+            fields: [{ value: "keyword", label: "名称 / ID" }],
+            field: "keyword",
+            value: "",
+            placeholder: "搜索云主机名称或 ID",
+            onFieldChange: () => undefined,
+            onChange: () => undefined,
+          },
           refresh: {
             label: "刷新",
             spinning: query.isFetching,
@@ -91,7 +122,7 @@ export default function VmsPage() {
           columns={columns}
           rowActions={actions}
           loading={query.isLoading}
-          tableLabel="云主机 VM 列表"
+          tableLabel="云主机列表"
           pagination={{
             page,
             pageSize,
@@ -110,6 +141,7 @@ export default function VmsPage() {
           }}
         />
       )}
+      {dialogNode}
     </>
   );
 }

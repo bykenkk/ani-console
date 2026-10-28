@@ -34,11 +34,23 @@ type RowActionBase<T> = {
   visible?: (record: T) => boolean;
   disabled?: (record: T) => boolean;
   loading?: (record: T) => boolean;
+  title?: ActionValue<T, string | undefined>;
   tooltip?: ActionValue<T, string | undefined>;
   onClick: (record: T) => void | Promise<unknown>;
 };
 
 export type RowAction<T> = RowActionBase<T> & (StaticActionLabel | DynamicActionLabel<T>);
+
+// oxlint-disable-next-line react/only-export-components -- 行操作工厂按约定与 RowAction 统一维护。
+export function unavailableAction<T>(key: string, label: string): RowAction<T> {
+  return {
+    key,
+    label,
+    disabled: () => true,
+    title: "该操作暂未开放",
+    onClick: () => undefined,
+  };
+}
 
 const MORE_ACTIONS_LABEL = "更多操作";
 
@@ -101,6 +113,7 @@ export function ConfiguredDataTableRowActions<T>({
         <Menu.Item
           key={action.key}
           disabled={action.disabled?.(record) || action.loading?.(record)}
+          title={resolveActionValue(action.title, record)}
           className={getMenuItemClassName(action.intent)}
         >
           {renderTooltip(action, record, renderActionLabel(action, record))}
