@@ -1,10 +1,16 @@
 import { useEffect, useRef, useState } from "react";
 import { Button, Card, Form, Space } from "@arco-design/web-react";
-import type { ModelDevImplementation, ModelDevInputVersion } from "@/api/modeldev";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  createTrainingExecution,
+  type ModelDevImplementation,
+  type ModelDevInputVersion,
+} from "@/api/modeldev";
 import type { InstancePreset } from "@/api/instances";
 import WizardModal from "@/components/common/WizardModal";
 import ModelDevParameterFields from "@/components/ai-training/ModelDevParameterFields";
 import { validateForm } from "@/lib/form";
+import { buildModelDevParameters } from "@/lib/modeldev";
 import TrainingTaskSummary from "./TrainingTaskSummary";
 import TrainingTaskBasicFields from "./TrainingTaskBasicFields";
 
@@ -38,7 +44,11 @@ const basicFields: TrainingFieldKey[] = [
   "dataset_version_id",
 ];
 
-export default function TrainingTaskCreateModal({ onCancel }: TrainingTaskCreateModalProps) {
+export default function TrainingTaskCreateModal({
+  onCancel,
+  onCreated,
+}: TrainingTaskCreateModalProps) {
+  const qc = useQueryClient();
   const [form] = Form.useForm<TrainingTaskCreateFormValues, TrainingFieldValue, TrainingFieldKey>();
   const [values, setValues] = useState(initialValues);
   const [implementation, setImplementation] = useState<ModelDevImplementation>();
@@ -48,6 +58,24 @@ export default function TrainingTaskCreateModal({ onCancel }: TrainingTaskCreate
   const [errorField, setErrorField] = useState<TrainingFieldKey>();
   const validationLock = useRef(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const create = useMutation({
+    mutationFn: createTrainingExecution,
+    retry: false,
+    meta: {
+      feedback: {
+        channel: "message",
+        action: "创建训练任务",
+        successText: "训练任务创建已提交",
+        errorFallback: "创建失败，请稍后重试",
+      },
+    },
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["training-executions"] });
+      // TODO(training-task): 后续统一接入创建任务跟踪，当前受理成功后关闭表单。
+      onCreated?.();
+      onCancel();
+    },
+  });
   const parameterFields = (implementation?.parameter_rules ?? []).map(
     (_, index): TrainingFieldKey => `parameters[${index}]`,
   );
@@ -64,16 +92,56 @@ export default function TrainingTaskCreateModal({ onCancel }: TrainingTaskCreate
   const close = () => {
     if (!validationLock.current) onCancel();
   };
-  const nextStep = async () => {
+  const nextStep = async (submit = false) => {
     if (validationLock.current) return;
     validationLock.current = true;
     setValidating(true);
-    const fields = step === 1 ? basicFields : [...basicFields, ...parameterFields];
+    const fields = !submit && step === 1 ? basicFields : [...basicFields, ...parameterFields];
     try {
-      await validateForm({
-        validate: () => form.validate(fields),
+      const submitted = await validateForm({
+        validate: async () => {
+          const submitted = { ...initialValues, ...(await form.validate(fields)) };
+          if (submit) {
+            const errors: Partial<Record<TrainingFieldKey, { error: { message: string } }>> = {};
+            if (
+              !implementation ||
+              implementation.implementation_id !== submitted.implementation_id ||
+              !implementation.available ||
+              implementation.kind !== "GENERAL_TRAINING"
+            )
+              errors.implementation_id = { error: { message: "请选择当前可用的训练方法" } };
+            if (
+              !submitted.preset?.enabled ||
+              !submitted.preset.selectable ||
+              (implementation?.supported_device_modes?.length &&
+                !implementation.supported_device_modes.includes(submitted.preset.compute_type))
+            )
+              errors.preset = { error: { message: "请选择训练方法支持的可用算力规格" } };
+            if (
+              !inputVersion ||
+              inputVersion.input_version_id !== submitted.dataset_version_id ||
+              inputVersion.state !== "READY" ||
+              inputVersion.format !== "CSV"
+            )
+              errors.dataset_version_id = { error: { message: "请选择已就绪的 CSV 数据集版本" } };
+            if (Object.keys(errors).length) {
+              form.setFields(errors);
+              throw new Error("训练提交选项校验失败");
+            }
+          }
+          return submitted;
+        },
       });
-      changeStep(step + 1);
+      if (submit && implementation && submitted.preset) {
+        await create.mutateAsync({
+          name: submitted.name,
+          kind: "GENERAL_TRAINING",
+          implementation_id: submitted.implementation_id,
+          compute_preset_id: submitted.preset.id,
+          dataset_version_id: submitted.dataset_version_id,
+          parameters: buildModelDevParameters(implementation, submitted.parameters),
+        });
+      } else if (!submit) changeStep(step + 1);
     } catch {
       const errors = form.getFieldsError();
       const field = fields.find((key) => errors[key]);
@@ -108,12 +176,11 @@ export default function TrainingTaskCreateModal({ onCancel }: TrainingTaskCreate
             </Button>
           )}
           {step < steps.length ? (
-            <Button type="primary" loading={validating} onClick={nextStep}>
+            <Button type="primary" loading={validating} onClick={() => nextStep()}>
               下一步
             </Button>
           ) : (
-            // TODO(modeldev-create): 创建提交暂缓；恢复时使用新实现/算力目录及 parameters，整数与 timeout_seconds 按第 7 节使用 JSON 数字。
-            <Button type="primary" disabled>
+            <Button type="primary" loading={validating} onClick={() => nextStep(true)}>
               创建
             </Button>
           )}

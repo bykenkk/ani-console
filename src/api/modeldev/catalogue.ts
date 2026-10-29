@@ -7,7 +7,20 @@ import type {
   ModelDevInputVersionListParams,
   ModelDevInputVersionListResponse,
   ModelDevInputVersion,
+  CheckFineTuningReadinessInput,
+  FineTuningReadiness,
 } from "./types";
+
+/** 只检查源模型和所选运行时，不创建执行、不分配算力；该 POST 未声明幂等字段。 */
+export function checkFineTuningReadiness(
+  input: CheckFineTuningReadinessInput,
+  signal?: AbortSignal,
+): Promise<FineTuningReadiness> {
+  return coreRequest<FineTuningReadiness, CheckFineTuningReadinessInput>(
+    "/modeldev/finetuning/readiness/check",
+    { method: "POST", data: input, signal },
+  );
+}
 
 export function listModelDevImplementations(
   params: ModelDevImplementationListParams,

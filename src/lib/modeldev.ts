@@ -2,6 +2,10 @@ import type {
   ModelDevExecution,
   ModelDevInputVersion,
   ModelDevParameterRule,
+  ModelDevImplementation,
+  TrainingParameters,
+  FineTuningParameters,
+  FineTuningReadiness,
 } from "@/api/modeldev";
 import type { InstancePreset } from "@/api/instances";
 import { parseDateTime } from "@/lib/date";
@@ -60,8 +64,8 @@ export function getModelDevParameterError(
       return `必须小于 ${rule.maximum.value}`;
   }
   if (rule.type === "DECIMAL") {
-    if (!/^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(value) || !Number.isFinite(Number(value)))
-      return "请输入普通十进制小数，不支持科学计数法";
+    if (!/^(0|[1-9][0-9]*)(\.[0-9]+)?$/.test(value) || !Number.isFinite(Number(value)))
+      return "请输入完整十进制数，例如 0.0001；不支持科学计数法";
     if (value.length > 32) return "最多输入 32 个字符";
     const decimal = Number(value);
     if (rule.minimum && decimal < Number(rule.minimum.value))
@@ -79,6 +83,40 @@ export function getModelDevParameterError(
       return "请输入可表示的大于 0 的小数";
     // TODO(modeldev-rules): 联调核对目录的开闭区间和可编辑规则；模型相关上限仍由后端校验。
   }
+}
+
+/** 留空交给后端采用默认值；仅显式整数转为 JSON number，小数保留原字符串。 */
+export function buildModelDevParameters(
+  implementation: ModelDevImplementation,
+  values: string[],
+): TrainingParameters & FineTuningParameters {
+  return Object.fromEntries(
+    (implementation.parameter_rules ?? []).flatMap((rule, index) => {
+      const value = values[index];
+      if (rule.editable === false || value === undefined || value === "") return [];
+      return [[rule.name, rule.type === "INTEGER" ? Number(value) : value]];
+    }),
+  );
+}
+
+export function getFineTuningReadinessError(
+  readiness: FineTuningReadiness | undefined,
+  checking: boolean,
+): string | undefined {
+  if (checking) return "请等待模型适用性检查完成";
+  if (!readiness) return "请先完成模型适用性检查";
+  if (readiness.assessment === "ELIGIBLE") return;
+  if (readiness.assessment === "TEMPLATE_REQUIRED") return "请选择微调模板并完成检查";
+  const reasons: Record<string, string> = {
+    BASE_MODEL_INVALID: "模型文件不完整或格式不符合微调要求",
+    BASE_MODEL_UNSUPPORTED: "当前微调运行时不支持该模型",
+    CONTEXT_LIMIT_UNKNOWN: "无法确定该模型的最大序列长度",
+    CONTEXT_LIMIT_EXCEEDED: "最大序列长度超过模型支持范围",
+    FINETUNING_TEMPLATE_UNSUPPORTED: "所选模板不受当前微调运行时支持",
+    CONTENT_LIMIT_EXCEEDED: "模型内容超过当前处理上限",
+    STRUCTURE_LIMIT_EXCEEDED: "模型文件结构超过当前处理上限",
+  };
+  return reasons[readiness.reason] || "当前模型不支持所选微调配置";
 }
 
 export function formatModelDevInputVersion(version: ModelDevInputVersion): string {

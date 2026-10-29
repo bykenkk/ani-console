@@ -1,5 +1,9 @@
 import type { CreateFineTuningFormValues } from "../index";
-import type { ModelDevImplementation, ModelDevInputVersion } from "@/api/modeldev";
+import type {
+  ModelDevImplementation,
+  ModelDevInputVersion,
+  FineTuningReadiness,
+} from "@/api/modeldev";
 import type { InstancePreset } from "@/api/instances";
 import type { Model, ModelVersion } from "@/api/models";
 import ModelDevSummary from "@/components/ai-training/ModelDevSummary";
@@ -15,6 +19,7 @@ type FineTuningSummaryProps = {
   baseModel?: Model;
   targetModel?: Model;
   inputVersion?: ModelDevInputVersion;
+  readiness?: FineTuningReadiness;
 };
 
 export default function FineTuningSummary({
@@ -25,6 +30,7 @@ export default function FineTuningSummary({
   baseModel,
   targetModel,
   inputVersion,
+  readiness,
 }: FineTuningSummaryProps) {
   const basicInfo = [
     { label: "名称", value: values.name },
@@ -42,6 +48,14 @@ export default function FineTuningSummary({
     { label: "算力规格", value: computePreset?.name ?? "-" },
     { label: "资源配置", value: formatModelDevComputeResources(computePreset) },
     { label: "微调技术", value: implementation?.name ?? "-" },
+    {
+      label: "微调模板",
+      value:
+        values.finetuning_template ||
+        readiness?.template_plan?.template_id ||
+        (readiness?.template_plan?.mode === "TOKENIZER_NATIVE" ? "模型自带模板" : "-"),
+    },
+    { label: "模型最大序列长度", value: readiness?.context_limit || "-" },
     {
       label: "数据集版本",
       value: inputVersion ? formatModelDevInputVersion(inputVersion) : values.dataset || "-",

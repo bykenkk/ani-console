@@ -72,7 +72,10 @@ export default function TrainingTasksPage() {
         />
       </ListPageFrame>
       {createVisible && (
-        <TrainingTaskCreateModal onCancel={() => setCreateVisible(false)} onCreated={refresh} />
+        <TrainingTaskCreateModal
+          onCancel={() => setCreateVisible(false)}
+          onCreated={paging.resetPagination}
+        />
       )}
     </>
   );

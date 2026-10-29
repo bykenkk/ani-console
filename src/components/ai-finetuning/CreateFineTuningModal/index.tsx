@@ -14,6 +14,8 @@ import FineTuningBasicFields from "./FineTuningBasicFields";
 import ModelDevParameterFields from "@/components/ai-training/ModelDevParameterFields";
 import FineTuningSummary from "./FineTuningSummary";
 import { buildFineTuningParameters } from "./utils";
+import { useFineTuningReadiness } from "@/hooks/useFineTuningReadiness";
+import FineTuningReadinessFields from "./FineTuningReadinessFields";
 
 type CreateFineTuningModalProps = { onCancel: () => void };
 
@@ -28,11 +30,21 @@ export type CreateFineTuningFormValues = {
   newModelName: string;
   dataset: string;
   parameters: string[];
+  finetuning_template: string;
 };
 
 const STEP_TITLES = ["基础信息", "参数配置", "摘要信息"];
 const STEP_FIELDS: (keyof CreateFineTuningFormValues)[][] = [
-  ["name", "baseModelId", "baseModelVersionId", "preset", "method", "dataset", "registrationMode"],
+  [
+    "name",
+    "baseModelId",
+    "baseModelVersionId",
+    "preset",
+    "method",
+    "dataset",
+    "registrationMode",
+    "finetuning_template",
+  ],
   [],
 ];
 
@@ -47,6 +59,7 @@ const INITIAL_VALUES: CreateFineTuningFormValues = {
   newModelName: "",
   dataset: "",
   parameters: [],
+  finetuning_template: "",
 };
 
 type FineTuningFieldKey = keyof CreateFineTuningFormValues | `parameters[${number}]`;
@@ -70,6 +83,28 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
   const [errorField, setErrorField] = useState<FineTuningFieldKey>();
   const scrollRef = useRef<HTMLDivElement>(null);
   const validationLock = useRef(false);
+  const readinessInput =
+    baseVersion?.id === values.baseModelVersionId &&
+    baseVersion.status.toLowerCase() === "ready" &&
+    values.preset?.enabled &&
+    values.preset.selectable &&
+    implementation?.available &&
+    implementation.implementation_id === values.method
+      ? {
+          base_model_version_id: values.baseModelVersionId,
+          compute_preset_id: values.preset.id,
+          ...(values.finetuning_template
+            ? { finetuning_template: values.finetuning_template }
+            : {}),
+        }
+      : undefined;
+  const readiness = useFineTuningReadiness(readinessInput);
+  const assessment = readiness.isError ? undefined : readiness.data;
+  useEffect(() => {
+    if (readiness.isFetching || assessment?.assessment === "ELIGIBLE") {
+      form.setFields({ finetuning_template: { error: undefined } });
+    }
+  }, [form, readiness.isFetching, assessment?.assessment]);
   const create = useMutation({
     mutationFn: createFineTuningExecution,
     retry: false,
@@ -99,6 +134,10 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
   });
   const changeBaseVersion = useCallback(
     (id: string, selected?: ModelVersion) => {
+      if (id !== form.getFieldValue("baseModelVersionId")) {
+        form.clearFields(["finetuning_template"]);
+        setValues((current) => ({ ...current, finetuning_template: "" }));
+      }
       form.setFieldValue("baseModelVersionId", id);
       setValues((current) => ({ ...current, baseModelVersionId: id }));
       setBaseVersion(selected);
@@ -184,6 +223,9 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
               ? { new_model_name: submitted.newModelName }
               : {}),
           parameters: buildFineTuningParameters(implementation, submitted.parameters),
+          ...(submitted.finetuning_template
+            ? { finetuning_template: submitted.finetuning_template }
+            : {}),
         });
       } else if (!submit) changeStep(step + 1);
     } catch {
@@ -258,6 +300,15 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
             reset.baseModelVersionId = "";
             setBaseVersion(undefined);
           }
+          if (
+            "baseModelId" in changed ||
+            "baseModelVersionId" in changed ||
+            "method" in changed ||
+            ("preset" in changed && next.preset?.id !== values.preset?.id)
+          ) {
+            form.clearFields(["finetuning_template"]);
+            reset.finetuning_template = "";
+          }
           if ("registrationMode" in changed) {
             form.clearFields(["targetModelId", "newModelName"]);
             reset.targetModelId = "";
@@ -277,12 +328,18 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
             onTargetModelSelect={setTargetModel}
             onBaseVersionChange={changeBaseVersion}
           />
+          <FineTuningReadinessFields
+            readiness={assessment}
+            checking={readiness.isFetching}
+            enabled={!!readinessInput}
+          />
         </div>
         <div hidden={step !== 1}>
           <Card bordered={false}>
             <ModelDevParameterFields
               key={implementation?.implementation_id}
               implementation={implementation}
+              contextLimit={assessment?.context_limit}
             />
           </Card>
         </div>
@@ -296,6 +353,7 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
           baseModel={baseModel}
           targetModel={targetModel}
           inputVersion={inputVersion}
+          readiness={assessment}
         />
       )}
     </WizardModal>

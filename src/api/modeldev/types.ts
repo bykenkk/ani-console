@@ -2,6 +2,24 @@ import type { PageParams } from "@/api/types";
 import type { ComputeType } from "@/api/instances";
 
 /** 创建接口使用严格 JSON Intent：整数为 JSON 数字，小数为非指数十进制字符串。 */
+export interface TrainingParameters {
+  learning_rate?: string;
+  epochs?: number;
+  batch_size?: number;
+  seed?: number;
+}
+export interface CreateTrainingInput {
+  name: string;
+  kind: "GENERAL_TRAINING";
+  implementation_id: string;
+  compute_preset_id: string;
+  dataset_version_id: string;
+  parameters: TrainingParameters;
+  timeout_seconds?: number;
+}
+export interface CreateTrainingRequest extends CreateTrainingInput {
+  idempotency_key: string;
+}
 export interface FineTuningParameters {
   learning_rate?: string;
   max_steps?: number;
@@ -24,6 +42,7 @@ export interface CreateFineTuningInput {
   new_model_name?: string;
   parameters: FineTuningParameters;
   timeout_seconds?: number;
+  finetuning_template?: string;
 }
 export interface CreateFineTuningRequest extends CreateFineTuningInput {
   idempotency_key: string;
@@ -61,6 +80,59 @@ export interface ModelDevImplementation {
   execution_timeout_default_seconds: string;
   execution_timeout_max_seconds: string;
   step_timeout_seconds: string;
+  runtime_capabilities?: FineTuningRuntimeCapabilities | null;
+  runtime_capabilities_sha256?: string;
+}
+export interface FineTuningRegisteredTemplate {
+  id: string;
+  source_sha256: string;
+  supports_system: boolean;
+  supports_multi_turn: boolean;
+}
+export interface FineTuningRuntimeCapabilities {
+  schema_version: string;
+  image_digest: string;
+  entrypoint_sha256: string;
+  packages: { name: string; version: string }[];
+  causal_lm_model_types: string[];
+  registered_templates: FineTuningRegisteredTemplate[];
+  context_limit_fields: { source: string; field: string }[];
+}
+export interface CheckFineTuningReadinessInput {
+  base_model_version_id: string;
+  compute_preset_id: string;
+  finetuning_template?: string;
+}
+export interface FineTuningReadiness {
+  assessment: "ELIGIBLE" | "TEMPLATE_REQUIRED" | "UNSUPPORTED";
+  reason: string;
+  template_candidates: FineTuningRegisteredTemplate[];
+  runtime_capabilities: FineTuningRuntimeCapabilities | null;
+  runtime_capabilities_sha256: string;
+  limits: { max_content_bytes: string } | null;
+  structure_limits: Record<string, string> | null;
+  runtime_validation_required: boolean;
+  model_id: string;
+  model_version_id: string;
+  model_type: string;
+  context_limit: string;
+  template_plan: {
+    schema_version: string;
+    mode: string;
+    selection_source: string;
+    template_id?: string;
+    source: {
+      kind: string;
+      path: string;
+      name: string;
+      default: boolean;
+      size_bytes: string;
+      sha256: string;
+    } | null;
+    source_sha256: string;
+    runtime_capabilities_sha256: string;
+    image_digest: string;
+  } | null;
 }
 export interface ModelDevImplementationListResponse {
   items: ModelDevImplementation[];
