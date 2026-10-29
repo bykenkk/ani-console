@@ -17,7 +17,6 @@ import InstanceStorage from "@/components/instances/InstanceStorage";
 import { useVMActions } from "@/hooks/useVMActions";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
-import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 // TODO(feature-visibility): 待云主机远程连接支持后恢复控制台打开方法导入。
 // import { openInstanceVncWindow } from "@/lib/instances";
@@ -43,7 +42,10 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
   const { actions, dialogNode } = useVMActions(detail.data ? [detail.data] : [], goBack);
   if (!detail.data) return <DetailPagePlaceholder loading={detail.isLoading} />;
   const vm = detail.data;
-  const spec = `${Number(vm.cpuMillis) / 1000} CPU / ${vm.memoryMib} MiB`;
+  const spec =
+    vm.cpuMillis && vm.memoryMib
+      ? `${Number(vm.cpuMillis) / 1000}C / ${Number(vm.memoryMib) / 1024} GiB`
+      : "-";
   // TODO(vm-detail-fields): 新详情缺少终止保护、节点、自动启动、安全组、创建时间及网络关联，保留原字段占位。
   // TODO(vm-integration): 新详情、磁盘、介质及快照流程仍需在已部署且允许访问的环境联调。
   return (
@@ -51,9 +53,9 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
       <DetailPageFrame
         breadcrumbs={[...navigationBreadcrumbsForPath("/vms"), { label: vm.name }]}
         title={vm.name}
-        status={<StatusBadge status={vm.observedState} reason={vm.reason} />}
+        status={<StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />}
         icon={<AliIcon name="yunzhuji" size={28} />}
-        headerItems={[{ label: "CPU / 内存", value: spec }]}
+        headerItems={[{ label: "规格", value: spec }]}
         actions={<ResourceActionMenu record={vm} actions={actions} />}
         cards={[
           {
@@ -62,47 +64,27 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
             fields: [
               { label: "ID", value: <ResourceId value={vm.id} /> },
               { label: "终止保护", value: "-" },
-              { label: "规格", value: vm.presetId || "-" },
-              { label: "镜像", value: "-" },
-              { label: "系统介质", value: vm.mediaKey || "-" },
+              { label: "规格", value: spec },
+              { label: "系统盘", value: vm.systemDiskSizeGb ? `${vm.systemDiskSizeGb} GB` : "-" },
               {
                 label: "操作系统",
                 value: [vm.osFamily, vm.osVersion].filter(Boolean).join(" ") || "-",
               },
               { label: "节点", value: "-" },
-              { label: "CPU / 内存", value: spec },
-              { label: "私网 IP", value: "-" },
               {
-                label: "观测地址",
+                label: "IP 地址",
                 value:
-                  vm.addresses?.map((item) => `${item.nicName}: ${item.address}`).join(" · ") ||
-                  "-",
+                  vm.addresses
+                    ?.map((item) => item.address)
+                    .filter(Boolean)
+                    .join(" · ") || "-",
               },
               { label: "自动启动", value: "-" },
               { label: "安全组", value: "-" },
               { label: "创建时间", value: "-" },
-              { label: "期望状态", value: vm.desiredState || "-" },
-              { label: "观测状态", value: vm.observedState || "-" },
-              { label: "原因", value: vm.reason || "-" },
-              { label: "观测时间", value: formatDateTime(vm.observedAt) },
-              { label: "系统盘容量 (GB)", value: vm.systemDiskSizeGb || "-" },
               {
-                label: "启动设备",
-                value:
-                  vm.bootDevice === "SYSTEM_DISK"
-                    ? "系统盘"
-                    : vm.bootDevice === "INSTALL_MEDIA"
-                      ? "安装介质"
-                      : "-",
-              },
-              {
-                label: "DNS 模式",
-                value:
-                  vm.dns?.mode === "PLATFORM_DEFAULT"
-                    ? "平台默认"
-                    : vm.dns?.mode === "CUSTOM"
-                      ? "自定义"
-                      : "-",
+                label: "状态",
+                value: <StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />,
               },
               { label: "DNS 服务器", value: vm.dns?.nameservers?.join(" · ") || "-" },
             ],
@@ -115,13 +97,9 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
               { label: "子网", value: "-" },
               { label: "安全组", value: "-" },
               { label: "文件存储", value: "-" },
-              { label: "镜像", value: "-" },
+              { label: "镜像", value: vm.mediaKey || "-" },
               { label: "密钥", value: "-" },
               { label: "负载均衡", value: "-" },
-              ...(vm.disks ?? []).map((disk) => ({
-                label: disk.role || "磁盘",
-                value: `${disk.name || "-"} · ${disk.diskId}`,
-              })),
             ],
           },
         ]}
