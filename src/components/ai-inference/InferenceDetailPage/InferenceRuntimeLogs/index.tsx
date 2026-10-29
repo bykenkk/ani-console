@@ -1,18 +1,11 @@
-import {
-  Button,
-  Empty,
-  InputNumber,
-  Select,
-  Space,
-  Spin,
-  Typography,
-} from "@arco-design/web-react";
+import { Button, Select, Space } from "@arco-design/web-react";
+import { IconPlayArrowFill, IconRecordStop, IconRefresh } from "@arco-design/web-react/icon";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { getInferenceLogs, getInferenceRuntime, type InferenceLogLevel } from "@/api/inference";
-import { getPreviousHoursDateTimeRange } from "@/lib/date";
-import { formatDateTime } from "@/lib/format";
+import LogViewer from "@/components/common/LogViewer";
 import { withId } from "@/lib/id";
+import { formatInferenceLogs } from "./log-text";
 import { useInferenceLogStream, INFERENCE_LOG_LIMIT } from "./useInferenceLogStream";
 
 type InferenceRuntimeLogsProps = { serviceId: string };
@@ -20,25 +13,8 @@ type InferenceRuntimeLogsProps = { serviceId: string };
 export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogsProps) {
   const [instance, setInstance] = useState("");
   const [container, setContainer] = useState("");
-  const [tailLines, setTailLines] = useState(INFERENCE_LOG_LIMIT);
-  const [hours, setHours] = useState(0);
-  const [since, setSince] = useState<string>();
   const [level, setLevel] = useState<InferenceLogLevel>();
   const [live, setLive] = useState(false);
-  const [connection, setConnection] = useState(0);
-  const params = {
-    level,
-    instance: instance || undefined,
-    container: container || undefined,
-    since,
-    tail_lines: tailLines,
-  };
-  const { lines, status: streamStatus } = useInferenceLogStream({
-    serviceId,
-    params,
-    enabled: live,
-    connection,
-  });
   const runtime = useQuery({
     queryKey: ["governance-inference-runtime", serviceId],
     queryFn: ({ signal }) => getInferenceRuntime(serviceId, signal),
@@ -46,135 +22,122 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
       errorNotification: { id: withId("inference-runtime", serviceId), action: "推理运行诊断加载" },
     },
   });
+  const instances = runtime.data?.instances ?? [];
+  const selectedInstance = instances.find((item) => item.name === instance) ?? instances[0];
+  const containers = selectedInstance?.containers ?? [];
+  const selectedContainer = containers.includes(container)
+    ? container
+    : containers.length === 1
+      ? containers[0]
+      : undefined;
+  // 下游要求指定实例；多容器实例还必须明确容器，选择完整后才允许请求。
+  const canQueryLogs = Boolean(
+    selectedInstance && selectedContainer && containers.includes(selectedContainer),
+  );
+  const params = {
+    level,
+    instance: selectedInstance?.name,
+    container: selectedContainer,
+    tail_lines: INFERENCE_LOG_LIMIT,
+  };
+  const { lines, status: streamStatus } = useInferenceLogStream({
+    serviceId,
+    params,
+    enabled: live && canQueryLogs,
+  });
   const logs = useQuery({
     queryKey: ["governance-inference-logs", serviceId, params],
-    enabled: !live,
+    enabled: !live && canQueryLogs,
     queryFn: ({ signal }) => getInferenceLogs(serviceId, params, signal),
     meta: {
       errorNotification: { id: withId("inference-logs", serviceId), action: "推理日志加载" },
     },
   });
-  const instances = runtime.data?.instances ?? [];
-  const containers = instances.find((item) => item.name === instance)?.containers ?? [];
-  const displayed = live ? lines : (logs.data?.items ?? []);
+  const text = useMemo(
+    () => (canQueryLogs ? formatInferenceLogs(live ? lines : (logs.data?.items ?? [])) : ""),
+    [canQueryLogs, live, lines, logs.data?.items],
+  );
   return (
-    <div className="flex flex-col gap-3">
-      <Space wrap>
-        <Select
-          aria-label="日志等级"
-          placeholder="全部等级"
-          allowClear
-          value={level}
-          disabled={live}
-          className="w-32"
-          options={["trace", "debug", "info", "warn", "error", "fatal", "unknown"].map((value) => ({
-            value,
-            label: value,
-          }))}
-          onChange={setLevel}
-        />
-        <Select
-          aria-label="日志实例"
-          placeholder="全部实例"
-          allowClear
-          value={instance || undefined}
-          disabled={live}
-          className="w-48"
-          loading={runtime.isFetching}
-          options={instances.map((item) => ({ value: item.name, label: item.name }))}
-          onChange={(value: string | undefined) => {
-            setInstance(value ?? "");
-            setContainer("");
-          }}
-        />
-        <Select
-          aria-label="日志容器"
-          placeholder="全部容器"
-          allowClear
-          value={container || undefined}
-          disabled={live || !instance}
-          className="w-40"
-          options={containers.map((name) => ({ value: name, label: name }))}
-          onChange={(value: string | undefined) => setContainer(value ?? "")}
-        />
-        <Select
-          aria-label="日志时间范围"
-          value={hours}
-          disabled={live}
-          className="w-32"
-          options={[
-            { value: 0, label: "全部时间" },
-            { value: 1, label: "最近 1 小时" },
-            { value: 24, label: "最近 24 小时" },
-          ]}
-          onChange={(value: number) => {
-            setHours(value);
-            setSince(value ? getPreviousHoursDateTimeRange(value).start : undefined);
-          }}
-        />
-        <Typography.Text>末尾行数</Typography.Text>
-        <InputNumber
-          aria-label="末尾行数"
-          value={tailLines}
-          min={1}
-          max={INFERENCE_LOG_LIMIT}
-          precision={0}
-          disabled={live}
-          className="w-28"
-          onChange={(value) => setTailLines(value ?? INFERENCE_LOG_LIMIT)}
-        />
-      </Space>
-      <Space wrap>
-        <Button
-          loading={!live && logs.isFetching}
-          onClick={() => {
-            if (live) setLive(false);
-            else logs.refetch();
-          }}
-        >
-          查询日志
-        </Button>
-        <Button
-          type="primary"
-          loading={streamStatus === "connecting"}
-          onClick={() => {
-            setLive(true);
-            setConnection((value) => value + 1);
-          }}
-        >
-          {live ? "重新连接" : "实时日志"}
-        </Button>
-        <Button disabled={!live} onClick={() => setLive(false)}>
-          停止实时日志
-        </Button>
-        <Typography.Text type="secondary">
-          {live
-            ? streamStatus === "connected"
-              ? "实时日志已连接"
-              : streamStatus === "connecting"
-                ? "正在连接"
-                : "连接已结束"
-            : logs.data?.truncated
-              ? "日志快照（已截断）"
-              : "日志快照"}
-        </Typography.Text>
-      </Space>
-      <Spin loading={live ? streamStatus === "connecting" : logs.isFetching}>
-        {displayed.length ? (
-          <pre className="m-0 max-h-96 min-h-60 overflow-auto whitespace-pre-wrap wrap-break-word rounded bg-(--color-fill-2) p-3 font-mono text-xs leading-5">
-            {displayed
-              .map(
-                (line) =>
-                  `${line.timestamp ? `${formatDateTime(line.timestamp)} ` : ""}${line.level ? `[${line.level}] ` : ""}${line.message}`,
-              )
-              .join("\n")}
-          </pre>
-        ) : (
-          <div className="flex min-h-60 items-center justify-center">
-            <Empty description={live && streamStatus === "connected" ? "等待新日志" : "暂无日志"} />
-          </div>
-        )}
-      </Spin>
+    <div className="flex h-full min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
+      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
+        <Space wrap>
+          <Select
+            aria-label="日志级别"
+            placeholder="全部级别"
+            allowClear
+            size="small"
+            value={level}
+            disabled={live}
+            autoWidth={false}
+            style={{ width: 128 }}
+            options={["trace", "debug", "info", "warn", "error", "fatal", "unknown"].map(
+              (value) => ({
+                value,
+                label: value,
+              }),
+            )}
+            onChange={setLevel}
+          />
+          <Select
+            aria-label="日志实例"
+            placeholder="请选择实例"
+            size="small"
+            value={selectedInstance?.name}
+            disabled={live}
+            autoWidth={false}
+            style={{ width: 200 }}
+            loading={runtime.isFetching}
+            options={instances.map((item) => ({ value: item.name, label: item.name }))}
+            onChange={(value: string | undefined) => {
+              setInstance(value ?? "");
+              setContainer("");
+            }}
+          />
+          <Select
+            aria-label="日志容器"
+            placeholder="请选择容器"
+            allowClear
+            size="small"
+            value={selectedContainer}
+            disabled={live || !selectedInstance}
+            autoWidth={false}
+            style={{ width: 200 }}
+            options={containers.map((name) => ({ value: name, label: name }))}
+            onChange={(value: string | undefined) => setContainer(value ?? "")}
+          />
+          <Button
+            size="small"
+            icon={live ? <IconRecordStop /> : <IconPlayArrowFill />}
+            aria-label={live ? "停止流式日志" : "开启流式日志"}
+            title={live ? "停止流式日志" : "开启流式日志"}
+            disabled={!live && !canQueryLogs}
+            onClick={() => setLive((current) => !current)}
+          />
+          <Button
+            size="small"
+            icon={<IconRefresh />}
+            aria-label="刷新日志"
+            title="刷新日志"
+            disabled={live || !canQueryLogs}
+            loading={!live && logs.isFetching}
+            onClick={() => logs.refetch()}
+          />
+        </Space>
+      </div>
+      <LogViewer
+        key={JSON.stringify([serviceId, selectedInstance?.name, selectedContainer, level, live])}
+        className="flex-1"
+        text={text}
+        loading={canQueryLogs && (live ? streamStatus === "connecting" : logs.isFetching)}
+        emptyDescription={
+          !canQueryLogs
+            ? "请选择实例和容器"
+            : live && streamStatus === "connected"
+              ? "等待新日志"
+              : "暂无日志"
+        }
+        ariaLabel="推理日志"
+      />
     </div>
   );
 }

@@ -12,17 +12,11 @@ type InferenceLogStreamOptions = {
   serviceId: string;
   params: InferenceLogParams;
   enabled: boolean;
-  connection: number;
 };
 type StreamStatus = "idle" | "connecting" | "connected";
 export const INFERENCE_LOG_LIMIT = 1000;
 
-export function useInferenceLogStream({
-  serviceId,
-  params,
-  enabled,
-  connection,
-}: InferenceLogStreamOptions) {
+export function useInferenceLogStream({ serviceId, params, enabled }: InferenceLogStreamOptions) {
   const [status, setStatus] = useState<StreamStatus>("idle");
   const [lines, setLines] = useState<InferenceLogLine[]>([]);
   const { instance, container, since, until, tail_lines, level } = params;
@@ -70,6 +64,6 @@ export function useInferenceLogStream({
     connect();
     // 切换 Tab、服务或筛选时取消请求和 reader；不自动重连，以免重复回放历史日志。
     return () => controller.abort();
-  }, [serviceId, instance, container, since, until, tail_lines, level, enabled, connection]);
+  }, [serviceId, instance, container, since, until, tail_lines, level, enabled]);
   return { lines, status: enabled ? status : "idle" };
 }
