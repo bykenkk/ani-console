@@ -1,4 +1,5 @@
 import type { PageParams } from "@/api/types";
+import type { ImageRegistrationScope } from "@/api/images";
 
 export type InferenceRuntimeMode = "RUNTIME_MODE_DEPLOYMENT" | "RUNTIME_MODE_LEADER_WORKER_SET";
 
@@ -13,7 +14,8 @@ export interface CreateInferenceInput {
   name: string;
   model_version_id: string;
   served_model_name: string;
-  engine_image: string;
+  image_id: string;
+  image_scope: ImageRegistrationScope;
   engine_type: string;
   command: string;
   preset_id: string;

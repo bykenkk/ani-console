@@ -15,6 +15,8 @@ import { Form, Input, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { validateForm } from "@/lib/form";
+import type { ImageRegistration } from "@/api/images";
+import InstanceImageSelect from "@/components/instances/InstanceImageSelect";
 
 interface ImportModelFormValues {
   source: ModelSourceInputValue;
@@ -24,7 +26,7 @@ interface ImportModelFormValues {
   format: ModelFormat;
   capabilities: ModelCapability[];
   engine_type: EngineType;
-  engine_image: string;
+  image: ImageRegistration;
   startup_command: string;
 }
 
@@ -86,7 +88,8 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
           version: values.revision,
           format: values.format,
           engine_type: values.engine_type,
-          engine_image: values.engine_image,
+          recommended_image_id: values.image.image_id,
+          recommended_image_scope: values.image.scope,
           startup_command: values.startup_command,
         },
         source: {
@@ -202,27 +205,23 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
             ]}
           />
         </Form.Item>
-        <Form.Item label="引擎镜像" required>
-          <Input.Group compact>
-            <Form.Item
-              field="engine_type"
-              noStyle={{ showErrorTip: true }}
-              rules={[{ required: true, message: "请选择引擎类型" }]}
-            >
-              <EngineSelect style={{ width: 140 }} />
-            </Form.Item>
-            <Form.Item
-              field="engine_image"
-              noStyle={{ showErrorTip: true }}
-              rules={[{ required: true, message: "请输入引擎镜像" }]}
-            >
-              <Input
-                aria-label="引擎镜像"
-                style={{ width: "calc(100% - 140px)" }}
-                placeholder="请输入引擎镜像地址"
-              />
-            </Form.Item>
-          </Input.Group>
+        <Form.Item
+          field="engine_type"
+          label="镜像类型"
+          rules={[{ required: true, message: "请选择引擎类型" }]}
+        >
+          <EngineSelect />
+        </Form.Item>
+        <Form.Item
+          field="image"
+          label="引擎镜像"
+          validateTrigger="onSelect"
+          rules={[{ type: "object", required: true, message: "请选择已注册的镜像" }]}
+        >
+          {/* TODO(model-image-pagination): 暂用容器现有目录查询，后端支持 page/pageSize 后统一迁移。 */}
+          <InstanceImageSelect
+            onScopeChange={() => form.setFields({ image: { error: undefined } })}
+          />
         </Form.Item>
         <Form.Item
           field="startup_command"

@@ -9,7 +9,7 @@ import {
 import { withId } from "@/lib/id";
 
 type InstanceImageSelectProps = {
-  value?: ImageRegistration;
+  value?: Pick<ImageRegistration, "image_id" | "scope"> & { displayName?: string };
   onChange?: (image?: ImageRegistration) => void;
   onSelect?: (image?: ImageRegistration) => void;
   onScopeChange?: (scope: ImageRegistrationScope) => void;
@@ -68,7 +68,8 @@ export default function InstanceImageSelect({
           label: item.displayName || item.image_id,
         }))}
         onChange={(id) => {
-          const image = options.find((item) => item.image_id === id);
+          const image = items.find((item) => item.image_id === id);
+          if (!image && id === value?.image_id) return;
           onChange?.(image);
           onSelect?.(image);
         }}

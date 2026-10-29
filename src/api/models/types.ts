@@ -1,4 +1,5 @@
 import type { PageParams } from "@/api/types";
+import type { ImageRegistrationScope } from "@/api/images";
 
 export interface ModelVersion {
   id: string;
@@ -6,6 +7,8 @@ export interface ModelVersion {
   version: string;
   status: string;
   engine_image?: string;
+  recommended_image_id?: string;
+  recommended_image_scope?: ImageRegistrationScope;
   engine_type?: string;
   startup_command?: string;
   format?: string;
@@ -90,7 +93,9 @@ export interface ImportModelBundleVersionInput {
   version: string;
   format: ModelFormat;
   engine_type: string;
-  engine_image: string;
+  engine_image?: string;
+  recommended_image_id: string;
+  recommended_image_scope: ImageRegistrationScope;
   startup_command: string;
 }
 

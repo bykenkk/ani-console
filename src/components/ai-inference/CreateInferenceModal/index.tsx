@@ -4,6 +4,8 @@ import { useCallback, useRef, useState } from "react";
 import { createInferenceService, type InferenceRuntimeMode } from "@/api/inference";
 import type { ModelVersion } from "@/api/models";
 import type { InstancePreset } from "@/api/instances";
+import type { ImageRegistration } from "@/api/images";
+import InstanceImageSelect from "@/components/instances/InstanceImageSelect";
 import InstanceComputeSelect from "@/components/instances/InstanceComputeSelect";
 import { showMessage } from "@/lib/feedback";
 import { validateForm } from "@/lib/form";
@@ -15,7 +17,7 @@ interface CreateInferenceFormValues {
   model_id: string;
   model_version_id: string;
   engine_type: string;
-  engine_image: string;
+  image?: Pick<ImageRegistration, "image_id" | "scope">;
   command: string;
   preset?: InstancePreset;
   runtime_mode: InferenceRuntimeMode;
@@ -51,7 +53,13 @@ export default function CreateInferenceModal({
       setModelName(modelName ?? "");
       form.setFieldsValue({
         model_version_id: id,
-        engine_image: selected?.engine_image ?? "",
+        image:
+          selected?.recommended_image_id && selected.recommended_image_scope
+            ? {
+                image_id: selected.recommended_image_id,
+                scope: selected.recommended_image_scope,
+              }
+            : undefined,
         engine_type: selected?.engine_type ?? "",
         command: selected?.startup_command ?? "",
       });
@@ -93,6 +101,7 @@ export default function CreateInferenceModal({
         return;
       }
 
+      if (!values.image) return;
       if (!values.preset?.enabled || !values.preset.selectable) {
         showMessage({ type: "error", content: "请选择可用的推理算力规格" });
         return;
@@ -121,7 +130,8 @@ export default function CreateInferenceModal({
         name: values.name.trim(),
         model_version_id: version.id,
         served_model_name: servedModelName.current.value,
-        engine_image: values.engine_image.trim(),
+        image_id: values.image.image_id,
+        image_scope: values.image.scope,
         engine_type: values.engine_type.trim(),
         command: values.command,
         preset_id: values.preset.id,
@@ -186,27 +196,19 @@ export default function CreateInferenceModal({
             </Form.Item>
           </Grid.Col>
         </Grid.Row>
-        <Form.Item label="引擎镜像" required>
-          <Input.Group compact>
-            <Form.Item
-              field="engine_type"
-              noStyle={{ showErrorTip: true }}
-              rules={required("请选择引擎类型")}
-            >
-              <EngineSelect style={{ width: 140 }} />
-            </Form.Item>
-            <Form.Item
-              field="engine_image"
-              noStyle={{ showErrorTip: true }}
-              rules={required("请输入运行镜像地址")}
-            >
-              <Input
-                aria-label="运行镜像"
-                style={{ width: "calc(100% - 140px)" }}
-                placeholder="请输入运行镜像地址"
-              />
-            </Form.Item>
-          </Input.Group>
+        <Form.Item field="engine_type" label="镜像类型" rules={required("请选择引擎类型")}>
+          <EngineSelect />
+        </Form.Item>
+        <Form.Item
+          field="image"
+          label="引擎镜像"
+          validateTrigger="onSelect"
+          rules={[{ type: "object", required: true, message: "请选择已注册的镜像" }]}
+        >
+          {/* TODO(inference-image-pagination): 暂用容器现有目录查询，后端支持 page/pageSize 后统一迁移。 */}
+          <InstanceImageSelect
+            onScopeChange={() => form.setFields({ image: { error: undefined } })}
+          />
         </Form.Item>
         {/* FIXME(inference-model-name): 命令中的模型名可能与自动生成的服务模型名不一致；若网关未做名称映射，外部调用可能失败，待核对后处理。 */}
         <Form.Item field="command" label="完整启动命令" rules={required("请输入完整启动命令")}>
