@@ -58,7 +58,9 @@ export type HomeSummaryCard = {
   label: string;
   value: number | null;
   icon: string;
-  route: HomeRoute;
+  // TODO(feature-visibility): 待知识库管理支持后恢复必填路由及卡片入口。
+  // route: HomeRoute;
+  route?: HomeRoute;
   statuses: HomeSummaryStatus[];
 };
 

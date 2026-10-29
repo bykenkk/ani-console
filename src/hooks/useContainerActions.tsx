@@ -14,9 +14,11 @@ const UNAVAILABLE_ACTIONS = [
   { key: "rollback", label: "回滚发布" },
   { key: "attach_volume", label: "挂载云盘" },
   { key: "detach_volume", label: "卸载云盘" },
-  { key: "attach_filesystem", label: "挂载 NFS" },
+  // TODO(feature-visibility): 待文件存储支持后恢复 NFS 挂载入口。
+  // { key: "attach_filesystem", label: "挂载 NFS" },
   { key: "bind_secret", label: "绑定密钥" },
-  { key: "change_security_groups", label: "更换安全组" },
+  // TODO(feature-visibility): 待安全组支持后恢复更换入口。
+  // { key: "change_security_groups", label: "更换安全组" },
   { key: "load-balancer", label: "挂到负载均衡" },
   { key: "copy-endpoint", label: "复制访问地址" },
   { key: "protection", label: "终止保护" },

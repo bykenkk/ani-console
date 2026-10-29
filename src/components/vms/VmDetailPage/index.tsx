@@ -9,7 +9,8 @@ import {
 } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import InstanceEvents from "@/components/instances/InstanceEvents";
-import InstanceLogs from "@/components/instances/InstanceLogs";
+// TODO(feature-visibility): 待云主机日志支持后恢复日志 Tab 及组件导入。
+// import InstanceLogs from "@/components/instances/InstanceLogs";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceOperations from "@/components/instances/InstanceOperations";
 import InstanceStorage from "@/components/instances/InstanceStorage";
@@ -18,9 +19,11 @@ import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
-import { openInstanceVncWindow } from "@/lib/instances";
+// TODO(feature-visibility): 待云主机远程连接支持后恢复控制台打开方法导入。
+// import { openInstanceVncWindow } from "@/lib/instances";
 import VmSnapshots from "./VmSnapshots";
-import VmSshAccess from "./VmSshAccess";
+// TODO(feature-visibility): 待云主机远程连接支持后恢复此组件导入。
+// import VmSshAccess from "./VmSshAccess";
 import VmDisks from "./VmDisks";
 import VmMediaDevices from "./VmMediaDevices";
 
@@ -123,11 +126,12 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
           },
         ]}
         tabs={[
-          {
-            key: "ssh",
-            label: "远程连接",
-            content: <VmSshAccess vm={vm} onOpenConsole={() => openInstanceVncWindow(vm.id)} />,
-          },
+          // TODO(feature-visibility): 待云主机远程连接支持后恢复此 Tab 入口。
+          // {
+          //   key: "ssh",
+          //   label: "远程连接",
+          //   content: <VmSshAccess vm={vm} onOpenConsole={() => openInstanceVncWindow(vm.id)} />,
+          // },
           {
             key: "storage",
             label: "存储挂载",
@@ -137,7 +141,8 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
           { key: "snapshots", label: "快照", content: <VmSnapshots vm={vm} /> },
           // TODO(vm-observability): VM 的监控、日志、事件契约未提供，沿用公共组件空态，不传 VM ID 到容器接口。
           { key: "monitoring", label: "资源监控", content: <InstanceMetrics /> },
-          { key: "logs", label: "日志", content: <InstanceLogs active={tab === "logs"} /> },
+          // TODO(feature-visibility): 待云主机日志支持后恢复此 Tab 入口。
+          // { key: "logs", label: "日志", content: <InstanceLogs active={tab === "logs"} /> },
           { key: "events", label: "事件", content: <InstanceEvents /> },
           // TODO(vm-operations): VM 操作查询及历史记录统一暂缓，保留原有入口。
           { key: "operations", label: "操作记录", content: <InstanceOperations /> },

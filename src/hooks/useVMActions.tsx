@@ -108,8 +108,10 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
     },
     unavailableAction("attach-volume", "挂载云盘"),
     unavailableAction("detach-volume", "卸载云盘"),
-    unavailableAction("attach-filesystem", "挂载 NFS"),
-    unavailableAction("change-security-groups", "更换安全组"),
+    // TODO(feature-visibility): 待文件存储支持后恢复 NFS 挂载入口。
+    // unavailableAction("attach-filesystem", "挂载 NFS"),
+    // TODO(feature-visibility): 待安全组支持后恢复更换入口。
+    // unavailableAction("change-security-groups", "更换安全组"),
     unavailableAction("termination-protection", "终止保护"),
     {
       key: "console",

@@ -1,12 +1,14 @@
 import type { ReactNode } from "react";
 import {
   IconApps,
-  IconCloud,
+  // TODO(feature-visibility): 待 GPU 算力管理支持后恢复分组图标。
+  // IconCloud,
   IconCodeSandbox,
   IconDashboard,
   IconFile,
   IconLock,
-  IconMessage,
+  // TODO(feature-visibility): 待知识库管理支持后恢复分组图标。
+  // IconMessage,
 } from "@arco-design/web-react/icon";
 import { AliIcon } from "@/components/common";
 
@@ -65,16 +67,18 @@ export const menuItems: readonly MenuItem[] = [
             label: "对象存储",
             icon: <AliIcon name="duixiangcunchu1" />,
           },
-          {
-            key: "/filesystems",
-            label: "文件存储",
-            icon: <AliIcon name="wenjiancunchu" />,
-          },
-          {
-            key: "/vector-stores",
-            label: "向量存储",
-            icon: <AliIcon name="xiangliangcunchu" />,
-          },
+          // TODO(feature-visibility): 待文件存储支持后恢复此菜单入口。
+          // {
+          //   key: "/filesystems",
+          //   label: "文件存储",
+          //   icon: <AliIcon name="wenjiancunchu" />,
+          // },
+          // TODO(feature-visibility): 待向量存储支持后恢复此菜单入口。
+          // {
+          //   key: "/vector-stores",
+          //   label: "向量存储",
+          //   icon: <AliIcon name="xiangliangcunchu" />,
+          // },
         ],
       },
       {
@@ -85,12 +89,14 @@ export const menuItems: readonly MenuItem[] = [
           { key: "/vpcs", label: "VPC 网络", icon: <AliIcon name="VPCwangluo" /> },
           { key: "/subnets", label: "VPC 子网", icon: <AliIcon name="ziwang" /> },
           { key: "/eips", label: "公网 IP", icon: <AliIcon name="wangluo" /> },
-          {
-            key: "/security-groups",
-            label: "安全组",
-            icon: <AliIcon name="anquanzu" />,
-          },
-          { key: "/routes", label: "路由", icon: <AliIcon name="VPCluyouqi" /> },
+          // TODO(feature-visibility): 待安全组支持后恢复此菜单入口。
+          // {
+          //   key: "/security-groups",
+          //   label: "安全组",
+          //   icon: <AliIcon name="anquanzu" />,
+          // },
+          // TODO(feature-visibility): 待路由支持后恢复此菜单入口。
+          // { key: "/routes", label: "路由", icon: <AliIcon name="VPCluyouqi" /> },
           {
             key: "/load-balancers",
             label: "负载均衡",
@@ -98,24 +104,25 @@ export const menuItems: readonly MenuItem[] = [
           },
         ],
       },
-      {
-        key: "compute-management",
-        label: "算力管理",
-        icon: <IconCloud />,
-        children: [
-          {
-            key: "/overview-compute",
-            label: "资源概览",
-            icon: <IconDashboard />,
-            hidden: true,
-          },
-          {
-            key: "/gpu-inventory",
-            label: "GPU 算力管理",
-            icon: <AliIcon name="GPU" />,
-          },
-        ],
-      },
+      // TODO(feature-visibility): 待 GPU 算力管理支持后恢复入口及分组，暂不展示空分组。
+      // {
+      //   key: "compute-management",
+      //   label: "算力管理",
+      //   icon: <IconCloud />,
+      //   children: [
+      //     {
+      //       key: "/overview-compute",
+      //       label: "资源概览",
+      //       icon: <IconDashboard />,
+      //       hidden: true,
+      //     },
+      //     {
+      //       key: "/gpu-inventory",
+      //       label: "GPU 算力管理",
+      //       icon: <AliIcon name="GPU" />,
+      //     },
+      //   ],
+      // },
       {
         key: "cluster-management",
         label: "集群管理",
@@ -135,12 +142,13 @@ export const menuItems: readonly MenuItem[] = [
           { key: "/ai-training", label: "模型训练", icon: <AliIcon name="moxing" /> },
         ],
       },
-      {
-        key: "knowledge-services",
-        label: "知识库管理",
-        icon: <IconMessage />,
-        children: [{ key: "/kb", label: "知识库管理", icon: <AliIcon name="zhishiku" /> }],
-      },
+      // TODO(feature-visibility): 待知识库管理支持后恢复此分组及菜单入口。
+      // {
+      //   key: "knowledge-services",
+      //   label: "知识库管理",
+      //   icon: <IconMessage />,
+      //   children: [{ key: "/kb", label: "知识库管理", icon: <AliIcon name="zhishiku" /> }],
+      // },
       {
         key: "registry-management",
         label: "镜像仓库",
@@ -164,7 +172,14 @@ export const productGroupSections = [
   },
   {
     label: "AI算力服务",
-    groupKeys: ["compute-management", "cluster-management", "ai-services", "knowledge-services"],
+    groupKeys: [
+      // TODO(feature-visibility): 待 GPU 算力管理支持后恢复分组索引。
+      // "compute-management",
+      "cluster-management",
+      "ai-services",
+      // TODO(feature-visibility): 待知识库管理支持后恢复分组索引。
+      // "knowledge-services",
+    ],
   },
   { label: "公共服务", groupKeys: ["registry-management", "security-identity"] },
 ] as const satisfies readonly ProductGroupSection[];

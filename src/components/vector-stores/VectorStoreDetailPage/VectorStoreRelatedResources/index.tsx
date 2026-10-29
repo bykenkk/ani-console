@@ -1,17 +1,20 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteVectorStoreKnowledgeBaseLink, type VectorStore } from "@/api/storage/vector-stores";
 import { DataTable, type RowAction } from "@/components/common";
-import { navigateToResourceDetail } from "@/lib/resources";
-import { Button, Link, Modal, Space } from "@arco-design/web-react";
+// TODO(feature-visibility): 待知识库管理支持后恢复关联知识库跳转及导航依赖。
+// import { navigateToResourceDetail } from "@/lib/resources";
+// import { Button, Link, Modal, Space } from "@arco-design/web-react";
+import { Button, Modal, Space } from "@arco-design/web-react";
 
-import { useNavigate } from "@tanstack/react-router";
+// import { useNavigate } from "@tanstack/react-router";
 
 type VectorStoreRelatedResourcesProps = { store: VectorStore };
 
 type RelatedResource = { id: string; type: "知识库"; name: string };
 
 export default function VectorStoreRelatedResources({ store }: VectorStoreRelatedResourcesProps) {
-  const navigate = useNavigate();
+  // TODO(feature-visibility): 待知识库管理支持后恢复关联知识库导航。
+  // const navigate = useNavigate();
 
   const qc = useQueryClient();
   const unlink = useMutation({
@@ -73,19 +76,21 @@ export default function VectorStoreRelatedResources({ store }: VectorStoreRelate
             {
               title: "名称",
               width: 200,
-              render: (_, resource) => (
-                <Link
-                  onClick={() =>
-                    navigateToResourceDetail(navigate, {
-                      type: "knowledge-base",
-                      id: resource.id,
-                      search: { tab: "documents" },
-                    })
-                  }
-                >
-                  {resource.name || resource.id}
-                </Link>
-              ),
+              // TODO(feature-visibility): 待知识库管理支持后恢复此链接，暂保留名称展示。
+              // render: (_, resource) => (
+              //   <Link
+              //     onClick={() =>
+              //       navigateToResourceDetail(navigate, {
+              //         type: "knowledge-base",
+              //         id: resource.id,
+              //         search: { tab: "documents" },
+              //       })
+              //     }
+              //   >
+              //     {resource.name || resource.id}
+              //   </Link>
+              // ),
+              render: (_, resource) => resource.name || resource.id,
             },
             {
               title: "操作",

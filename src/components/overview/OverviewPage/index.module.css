@@ -75,7 +75,9 @@
     box-shadow 0.15s;
 }
 
-.summaryCard:hover {
+/* TODO(feature-visibility): 待知识库卡片恢复跳转后恢复原悬停选择器。 */
+/* .summaryCard:hover */
+.summaryCard[href]:hover {
   border-color: #a0c9ff;
   box-shadow: 0 0 12px rgba(0, 73, 128, 0.06);
 }
@@ -86,7 +88,9 @@
   transition: color 0.15s;
 }
 
-.summaryCard:hover .inlineArrow {
+/* TODO(feature-visibility): 待知识库卡片恢复跳转后恢复原箭头悬停选择器。 */
+/* .summaryCard:hover .inlineArrow */
+.summaryCard[href]:hover .inlineArrow {
   color: var(--home-primary);
 }
 

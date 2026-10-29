@@ -73,7 +73,8 @@ export const homeSummaryPlaceholders: HomeSummaryCard[] = [
     label: "知识库",
     value: null,
     icon: "zhishiku",
-    route: "/kb",
+    // TODO(feature-visibility): 待知识库管理支持后恢复卡片跳转，暂保留统计展示。
+    // route: "/kb",
     statuses: [
       { label: "活跃", value: null, tone: "success" },
       { label: "其他", value: null, tone: "neutral" },
@@ -200,7 +201,8 @@ function toHomeSummaries(overview: ConsoleOverviewStatistics): HomeSummaryCard[]
       label: "知识库",
       value: overview.knowledge_bases.total,
       icon: "zhishiku",
-      route: "/kb",
+      // TODO(feature-visibility): 待知识库管理支持后恢复卡片跳转，暂保留统计展示。
+      // route: "/kb",
       statuses: [
         { label: "活跃", value: knowledgeBaseActive, tone: "success" },
         {

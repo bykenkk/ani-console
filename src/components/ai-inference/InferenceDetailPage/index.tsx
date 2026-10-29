@@ -17,10 +17,10 @@ import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 import InferenceRelatedResources from "./InferenceRelatedResources";
 import InferenceEvents from "./InferenceEvents";
-import InferenceMonitoring from "./InferenceMonitoring";
+// import InferenceMonitoring from "./InferenceMonitoring";
 import InferenceRuntimeLogs from "./InferenceRuntimeLogs";
 import UpdateInferenceModal from "../UpdateInferenceModal";
-import InferencePolicies from "./InferencePolicies";
+// import InferencePolicies from "./InferencePolicies";
 import InferenceInvocationTest from "./InferenceInvocationTest";
 
 type InferenceDetailPageProps = {
@@ -102,11 +102,12 @@ export default function InferenceDetailPage({
             label: "关联资源",
             content: <InferenceRelatedResources service={item} />,
           },
-          {
-            key: "policies",
-            label: "策略",
-            content: <InferencePolicies key={item.id} serviceId={item.id} />,
-          },
+          // TODO(inference-policy-migration): 完成旧访问策略的 Governance 适配后恢复入口。
+          // {
+          //   key: "policies",
+          //   label: "策略",
+          //   content: <InferencePolicies key={item.id} serviceId={item.id} />,
+          // },
           {
             key: "invocation-test",
             label: "调用测试",
@@ -118,11 +119,12 @@ export default function InferenceDetailPage({
               />
             ),
           },
-          {
-            key: "monitoring",
-            label: "监控",
-            content: <InferenceMonitoring serviceId={item.id} />,
-          },
+          // TODO(inference-monitoring): 监控能力开放后恢复此入口。
+          // {
+          //   key: "monitoring",
+          //   label: "监控",
+          //   content: <InferenceMonitoring />,
+          // },
           {
             key: "logs",
             label: "日志",

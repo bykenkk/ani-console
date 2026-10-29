@@ -1,24 +1,27 @@
 import { useResourceDelete } from "@/hooks/useResourceDelete";
-import { useNavigate } from "@tanstack/react-router";
+// TODO(feature-visibility): 待知识库管理支持后恢复问答导航依赖。
+// import { useNavigate } from "@tanstack/react-router";
 import { type KnowledgeBase } from "@/api/knowledge";
-import { navigateToResourceDetail } from "@/lib/resources";
+// import { navigateToResourceDetail } from "@/lib/resources";
 import type { RowAction } from "@/components/common";
 
 export function useKnowledgeBaseActions(onDeleted: (item: KnowledgeBase) => void) {
-  const navigate = useNavigate();
+  // TODO(feature-visibility): 待知识库管理支持后恢复问答导航。
+  // const navigate = useNavigate();
   const remove = useResourceDelete<KnowledgeBase>("knowledge-base", onDeleted);
 
   const actions: RowAction<KnowledgeBase>[] = [
-    {
-      key: "chat",
-      label: "问答",
-      onClick: (item) =>
-        navigateToResourceDetail(navigate, {
-          type: "knowledge-base",
-          id: item.id,
-          search: { tab: "chat" },
-        }),
-    },
+    // TODO(feature-visibility): 待知识库管理支持后恢复问答入口。
+    // {
+    //   key: "chat",
+    //   label: "问答",
+    //   onClick: (item) =>
+    //     navigateToResourceDetail(navigate, {
+    //       type: "knowledge-base",
+    //       id: item.id,
+    //       search: { tab: "chat" },
+    //     }),
+    // },
     {
       key: "delete",
       label: "删除",

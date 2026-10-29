@@ -24,7 +24,16 @@ export type ResourceNameIdProps = ResourceNameIdBaseProps &
 export default function ResourceNameId(props: ResourceNameIdProps) {
   const { name, id, openable = true, copyable = true } = props;
   const navigate = useNavigate();
-  const canOpen = openable && Boolean(props.type && id && id !== "-");
+  // TODO(feature-visibility): 待对应功能支持后移除类型限制，恢复资源名称跳转。
+  // const canOpen = openable && Boolean(props.type && id && id !== "-");
+  const canOpen =
+    openable &&
+    Boolean(props.type && id && id !== "-") &&
+    props.type !== "filesystem" &&
+    props.type !== "vector-store" &&
+    props.type !== "security-group" &&
+    props.type !== "network-route" &&
+    props.type !== "knowledge-base";
 
   const handleOpen = () => {
     if (!openable || !props.type || !id || id === "-") return;

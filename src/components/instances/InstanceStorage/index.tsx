@@ -9,13 +9,14 @@ type InstanceStorageProps = {
   loading?: boolean;
   diskContent?: ReactNode;
 };
-type FilesystemRow = {
-  id: string;
-  name: string;
-  mount_path: string;
-  access_mode: string;
-  status: string;
-};
+// TODO(feature-visibility): 待文件存储支持后随 NFS 区域恢复行类型。
+// type FilesystemRow = {
+//   id: string;
+//   name: string;
+//   mount_path: string;
+//   access_mode: string;
+//   status: string;
+// };
 
 export default function InstanceStorage({
   configuration,
@@ -64,7 +65,8 @@ export default function InstanceStorage({
         />
       )}
       {/* TODO(instance-nfs): 新接口未提供 NFS 关联与管理能力，保留原表格和按钮，待契约补齐并联调后接入。 */}
-      <DataTable<FilesystemRow>
+      {/* TODO(feature-visibility): 待文件存储支持后恢复 NFS 区域及挂载入口。 */}
+      {/* <DataTable<FilesystemRow>
         header={{
           title: "文件存储 NFS",
           extra: <Button disabled>挂载 NFS</Button>,
@@ -79,7 +81,7 @@ export default function InstanceStorage({
           { title: "访问模式", width: 100, dataIndex: "access_mode" },
           { title: "状态", width: 120, dataIndex: "status" },
         ]}
-      />
+      /> */}
     </Space>
   );
 }

@@ -1,7 +1,8 @@
 import { useVectorStoreActions } from "@/hooks/useVectorStoreActions";
 
-import { useNavigate } from "@tanstack/react-router";
-import { Link } from "@arco-design/web-react";
+// TODO(feature-visibility): 待知识库管理支持后恢复关联知识库跳转及导航依赖。
+// import { useNavigate } from "@tanstack/react-router";
+// import { Link } from "@arco-design/web-react";
 import { useState } from "react";
 import { listVectorStores, type VectorStore } from "@/api/storage/vector-stores";
 
@@ -15,13 +16,14 @@ import {
 } from "@/components/common";
 import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
-import { navigateToResourceDetail } from "@/lib/resources";
+// import { navigateToResourceDetail } from "@/lib/resources";
 
 type StatusFilter = "all" | "ready" | "pending" | "failed";
 type SearchField = "name" | "id";
 
 export default function VectorStoresPage() {
-  const navigate = useNavigate();
+  // TODO(feature-visibility): 待知识库管理支持后恢复关联知识库导航。
+  // const navigate = useNavigate();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
   const [searchField, setSearchField] = useState<SearchField>("name");
@@ -104,21 +106,23 @@ export default function VectorStoresPage() {
       ellipsis: true,
       render: (_, item) => {
         const knowledgeBase = item.knowledge_base_ref;
-        return knowledgeBase ? (
-          <Link
-            onClick={() =>
-              navigateToResourceDetail(navigate, {
-                type: "knowledge-base",
-                id: knowledgeBase.id,
-                search: { tab: "documents" },
-              })
-            }
-          >
-            {knowledgeBase.name || knowledgeBase.id}
-          </Link>
-        ) : (
-          "未关联"
-        );
+        // TODO(feature-visibility): 待知识库管理支持后恢复此链接，暂保留名称展示。
+        // return knowledgeBase ? (
+        //   <Link
+        //     onClick={() =>
+        //       navigateToResourceDetail(navigate, {
+        //         type: "knowledge-base",
+        //         id: knowledgeBase.id,
+        //         search: { tab: "documents" },
+        //       })
+        //     }
+        //   >
+        //     {knowledgeBase.name || knowledgeBase.id}
+        //   </Link>
+        // ) : (
+        //   "未关联"
+        // );
+        return knowledgeBase ? knowledgeBase.name || knowledgeBase.id : "未关联";
       },
     },
     {

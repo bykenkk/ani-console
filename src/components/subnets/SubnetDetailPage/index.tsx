@@ -25,7 +25,8 @@ import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 type Subnet = NetworkSubnet;
 type Vpc = NetworkVPC;
 import SubnetRelatedResources from "./SubnetRelatedResources";
-import SubnetRoutes from "./SubnetRoutes";
+// TODO(feature-visibility): 待路由支持后恢复标签页及组件导入。
+// import SubnetRoutes from "./SubnetRoutes";
 
 type SubnetDetailPageProps = {
   subnetId: string;
@@ -91,11 +92,12 @@ export default function SubnetDetailPage({ subnetId, tab, onTabChange }: SubnetD
         },
       ]}
       tabs={[
-        {
-          key: "routes",
-          label: "路由",
-          content: <SubnetRoutes subnetId={subnetId} vpcId={subnet.vpc_id} />,
-        },
+        // TODO(feature-visibility): 待路由支持后恢复此标签页入口。
+        // {
+        //   key: "routes",
+        //   label: "路由",
+        //   content: <SubnetRoutes subnetId={subnetId} vpcId={subnet.vpc_id} />,
+        // },
         {
           key: "related",
           label: "关联资源",

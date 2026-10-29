@@ -11,16 +11,26 @@ const resourceListRoutes = {
   "gpu-instance": "/gpu-containers",
   "sandbox-instance": "/sandboxes",
   "k8s-cluster": "/k8s-clusters",
-  "knowledge-base": "/kb",
+  // TODO(feature-visibility): 待知识库管理支持后恢复列表返回目标。
+  // "knowledge-base": "/kb",
+  "knowledge-base": "/",
   vpc: "/vpcs",
   subnet: "/subnets",
-  "security-group": "/security-groups",
-  "network-route": "/routes",
+  // TODO(feature-visibility): 待安全组支持后恢复列表返回目标。
+  // "security-group": "/security-groups",
+  "security-group": "/",
+  // TODO(feature-visibility): 待路由支持后恢复列表返回目标。
+  // "network-route": "/routes",
+  "network-route": "/",
   "load-balancer": "/load-balancers",
   volume: "/volumes",
-  filesystem: "/filesystems",
+  // TODO(feature-visibility): 待文件存储支持后恢复列表返回目标。
+  // filesystem: "/filesystems",
+  filesystem: "/",
   bucket: "/objects",
-  "vector-store": "/vector-stores",
+  // TODO(feature-visibility): 待向量存储支持后恢复列表返回目标。
+  // "vector-store": "/vector-stores",
+  "vector-store": "/",
 } as const satisfies Record<ResourceDetailType, string>;
 
 export function useBackOrFallback(
@@ -31,6 +41,12 @@ export function useBackOrFallback(
   const router = useRouter();
 
   return useCallback(() => {
+    // TODO(feature-visibility): 待隐藏功能支持后移除此分支，恢复下方原返回逻辑。
+    // 暂直接返回概览，避免旧浏览历史再次进入这些功能的列表或详情。
+    if (resourceType !== "object" && resourceListRoutes[resourceType] === "/") {
+      router.navigate({ to: "/", replace: true });
+      return;
+    }
     if (router.history.canGoBack()) {
       router.history.back();
       return;
