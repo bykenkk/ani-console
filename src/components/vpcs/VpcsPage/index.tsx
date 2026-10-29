@@ -9,9 +9,11 @@ import {
   type ListColumn,
   StatusBadge,
   ListDataTable,
+  type RowAction,
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import CreateVpcModal from "../CreateVpcModal";
+import BindVpcEipModal from "../BindVpcEipModal";
 
 type Vpc = NetworkVPC;
 type VpcStatusFilter = "" | NetworkResourceStateFilter;
@@ -19,6 +21,7 @@ type VpcStatusFilter = "" | NetworkResourceStateFilter;
 export default function VpcsPage() {
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
+  const [bindingVpc, setBindingVpc] = useState<Vpc | null>(null);
   const [status, setStatus] = useState<VpcStatusFilter>("");
   const [searchText, setSearchText] = useState("");
   const paging = useListPagination(JSON.stringify({ status, name: searchText.trim() }), 10);
@@ -44,6 +47,15 @@ export default function VpcsPage() {
   const items = vpcs.data?.items ?? [];
   const refresh = () => vpcs.refetch();
   const { actions } = useVpcActions(resetPagination);
+  const rowActions: RowAction<Vpc>[] = [
+    {
+      key: "bind-eip",
+      label: "绑定公网 IP",
+      disabled: (vpc) => vpc.state === "deleting" || vpc.state === "deleted",
+      onClick: setBindingVpc,
+    },
+    ...actions,
+  ];
   const columns: Array<ListColumn<Vpc>> = [
     {
       key: "name",
@@ -131,7 +143,7 @@ export default function VpcsPage() {
           data={items}
           columns={columns}
           loading={vpcs.isFetching}
-          rowActions={actions}
+          rowActions={rowActions}
           tableLabel="VPC 列表"
           pagination={{
             mode: "total",
@@ -144,6 +156,13 @@ export default function VpcsPage() {
           }}
         />
       </ListPageFrame>
+      {bindingVpc && (
+        <BindVpcEipModal
+          vpc={bindingVpc}
+          onCancel={() => setBindingVpc(null)}
+          onSubmitted={() => setBindingVpc(null)}
+        />
+      )}
       {createVisible && (
         <CreateVpcModal
           onCancel={() => setCreateVisible(false)}

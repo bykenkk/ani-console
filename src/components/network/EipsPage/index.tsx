@@ -80,7 +80,7 @@ export default function EipsPage() {
         header={{
           iconClassName: "icon-wangluo",
           title: "公网 IP",
-          subtitle: "创建和管理弹性公网 IP（EIP）",
+          subtitle: "创建和管理公网 IP",
           actions: [
             {
               key: "create",
