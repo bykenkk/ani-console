@@ -29,9 +29,18 @@ export default function RevokeModelApiKeyModal({
         errorFallback: "撤销模型 API Key 失败",
       },
     },
-    onSuccess: () => {
+    onSuccess: async () => {
+      const secretKey = ["governance-inference-key-secret", apiKey.id];
+      await qc.cancelQueries({ queryKey: secretKey });
+      qc.removeQueries({ queryKey: secretKey });
+      await Promise.all([
+        qc.invalidateQueries({
+          queryKey: ["governance-inference-keys"],
+          predicate: (query) => query.queryKey[1] !== "options",
+        }),
+        qc.resetQueries({ queryKey: ["governance-inference-keys", "options"] }),
+      ]);
       onRevoked();
-      return qc.invalidateQueries({ queryKey: ["governance-inference-keys"] });
     },
   });
 

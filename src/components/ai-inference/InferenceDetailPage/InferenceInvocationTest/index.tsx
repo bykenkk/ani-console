@@ -33,7 +33,13 @@ export default function InferenceInvocationTest({ service }: InferenceInvocation
   const active = useRef<AbortController | null>(null);
   const submitting = useRef(false);
 
-  useEffect(() => () => active.current?.abort(), []);
+  useEffect(() => {
+    active.current?.abort();
+    setResult(undefined);
+    return () => {
+      active.current?.abort();
+    };
+  }, [service.id, service.served_model_name]);
 
   const invocation = useMutation({
     retry: false,
@@ -46,11 +52,7 @@ export default function InferenceInvocationTest({ service }: InferenceInvocation
         // 每次发送都读详情，使用重置后的最新 secret；密钥不进入表单或 mutation 参数。
         const key = await getInferenceKey(keyId, controller.signal);
         if (controller.signal.aborted) throw new Error("调用测试已取消");
-        const unavailable = getInferenceKeyUnavailableReason(
-          key,
-          target.served_model_name,
-          target.id,
-        );
+        const unavailable = getInferenceKeyUnavailableReason(key);
         if (unavailable) throw new Error(`API Key ${unavailable}，请重新选择`);
         const startedAt = performance.now();
         const response = await invokeInferenceChat(

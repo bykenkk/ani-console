@@ -2,6 +2,7 @@ import { coreRequest } from "@/api/request";
 import { runIdempotentRequest } from "@/api/idempotency";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
+  BindInferenceKeyPolicyRequest,
   CreateInferenceKeyInput,
   CreateInferenceKeyRequest,
   InferenceKey,
@@ -38,9 +39,10 @@ export function getInferenceKey(keyId: string, signal?: AbortSignal) {
   });
 }
 
-export { getInferenceKeyExclusionReason, getInferenceKeyUnavailableReason } from "./availability";
+export { getInferenceKeyUnavailableReason } from "./availability";
+export { listModelInferenceKeys } from "./model-options";
 
-// 一次性凭证交付必须保留响应；资源列表仍通过查询刷新，不使用写入响应更新缓存。
+// 凭证交付保留本次响应；资源列表仍通过查询刷新，不使用写入响应更新缓存。
 // TODO(inference-keys): 待部署后联调首次签发、响应丢失后的幂等重放及权限隔离。
 export function createInferenceKey(input: CreateInferenceKeyInput) {
   return runIdempotentRequest(createScope, input, (data) =>
@@ -71,4 +73,12 @@ export async function revokeInferenceKey(keyId: string): Promise<void> {
   await coreRequest<InferenceKey>(`/inference-keys/${encodeURIComponent(keyId)}`, {
     method: "DELETE",
   });
+}
+
+// TODO(inference-key-policy): 部署后验证换绑授权、计数保留和跨租户拒绝。
+export async function bindInferenceKeyPolicy(keyId: string, policyId: string): Promise<void> {
+  await coreRequest<InferenceKey, BindInferenceKeyPolicyRequest>(
+    `/inference-keys/${encodeURIComponent(keyId)}:bind-policy`,
+    { method: "POST", data: { data: { policy_id: policyId } } },
+  );
 }

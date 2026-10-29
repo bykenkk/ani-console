@@ -1,33 +1,33 @@
 import { Form, InputNumber, Switch } from "@arco-design/web-react";
 
-export interface ModelApiKeyLimit {
+export interface InferencePolicyLimit {
   enabled: boolean;
   limit?: number;
 }
 
-type ModelApiKeyLimitFieldProps = {
+type InferencePolicyLimitFieldProps = {
   field: string;
   label: string;
   disabled?: boolean;
 };
 
-type ModelApiKeyLimitInputProps = {
-  value?: ModelApiKeyLimit;
-  onChange?: (value: ModelApiKeyLimit) => void;
+type InferencePolicyLimitInputProps = {
+  value?: InferencePolicyLimit;
+  onChange?: (value: InferencePolicyLimit) => void;
   onLimitChange?: () => void;
   onToggle?: () => void;
   label: string;
   disabled?: boolean;
 };
 
-function ModelApiKeyLimitInput({
+function InferencePolicyLimitInput({
   value = { enabled: false },
   onChange,
   onLimitChange,
   onToggle,
   label,
   disabled,
-}: ModelApiKeyLimitInputProps) {
+}: InferencePolicyLimitInputProps) {
   return (
     <InputNumber
       aria-label={label}
@@ -64,11 +64,11 @@ function ModelApiKeyLimitInput({
   );
 }
 
-export default function ModelApiKeyLimitField({
+export default function InferencePolicyLimitField({
   field,
   label,
   disabled,
-}: ModelApiKeyLimitFieldProps) {
+}: InferencePolicyLimitFieldProps) {
   const { form } = Form.useFormContext();
 
   return (
@@ -78,7 +78,7 @@ export default function ModelApiKeyLimitField({
       validateTrigger="onLimitChange"
       rules={[
         {
-          validator: (value: ModelApiKeyLimit | undefined, callback) =>
+          validator: (value: InferencePolicyLimit | undefined, callback) =>
             callback(
               value?.enabled &&
                 (typeof value.limit !== "number" ||
@@ -91,7 +91,7 @@ export default function ModelApiKeyLimitField({
         },
       ]}
     >
-      <ModelApiKeyLimitInput
+      <InferencePolicyLimitInput
         label={label}
         disabled={disabled}
         onToggle={() => form.setFields({ [field]: { error: undefined } })}

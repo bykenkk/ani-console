@@ -32,9 +32,18 @@ export default function RotateModelApiKeyModal({
         errorFallback: "重置模型 API Key 失败",
       },
     },
-    onSuccess: (credentials) => {
+    onSuccess: async (credentials) => {
+      const secretKey = ["governance-inference-key-secret", apiKey.id];
+      await qc.cancelQueries({ queryKey: secretKey });
+      qc.removeQueries({ queryKey: secretKey });
       onRotated(credentials);
-      return qc.invalidateQueries({ queryKey: ["governance-inference-keys"] });
+      return Promise.all([
+        qc.invalidateQueries({
+          queryKey: ["governance-inference-keys"],
+          predicate: (query) => query.queryKey[1] !== "options",
+        }),
+        qc.resetQueries({ queryKey: ["governance-inference-keys", "options"] }),
+      ]);
     },
   });
 
@@ -66,7 +75,7 @@ export default function RotateModelApiKeyModal({
       maskClosable={false}
       cancelButtonProps={{ disabled: rotate.isPending }}
     >
-      <div>重置后旧密钥将失效。新密钥仅展示一次，请保存并更新调用方。</div>
+      <div>重置后旧密钥将立即失效，请更新调用方。之后也可通过“查看密钥”获取当前值。</div>
     </Modal>
   );
 }

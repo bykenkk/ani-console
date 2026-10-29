@@ -137,6 +137,11 @@ export const menuItems: readonly MenuItem[] = [
         children: [
           { key: "/ai-models", label: "模型仓库", icon: <AliIcon name="moxing" /> },
           { key: "/ai-inference", label: "推理服务", icon: <AliIcon name="tuili" /> },
+          {
+            key: "/ai-inference-policies",
+            label: "限流与访问策略",
+            icon: <AliIcon name="anquanzu" />,
+          },
           { key: "/ai-api-keys", label: "模型 API Key", icon: <AliIcon name="Ukeyguanli" /> },
           { key: "/ai-finetuning", label: "模型微调", icon: <AliIcon name="moxing" /> },
           { key: "/ai-training", label: "模型训练", icon: <AliIcon name="moxing" /> },
@@ -241,6 +246,7 @@ const PATH_SUBMENU: { prefix: string; key: string }[] = [
   { prefix: "/vector-stores", key: "storage-management" },
   { prefix: "/ai-models", key: "ai-services" },
   { prefix: "/ai-inference", key: "ai-services" },
+  { prefix: "/ai-inference-policies", key: "ai-services" },
   { prefix: "/ai-api-keys", key: "ai-services" },
   { prefix: "/ai-finetuning", key: "ai-services" },
   { prefix: "/kb", key: "knowledge-services" },

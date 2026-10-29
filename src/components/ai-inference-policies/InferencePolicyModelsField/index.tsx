@@ -3,24 +3,24 @@ import { useQuery } from "@tanstack/react-query";
 import { listInferenceServices } from "@/api/inference";
 import { withFirst100 } from "@/api/pagination";
 
-export interface ModelApiKeyScope {
+export interface InferencePolicyModels {
   modelNames: string[];
 }
 
-type ModelApiKeyScopeFieldProps = { disabled?: boolean };
-type ModelApiKeyScopeInputProps = {
-  value?: ModelApiKeyScope;
-  onChange?: (value: ModelApiKeyScope) => void;
+type InferencePolicyModelsFieldProps = { disabled?: boolean };
+type InferencePolicyModelsInputProps = {
+  value?: InferencePolicyModels;
+  onChange?: (value: InferencePolicyModels) => void;
   disabled?: boolean;
 };
 
 const listServiceOptions = withFirst100(listInferenceServices);
 
-function ModelApiKeyScopeInput({
+function InferencePolicyModelsInput({
   value = { modelNames: [] },
   onChange,
   disabled,
-}: ModelApiKeyScopeInputProps) {
+}: InferencePolicyModelsInputProps) {
   const services = useQuery({
     queryKey: ["governance-inference-services", "options"],
     queryFn: ({ signal }) => listServiceOptions({}, signal),
@@ -41,27 +41,26 @@ function ModelApiKeyScopeInput({
       loading={services.isFetching}
       value={value.modelNames}
       options={Array.from(
-        new Set((services.data?.items ?? []).map((service) => service.served_model_name)),
+        new Set([
+          ...value.modelNames,
+          ...(services.data?.items ?? []).map((service) => service.served_model_name),
+        ]),
       )}
       onChange={(modelNames) => onChange?.({ modelNames })}
     />
   );
 }
 
-export default function ModelApiKeyScopeField({ disabled }: ModelApiKeyScopeFieldProps) {
+export default function InferencePolicyModelsField({ disabled }: InferencePolicyModelsFieldProps) {
   return (
     <Form.Item
       field="scope"
       label="授权模型"
-      required
+      extra="未选择任何模型时，将拒绝全部模型调用"
       rules={[
         {
-          validator: (value: ModelApiKeyScope | undefined, callback) => {
-            if (!value?.modelNames.length) {
-              callback("请选择至少一个授权模型");
-              return;
-            }
-            if (value.modelNames.some((name) => !name.trim() || new Blob([name]).size > 256)) {
+          validator: (value: InferencePolicyModels | undefined, callback) => {
+            if (value?.modelNames.some((name) => !name.trim() || new Blob([name]).size > 256)) {
               callback("模型名不能为空，且每项不能超过 256 字节");
               return;
             }
@@ -70,7 +69,7 @@ export default function ModelApiKeyScopeField({ disabled }: ModelApiKeyScopeFiel
         },
       ]}
     >
-      <ModelApiKeyScopeInput disabled={disabled} />
+      <InferencePolicyModelsInput disabled={disabled} />
     </Form.Item>
   );
 }

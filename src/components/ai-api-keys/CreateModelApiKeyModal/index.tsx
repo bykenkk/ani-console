@@ -4,8 +4,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createInferenceKey, type InferenceKeyCredentials } from "@/api/inference-keys";
 import { formatIsoDateTime, isDateTimeExpired, isValidDateTime } from "@/lib/date";
 import { validateForm } from "@/lib/form";
-import ModelApiKeyLimitField, { type ModelApiKeyLimit } from "../ModelApiKeyLimitField";
-import ModelApiKeyScopeField, { type ModelApiKeyScope } from "../ModelApiKeyScopeField";
+import ModelApiKeyPolicyField from "../ModelApiKeyPolicyField";
 
 type CreateModelApiKeyModalProps = {
   onCancel: () => void;
@@ -14,18 +13,9 @@ type CreateModelApiKeyModalProps = {
 
 interface CreateModelApiKeyFormValues {
   name: string;
-  scope: ModelApiKeyScope;
-  requests_per_second: ModelApiKeyLimit;
-  requests_per_minute: ModelApiKeyLimit;
-  requests_per_hour: ModelApiKeyLimit;
+  policy_id: string;
   expires_on?: string;
 }
-
-const limitFields = [
-  { field: "requests_per_second", label: "每秒请求上限" },
-  { field: "requests_per_minute", label: "每分钟请求上限" },
-  { field: "requests_per_hour", label: "每小时请求上限" },
-] as const;
 
 export default function CreateModelApiKeyModal({
   onCancel,
@@ -38,15 +28,7 @@ export default function CreateModelApiKeyModal({
     mutationFn: (values: CreateModelApiKeyFormValues) =>
       createInferenceKey({
         name: values.name.trim(),
-        allowed_service_ids: [],
-        allowed_model_names: values.scope.modelNames,
-        requests_per_second: values.requests_per_second.enabled
-          ? values.requests_per_second.limit!
-          : 0,
-        requests_per_minute: values.requests_per_minute.enabled
-          ? values.requests_per_minute.limit!
-          : 0,
-        requests_per_hour: values.requests_per_hour.enabled ? values.requests_per_hour.limit! : 0,
+        policy_id: values.policy_id,
         expires_at: values.expires_on
           ? formatIsoDateTime(`${values.expires_on}T23:59:59`)
           : undefined,
@@ -61,7 +43,13 @@ export default function CreateModelApiKeyModal({
     },
     onSuccess: (credentials) => {
       onCreated(credentials);
-      return qc.invalidateQueries({ queryKey: ["governance-inference-keys"] });
+      return Promise.all([
+        qc.invalidateQueries({
+          queryKey: ["governance-inference-keys"],
+          predicate: (query) => query.queryKey[1] !== "options",
+        }),
+        qc.resetQueries({ queryKey: ["governance-inference-keys", "options"] }),
+      ]);
     },
   });
 
@@ -94,18 +82,7 @@ export default function CreateModelApiKeyModal({
       cancelButtonProps={{ disabled: create.isPending }}
       style={{ width: 680, maxWidth: "calc(100vw - 48px)" }}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        disabled={create.isPending}
-        autoComplete="off"
-        initialValues={{
-          scope: { modelNames: [] },
-          requests_per_second: { enabled: false },
-          requests_per_minute: { enabled: false },
-          requests_per_hour: { enabled: false },
-        }}
-      >
+      <Form form={form} layout="vertical" disabled={create.isPending} autoComplete="off">
         <Form.Item
           field="name"
           label="名称"
@@ -123,15 +100,7 @@ export default function CreateModelApiKeyModal({
         >
           <Input placeholder="请输入模型 API Key 名称" maxLength={256} />
         </Form.Item>
-        <ModelApiKeyScopeField disabled={create.isPending} />
-        {limitFields.map(({ field, label }) => (
-          <ModelApiKeyLimitField
-            key={field}
-            field={field}
-            label={label}
-            disabled={create.isPending}
-          />
-        ))}
+        <ModelApiKeyPolicyField disabled={create.isPending} showRules={false} />
         <Form.Item
           field="expires_on"
           label="过期日期"

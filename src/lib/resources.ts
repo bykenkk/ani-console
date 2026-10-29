@@ -4,6 +4,7 @@ export type ResourceDetailType =
   | "model"
   | "training-task"
   | "inference-service"
+  | "inference-policy"
   | "vm-instance"
   | "container-instance"
   | "gpu-instance"
@@ -53,6 +54,9 @@ export function navigateToResourceDetail(
       return;
     case "inference-service":
       navigate({ to: "/ai-inference/$serviceId", params: { serviceId: resource.id } });
+      return;
+    case "inference-policy":
+      navigate({ to: "/ai-inference-policies/$policyId", params: { policyId: resource.id } });
       return;
     case "vm-instance":
       navigate({ to: "/vms/$instanceId", params: { instanceId: resource.id } });

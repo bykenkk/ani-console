@@ -6,6 +6,7 @@ const resourceListRoutes = {
   model: "/ai-models",
   "training-task": "/ai-training",
   "inference-service": "/ai-inference",
+  "inference-policy": "/ai-inference-policies",
   "vm-instance": "/vms",
   "container-instance": "/containers",
   "gpu-instance": "/gpu-containers",
