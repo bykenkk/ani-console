@@ -1,36 +1,37 @@
-import { getInstance } from "@/api/instances/legacy";
+import { Button, Empty } from "@arco-design/web-react";
+import { useQuery } from "@tanstack/react-query";
+import { getSandbox } from "@/api/sandboxes";
 import { withId } from "@/lib/id";
-import { Empty } from "@arco-design/web-react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ImageNameText,
   ResourceId,
   StatusBadge,
 } from "@/components/common";
-import InstanceLogs from "@/components/instances/InstanceLogs";
-import InstanceMetrics from "@/components/instances/InstanceMetrics";
-import InstanceOperations from "@/components/instances/InstanceOperations";
 import SandboxActions from "@/components/sandboxes/SandboxActions";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
-import { formatBytes, formatDateTime } from "@/lib/format";
-import { getSandboxProviderLabel } from "@/lib/instances";
-import SandboxAccess from "./SandboxAccess";
-import SandboxCheckpoints from "./SandboxCheckpoints";
-import SandboxCodeRunner from "./SandboxCodeRunner";
-import SandboxEnvironment from "./SandboxEnvironment";
-import SandboxEvents from "./SandboxEvents";
-import SandboxFiles from "./SandboxFiles";
-import { formatDurationSeconds, sandboxEgressLabel, sandboxTimeoutLabel } from "./utils";
+import { sandboxComputeText } from "@/lib/sandboxes";
+import SandboxRuntime from "./SandboxRuntime";
+import SandboxWorkspace from "./SandboxWorkspace";
 
 type SandboxDetailPageProps = {
   instanceId: string;
   tab?: string;
   onTabChange: (tab: string) => void;
 };
+// TODO(sandbox-legacy): 独立沙箱尚无下列正式契约；保留入口和原组件作为迁移参考，不调用旧实例接口。
+const UNAVAILABLE_TABS = [
+  { key: "access", label: "访问配置" },
+  { key: "env", label: "环境变量" },
+  { key: "files", label: "文件" },
+  { key: "code", label: "运行代码" },
+  { key: "checkpoints", label: "检查点" },
+  { key: "metrics", label: "资源监控" },
+  { key: "logs", label: "日志" },
+  { key: "events", label: "事件" },
+];
 
 export default function SandboxDetailPage({
   instanceId,
@@ -38,227 +39,102 @@ export default function SandboxDetailPage({
   onTabChange,
 }: SandboxDetailPageProps) {
   const goBack = useBackOrFallback("sandbox-instance");
-  const queryClient = useQueryClient();
-
   const detail = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("sandbox", instanceId),
-        action: "沙箱加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["instance", instanceId],
-    queryFn: () => getInstance(instanceId),
+    queryKey: ["sandboxes", instanceId],
+    queryFn: ({ signal }) => getSandbox(instanceId, signal),
+    meta: { errorNotification: { id: withId("sandbox", instanceId), action: "沙箱加载" } },
   });
-  const refreshDetail = async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: ["instance", instanceId] }),
-      queryClient.invalidateQueries({ queryKey: ["sandbox-instances"] }),
-    ]);
-  };
-
-  if (!detail.data) {
-    return <DetailPagePlaceholder loading={detail.isLoading} />;
-  }
-
-  const instance = detail.data;
-  if (instance.kind !== "sandbox" || !instance.sandbox) {
-    return <Empty description="当前资源不是沙箱，或缺少沙箱运行摘要" />;
-  }
-
-  const sandbox = instance.sandbox;
-  const sessionState = sandbox.session_state ?? instance.state;
-  const running = sessionState === "running";
-
+  if (!detail.data) return <DetailPagePlaceholder loading={detail.isLoading} />;
+  const sandbox = detail.data;
+  const snapshot = sandbox.snapshot;
+  const refresh = (
+    <Button
+      loading={detail.isFetching}
+      onClick={() => {
+        detail.refetch();
+      }}
+    >
+      刷新
+    </Button>
+  );
   return (
     <DetailPageFrame
       breadcrumbs={[
         ...navigationBreadcrumbsForPath("/sandboxes"),
-        { label: instance.name || instance.id },
+        { label: snapshot?.name || sandbox.id },
       ]}
-      title={instance.name || instance.id}
-      status={<StatusBadge status={sessionState} reason={instance.reason} />}
-      icon={<AliIcon name="Sandbox" size={28} />}
-      headerItems={[
-        {
-          label: "CPU / 内存",
-          value:
-            [instance.compute?.cpu, instance.compute?.memory]
-              .filter((value) => value != null)
-              .join(" / ") || "-",
-        },
-      ]}
-      actions={
-        <SandboxActions
-          instance={instance}
-          onChanged={() => {
-            refreshDetail();
-          }}
-          onDeleted={goBack}
-        />
+      title={snapshot?.name || sandbox.id}
+      status={
+        <StatusBadge status={sandbox.observed_state} reason={sandbox.reason} loading={false} />
       }
+      icon={<AliIcon name="Sandbox" size={28} />}
+      headerItems={[{ label: "CPU / 内存", value: sandboxComputeText(sandbox) }]}
+      actions={<SandboxActions sandbox={sandbox} onDeleted={goBack} />}
       cards={[
         {
           key: "basic",
           title: "基本信息",
           fields: [
-            { label: "ID", value: <ResourceId value={instance.id} /> },
+            { label: "ID", value: <ResourceId value={sandbox.id} /> },
+            { label: "版本", value: sandbox.version },
+            { label: "期望状态", value: sandbox.desired_state },
+            { label: "计算预设", value: snapshot?.preset_name || snapshot?.preset_code || "-" },
             {
-              label: "终止保护",
-              value: instance.termination_protection ? "已开启" : "未开启",
+              label: "预设 ID",
+              value: snapshot?.preset_id ? <ResourceId value={snapshot.preset_id} /> : "-",
             },
-            {
-              label: "镜像",
-              value: <ImageNameText image={instance.image} />,
-            },
-            {
-              label: "CPU / 内存",
-              value:
-                [instance.compute?.cpu, instance.compute?.memory]
-                  .filter((value) => value != null)
-                  .join(" / ") || "-",
-            },
-            { label: "RuntimeClass", value: sandbox.runtime_class },
-            {
-              label: "出口策略",
-              value: sandboxEgressLabel(sandbox.network_egress_policy),
-            },
-            { label: "Provider", value: getSandboxProviderLabel(instance) },
-            { label: "会话 TTL", value: sandbox.session_timeout },
-            { label: "空闲超时", value: sandbox.idle_timeout ?? "-" },
-            {
-              label: "到期策略",
-              value: sandboxTimeoutLabel(sandbox.on_timeout),
-            },
-            { label: "创建时间", value: formatDateTime(instance.created_at) },
+            { label: "镜像引用", value: snapshot?.image_reference || "-" },
+            { label: "镜像摘要", value: snapshot?.image_digest || "-" },
+            { label: "计算类型", value: snapshot?.compute_type || "-" },
           ],
         },
         {
-          key: "related-summary",
-          title: "关联摘要",
+          key: "operations",
+          title: "操作标识",
           fields: [
-            { label: "关联 Agent", value: sandbox.agent_ref ?? "-" },
             {
-              label: "预览端口",
-              value: `${sandbox.ports?.length ?? 0} 个`,
+              label: "创建操作 ID",
+              value: sandbox.create_operation_id ? (
+                <ResourceId value={sandbox.create_operation_id} />
+              ) : (
+                "-"
+              ),
             },
             {
-              label: "检查点",
-              value: `${sandbox.checkpoints?.length ?? 0} 个`,
+              label: "最近操作 ID",
+              value: sandbox.last_operation_id ? (
+                <ResourceId value={sandbox.last_operation_id} />
+              ) : (
+                "-"
+              ),
             },
-            {
-              label: "环境变量",
-              value: `${sandbox.env?.length ?? 0} 个`,
-            },
-            {
-              label: "工作区文件",
-              value:
-                sandbox.files_summary?.file_count != null
-                  ? `${sandbox.files_summary.file_count} 个 / ${formatBytes(
-                      sandbox.files_summary.total_size_bytes,
-                    )}`
-                  : "-",
-            },
-            {
-              label: "资源引用",
-              value: instance.resource_refs?.join("、") || "-",
-            },
-            {
-              label: "剩余时长",
-              value: formatDurationSeconds(sandbox.remain_seconds),
-            },
-            {
-              label: "空闲剩余",
-              value: formatDurationSeconds(sandbox.idle_remain_seconds),
-            },
-            { label: "停止原因", value: sandbox.stop_reason ?? "-" },
-            { label: "更新时间", value: formatDateTime(instance.updated_at) },
           ],
         },
       ]}
       tabs={[
         {
-          key: "access",
-          label: "访问配置",
-          content: (
-            <SandboxAccess
-              instance={instance}
-              onChanged={() => {
-                refreshDetail();
-              }}
-            />
-          ),
+          key: "runtime",
+          label: "运行资源",
+          content: <SandboxRuntime sandbox={sandbox} />,
+          extra: refresh,
         },
         {
-          key: "env",
-          label: "环境变量",
-          content: <SandboxEnvironment sandbox={sandbox} />,
+          key: "workspace",
+          label: "工作区",
+          content: <SandboxWorkspace sandbox={sandbox} />,
+          extra: refresh,
         },
-        {
-          key: "files",
-          label: "文件",
-          content: (
-            <SandboxFiles
-              instanceId={instanceId}
-              running={running}
-              onChanged={() => {
-                refreshDetail();
-              }}
-            />
-          ),
-        },
-        {
-          key: "code",
-          label: "运行代码",
-          content: (
-            <SandboxCodeRunner
-              instanceId={instanceId}
-              running={running}
-              onChanged={() => {
-                refreshDetail();
-              }}
-            />
-          ),
-        },
-        {
-          key: "checkpoints",
-          label: "检查点",
-          content: (
-            <SandboxCheckpoints
-              instanceId={instanceId}
-              sessionState={sessionState}
-              onChanged={() => {
-                refreshDetail();
-              }}
-            />
-          ),
-        },
-        {
-          key: "metrics",
-          label: "资源监控",
-          // TODO(sandbox-instance-detail): 新接口尚未提供对应能力，保留原模板空态，待契约补齐并联调后接入。
-          content: <InstanceMetrics />,
-        },
-        {
-          key: "logs",
-          label: "日志",
-          // TODO(sandbox-instance-detail): 新接口尚未提供对应能力，保留原模板空态，待契约补齐并联调后接入。
-          content: <InstanceLogs active />,
-        },
-        {
-          key: "events",
-          label: "事件",
-          content: <SandboxEvents instanceId={instanceId} />,
-        },
+        ...UNAVAILABLE_TABS.map((item) => ({
+          ...item,
+          content: <Empty description={`独立沙箱接口暂未提供${item.label}能力`} />,
+        })),
+        // TODO(sandbox-task): 创建、删除任务跟踪按统一方案后续接入。
         {
           key: "operations",
           label: "操作记录",
-          // TODO(sandbox-instance-detail): 新接口尚未提供对应能力，保留原模板空态，待契约补齐并联调后接入。
-          content: <InstanceOperations />,
+          content: <Empty description="操作跟踪待统一接入，当前可在左侧查看操作 ID" />,
         },
       ]}
-
       activeTabKey={tab}
       onTabChange={onTabChange}
       onBack={goBack}

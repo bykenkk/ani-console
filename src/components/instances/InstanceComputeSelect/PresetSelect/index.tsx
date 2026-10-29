@@ -6,12 +6,13 @@ import { listInstancePresets, type ComputeType, type InstancePreset } from "@/ap
 import { listInferencePresets } from "@/api/inference";
 import { listModelDevComputePresets } from "@/api/modeldev";
 import { listVmPresets } from "@/api/vms";
+import { listSandboxPresets } from "@/api/sandboxes";
 import { withId } from "@/lib/id";
 import { withFirst100 } from "@/api/pagination";
 import { closeNotification, showNotification } from "@/lib/feedback";
 
 export type PresetSelectProps = {
-  usage?: "CONTAINER_INSTANCE" | "INFERENCE" | "TRAINING" | "VIRTUAL_MACHINE";
+  usage?: "CONTAINER_INSTANCE" | "INFERENCE" | "TRAINING" | "VIRTUAL_MACHINE" | "SANDBOX";
   computeType?: ComputeType;
   value?: InstancePreset;
   onChange?: (preset?: InstancePreset) => void;
@@ -22,11 +23,13 @@ const listPresetOptions = withFirst100(listInstancePresets);
 const listInferencePresetOptions = withFirst100(listInferencePresets);
 const listTrainingPresetOptions = withFirst100(listModelDevComputePresets);
 const listVmPresetOptions = withFirst100(listVmPresets);
+const listSandboxPresetOptions = withFirst100(listSandboxPresets);
 const listOptionsByUsage = {
   CONTAINER_INSTANCE: listPresetOptions,
   INFERENCE: listInferencePresetOptions,
   TRAINING: listTrainingPresetOptions,
   VIRTUAL_MACHINE: listVmPresetOptions,
+  SANDBOX: listSandboxPresetOptions,
 };
 
 export default function PresetSelect({
@@ -44,21 +47,18 @@ export default function PresetSelect({
         ? "算力规格"
         : usage === "VIRTUAL_MACHINE"
           ? "虚拟机算力规格"
-          : "实例预设";
+          : usage === "SANDBOX"
+            ? "沙箱算力规格"
+            : "实例预设";
   const scope = `${usage}-${computeType ?? "all"}`;
+  const serverSearch = usage === "VIRTUAL_MACHINE" || usage === "SANDBOX";
   const query = useQuery({
-    queryKey: [
-      "compute-presets",
-      usage,
-      computeType,
-      "options",
-      ...(usage === "VIRTUAL_MACHINE" ? [search] : []),
-    ],
+    queryKey: ["compute-presets", usage, computeType, "options", ...(serverSearch ? [search] : [])],
     queryFn: ({ signal }) =>
       listOptionsByUsage[usage](
         {
           compute_type: computeType,
-          ...(usage === "VIRTUAL_MACHINE" ? { name: search || undefined } : {}),
+          ...(serverSearch ? { name: search || undefined } : {}),
         },
         signal,
       ),
@@ -85,7 +85,7 @@ export default function PresetSelect({
   }, [catalogStatus, scope, label, query.dataUpdatedAt]);
   useEffect(() => {
     const current = query.data?.items.find((item) => item.id === value?.id);
-    if (usage !== "VIRTUAL_MACHINE" && query.data && value && !current) {
+    if (!serverSearch && query.data && value && !current) {
       onChange?.(undefined);
       return;
     }
@@ -98,7 +98,7 @@ export default function PresetSelect({
         current.compute_type !== value.compute_type)
     )
       onChange?.(current);
-  }, [query.data, value, onChange, usage]);
+  }, [query.data, value, onChange, serverSearch]);
   const items = query.data?.items ?? [];
   const options = value && !items.some((item) => item.id === value.id) ? [value, ...items] : items;
   return (
@@ -108,7 +108,7 @@ export default function PresetSelect({
       aria-label="具体规格"
       showSearch
       filterOption={
-        usage === "VIRTUAL_MACHINE"
+        serverSearch
           ? false
           : (input, option) =>
               Boolean(
@@ -118,7 +118,7 @@ export default function PresetSelect({
                   .includes(input.toLowerCase()),
               )
       }
-      onSearch={usage === "VIRTUAL_MACHINE" ? setSearch : undefined}
+      onSearch={serverSearch ? setSearch : undefined}
       loading={query.isFetching}
       placeholder={`请选择${label}`}
       options={options.map((item) => {

@@ -1,122 +1,101 @@
 import { Modal } from "@arco-design/web-react";
-import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
-import type { RowAction } from "@/components/common";
-import SandboxExtendModal from "@/components/sandboxes/SandboxExtendModal";
-import { openInstanceTerminalWindow } from "@/lib/instances";
-import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
+import { ApiError } from "@/api/request";
+import { pauseSandbox, resumeSandbox, deleteSandbox, type Sandbox } from "@/api/sandboxes";
+import { unavailableAction, type RowAction } from "@/components/common/DataTable/RowActions";
+import { withId } from "@/lib/id";
 
-type Instance = InstanceRecord;
-type LifecycleAction = "pause" | "resume" | "extend" | "touch_idle" | "delete";
-type LifecycleVariables = { instance: Instance; action: LifecycleAction; duration?: string };
-const lifecycleLabels = {
+type SandboxAction = "pause" | "resume" | "delete";
+type SandboxActionVariables = { sandbox: Sandbox; action: SandboxAction };
+const LABELS: Record<SandboxAction, string> = {
   pause: "暂停沙箱",
   resume: "恢复沙箱",
-  extend: "延长会话",
-  touch_idle: "活跃续期",
   delete: "销毁沙箱",
 };
 
-const TERMINAL_STATES = new Set(["expired", "deleted", "deleting"]);
-const BUSY_STATES = new Set<Instance["state"]>([
-  "pending",
-  "provisioning",
-  "starting",
-  "stopping",
-  "deleting",
-]);
-
-function sessionState(instance: Instance) {
-  return instance.sandbox?.session_state ?? instance.state;
-}
-
-export function useSandboxActions(onChanged: () => void, onDeleted?: () => void) {
-  const [extendTarget, setExtendTarget] = useState<Instance>();
-  const lifecycle = useMutation({
+export function useSandboxActions(onDeleted?: () => void) {
+  const qc = useQueryClient();
+  const pending = useIsMutating({ mutationKey: ["sandbox-write"] });
+  const mutation = useMutation({
+    mutationKey: ["sandbox-write", "lifecycle"],
+    retry: false,
+    mutationFn: async ({ sandbox, action }: SandboxActionVariables) => {
+      await { pause: pauseSandbox, resume: resumeSandbox, delete: deleteSandbox }[action](
+        sandbox.id,
+        { expected_version: sandbox.version },
+      );
+    },
     meta: {
       feedback: (variables) => {
-        const { action } = variables as LifecycleVariables;
-        const label = lifecycleLabels[action];
+        const { action, sandbox } = variables as SandboxActionVariables;
         return {
           channel: "notification",
-          id: "sandbox-lifecycle",
-          action: label,
-          successText:
-            action === "extend" || action === "touch_idle" ? `${label}成功` : `${label}已提交`,
-          errorFallback: `${label}失败，请稍后重试`,
+          id: withId(`sandbox-${action}`, sandbox.id),
+          action: LABELS[action],
+          successText: `${LABELS[action]}已提交`,
         };
       },
     },
-    mutationFn: async ({ instance, action, duration }: LifecycleVariables) => {
-      await applyInstanceLifecycle(instance.id, { action, duration });
+    onSuccess: async (_, { action, sandbox }) => {
+      // TODO(sandbox-task): 创建、删除操作跟踪暂缓，只刷新服务端资源状态。
+      if (action === "delete") {
+        await qc.invalidateQueries({ queryKey: ["sandboxes", sandbox.id], refetchType: "none" });
+        onDeleted?.();
+        await qc.invalidateQueries({ queryKey: ["sandboxes", "list"] });
+      } else await qc.invalidateQueries({ queryKey: ["sandboxes"] });
     },
-    onSuccess: (_, { action }) => {
-      if (action === "delete" && onDeleted) onDeleted();
-      else onChanged();
+    onError: async (error, { sandbox }) => {
+      if (error instanceof ApiError && error.status === 409)
+        await Promise.all([
+          qc.invalidateQueries({ queryKey: ["sandboxes", sandbox.id] }),
+          qc.invalidateQueries({ queryKey: ["sandboxes", "list"] }),
+        ]);
     },
   });
-
-  const pending = (instance: Instance) =>
-    lifecycle.isPending && lifecycle.variables?.instance.id === instance.id;
-  const busy = (instance: Instance) => pending(instance) || BUSY_STATES.has(instance.state);
-  const running = (instance: Instance) => sessionState(instance) === "running";
-  const resumable = (instance: Instance) =>
-    sessionState(instance) === "paused" || sessionState(instance) === "stopped";
-
-  const actions: Array<RowAction<Instance>> = [
+  const closed = (sandbox: Sandbox) =>
+    sandbox.desired_state === "deleted" || sandbox.observed_state === "deleted";
+  const unavailable = (sandbox: Sandbox) => pending > 0 || closed(sandbox);
+  const confirm = (sandbox: Sandbox, action: SandboxAction) => {
+    const dialog = Modal.confirm({
+      title: LABELS[action],
+      content:
+        action === "delete"
+          ? `确认销毁「${sandbox.snapshot?.name || sandbox.id}」？运行环境和工作区数据将被删除，无法恢复。`
+          : action === "pause"
+            ? `确认暂停「${sandbox.snapshot?.name || sandbox.id}」？工作区文件保留，内存和运行中的进程不会保留。`
+            : `确认恢复「${sandbox.snapshot?.name || sandbox.id}」？将使用原工作区重新启动运行环境。`,
+      okButtonProps: { status: action === "delete" ? "danger" : "default" },
+      onOk: async () => {
+        try {
+          await mutation.mutateAsync({ sandbox, action });
+        } catch (error) {
+          // 冲突后关闭持有旧版本的确认框，基于刷新结果重新确认。
+          if (error instanceof ApiError && error.status === 409) dialog.close();
+          throw error;
+        }
+      },
+    });
+  };
+  const actions: RowAction<Sandbox>[] = [
     {
       key: "lifecycle",
-      label: (instance) => (running(instance) ? "暂停" : "恢复"),
+      label: (sandbox) => (sandbox.desired_state === "paused" ? "恢复" : "暂停"),
       widthLabel: "暂停",
-      disabled: (instance) => busy(instance) || (!running(instance) && !resumable(instance)),
-      loading: pending,
-      onClick: (instance) =>
-        lifecycle.mutateAsync({ instance, action: running(instance) ? "pause" : "resume" }),
+      disabled: unavailable,
+      onClick: (sandbox) =>
+        confirm(sandbox, sandbox.desired_state === "paused" ? "resume" : "pause"),
     },
-    {
-      key: "extend",
-      label: "延长会话",
-      disabled: (instance) => busy(instance) || TERMINAL_STATES.has(sessionState(instance)),
-      onClick: setExtendTarget,
-    },
-    {
-      key: "touch-idle",
-      label: "活跃续期",
-      disabled: (instance) => busy(instance) || !running(instance),
-      onClick: (instance) => lifecycle.mutateAsync({ instance, action: "touch_idle" }),
-    },
-    {
-      key: "terminal",
-      label: "远程终端",
-      disabled: (instance) => !running(instance) || instance.access?.exec_available === false,
-      onClick: (instance) => openInstanceTerminalWindow(instance.id),
-    },
+    // TODO(sandbox-legacy): 独立 Sandbox 尚无续期、终端契约，保留禁用入口和旧实现，不向旧接口传新 ID。
+    unavailableAction("extend", "延长会话"),
+    unavailableAction("touch-idle", "活跃续期"),
+    unavailableAction("terminal", "远程终端"),
     {
       key: "delete",
       label: "销毁",
       intent: "danger",
-      disabled: (instance) => busy(instance) || sessionState(instance) === "deleted",
-      onClick: (instance) => {
-        Modal.confirm({
-          title: "销毁沙箱",
-          content: `确认销毁「${instance.name || instance.id}」？工作区和未保存数据将不可恢复。`,
-          okButtonProps: { status: "danger" },
-          onOk: () => lifecycle.mutateAsync({ instance, action: "delete" }),
-        });
-      },
+      disabled: unavailable,
+      onClick: (sandbox) => confirm(sandbox, "delete"),
     },
   ];
-
-  const dialogNode = extendTarget ? (
-    <SandboxExtendModal
-      instance={extendTarget}
-      onCancel={() => setExtendTarget(undefined)}
-      onSubmitted={() => {
-        setExtendTarget(undefined);
-        onChanged();
-      }}
-    />
-  ) : null;
-
-  return { dialogNode, actions };
+  return { actions };
 }

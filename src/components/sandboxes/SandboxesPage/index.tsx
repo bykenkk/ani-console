@@ -1,9 +1,6 @@
-import {
-  listInstances,
-  type InstanceRecord,
-  type FilterableInstanceState,
-} from "@/api/instances/legacy";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { listSandboxes, type Sandbox } from "@/api/sandboxes";
 import {
   ResourceNameId,
   ListPageFrame,
@@ -11,179 +8,152 @@ import {
   type ListColumn,
   ListDataTable,
 } from "@/components/common";
-import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
-import { formatDateTime } from "@/lib/format";
-import { getImageDisplayName } from "@/lib/render";
-import SandboxCreateModal from "@/components/sandboxes/SandboxCreateModal";
+import { useListPagination } from "@/hooks/useListPagination";
 import { useSandboxActions } from "@/hooks/useSandboxActions";
-
-type SandboxInstance = InstanceRecord;
-type SandboxStatus = "all" | FilterableInstanceState;
-type SearchField = "name" | "id";
+import { formatDateTime } from "@/lib/format";
+import { sandboxComputeText } from "@/lib/sandboxes";
+import SandboxCreateModal from "@/components/sandboxes/SandboxCreateModal";
 
 export default function SandboxesPage() {
-  const [status, setStatus] = useState<SandboxStatus>("all");
-  const [searchField, setSearchField] = useState<SearchField>("name");
-  const [searchText, setSearchText] = useState("");
-  const [createVisible, setCreateVisible] = useState(false);
-
-  const {
-    query,
-    refresh,
-    items: rows,
-    pagination,
-  } = useCursorPaginatedQuery<SandboxInstance>({
-    errorNotification: {
-      id: "sandboxes",
-      action: "沙箱列表加载",
-      fallback: "请求失败，请稍后重试",
-    },
-    queryKey: ["sandbox-instances", { status, searchField, searchText }],
-    queryFn: async ({ cursor, limit }) => {
-      const keyword = searchText.trim();
-      return listInstances({
-        kind: "sandbox",
-        state: status === "all" ? undefined : status,
-        search_field: keyword ? searchField : undefined,
-        keyword: keyword || undefined,
-        cursor,
-        limit,
-      });
-    },
+  const [creating, setCreating] = useState(false);
+  const { page, pageSize, setPage, setPageSize, resetPagination } = useListPagination(
+    "sandboxes",
+    20,
+  );
+  const query = useQuery({
+    queryKey: ["sandboxes", "list", { page, pageSize }],
+    queryFn: ({ signal }) => listSandboxes({ page, pageSize }, signal),
+    meta: { errorNotification: { id: "sandboxes", action: "沙箱列表加载" } },
   });
-  const { dialogNode, actions } = useSandboxActions(refresh);
-
+  const { actions } = useSandboxActions();
+  // TODO(sandbox-filter): 保留筛选入口但禁用，后端提供正式筛选参数后再接入。
   const statusTabs = [
-    { value: "all" as const, label: "全部" },
-    { value: "pending" as const, label: "等待中" },
-    { value: "provisioning" as const, label: "配置中" },
-    { value: "starting" as const, label: "启动中" },
-    { value: "running" as const, label: "运行中" },
-    { value: "stopping" as const, label: "停止中" },
-    { value: "stopped" as const, label: "已停止" },
-    { value: "failed" as const, label: "异常" },
+    { value: "all", label: "全部" },
+    { value: "provisioning", label: "配置中", disabled: true },
+    { value: "running", label: "运行中", disabled: true },
+    { value: "paused", label: "已暂停", disabled: true },
+    { value: "unknown", label: "状态未知", disabled: true },
   ];
-
-  const columns: Array<ListColumn<SandboxInstance>> = [
+  const columns: ListColumn<Sandbox>[] = [
     {
       key: "name",
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => (
-        <ResourceNameId name={item.name || item.id} id={item.id} type="sandbox-instance" />
+      render: (_, sandbox) => (
+        <ResourceNameId
+          name={sandbox.snapshot?.name || sandbox.id}
+          id={sandbox.id}
+          type="sandbox-instance"
+        />
       ),
     },
     {
-      key: "state",
-      title: "状态",
+      key: "observed_state",
+      title: "当前状态",
       width: 120,
-      render: (_, item) => (
-        <StatusBadge status={item.state} reason={item.reason ?? item.sandbox?.stop_reason} />
+      render: (_, sandbox) => (
+        <StatusBadge status={sandbox.observed_state} reason={sandbox.reason} loading={false} />
       ),
     },
+    { key: "desired_state", title: "期望状态", width: 120, dataIndex: "desired_state" },
     {
-      key: "template",
-      title: "模板 / 镜像",
-      width: 150,
+      key: "spec",
+      title: "CPU / 内存",
+      width: 180,
+      render: (_, sandbox) => sandboxComputeText(sandbox),
+    },
+    {
+      key: "preset",
+      title: "计算预设",
+      width: 180,
+      dataIndex: "snapshot.preset_name",
       ellipsis: true,
-      render: (_, item) => getImageDisplayName(item.image),
     },
     {
-      key: "ttl",
-      title: "会话时长",
+      key: "image",
+      title: "镜像引用",
+      width: 260,
+      dataIndex: "snapshot.image_reference",
+      ellipsis: true,
+    },
+    { key: "workspace", title: "工作区容量", width: 140, dataIndex: "snapshot.workspace.size" },
+    {
+      key: "runtime",
+      title: "RuntimeClass",
       width: 180,
-      dataIndex: "sandbox.session_timeout",
+      dataIndex: "snapshot.runtime_class",
+      ellipsis: true,
     },
-    { key: "idle", title: "空闲剩余", width: 180, render: () => "-" },
+    { key: "reason", title: "状态原因", width: 240, dataIndex: "reason", ellipsis: true },
     {
-      key: "session",
-      title: "关联会话",
-      width: 110,
-      render: (_, item) => (item.access?.exec_available ? "可连接" : "-"),
-    },
-    {
-      key: "egress",
-      title: "出口策略",
-      width: 130,
-      dataIndex: "sandbox.network_egress_policy",
-    },
-    {
-      key: "protection",
-      title: "终止保护",
-      width: 100,
-      render: (_, item) => (item.termination_protection ? "已开启" : "未开启"),
-    },
-    {
-      key: "created",
-      title: "创建时间",
+      key: "observed_at",
+      title: "状态观测时间",
       width: 180,
-      render: (_, item) => formatDateTime(item.created_at),
+      render: (_, sandbox) => formatDateTime(sandbox.observed_at),
     },
   ];
-
   return (
     <>
       <ListPageFrame
         header={{
           iconClassName: "icon-Sandbox",
           title: "沙箱",
-          subtitle: "隔离会话、双超时与受控网络出口",
+          subtitle: "管理隔离运行环境和持久化工作区",
           actions: [
             {
               key: "create",
               label: "创建沙箱",
               iconClassName: "icon-add-1",
               variant: "primary",
-              onClick: () => setCreateVisible(true),
+              onClick: () => setCreating(true),
             },
           ],
         }}
-        tabs={{
-          items: statusTabs,
-          value: status,
-          onChange: setStatus,
-        }}
+        tabs={{ items: statusTabs, value: "all", onChange: () => undefined }}
         toolbar={{
           search: {
-            fields: [
-              {
-                value: "name",
-                label: "名称",
-              },
-              {
-                value: "id",
-                label: "ID",
-              },
-            ],
-            field: searchField,
-            value: searchText,
-            onFieldChange: setSearchField,
-            onChange: setSearchText,
+            disabled: true,
+            fields: [{ value: "keyword", label: "名称 / ID" }],
+            field: "keyword",
+            value: "",
+            placeholder: "搜索沙箱名称或 ID",
+            onFieldChange: () => undefined,
+            onChange: () => undefined,
           },
           refresh: {
             label: "刷新",
             spinning: query.isFetching,
-            onClick: refresh,
+            onClick: () => {
+              query.refetch();
+            },
           },
         }}
       >
         <ListDataTable
-          data={rows}
+          data={query.data?.items ?? []}
           columns={columns}
           rowActions={actions}
-          loading={query.isFetching}
+          loading={query.isLoading}
           tableLabel="沙箱列表"
-          pagination={pagination}
+          pagination={{
+            page,
+            pageSize,
+            total: Number(query.data?.total ?? "0"),
+            onPageChange: setPage,
+            onPageSizeChange: setPageSize,
+          }}
         />
       </ListPageFrame>
-      {createVisible && (
+      {creating && (
         <SandboxCreateModal
-          onCancel={() => setCreateVisible(false)}
-          onCreated={() => setCreateVisible(false)}
+          onCancel={() => setCreating(false)}
+          onCreated={() => {
+            setCreating(false);
+            resetPagination();
+          }}
         />
       )}
-      {dialogNode}
     </>
   );
 }
