@@ -7,8 +7,7 @@ import { useTrainingTaskActions } from "@/hooks/useTrainingTaskActions";
 import { taskColumns } from "./task-config";
 import TrainingTaskCreateModal from "./TrainingTaskCreateModal";
 
-// const filters = { kind: "GENERAL_TRAINING" } as const;
-const filters = {} as const;
+const filters = { kind: "GENERAL_TRAINING" } as const;
 
 export default function TrainingTasksPage() {
   const [createVisible, setCreateVisible] = useState(false);

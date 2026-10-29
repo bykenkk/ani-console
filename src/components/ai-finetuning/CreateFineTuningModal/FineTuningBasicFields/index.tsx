@@ -64,6 +64,7 @@ export default function FineTuningBasicFields({
       <ModelDevImplementationField
         field="method"
         kind="FINETUNING"
+        deviceMode={values.preset?.compute_type}
         selectedId={values.method}
         onResolve={onImplementationSelect}
       />

@@ -127,12 +127,20 @@ export default function TrainingTaskCreateModal({ onCancel }: TrainingTaskCreate
         initialValues={initialValues}
         wrapper="div"
         onValuesChange={(changed, next) => {
-          if ("implementation_id" in changed) {
+          const reset: Partial<TrainingTaskCreateFormValues> = {};
+          const deviceModeChanged =
+            "preset" in changed && next.preset?.compute_type !== values.preset?.compute_type;
+          if (deviceModeChanged) {
+            form.clearFields(["implementation_id"]);
+            reset.implementation_id = "";
+          }
+          if ("implementation_id" in changed || deviceModeChanged) {
             if (parameterFields.length) form.clearFields(parameterFields);
-            form.setFieldValue("parameters", []);
+            reset.parameters = [];
             setImplementation(undefined);
-            setValues((current) => ({ ...current, ...next, parameters: [] }));
-          } else setValues((current) => ({ ...current, ...next }));
+          }
+          form.setFieldsValue(reset);
+          setValues((current) => ({ ...current, ...next, ...reset }));
         }}
       >
         <div hidden={step !== 1}>

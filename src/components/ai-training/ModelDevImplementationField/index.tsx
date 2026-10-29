@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Form, Select } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
+import { skipToken, useQuery } from "@tanstack/react-query";
 import {
   listModelDevImplementations,
   type ModelDevImplementation,
@@ -13,6 +13,7 @@ const listOptions = withFirst100(listModelDevImplementations);
 type ModelDevImplementationFieldProps = {
   field: string;
   kind: NonNullable<ModelDevImplementationListParams["kind"]>;
+  deviceMode?: ModelDevImplementationListParams["device_mode"];
   selectedId: string;
   onResolve: (implementation: ModelDevImplementation | undefined) => void;
 };
@@ -20,14 +21,17 @@ type ModelDevImplementationFieldProps = {
 export default function ModelDevImplementationField({
   field,
   kind,
+  deviceMode,
   selectedId,
   onResolve,
 }: ModelDevImplementationFieldProps) {
+  const { disabled } = Form.useFormContext();
   const label = kind === "FINETUNING" ? "微调技术" : "训练方法";
   const query = useQuery({
-    queryKey: ["training-implementations", "options", { kind }],
-    // TODO(modeldev-kind): 待联调验证 GENERAL_TRAINING / FINETUNING 的筛选及空结果。
-    queryFn: ({ signal }) => listOptions({ kind }, signal),
+    queryKey: ["training-implementations", "options", { kind, device_mode: deviceMode }],
+    queryFn: deviceMode
+      ? ({ signal }) => listOptions({ kind, device_mode: deviceMode }, signal)
+      : skipToken,
     meta: {
       errorNotification: {
         id: withId("training-implementations", kind),
@@ -65,7 +69,8 @@ export default function ModelDevImplementationField({
       ]}
     >
       <Select
-        placeholder={`请选择${label}`}
+        placeholder={deviceMode ? `请选择${label}` : "请先选择算力规格"}
+        disabled={disabled || !deviceMode}
         loading={query.isFetching}
         filterOption={false}
         options={(query.data?.items ?? []).map((item) => ({

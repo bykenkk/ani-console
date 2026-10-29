@@ -50,6 +50,7 @@ export default function TrainingTaskBasicFields({
       <ModelDevImplementationField
         field="implementation_id"
         kind="GENERAL_TRAINING"
+        deviceMode={values.preset?.compute_type}
         selectedId={values.implementation_id}
         onResolve={onImplementationSelect}
       />

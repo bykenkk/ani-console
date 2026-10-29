@@ -1,4 +1,5 @@
 import type { PageParams } from "@/api/types";
+import type { ComputeType } from "@/api/instances";
 
 /** 创建接口使用严格 JSON Intent：整数为 JSON 数字，小数为非指数十进制字符串。 */
 export interface FineTuningParameters {
@@ -66,6 +67,7 @@ export interface ModelDevImplementationListResponse {
   total: string;
 }
 export interface ModelDevImplementationListParams extends PageParams {
+  device_mode: ComputeType;
   kind?: "GENERAL_TRAINING" | "FINETUNING";
 }
 export interface ModelDevInputVersion {

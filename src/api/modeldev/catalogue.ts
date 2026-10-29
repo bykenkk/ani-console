@@ -10,10 +10,10 @@ import type {
 } from "./types";
 
 export function listModelDevImplementations(
-  params: ModelDevImplementationListParams = {},
+  params: ModelDevImplementationListParams,
   signal?: AbortSignal,
 ): Promise<ModelDevImplementationListResponse> {
-  // TODO(modeldev-kind): 按 kind 服务端筛选接入；待验证两种类型、分页 total、空页及部署版本。
+  // TODO(modeldev-catalogue): 待联调验证 device_mode / kind 组合筛选、分页 total、空页及部署版本。
   return coreRequest<ModelDevImplementationListResponse>("/modeldev/implementations", {
     method: "GET",
     params,

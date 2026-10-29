@@ -242,7 +242,13 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
         wrapper="div"
         onValuesChange={(changed, next) => {
           const reset: Partial<CreateFineTuningFormValues> = {};
-          if ("method" in changed) {
+          const deviceModeChanged =
+            "preset" in changed && next.preset?.compute_type !== values.preset?.compute_type;
+          if (deviceModeChanged) {
+            form.clearFields(["method"]);
+            reset.method = "";
+          }
+          if ("method" in changed || deviceModeChanged) {
             if (parameterFields.length) form.clearFields(parameterFields);
             reset.parameters = [];
             setImplementation(undefined);

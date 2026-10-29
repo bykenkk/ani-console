@@ -8,8 +8,7 @@ import { formatDateTime } from "@/lib/date";
 import { formatModelDevComputeResources, formatModelDevExecutionDuration } from "@/lib/modeldev";
 import CreateFineTuningModal from "../CreateFineTuningModal";
 
-// const filters = { kind: "FINETUNING" } as const;
-const filters = {} as const;
+const filters = { kind: "FINETUNING" } as const;
 
 const columns: ListColumn<ModelDevExecution>[] = [
   {
