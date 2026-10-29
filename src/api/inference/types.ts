@@ -46,7 +46,8 @@ export interface UpdateInferenceInput {
   update_mask: InferenceUpdateField[];
   model_version_id?: string;
   served_model_name?: string;
-  engine_image?: string;
+  image_id?: string;
+  image_scope?: ImageRegistrationScope;
   engine_type?: string;
   command?: string;
 }
@@ -74,6 +75,8 @@ export interface InferenceService {
   health?: string;
   observed_at?: string;
   engine_image: string;
+  image_id?: string;
+  image_scope?: ImageRegistrationScope;
   engine_type: string;
   command: string;
   cpu: string;
