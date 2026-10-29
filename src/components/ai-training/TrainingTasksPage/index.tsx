@@ -7,7 +7,8 @@ import { useTrainingTaskActions } from "@/hooks/useTrainingTaskActions";
 import { taskColumns } from "./task-config";
 import TrainingTaskCreateModal from "./TrainingTaskCreateModal";
 
-const filters = {};
+// const filters = { kind: "GENERAL_TRAINING" } as const;
+const filters = {} as const;
 
 export default function TrainingTasksPage() {
   const [createVisible, setCreateVisible] = useState(false);
@@ -17,7 +18,7 @@ export default function TrainingTasksPage() {
   const query = useQuery({
     queryKey: ["training-executions", filters, { page, pageSize }],
     queryFn: ({ signal }) => listModelDevExecutions({ ...filters, page, pageSize }, signal),
-    // TODO(training-list): 暂不提供名称、状态和 kind 筛选；恢复后联调验证组合筛选、空结果与超界页行为。
+    // TODO(training-list): 待联调验证 kind=GENERAL_TRAINING 的筛选、total、空结果与超界页行为；名称与状态筛选暂缓恢复。
     meta: {
       errorNotification: {
         id: "training-executions",

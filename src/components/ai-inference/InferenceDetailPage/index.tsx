@@ -111,13 +111,7 @@ export default function InferenceDetailPage({
           {
             key: "invocation-test",
             label: "调用测试",
-            content: (
-              <InferenceInvocationTest
-                key={item.id}
-                servedModelName={item.served_model_name}
-                status={item.phase}
-              />
-            ),
+            content: <InferenceInvocationTest key={item.id} service={item} />,
           },
           // TODO(inference-monitoring): 监控能力开放后恢复此入口。
           // {

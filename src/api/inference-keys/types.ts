@@ -1,10 +1,11 @@
 import type { PageParams } from "@/api/types";
 
-/** 推理调用凭证元数据；列表和详情不返回密钥明文。 */
+/** 已授权的列表和详情可返回 secret；存量密钥可能未保存明文。 */
 export interface InferenceKey {
   id: string;
   name: string;
   key_prefix: string;
+  secret?: string;
   allowed_service_ids?: string[];
   allowed_model_names?: string[];
   requests_per_second?: number;

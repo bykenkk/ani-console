@@ -31,6 +31,15 @@ export function listInferenceKeys(params: InferenceKeyListParams = {}, signal?: 
   });
 }
 
+export function getInferenceKey(keyId: string, signal?: AbortSignal) {
+  return coreRequest<InferenceKey>(`/inference-keys/${encodeURIComponent(keyId)}`, {
+    method: "GET",
+    signal,
+  });
+}
+
+export { getInferenceKeyExclusionReason, getInferenceKeyUnavailableReason } from "./availability";
+
 // 一次性凭证交付必须保留响应；资源列表仍通过查询刷新，不使用写入响应更新缓存。
 // TODO(inference-keys): 待部署后联调首次签发、响应丢失后的幂等重放及权限隔离。
 export function createInferenceKey(input: CreateInferenceKeyInput) {

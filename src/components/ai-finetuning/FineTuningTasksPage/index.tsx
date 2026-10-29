@@ -8,7 +8,8 @@ import { formatDateTime } from "@/lib/date";
 import { formatModelDevComputeResources, formatModelDevExecutionDuration } from "@/lib/modeldev";
 import CreateFineTuningModal from "../CreateFineTuningModal";
 
-const filters = {};
+// const filters = { kind: "FINETUNING" } as const;
+const filters = {} as const;
 
 const columns: ListColumn<ModelDevExecution>[] = [
   {
@@ -75,7 +76,7 @@ export default function FineTuningTasksPage() {
   const query = useQuery({
     queryKey: ["training-executions", filters, { page, pageSize }],
     queryFn: ({ signal }) => listModelDevExecutions({ ...filters, page, pageSize }, signal),
-    // TODO(finetuning-list): 页面预览暂不传 kind；恢复 FINETUNING 筛选后联调验证 total、空结果与超界页语义。
+    // TODO(finetuning-list): 待联调验证 kind=FINETUNING 在服务端分页前筛选，total、空结果与超界页语义正确。
     meta: {
       errorNotification: {
         id: "finetuning-executions",

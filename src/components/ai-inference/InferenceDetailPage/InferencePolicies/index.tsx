@@ -1,61 +1,95 @@
-import { useState } from "react";
-import { Button, Space, Typography } from "@arco-design/web-react";
+// TODO(inference-policy-migration): 保留 ANI 旧访问策略列表，完成 Governance 适配后再启用；不得传入新系统资源 ID。
+import { Button, Empty } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
-import { getInferencePolicy } from "@/api/inference";
-import { DataTable } from "@/components/common";
+import { listInferenceServicePolicies, type InferenceAccessPolicy } from "@/api/inference/legacy";
+import { DataTable, StatusBadge } from "@/components/common";
 import { withId } from "@/lib/id";
 import { formatDateTime } from "@/lib/format";
-import UpdateInferencePolicyModal from "./UpdateInferencePolicyModal";
 
 type InferencePoliciesProps = { serviceId: string };
 
+const SCOPE_LABELS: Record<InferenceAccessPolicy["scope"]["type"], string> = {
+  tenant_default: "租户默认",
+  inference_service: "推理服务",
+  api_key: "API Key",
+  inference_service_api_key: "服务与 API Key",
+};
+
+function formatRateLimits(policy: InferenceAccessPolicy) {
+  const limits = [
+    policy.rate_limits.qps ? `QPS ${policy.rate_limits.qps}` : "",
+    policy.rate_limits.rpm ? `RPM ${policy.rate_limits.rpm}` : "",
+  ].filter(Boolean);
+  return limits.length ? limits.join(" / ") : "-";
+}
+
 export default function InferencePolicies({ serviceId }: InferencePoliciesProps) {
-  const [editing, setEditing] = useState(false);
-  const query = useQuery({
-    queryKey: ["governance-inference-policy", serviceId],
-    queryFn: ({ signal }) => getInferencePolicy(serviceId, signal),
+  const policies = useQuery({
     meta: {
-      errorNotification: { id: withId("inference-policy", serviceId), action: "推理访问策略加载" },
+      errorNotification: {
+        id: withId("inference-policies", serviceId),
+        action: "访问策略加载",
+        fallback: "请求失败，请稍后重试",
+      },
     },
+    queryKey: ["inference-service-policies", serviceId],
+    queryFn: () => listInferenceServicePolicies(serviceId),
   });
-  const policy = query.data?.policy;
-  const items = (policy?.allowed_tenants ?? []).map((tenant) => ({
-    tenant,
-    minute: policy?.rate_limits?.[tenant]?.requests_per_minute ?? 0,
-    hour: policy?.rate_limits?.[tenant]?.requests_per_hour ?? 0,
-  }));
+
   return (
-    <div className="flex flex-col gap-4">
-      <Space>
-        <Button loading={query.isFetching} onClick={() => query.refetch()}>
-          刷新
-        </Button>
-        <Button type="primary" disabled={!policy} onClick={() => setEditing(true)}>
-          编辑策略
-        </Button>
-      </Space>
-      <DataTable
-        data={items}
-        rowKey="tenant"
-        loading={query.isFetching}
+    <div>
+      <DataTable<InferenceAccessPolicy>
+        header={{
+          title: "已绑定访问策略",
+          extra: (
+            <Button size="small" loading={policies.isFetching} onClick={() => policies.refetch()}>
+              刷新
+            </Button>
+          ),
+        }}
+        data={policies.data?.policies ?? []}
+        loading={policies.isFetching}
         pagination={false}
+        rowKey="id"
+        noDataElement={<Empty description="当前服务未绑定访问策略" />}
         columns={[
-          { title: "允许的租户 UUID", dataIndex: "tenant", width: 360, ellipsis: true },
-          { title: "每分钟请求上限", width: 180, render: (_, row) => row.minute || "不限" },
-          { title: "每小时请求上限", width: 180, render: (_, row) => row.hour || "不限" },
+          { title: "策略名称", dataIndex: "name", width: 200, ellipsis: true },
+          {
+            title: "状态",
+            width: 120,
+            render: (_, policy) => <StatusBadge status={policy.status} />,
+          },
+          {
+            title: "作用范围",
+            width: 150,
+            render: (_, policy) => SCOPE_LABELS[policy.scope.type],
+          },
+          {
+            title: "API Key",
+            width: 160,
+            render: (_, policy) =>
+              policy.access.allow_all_tenant_keys
+                ? "租户内全部"
+                : `允许 ${policy.access.allow_api_key_ids?.length ?? 0} 个`,
+          },
+          {
+            title: "限流",
+            width: 150,
+            render: (_, policy) => formatRateLimits(policy),
+          },
+          {
+            title: "最大并发",
+            width: 110,
+            render: (_, policy) => policy.concurrency.max_in_flight ?? "-",
+          },
+          {
+            title: "更新时间",
+            width: 180,
+            render: (_, policy) => formatDateTime(policy.updated_at ?? policy.created_at),
+          },
         ]}
-        tableLabel="推理服务访问白名单"
+        tableLabel="推理服务访问策略列表"
       />
-      <Typography.Text type="secondary">
-        更新时间：{formatDateTime(policy?.updated_at)}
-      </Typography.Text>
-      {editing && policy && (
-        <UpdateInferencePolicyModal
-          serviceId={serviceId}
-          policy={policy}
-          onCancel={() => setEditing(false)}
-        />
-      )}
     </div>
   );
 }

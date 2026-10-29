@@ -135,6 +135,7 @@ export default function CreateModelApiKeyModal({
         <Form.Item
           field="expires_on"
           label="过期日期"
+          extra="留空永不过期"
           rules={[
             {
               validator: (value: string | undefined, callback) =>

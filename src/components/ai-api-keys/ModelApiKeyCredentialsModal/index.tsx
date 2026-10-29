@@ -1,9 +1,7 @@
-import { useState } from "react";
-import { Alert, Button, Modal, Space, Typography } from "@arco-design/web-react";
 import type { InferenceKeyCredentials } from "@/api/inference-keys";
-import { ResourceNameId } from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
-import RotateModelApiKeyModal from "../RotateModelApiKeyModal";
+import { Alert, Button, Modal } from "@arco-design/web-react";
+import { IconCopy } from "@arco-design/web-react/icon";
 
 type ModelApiKeyCredentialsModalProps = {
   credentials: InferenceKeyCredentials;
@@ -14,68 +12,40 @@ export default function ModelApiKeyCredentialsModal({
   credentials,
   onCancel,
 }: ModelApiKeyCredentialsModalProps) {
-  const [current, setCurrent] = useState(credentials);
-  const [rotating, setRotating] = useState(false);
-  const hasSecret = !current.replayed && Boolean(current.secret);
-
   return (
     <>
       <Modal
         visible
-        title={hasSecret ? "请保存模型 API Key" : "模型 API Key 未返回明文"}
+        title="模型 API Key"
         closable={false}
         escToExit={false}
         maskClosable={false}
         onCancel={onCancel}
         style={{ width: 620, maxWidth: "calc(100vw - 48px)" }}
         footer={
-          <Button type="primary" disabled={rotating} onClick={onCancel}>
-            {hasSecret ? "我已保存" : "关闭"}
+          <Button type="primary" onClick={onCancel}>
+            我已保存
           </Button>
         }
       >
-        <Space direction="vertical" size={16} className="w-full">
-          <ResourceNameId name={current.key.name} id={current.key.id} openable={false} />
-          <Alert
-            type="warning"
-            showIcon
-            content={
-              hasSecret
-                ? "密钥仅在本次展示，关闭后无法再次查看，请立即复制保存。"
-                : "本次操作已完成，但未返回密钥明文。如未保存之前的密钥，可重置生成新密钥。"
-            }
-          />
-          {hasSecret ? (
-            <>
-              <Typography.Text bold>模型 API Key</Typography.Text>
-              <code className="block font-mono break-all select-text">{current.secret}</code>
-              <Button onClick={() => copyToClipboard(current.secret!, "模型 API Key")}>
-                复制密钥
-              </Button>
-              <Typography.Text type="secondary">
-                外部调用推理服务时，将此密钥填入 x-api-key 请求头。
-              </Typography.Text>
-            </>
-          ) : (
+        <div>
+          <Alert type="warning" content="API Key 用于调用模型，请妥善保管，避免泄露。" />
+          <div className="mt-2 flex items-start gap-1">
+            <code className="min-w-0 self-center font-mono break-all select-text">
+              {credentials.secret}
+            </code>
             <Button
-              onClick={() => setRotating(true)}
-              disabled={rotating || Boolean(current.key.revoked_at)}
-            >
-              重置
-            </Button>
-          )}
-        </Space>
+              type="text"
+              size="mini"
+              className="shrink-0"
+              icon={<IconCopy />}
+              title="复制模型 API Key"
+              aria-label="复制模型 API Key"
+              onClick={() => copyToClipboard(credentials.secret!, "模型 API Key")}
+            />
+          </div>
+        </div>
       </Modal>
-      {rotating && (
-        <RotateModelApiKeyModal
-          apiKey={current.key}
-          onCancel={() => setRotating(false)}
-          onRotated={(result) => {
-            setRotating(false);
-            setCurrent(result);
-          }}
-        />
-      )}
     </>
   );
 }

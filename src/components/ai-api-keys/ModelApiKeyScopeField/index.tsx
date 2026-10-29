@@ -53,6 +53,7 @@ export default function ModelApiKeyScopeField({ disabled }: ModelApiKeyScopeFiel
     <Form.Item
       field="scope"
       label="授权模型"
+      required
       rules={[
         {
           validator: (value: ModelApiKeyScope | undefined, callback) => {

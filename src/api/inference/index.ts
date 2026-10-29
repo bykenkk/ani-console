@@ -149,3 +149,4 @@ export function applyInferenceCommand(
 export * as legacyInference from "./legacy";
 export * from "./diagnostics";
 export * from "./policy";
+export * from "./invocation";
