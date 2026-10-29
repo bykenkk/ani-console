@@ -16,16 +16,23 @@ const METRIC_CODES: InstanceMetricCode[] = [
   "network.receive_bytes_per_second",
   "network.transmit_bytes_per_second",
 ];
+const GPU_METRIC_CODES: InstanceMetricCode[] = [
+  "gpu.utilization_percent",
+  "gpu.memory_usage_bytes",
+];
 const METRIC_LABELS: Record<InstanceMetricCode, string> = {
   "cpu.usage_cores": "CPU 使用量",
   "memory.working_set_bytes": "内存使用量",
   "network.receive_bytes_per_second": "网络接收速率",
   "network.transmit_bytes_per_second": "网络发送速率",
+  "gpu.utilization_percent": "GPU 利用率",
+  "gpu.memory_usage_bytes": "GPU 显存",
 };
 const METRIC_UNIT_LABELS: Record<InstanceMetricSeries["unit"], string> = {
   cores: "核",
   bytes: "字节",
   bytes_per_second: "B/s",
+  percent: "%",
 };
 const METRIC_CHARTS: Array<{
   key: string;
@@ -54,6 +61,7 @@ function metricValue(value: number | null | undefined, unit?: InstanceMetricSeri
   if (value == null || unit == null) return "-";
   if (unit === "bytes") return formatBytes(value);
   if (unit === "bytes_per_second") return `${formatBytes(value)}/s`;
+  if (unit === "percent") return `${Number(value.toFixed(3))}%`;
   return `${Number(value.toFixed(3))} 核`;
 }
 
@@ -100,7 +108,7 @@ function metricChart(
 }
 
 export function useGovernanceMetrics(instanceId?: string, hasGpuMetrics = false) {
-  // TODO(instance-metrics): 部署确认后联调四项指标、网络真实值、时间边界及缺失点；缺失点保留 null，不补零。
+  // TODO(instance-metrics): Gov 新版部署后联调 GPU 非零值、多卡聚合及 VM 指标；缺失点保留 null，不补零。
   const latest = useQuery({
     queryKey: ["governance-instance-metrics-latest", instanceId],
     enabled: Boolean(instanceId),
@@ -112,11 +120,17 @@ export function useGovernanceMetrics(instanceId?: string, hasGpuMetrics = false)
       },
     },
   });
-  // TODO(instance-network-metrics): Gov/Obs 部署尚未确认，既有 latest 成功返回完整四项后才启用网络查询。
+  // latest 返回的指标目录用于兼容 Gov 的 2 / 4 / 6 项版本，NO_DATA 不代表指标未启用。
   const hasNetworkMetrics = METRIC_CODES.every((code) =>
     latest.data?.data.series.some((series) => series.metric_code === code),
   );
-  const metricCodes = hasNetworkMetrics ? METRIC_CODES : BASE_METRIC_CODES;
+  const supportsGpuMetrics = GPU_METRIC_CODES.every((code) =>
+    latest.data?.data.series.some((series) => series.metric_code === code),
+  );
+  const metricCodes = [
+    ...(hasNetworkMetrics ? METRIC_CODES : BASE_METRIC_CODES),
+    ...(hasGpuMetrics && supportsGpuMetrics ? GPU_METRIC_CODES : []),
+  ];
   const range = useQuery({
     queryKey: [
       "governance-instance-metrics-range",
@@ -147,16 +161,24 @@ export function useGovernanceMetrics(instanceId?: string, hasGpuMetrics = false)
     const series = latest.data?.data.series.find((item) => item.metric_code === code);
     return metricValue(series?.points[0]?.value, series?.unit);
   };
+  const gpuUtilization = latestValue("gpu.utilization_percent");
+  const gpuMemoryUsage = latestValue("gpu.memory_usage_bytes");
   const statistics = [
     { title: "CPU 使用量", value: latestValue("cpu.usage_cores") },
     { title: "内存使用量", value: latestValue("memory.working_set_bytes") },
-    ...(hasGpuMetrics ? [{ title: "GPU 利用率", value: "-" }] : []),
+    ...(hasGpuMetrics
+      ? [
+          { title: "GPU 利用率", value: gpuUtilization },
+          { title: "GPU 显存", value: gpuMemoryUsage },
+        ]
+      : []),
     {
       title: "网络入 / 出速率",
       value: `${latestValue("network.receive_bytes_per_second")} / ${latestValue("network.transmit_bytes_per_second")}`,
     },
   ];
   const series = range.data?.data.series ?? [];
+  const gpuSeries = series.filter((item) => item.metric_code === "gpu.utilization_percent");
   const charts = METRIC_CHARTS.map(({ key, title, codes, unit }) => {
     const chartSeries = series.filter((item) => codes.includes(item.metric_code));
     return {
@@ -166,11 +188,23 @@ export function useGovernanceMetrics(instanceId?: string, hasGpuMetrics = false)
       option: metricChart(chartSeries, unit),
     };
   });
+  const gpuChart = {
+    key: "gpu",
+    title: "GPU 利用率趋势",
+    hasTrend: gpuSeries.some((item) => item.points.some((point) => point.value !== null)),
+    option: metricChart(gpuSeries, "percent"),
+  };
   return {
     statistics,
     hasData: Boolean(latest.data),
     loading: latest.isLoading,
     trendLoading: range.isLoading,
-    charts,
+    charts: hasGpuMetrics ? [...charts, gpuChart] : charts,
+    gpuMetrics: {
+      utilization: gpuUtilization,
+      memoryUsage: gpuMemoryUsage,
+      hasTrend: gpuChart.hasTrend,
+      option: gpuChart.option,
+    },
   };
 }

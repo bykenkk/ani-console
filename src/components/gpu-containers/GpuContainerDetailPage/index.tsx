@@ -219,6 +219,7 @@ export default function GpuContainerDetailPage({
             content: (
               <InstanceMetrics
                 gpuOnly
+                instanceId={instanceId}
                 computeType={record.compute_type}
                 gpuModel={record.gpu_summary?.model_key}
                 gpuCount={record.gpu_summary?.devices_per_instance}

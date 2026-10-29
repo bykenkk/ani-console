@@ -1,26 +1,41 @@
 import { Card, Empty, Grid, Statistic, Tooltip } from "@arco-design/web-react";
+import type { EChartsOption } from "echarts";
+import { CoreLineBarChart } from "@/components/common";
 
 type InstanceGpuMetricsProps = {
   gpuModel?: string;
   gpuCount?: number;
+  metrics: {
+    utilization: string;
+    memoryUsage: string;
+    hasTrend: boolean;
+    option: EChartsOption;
+  };
+  loading: boolean;
+  trendLoading: boolean;
 };
 
-export default function InstanceGpuMetrics({ gpuModel, gpuCount }: InstanceGpuMetricsProps) {
-  // TODO(instance-gpu-metrics): GPU 指标尚无等价契约，保留原统计与趋势结构，待补齐并联调后接入。
+export default function InstanceGpuMetrics({
+  gpuModel,
+  gpuCount,
+  metrics,
+  loading,
+  trendLoading,
+}: InstanceGpuMetricsProps) {
   const gpuModelSummary = gpuModel ? `${gpuModel}×${gpuCount ?? "-"}` : "-";
   return (
     <Grid.Row gutter={[16, 16]}>
       <Grid.Col span={24}>
-        <Card bordered={false} size="small">
+        <Card bordered={false} size="small" loading={loading}>
           <Grid.Row gutter={16}>
             <Grid.Col span={8}>
               <div className="px-3 py-2">
-                <Statistic title="GPU 利用率" value="-" />
+                <Statistic title="GPU 利用率" value={metrics.utilization} />
               </div>
             </Grid.Col>
             <Grid.Col span={8}>
               <div className="px-3 py-2">
-                <Statistic title="显存" value="-" />
+                <Statistic title="显存" value={metrics.memoryUsage} />
               </div>
             </Grid.Col>
             <Grid.Col span={8}>
@@ -44,8 +59,12 @@ export default function InstanceGpuMetrics({ gpuModel, gpuCount }: InstanceGpuMe
         </Card>
       </Grid.Col>
       <Grid.Col span={24}>
-        <Card bordered={false} title="GPU 利用率趋势" size="small">
-          <Empty description="暂无 GPU 利用率趋势数据" />
+        <Card bordered={false} title="GPU 利用率趋势" size="small" loading={trendLoading}>
+          {metrics.hasTrend ? (
+            <CoreLineBarChart option={metrics.option} style={{ height: 280 }} />
+          ) : (
+            <Empty description="暂无 GPU 利用率趋势数据" />
+          )}
         </Card>
       </Grid.Col>
     </Grid.Row>

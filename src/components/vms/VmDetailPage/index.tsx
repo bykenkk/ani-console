@@ -117,10 +117,15 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
           },
           { key: "media", label: "介质与启动", content: <VmMediaDevices vm={vm} /> },
           { key: "snapshots", label: "快照", content: <VmSnapshots vm={vm} /> },
-          // TODO(vm-observability): VM 的监控、日志、事件契约未提供，沿用公共组件空态，不传 VM ID 到容器接口。
-          { key: "monitoring", label: "资源监控", content: <InstanceMetrics /> },
+          // TODO(vm-metrics): Gov 新版部署后联调 VM ID 的实例指标查询与 instance:read 权限。
+          {
+            key: "monitoring",
+            label: "资源监控",
+            content: <InstanceMetrics instanceId={vm.id} />,
+          },
           // TODO(feature-visibility): 待云主机日志支持后恢复此 Tab 入口。
           // { key: "logs", label: "日志", content: <InstanceLogs active={tab === "logs"} /> },
+          // TODO(vm-events): VM 事件契约尚未提供，沿用公共组件空态。
           { key: "events", label: "事件", content: <InstanceEvents /> },
           // TODO(vm-operations): VM 操作查询及历史记录统一暂缓，保留原有入口。
           { key: "operations", label: "操作记录", content: <InstanceOperations /> },

@@ -19,11 +19,19 @@ export default function InstanceMetrics({
   gpuModel,
   gpuCount,
 }: InstanceMetricsProps) {
-  // TODO(instance-metrics): 云主机、沙箱的新监控契约尚未提供；调用方保留模板空态，待接口补齐后传入正式实例 ID。
-  const metrics = useGovernanceMetrics(gpuOnly ? undefined : instanceId, computeType === "gpu");
+  // TODO(instance-metrics): 沙箱监控契约尚未提供，调用方保留模板空态，待补齐后传入正式实例 ID。
+  const metrics = useGovernanceMetrics(instanceId, computeType === "gpu");
   const statistics = metrics.statistics;
   if (gpuOnly && computeType === "gpu") {
-    return <InstanceGpuMetrics gpuModel={gpuModel} gpuCount={gpuCount} />;
+    return (
+      <InstanceGpuMetrics
+        gpuModel={gpuModel}
+        gpuCount={gpuCount}
+        metrics={metrics.gpuMetrics}
+        loading={metrics.loading}
+        trendLoading={metrics.trendLoading}
+      />
+    );
   }
   return (
     <Grid.Row gutter={[16, 16]}>
@@ -32,7 +40,7 @@ export default function InstanceMetrics({
           {metrics.hasData ? (
             <Grid.Row gutter={[16, 16]}>
               {statistics.map((statistic) => (
-                <Grid.Col key={statistic.title} span={24 / statistics.length}>
+                <Grid.Col key={statistic.title} flex={1}>
                   <div className="px-3 py-2">
                     <Statistic
                       title={statistic.title}
