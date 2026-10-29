@@ -25,9 +25,11 @@ import { formatDateTime } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { loadBalancerLabel } from "@/lib/load-balancers";
 import LoadBalancerBackends from "./LoadBalancerBackends";
-import LoadBalancerEvents from "./LoadBalancerEvents";
+// TODO(feature-visibility): 待负载均衡事件支持后恢复此组件导入。
+// import LoadBalancerEvents from "./LoadBalancerEvents";
 import LoadBalancerListeners from "./LoadBalancerListeners";
-import LoadBalancerMonitoring from "./LoadBalancerMonitoring";
+// TODO(feature-visibility): 待负载均衡监控支持后恢复此组件导入。
+// import LoadBalancerMonitoring from "./LoadBalancerMonitoring";
 
 type LoadBalancerDetailPageProps = {
   loadBalancerId: string;
@@ -173,16 +175,18 @@ export default function LoadBalancerDetailPage({
           label: "后端组",
           content: <LoadBalancerBackends item={item} />,
         },
-        {
-          key: "metrics",
-          label: "监控",
-          content: <LoadBalancerMonitoring />,
-        },
-        {
-          key: "events",
-          label: "事件",
-          content: <LoadBalancerEvents />,
-        },
+        // TODO(feature-visibility): 待负载均衡监控支持后恢复此 Tab 入口。
+        // {
+        //   key: "metrics",
+        //   label: "监控",
+        //   content: <LoadBalancerMonitoring />,
+        // },
+        // TODO(feature-visibility): 待负载均衡事件支持后恢复此 Tab 入口。
+        // {
+        //   key: "events",
+        //   label: "事件",
+        //   content: <LoadBalancerEvents />,
+        // },
       ]}
       activeTabKey={tab}
       onTabChange={onTabChange}
