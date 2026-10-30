@@ -12,7 +12,6 @@ import {
 } from "@/components/common";
 import SandboxActions from "@/components/sandboxes/SandboxActions";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
-import { sandboxComputeText } from "@/lib/sandboxes";
 import SandboxRuntime from "./SandboxRuntime";
 import SandboxWorkspace from "./SandboxWorkspace";
 
@@ -68,7 +67,15 @@ export default function SandboxDetailPage({
         <StatusBadge status={sandbox.observed_state} reason={sandbox.reason} loading={false} />
       }
       icon={<AliIcon name="Sandbox" size={28} />}
-      headerItems={[{ label: "CPU / 内存", value: sandboxComputeText(sandbox) }]}
+      headerItems={[
+        {
+          label: "CPU / 内存",
+          value: [
+            snapshot?.cpu_millis ? `${Number(snapshot.cpu_millis) / 1000}C` : "-",
+            snapshot?.memory_mib ? `${Number(snapshot.memory_mib) / 1024} GiB` : "-",
+          ].join(" / "),
+        },
+      ]}
       actions={<SandboxActions sandbox={sandbox} onDeleted={goBack} />}
       cards={[
         {

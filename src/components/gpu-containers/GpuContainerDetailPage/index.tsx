@@ -118,12 +118,6 @@ export default function GpuContainerDetailPage({
               // FIXME(instance-basic): 当前实例合同未提供保护、Provider、发布、身份、安全组、负载均衡和调用地址，保留字段空态。
               // TODO(instance-basic): 上述正式字段对齐并联调验证后逐项接入，不补查其他系统实例。
               { label: "终止保护", value: "-" },
-              {
-                label: "规格",
-                value: record.gpu_summary
-                  ? record.gpu_summary.devices_per_instance + "×" + record.gpu_summary.model_key
-                  : "-",
-              },
               { label: "镜像", value: <ImageNameText image={record.imageId} /> },
               { label: "Provider", value: "-" },
               { label: "节点", value: runtime.data?.pod?.nodeName ?? "-" },

@@ -49,13 +49,15 @@ export default function VmsPage() {
       ),
     },
     {
-      key: "spec",
-      title: "规格",
-      width: 170,
+      key: "compute",
+      title: "CPU / 内存",
+      width: 180,
+      ellipsis: true,
       render: (_, vm) =>
-        vm.cpuMillis && vm.memoryMib
-          ? `${Number(vm.cpuMillis) / 1000}C / ${Number(vm.memoryMib) / 1024} GiB`
-          : "-",
+        [
+          vm.cpuMillis ? `${Number(vm.cpuMillis) / 1000}C` : "-",
+          vm.memoryMib ? `${Number(vm.memoryMib) / 1024} GiB` : "-",
+        ].join(" / "),
     },
     {
       key: "systemDiskSizeGb",

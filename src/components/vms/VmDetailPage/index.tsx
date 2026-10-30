@@ -42,10 +42,10 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
   const { actions, dialogNode } = useVMActions(detail.data ? [detail.data] : [], goBack);
   if (!detail.data) return <DetailPagePlaceholder loading={detail.isLoading} />;
   const vm = detail.data;
-  const spec =
-    vm.cpuMillis && vm.memoryMib
-      ? `${Number(vm.cpuMillis) / 1000}C / ${Number(vm.memoryMib) / 1024} GiB`
-      : "-";
+  const compute = [
+    vm.cpuMillis ? `${Number(vm.cpuMillis) / 1000}C` : "-",
+    vm.memoryMib ? `${Number(vm.memoryMib) / 1024} GiB` : "-",
+  ].join(" / ");
   // TODO(vm-detail-fields): 新详情缺少终止保护、节点、自动启动、安全组、创建时间及网络关联，保留原字段占位。
   // TODO(vm-integration): 新详情、磁盘、介质及快照流程仍需在已部署且允许访问的环境联调。
   return (
@@ -55,7 +55,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
         title={vm.name}
         status={<StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />}
         icon={<AliIcon name="yunzhuji" size={28} />}
-        headerItems={[{ label: "规格", value: spec }]}
+        headerItems={[{ label: "CPU / 内存", value: compute }]}
         actions={<ResourceActionMenu record={vm} actions={actions} />}
         cards={[
           {
@@ -64,7 +64,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
             fields: [
               { label: "ID", value: <ResourceId value={vm.id} /> },
               { label: "终止保护", value: "-" },
-              { label: "规格", value: spec },
+              { label: "CPU / 内存", value: compute },
               { label: "系统盘", value: vm.systemDiskSizeGb ? `${vm.systemDiskSizeGb} GB` : "-" },
               {
                 label: "操作系统",

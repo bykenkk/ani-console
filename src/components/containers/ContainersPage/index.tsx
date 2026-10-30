@@ -76,13 +76,6 @@ export default function ContainersPage() {
       render: (_, row) => <StatusBadge status={row.observedState} reason={row.reason} />,
     },
     {
-      key: "preset",
-      title: "规格",
-      width: 180,
-      ellipsis: true,
-      render: (_, row) => row.preset_name || row.preset_code || row.presetId,
-    },
-    {
       key: "compute",
       title: "CPU / 内存",
       width: 160,
