@@ -39,8 +39,7 @@ export default function VmSnapshotDetailModal({
             <Descriptions
               column={1}
               data={[
-                // TODO(vm-snapshot-fields): 名称、创建时间待正式查询契约补齐后回显。
-                { label: "名称", value: "-" },
+                { label: "名称", value: snapshot.name || "-" },
                 { label: "ID", value: <ResourceId value={snapshot.snapshotId} /> },
                 { label: "来源 VM", value: <ResourceId value={snapshot.sourceVmId} /> },
                 { label: "来源 VM UID", value: snapshot.sourceVmUid || "-" },
@@ -52,7 +51,7 @@ export default function VmSnapshotDetailModal({
                     </StatusBadge>
                   ),
                 },
-                { label: "创建时间", value: "-" },
+                { label: "创建时间", value: formatDateTime(snapshot.createdAt) },
                 { label: "观测时间", value: formatDateTime(snapshot.observedAt) },
                 { label: "完整性", value: snapshot.completeness || "-" },
                 { label: "包含内容", value: snapshot.included?.join("、") || "-" },

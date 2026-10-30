@@ -77,13 +77,16 @@ export default function VmSnapshots({ vm }: VmSnapshotsProps) {
         pagination={false}
         rowActions={actions}
         columns={[
-          // TODO(vm-snapshot-fields): 新契约未返回名称及创建时间，保留原列；补齐后使用真实字段。
           {
             title: "名称 / ID",
             width: 200,
             fixed: "left",
             render: (_, snapshot) => (
-              <ResourceNameId name="-" id={snapshot.snapshotId} openable={false} />
+              <ResourceNameId
+                name={snapshot.name || "-"}
+                id={snapshot.snapshotId}
+                openable={false}
+              />
             ),
           },
           {
@@ -95,7 +98,11 @@ export default function VmSnapshots({ vm }: VmSnapshotsProps) {
               </StatusBadge>
             ),
           },
-          { title: "创建时间", width: 180, render: () => "-" },
+          {
+            title: "创建时间",
+            width: 180,
+            render: (_, snapshot) => formatDateTime(snapshot.createdAt),
+          },
           { title: "完整性", width: 180, dataIndex: "completeness" },
           {
             title: "包含内容",

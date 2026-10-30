@@ -27,6 +27,39 @@ export interface VmMediaState {
   effectiveNow: boolean;
   pendingRestart: boolean;
 }
+export interface VmResourceReference {
+  id: string;
+  name?: string;
+  state: "RESOLVED" | "NOT_FOUND" | "UNAVAILABLE" | "NOT_QUERIED";
+}
+export interface VmRuntime {
+  state: "AVAILABLE" | "NOT_RUNNING" | "AGENT_NOT_CONNECTED" | "UNAVAILABLE" | "CHANGED";
+  agentState: "CONNECTED" | "NOT_CONNECTED" | "UNKNOWN";
+  observedAt?: string;
+  nodeName?: string;
+  startedAt?: string;
+  hostname?: string;
+  agentVersion?: string;
+  osName?: string;
+  osVersion?: string;
+  kernelRelease?: string;
+  kernelVersion?: string;
+  interfaces?: Array<{
+    name: string;
+    guestName?: string;
+    mac?: string;
+    addresses?: string[];
+    infoSource?: string;
+  }>;
+  filesystemsState: "AVAILABLE" | "UNSUPPORTED" | "UNAVAILABLE" | "NOT_QUERIED";
+  filesystems?: Array<{
+    diskName: string;
+    mountPoint: string;
+    fileSystemType: string;
+    totalBytes?: string;
+    usedBytes?: string;
+  }>;
+}
 export interface VirtualMachine {
   id: string;
   name: string;
@@ -45,6 +78,27 @@ export interface VirtualMachine {
   disks: VmDisk[];
   media: VmMediaState[];
   bootDevice: VmBootDevice;
+  presetName?: string;
+  hardware?: {
+    sockets: number;
+    cores: number;
+    threads: number;
+    architecture: string;
+    firmware: string;
+    rootBus: string;
+    dataBus: string;
+    nicModel: string;
+    persistentTpm: boolean;
+    persistentUefi: boolean;
+  };
+  initialization?: { method: string; username: string; sshKeyFingerprint?: string };
+  sourceMedia?: VmMedia;
+  runtime?: VmRuntime;
+  relations?: {
+    vpc?: VmResourceReference;
+    subnet?: VmResourceReference;
+    securityGroups?: VmResourceReference[];
+  };
   presetId: string;
   cpuMillis: string;
   memoryMib: string;
@@ -148,6 +202,8 @@ export interface VmOperation {
   observedAt?: string;
 }
 export interface VmSnapshot {
+  name?: string;
+  createdAt?: string;
   snapshotId: string;
   sourceVmId: string;
   sourceVmUid: string;
