@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Button, Card, Form, Space } from "@arco-design/web-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { skipToken, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { InstancePreset } from "@/api/instances";
 import {
+  checkFineTuningReadiness,
   createFineTuningExecution,
   type ModelDevImplementation,
   type ModelDevInputVersion,
@@ -14,7 +15,6 @@ import FineTuningBasicFields from "./FineTuningBasicFields";
 import ModelDevParameterFields from "@/components/ai-training/ModelDevParameterFields";
 import FineTuningSummary from "./FineTuningSummary";
 import { buildFineTuningParameters } from "./utils";
-import { useFineTuningReadiness } from "@/hooks/useFineTuningReadiness";
 import FineTuningReadinessFields from "./FineTuningReadinessFields";
 
 type CreateFineTuningModalProps = { onCancel: () => void };
@@ -98,7 +98,20 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
             : {}),
         }
       : undefined;
-  const readiness = useFineTuningReadiness(readinessInput);
+  const readiness = useQuery({
+    queryKey: ["finetuning-readiness", readinessInput],
+    queryFn: readinessInput
+      ? ({ signal }) => checkFineTuningReadiness(readinessInput, signal)
+      : skipToken,
+    retry: false,
+    meta: {
+      errorNotification: {
+        id: "finetuning-readiness",
+        action: "微调适用性检查",
+        fallback: "请稍后重试",
+      },
+    },
+  });
   const assessment = readiness.isError ? undefined : readiness.data;
   useEffect(() => {
     if (readiness.isFetching || assessment?.assessment === "ELIGIBLE") {

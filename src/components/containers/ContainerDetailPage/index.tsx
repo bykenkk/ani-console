@@ -76,7 +76,10 @@ export default function ContainerDetailPage({
         status={<StatusBadge status={record.observedState} reason={record.reason} />}
         headerItems={[
           { label: "镜像", value: record.imageId || "-" },
-          { label: "规格", value: record.preset_name || record.preset_code || record.presetId },
+          {
+            label: "CPU / 内存",
+            value: [record.cpu || "-", record.memory || "-"].join(" / "),
+          },
           // TODO(container-private-ip): 当前契约未返回私网 IP，待正式字段补齐后接入，不以 Pod IP 替代。
           { label: "私网 IP", value: "-" },
         ]}

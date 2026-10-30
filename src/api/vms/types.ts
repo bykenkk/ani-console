@@ -53,6 +53,10 @@ export interface VirtualMachine {
   dns?: VmDns;
 }
 export type VmListParams = PageParams;
+export interface VmLogParams {
+  tailLines?: number;
+  follow?: boolean;
+}
 export interface VmListResponse {
   items: VirtualMachine[];
   total: string;

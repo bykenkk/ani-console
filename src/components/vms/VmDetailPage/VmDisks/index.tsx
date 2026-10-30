@@ -11,7 +11,7 @@ import {
 import { DataTable, ResourceNameId, type RowAction } from "@/components/common";
 import VmCreateDiskModal from "@/components/vms/VmCreateDiskModal";
 import VmDetachDiskModal from "@/components/vms/VmDetachDiskModal";
-import { useVmResourceMutation } from "@/hooks/useVmResourceMutation";
+import { useVMMutation } from "@/hooks/useVMMutation";
 import { formatBytes } from "@/lib/format";
 import { withId } from "@/lib/id";
 import { vmIsClosed } from "@/lib/vms";
@@ -26,14 +26,14 @@ export default function VmDisks({ vm }: VmDisksProps) {
     queryFn: ({ signal }) => listVmDisks(vm.id, signal),
     meta: { errorNotification: { id: withId("vm-disks", vm.id), action: "磁盘列表加载" } },
   });
-  const attach = useVmResourceMutation<VmDisk>({
+  const attach = useVMMutation<VmDisk>({
     vmId: vm.id,
     action: "挂载数据盘",
     actionId: "vm-disk-attach",
     channel: "notification",
     mutationFn: (disk) => attachVmDisk(vm.id, disk.diskId, { expected_version: vm.version }),
   });
-  const remove = useVmResourceMutation<VmDisk>({
+  const remove = useVMMutation<VmDisk>({
     vmId: vm.id,
     action: "删除数据盘",
     actionId: "vm-disk-delete",

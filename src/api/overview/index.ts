@@ -11,7 +11,6 @@ const OVERVIEW_ERROR_MESSAGES: Record<string, string> = {
   ETIMEDOUT: "资源统计查询超时，请稍后重试",
 };
 
-// TODO(governance-migration): 已按 PR #51 f68375e 核对；部署确认后联调统计口径、单卡降级及入口权限。
 export async function getConsoleOverview(signal?: AbortSignal): Promise<ConsoleOverviewStatistics> {
   try {
     return await coreRequest<ConsoleOverviewStatistics>("/overview", {
@@ -30,6 +29,8 @@ export async function getConsoleOverview(signal?: AbortSignal): Promise<ConsoleO
 }
 
 export type {
+  ConsoleGpuQuotaOverview,
+  ConsoleGpuQuotaItem,
   ConsoleOverviewStatistics,
   InferenceServiceOverviewStatistics,
   InstanceOverviewStatistics,

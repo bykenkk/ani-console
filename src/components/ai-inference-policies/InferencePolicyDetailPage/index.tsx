@@ -3,7 +3,9 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
-import { useInferencePolicy } from "@/hooks/useInferencePolicy";
+import { getInferencePolicy } from "@/api/inference-policies";
+import { useQuery } from "@tanstack/react-query";
+import { withId } from "@/lib/id";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import InferencePolicyRules from "../InferencePolicyRules";
 import SaveInferencePolicyModal from "../SaveInferencePolicyModal";
@@ -15,7 +17,17 @@ export default function InferencePolicyDetailPage({ policyId }: InferencePolicyD
   const [action, setAction] = useState<"edit" | "delete">();
   const navigate = useNavigate();
   const goBack = useBackOrFallback("inference-policy");
-  const policy = useInferencePolicy(policyId);
+  const policy = useQuery({
+    queryKey: ["governance-inference-policy", policyId],
+    queryFn: ({ signal }) => getInferencePolicy(policyId, signal),
+    enabled: Boolean(policyId),
+    meta: {
+      errorNotification: {
+        id: withId("inference-policy", policyId),
+        action: "访问策略详情加载",
+      },
+    },
+  });
   if (!policy.data) return <DetailPagePlaceholder loading={policy.isLoading} />;
   const item = policy.data;
   return (

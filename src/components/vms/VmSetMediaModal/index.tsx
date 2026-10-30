@@ -1,7 +1,7 @@
 import { Alert, Form, Modal, Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { listVmMedia, setVmMedia, type VirtualMachine, type VmMediaSlot } from "@/api/vms";
-import { useVmResourceMutation } from "@/hooks/useVmResourceMutation";
+import { useVMMutation } from "@/hooks/useVMMutation";
 import { validateForm } from "@/lib/form";
 import { vmIsClosed } from "@/lib/vms";
 
@@ -20,7 +20,7 @@ export default function VmSetMediaModal({ vm, slot, onCancel, onSubmitted }: VmS
     queryFn: ({ signal }) => listVmMedia(signal),
     meta: { errorNotification: { id: "vm-media", action: "虚拟机介质加载" } },
   });
-  const mutation = useVmResourceMutation<VmSetMediaFormValues>({
+  const mutation = useVMMutation<VmSetMediaFormValues>({
     vmId: vm.id,
     action: "设置介质",
     actionId: "vm-media-set",

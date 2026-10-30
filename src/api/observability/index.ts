@@ -17,7 +17,6 @@ const RESOURCE_TREND_ERROR_MESSAGES: Record<string, string> = {
   ETIMEDOUT: "资源趋势查询超时，请稍后重试",
 };
 
-// TODO(governance-migration): 已按 PR #51 f68375e 核对；部署确认后联调三档趋势、缺数点及权限错误。
 export async function queryResourceTrend(
   params: ResourceTrendQueryParams,
   signal?: AbortSignal,

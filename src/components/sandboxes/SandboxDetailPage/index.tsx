@@ -12,7 +12,6 @@ import {
 } from "@/components/common";
 import SandboxActions from "@/components/sandboxes/SandboxActions";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
-import { sandboxComputeText } from "@/lib/sandboxes";
 import SandboxRuntime from "./SandboxRuntime";
 import SandboxWorkspace from "./SandboxWorkspace";
 
@@ -68,7 +67,15 @@ export default function SandboxDetailPage({
         <StatusBadge status={sandbox.observed_state} reason={sandbox.reason} loading={false} />
       }
       icon={<AliIcon name="Sandbox" size={28} />}
-      headerItems={[{ label: "CPU / 内存", value: sandboxComputeText(sandbox) }]}
+      headerItems={[
+        {
+          label: "CPU / 内存",
+          value: [
+            snapshot?.cpu_millis ? `${Number(snapshot.cpu_millis) / 1000}C` : "-",
+            snapshot?.memory_mib ? `${Number(snapshot.memory_mib) / 1024} GiB` : "-",
+          ].join(" / "),
+        },
+      ]}
       actions={<SandboxActions sandbox={sandbox} onDeleted={goBack} />}
       cards={[
         {
@@ -78,9 +85,9 @@ export default function SandboxDetailPage({
             { label: "ID", value: <ResourceId value={sandbox.id} /> },
             { label: "版本", value: sandbox.version },
             { label: "期望状态", value: sandbox.desired_state },
-            { label: "计算预设", value: snapshot?.preset_name || snapshot?.preset_code || "-" },
+            { label: "算力规格", value: snapshot?.preset_name || snapshot?.preset_code || "-" },
             {
-              label: "预设 ID",
+              label: "算力规格 ID",
               value: snapshot?.preset_id ? <ResourceId value={snapshot.preset_id} /> : "-",
             },
             { label: "镜像引用", value: snapshot?.image_reference || "-" },

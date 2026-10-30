@@ -5,7 +5,7 @@ import { DataTable, type RowAction } from "@/components/common";
 import DataTableSectionHeader from "@/components/common/DataTable/DataTableSectionHeader";
 import VmSetMediaModal from "@/components/vms/VmSetMediaModal";
 import VmSetBootDeviceModal from "@/components/vms/VmSetBootDeviceModal";
-import { useVmResourceMutation } from "@/hooks/useVmResourceMutation";
+import { useVMMutation } from "@/hooks/useVMMutation";
 import { vmIsClosed } from "@/lib/vms";
 
 type VmMediaDevicesProps = { vm: VirtualMachine };
@@ -15,7 +15,7 @@ const SLOTS: VmMediaSlot[] = ["INSTALL", "DRIVER"];
 export default function VmMediaDevices({ vm }: VmMediaDevicesProps) {
   const [editingSlot, setEditingSlot] = useState<VmMediaSlot>();
   const [editingBoot, setEditingBoot] = useState(false);
-  const eject = useVmResourceMutation<VmMediaSlot>({
+  const eject = useVMMutation<VmMediaSlot>({
     vmId: vm.id,
     action: "弹出介质",
     actionId: "vm-media-eject",

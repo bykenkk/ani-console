@@ -123,7 +123,7 @@ export default function GpuContainerCreateModal({
         !image
       ) {
         setStep(0);
-        showMessage({ type: "error", content: "镜像或预设已变化，请重新选择" });
+        showMessage({ type: "error", content: "镜像或算力规格已变化，请重新选择" });
         return;
       }
       const submitData = {

@@ -47,4 +47,21 @@ export interface ConsoleOverviewStatistics {
   inference_services: InferenceServiceOverviewStatistics;
   models: ModelOverviewStatistics;
   knowledge_bases: KnowledgeBaseOverviewStatistics;
+  gpu_quota: ConsoleGpuQuotaOverview;
+}
+
+export interface ConsoleGpuQuotaOverview {
+  shared_memory_mib: ConsoleGpuQuotaItem;
+  physical_count: ConsoleGpuQuotaItem;
+}
+
+export interface ConsoleGpuQuotaItem {
+  quota_code: string;
+  unit: string;
+  limit: string;
+  occupied: string;
+  available: string;
+  over_limit: boolean;
+  configured: boolean;
+  enforcement: string;
 }

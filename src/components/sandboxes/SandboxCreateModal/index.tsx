@@ -98,14 +98,14 @@ export default function SandboxCreateModal({ onCancel, onCreated }: SandboxCreat
         </Form.Item>
         <Form.Item
           field="preset"
-          label="CPU 算力规格"
+          label="算力规格"
           rules={[
-            { required: true, message: "请选择 CPU 算力规格" },
+            { required: true, message: "请选择 算力规格" },
             {
               validator: (preset: InstancePreset | undefined, cb) =>
                 cb(
                   preset && (!preset.enabled || !preset.selectable || preset.compute_type !== "cpu")
-                    ? "请选择可用的 CPU 算力规格"
+                    ? "请选择可用的 算力规格"
                     : undefined,
                 ),
             },

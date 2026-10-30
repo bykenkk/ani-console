@@ -20,18 +20,14 @@
 
 .twoColumnRow {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(360px, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   height: 320px;
   gap: 16px;
   min-height: 320px;
 }
 
-.bottomGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(360px, 1fr);
-  grid-template-rows: 320px;
-  gap: 16px;
-  min-height: 320px;
+.twoColumnRow > .summaryPanel {
+  grid-column: span 2;
 }
 
 .panel {
@@ -646,6 +642,7 @@
   }
 
   .twoColumnRow > .panel {
+    grid-column: auto;
     height: auto;
   }
 
@@ -658,26 +655,11 @@
   .summaryPanel {
     min-height: 420px;
   }
-
-  .bottomGrid {
-    grid-template-columns: 1fr;
-    grid-template-rows: repeat(2, 320px);
-  }
 }
 
 @media (max-width: 760px) {
   .homePage {
     min-height: 0;
-  }
-
-  .bottomGrid {
-    display: flex;
-    min-height: 0;
-    flex-direction: column;
-  }
-
-  .bottomGrid > .panel {
-    min-height: 320px;
   }
 
   .summaryGrid {

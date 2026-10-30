@@ -24,6 +24,7 @@ export { default as DetailPagePlaceholder } from "./DetailPagePlaceholder";
 export type { DetailCard } from "./DetailPageFrame";
 export { default as Ipv4CidrInput } from "./Ipv4CidrInput";
 export { default as ImageNameText } from "./ImageNameText";
+export { default as RegisteredImageSelect } from "./RegisteredImageSelect";
 export { default as NotFoundPage } from "./NotFoundPage";
 export { default as ResourceId } from "./ResourceId";
 export { default as StatusBadge } from "./StatusBadge";

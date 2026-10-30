@@ -11,7 +11,6 @@ import {
 import { useListPagination } from "@/hooks/useListPagination";
 import { useSandboxActions } from "@/hooks/useSandboxActions";
 import { formatDateTime } from "@/lib/format";
-import { sandboxComputeText } from "@/lib/sandboxes";
 import SandboxCreateModal from "@/components/sandboxes/SandboxCreateModal";
 
 export default function SandboxesPage() {
@@ -58,17 +57,15 @@ export default function SandboxesPage() {
     },
     { key: "desired_state", title: "期望状态", width: 120, dataIndex: "desired_state" },
     {
-      key: "spec",
+      key: "compute",
       title: "CPU / 内存",
       width: 180,
-      render: (_, sandbox) => sandboxComputeText(sandbox),
-    },
-    {
-      key: "preset",
-      title: "计算预设",
-      width: 180,
-      dataIndex: "snapshot.preset_name",
       ellipsis: true,
+      render: (_, sandbox) =>
+        [
+          sandbox.snapshot?.cpu_millis ? `${Number(sandbox.snapshot.cpu_millis) / 1000}C` : "-",
+          sandbox.snapshot?.memory_mib ? `${Number(sandbox.snapshot.memory_mib) / 1024} GiB` : "-",
+        ].join(" / "),
     },
     {
       key: "image",

@@ -1,6 +1,6 @@
 import { Form, Input } from "@arco-design/web-react";
 import type { ComputeType, InstancePreset } from "@/api/instances";
-import InstanceImageSelect from "@/components/instances/InstanceImageSelect";
+import RegisteredImageSelect from "@/components/common/RegisteredImageSelect";
 import InstanceComputeSelect from "@/components/instances/InstanceComputeSelect";
 
 type InstanceCreateBasicFieldsProps = {
@@ -30,16 +30,16 @@ export default function InstanceCreateBasicFields({ computeType }: InstanceCreat
         validateTrigger="onSelect"
         rules={[{ type: "object", required: true, message: "请选择已注册的镜像" }]}
       >
-        <InstanceImageSelect
+        <RegisteredImageSelect
           onScopeChange={() => form.setFields({ image: { error: undefined } })}
         />
       </Form.Item>
       <Form.Item
         field="preset"
-        label="实例预设"
+        label="算力规格"
         validateTrigger="onSelect"
         rules={[
-          { type: "object", required: true, message: "请选择实例预设" },
+          { type: "object", required: true, message: "请选择算力规格" },
           {
             validator: (value: InstancePreset | undefined, callback) =>
               callback(
@@ -48,7 +48,7 @@ export default function InstanceCreateBasicFields({ computeType }: InstanceCreat
                   value.selectable &&
                   (computeType !== "gpu" || value.gpu)
                   ? undefined
-                  : "预设不可用，请重新选择",
+                  : "算力规格不可用，请重新选择",
               ),
           },
         ]}

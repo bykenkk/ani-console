@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Button, Select, Space, Typography } from "@arco-design/web-react";
+import { Button, Select, Typography } from "@arco-design/web-react";
 import { IconPlayArrowFill, IconRecordStop, IconRefresh } from "@arco-design/web-react/icon";
 import { useQuery } from "@tanstack/react-query";
 import { getModelDevExecutionLogs } from "@/api/modeldev";
@@ -43,51 +43,55 @@ export default function TrainingTaskLogs({ executionId, observing }: TrainingTas
   );
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
-      <Space wrap className="shrink-0">
-        <Select
-          aria-label="日志行数上限"
-          placeholder="请选择日志行数上限"
-          size="small"
-          autoWidth={false}
-          value={tailLines}
-          onChange={setTailLines}
-          style={{ width: 200 }}
-          options={[100, 200, 500, 1000].map((value) => ({ value, label: `最近 ${value} 行` }))}
-        />
-        <Select
-          aria-label="日志字节上限"
-          placeholder="请选择日志字节上限"
-          size="small"
-          autoWidth={false}
-          value={maxBytes}
-          onChange={setMaxBytes}
-          style={{ width: 200 }}
-          options={[8192, 16384, 32768, 65536].map((value) => ({
-            value,
-            label: `最多 ${value / 1024} KiB`,
-          }))}
-        />
-        <Button
-          size="small"
-          icon={refreshing ? <IconRecordStop /> : <IconPlayArrowFill />}
-          aria-label={refreshing ? "暂停自动刷新" : "开启自动刷新"}
-          title={refreshing ? "暂停自动刷新" : "开启自动刷新"}
-          disabled={!observing}
-          onClick={() => {
-            setAutoRefresh(!refreshing);
-            if (!refreshing) logs.refetch();
-          }}
-        />
-        <Button
-          size="small"
-          icon={<IconRefresh />}
-          aria-label="刷新日志"
-          title="刷新日志"
-          disabled={refreshing}
-          loading={logs.isFetching}
-          onClick={() => logs.refetch()}
-        />
-      </Space>
+      <div className="flex shrink-0 items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <Select
+            aria-label="日志行数上限"
+            placeholder="请选择日志行数上限"
+            size="small"
+            autoWidth={false}
+            value={tailLines}
+            onChange={setTailLines}
+            style={{ width: 150 }}
+            options={[100, 200, 500, 1000].map((value) => ({ value, label: `最近 ${value} 行` }))}
+          />
+          <Select
+            aria-label="日志字节上限"
+            placeholder="请选择日志字节上限"
+            size="small"
+            autoWidth={false}
+            value={maxBytes}
+            onChange={setMaxBytes}
+            style={{ width: 150 }}
+            options={[8192, 16384, 32768, 65536].map((value) => ({
+              value,
+              label: `最多 ${value / 1024} KiB`,
+            }))}
+          />
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <Button
+            size="small"
+            icon={refreshing ? <IconRecordStop /> : <IconPlayArrowFill />}
+            aria-label={refreshing ? "暂停自动刷新" : "开启自动刷新"}
+            title={refreshing ? "暂停自动刷新" : "开启自动刷新"}
+            disabled={!observing}
+            onClick={() => {
+              setAutoRefresh(!refreshing);
+              if (!refreshing) logs.refetch();
+            }}
+          />
+          <Button
+            size="small"
+            icon={<IconRefresh />}
+            aria-label="刷新日志"
+            title="刷新日志"
+            disabled={refreshing}
+            loading={logs.isFetching}
+            onClick={() => logs.refetch()}
+          />
+        </div>
+      </div>
       <LogViewer
         key={`${executionId}:${tailLines}:${maxBytes}`}
         className="flex-1"

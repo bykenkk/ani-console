@@ -81,7 +81,7 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
     });
   };
   const unavailable = (vm: VirtualMachine) => vmIsClosed(vm) || pending > 0 || Boolean(dialog);
-  // TODO(vm-legacy-actions): 未提供正式契约的操作保留禁用；旧 useLegacyVMActions 仅作迁移参考。
+  // TODO(vm-actions): 未提供正式契约的操作保留禁用，待对应 Governance 接口补齐并核对后逐项接入。
   const actions: RowAction<VirtualMachine>[] = [
     {
       key: "lifecycle",

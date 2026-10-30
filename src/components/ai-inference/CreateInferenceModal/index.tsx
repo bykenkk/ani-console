@@ -5,7 +5,7 @@ import { createInferenceService, type InferenceRuntimeMode } from "@/api/inferen
 import type { ModelVersion } from "@/api/models";
 import type { InstancePreset } from "@/api/instances";
 import type { ImageRegistration } from "@/api/images";
-import InstanceImageSelect from "@/components/instances/InstanceImageSelect";
+import RegisteredImageSelect from "@/components/common/RegisteredImageSelect";
 import InstanceComputeSelect from "@/components/instances/InstanceComputeSelect";
 import { showMessage } from "@/lib/feedback";
 import { validateForm } from "@/lib/form";
@@ -103,7 +103,7 @@ export default function CreateInferenceModal({
 
       if (!values.image) return;
       if (!values.preset?.enabled || !values.preset.selectable) {
-        showMessage({ type: "error", content: "请选择可用的推理算力规格" });
+        showMessage({ type: "error", content: "请选择可用的算力规格" });
         return;
       }
       if (
@@ -206,7 +206,7 @@ export default function CreateInferenceModal({
           rules={[{ type: "object", required: true, message: "请选择已注册的镜像" }]}
         >
           {/* TODO(inference-image-pagination): 暂用容器现有目录查询，后端支持 page/pageSize 后统一迁移。 */}
-          <InstanceImageSelect
+          <RegisteredImageSelect
             onScopeChange={() => form.setFields({ image: { error: undefined } })}
           />
         </Form.Item>
@@ -218,7 +218,7 @@ export default function CreateInferenceModal({
           field="preset"
           label="算力规格"
           validateTrigger="onSelect"
-          rules={[{ required: true, message: "请选择推理算力规格" }]}
+          rules={[{ required: true, message: "请选择算力规格" }]}
         >
           <InstanceComputeSelect
             usage="INFERENCE"

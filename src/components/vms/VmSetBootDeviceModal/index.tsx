@@ -1,6 +1,6 @@
 import { Alert, Form, Modal, Select } from "@arco-design/web-react";
 import { setVmBootDevice, type VirtualMachine, type VmBootDevice } from "@/api/vms";
-import { useVmResourceMutation } from "@/hooks/useVmResourceMutation";
+import { useVMMutation } from "@/hooks/useVMMutation";
 import { validateForm } from "@/lib/form";
 import { vmIsClosed } from "@/lib/vms";
 
@@ -17,7 +17,7 @@ export default function VmSetBootDeviceModal({
   onSubmitted,
 }: VmSetBootDeviceModalProps) {
   const [form] = Form.useForm<VmSetBootDeviceFormValues>();
-  const mutation = useVmResourceMutation<VmSetBootDeviceFormValues>({
+  const mutation = useVMMutation<VmSetBootDeviceFormValues>({
     vmId: vm.id,
     action: "切换启动设备",
     actionId: "vm-boot",

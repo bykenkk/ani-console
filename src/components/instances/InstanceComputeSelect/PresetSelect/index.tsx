@@ -40,30 +40,19 @@ export default function PresetSelect({
   disabled,
 }: PresetSelectProps) {
   const [search, setSearch] = useState("");
-  const label =
-    usage === "INFERENCE"
-      ? "推理算力规格"
-      : usage === "TRAINING"
-        ? "算力规格"
-        : usage === "VIRTUAL_MACHINE"
-          ? "虚拟机算力规格"
-          : usage === "SANDBOX"
-            ? "沙箱算力规格"
-            : "实例预设";
   const scope = `${usage}-${computeType ?? "all"}`;
-  const serverSearch = usage === "VIRTUAL_MACHINE" || usage === "SANDBOX";
   const query = useQuery({
-    queryKey: ["compute-presets", usage, computeType, "options", ...(serverSearch ? [search] : [])],
+    queryKey: ["compute-presets", usage, computeType, "options", search],
     queryFn: ({ signal }) =>
       listOptionsByUsage[usage](
         {
           compute_type: computeType,
-          ...(serverSearch ? { name: search || undefined } : {}),
+          name: search || undefined,
         },
         signal,
       ),
     meta: {
-      errorNotification: { id: withId("compute-presets", scope), action: `${label}加载` },
+      errorNotification: { id: withId("compute-presets", scope), action: "加载算力规格" },
     },
   });
   const catalogStatus = query.data?.gpu_catalog_status;
@@ -75,20 +64,16 @@ export default function PresetSelect({
       showNotification({
         id,
         state: "error",
-        action: `加载 GPU ${label}`,
+        action: "加载算力规格",
         content:
           catalogStatus === "NO_PERMISSION"
-            ? `当前账号无权查看 GPU ${label}`
-            : `GPU ${label}暂不可用，请稍后重试`,
+            ? "当前账号无权查看算力规格"
+            : "算力规格暂不可用，请稍后重试",
       });
     }
-  }, [catalogStatus, scope, label, query.dataUpdatedAt]);
+  }, [catalogStatus, scope, query.dataUpdatedAt]);
   useEffect(() => {
     const current = query.data?.items.find((item) => item.id === value?.id);
-    if (!serverSearch && query.data && value && !current) {
-      onChange?.(undefined);
-      return;
-    }
     // 候选刷新后同步可选状态，使调用方按表单当前值执行校验。
     if (
       value &&
@@ -98,29 +83,19 @@ export default function PresetSelect({
         current.compute_type !== value.compute_type)
     )
       onChange?.(current);
-  }, [query.data, value, onChange, serverSearch]);
+  }, [query.data, value, onChange]);
   const items = query.data?.items ?? [];
   const options = value && !items.some((item) => item.id === value.id) ? [value, ...items] : items;
   return (
     <Select
       value={value?.id}
       disabled={disabled}
-      aria-label="具体规格"
+      aria-label="算力规格"
       showSearch
-      filterOption={
-        serverSearch
-          ? false
-          : (input, option) =>
-              Boolean(
-                options
-                  .find((item) => item.id === option.props.value)
-                  ?.name.toLowerCase()
-                  .includes(input.toLowerCase()),
-              )
-      }
-      onSearch={serverSearch ? setSearch : undefined}
+      filterOption={false}
+      onSearch={setSearch}
       loading={query.isFetching}
-      placeholder={`请选择${label}`}
+      placeholder="请选择算力规格"
       options={options.map((item) => {
         const unavailable = !item.enabled || !item.selectable;
         return {
@@ -145,12 +120,12 @@ export default function PresetSelect({
                 <span className="truncate">{item.name}</span>
               </Tooltip>
               {unavailable && (
-                <Tooltip content={item.unavailable_reason || "当前规格不可选"}>
+                <Tooltip content={item.unavailable_reason || "当前算力规格不可选"}>
                   <span
                     className="inline-flex shrink-0"
                     style={{ color: "rgb(var(--warning-6))" }}
                     role="img"
-                    aria-label="规格不可选"
+                    aria-label="算力规格不可选"
                   >
                     <IconExclamationCircle />
                   </span>
