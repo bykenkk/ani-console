@@ -21,7 +21,7 @@ export default function NotFoundPage() {
             </Space>
           }
           extra={
-            <Space wrap>
+            <Space>
               <Button onClick={() => router.history.back()}>返回上一页</Button>
               <Button
                 type="primary"

@@ -93,11 +93,11 @@ export default function ModelsPage() {
     },
     {
       key: "capabilities",
-      title: "任务",
+      title: "能力",
       width: 180,
       render: (_, item) =>
         item.capabilities?.length ? (
-          <Space wrap size={4}>
+          <Space size={4}>
             {item.capabilities.map((capability) => (
               <Tag key={capability}>{formatModelCapabilities([capability])}</Tag>
             ))}

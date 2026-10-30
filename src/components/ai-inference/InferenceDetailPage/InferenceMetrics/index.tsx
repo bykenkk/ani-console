@@ -55,7 +55,7 @@ export default function InferenceMetrics({ serviceId }: InferenceMetricsProps) {
   });
   return (
     <div className="flex flex-col gap-4">
-      <Space wrap>
+      <Space>
         <Select
           aria-label="指标时间范围"
           className="w-40"

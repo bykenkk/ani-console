@@ -166,7 +166,7 @@ export default function InferenceInvocationTest({ service }: InferenceInvocation
           <Typography.Title heading={6} className="m-0!">
             响应结果
           </Typography.Title>
-          <Space wrap>
+          <Space>
             <Typography.Text type="secondary">
               耗时：{result ? `${result.elapsedMs} ms` : "-"}
             </Typography.Text>

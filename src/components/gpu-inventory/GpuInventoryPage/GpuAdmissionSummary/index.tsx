@@ -66,7 +66,7 @@ export default function GpuAdmissionSummary() {
               </Typography.Text>
             </div>
           </div>
-          <Space wrap>
+          <Space>
             <StatusBadge tone="success">可用 {availableSpecs}</StatusBadge>
             <StatusBadge tone="warning">配额不足 {quotaFullSpecs}</StatusBadge>
             <StatusBadge tone="warning">设备不足 {deviceFullSpecs}</StatusBadge>
