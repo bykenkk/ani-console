@@ -165,7 +165,6 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
                   "-"
                 ),
               },
-              { label: "文件存储", value: "-" },
               {
                 label: "创建时系统来源",
                 value: (
