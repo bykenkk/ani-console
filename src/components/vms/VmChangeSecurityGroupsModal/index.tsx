@@ -3,7 +3,7 @@ import ChangeSecurityGroupsModal from "@/components/security-groups/ChangeSecuri
 type VmChangeSecurityGroupsModalProps = {
   instance: { id: string; name: string };
   onCancel: () => void;
-  onSubmitted: () => void;
+  onSubmitted: (operationId: string) => void;
 };
 export default function VmChangeSecurityGroupsModal({
   instance,

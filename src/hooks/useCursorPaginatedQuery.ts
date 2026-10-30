@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, type UseQueryOptions } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
 import type { QueryErrorNotificationMeta } from "@/vite-env";
 import type { ListPagination } from "@/components/common/DataTable";
@@ -13,6 +13,7 @@ type UseCursorPaginatedQueryOptions<T> = {
   initialPageSize?: number;
   enabled?: boolean;
   errorNotification?: QueryErrorNotificationMeta;
+  refetchInterval?: UseQueryOptions<CursorPage<T>>["refetchInterval"];
 };
 
 // TODO(pagination-migration): 后端迁至 page/pageSize 后移除此游标兼容 Hook，改用正常服务端页码分页。
@@ -22,6 +23,7 @@ export function useCursorPaginatedQuery<T>({
   initialPageSize = 10,
   enabled = true,
   errorNotification,
+  refetchInterval,
 }: UseCursorPaginatedQueryOptions<T>) {
   const queryClient = useQueryClient();
   const scope = JSON.stringify(queryKey);
@@ -47,6 +49,7 @@ export function useCursorPaginatedQuery<T>({
     enabled,
     meta: { errorNotification },
     queryFn: ({ signal }) => queryFn({ cursor, limit: pageSize }, signal),
+    refetchInterval,
   });
   // A deletion can empty the last page. Fetch the previous page instead of trapping the user.
   useEffect(() => {

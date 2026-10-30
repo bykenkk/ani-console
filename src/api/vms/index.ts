@@ -1,6 +1,7 @@
 import { coreRequest } from "@/api/request";
 import { runIdempotentRequest } from "@/api/idempotency";
 import { createIdempotencyScope, type IdempotencyScope } from "@/lib/idempotency";
+import type { SetSecurityGroupsInput, SetSecurityGroupsRequest } from "@/api/network";
 import type { InstancePresetListParams, InstancePresetListResponse } from "@/api/instances";
 import type {
   CreateVmInput,
@@ -195,14 +196,16 @@ export type * from "./types";
 
 export function setVmSecurityGroups(
   id: string,
-  input: import("@/api/network").SetSecurityGroupsInput,
-): Promise<void> {
+  input: SetSecurityGroupsInput,
+): Promise<VmOperation> {
   return runIdempotentRequest(
     securityGroupsScope,
     input,
-    async (data) => {
-      await coreRequest(`${vmPath(id)}/security-groups`, { method: "PUT", data: { data } });
-    },
+    (data) =>
+      coreRequest<VmOperation, SetSecurityGroupsRequest>(`${vmPath(id)}/security-groups`, {
+        method: "PUT",
+        data: { data },
+      }),
     [id],
   );
 }

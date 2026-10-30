@@ -193,6 +193,12 @@ export interface InstanceOperation {
   state: string;
   reason?: string;
 }
+export interface InstanceAcceptance {
+  operationId: string;
+  resourceId: string;
+  replayed: boolean;
+  result: string;
+}
 export interface InstanceRuntime {
   instance_id: string;
   version: string;

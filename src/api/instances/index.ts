@@ -1,6 +1,7 @@
 import { coreRequest } from "@/api/request";
 import { runIdempotentRequest } from "@/api/idempotency";
 import { createIdempotencyScope } from "@/lib/idempotency";
+import type { SetSecurityGroupsInput, SetSecurityGroupsRequest } from "@/api/network";
 import type {
   InstanceRecord,
   InstanceListParams,
@@ -12,6 +13,7 @@ import type {
   ChangeInstanceInput,
   ChangeInstanceRequest,
   InstanceOperation,
+  InstanceAcceptance,
   InstanceRuntime,
   InstanceEventsResponse,
   InstanceLogParams,
@@ -180,14 +182,16 @@ export type * from "./types";
 
 export function setInstanceSecurityGroups(
   id: string,
-  input: import("@/api/network").SetSecurityGroupsInput,
-): Promise<void> {
+  input: SetSecurityGroupsInput,
+): Promise<InstanceAcceptance> {
   return runIdempotentRequest(
     securityGroupsScope,
     input,
-    async (data) => {
-      await coreRequest(`${instancePath(id)}/security-groups`, { method: "PUT", data: { data } });
-    },
+    (data) =>
+      coreRequest<InstanceAcceptance, SetSecurityGroupsRequest>(
+        `${instancePath(id)}/security-groups`,
+        { method: "PUT", data: { data } },
+      ),
     [id],
   );
 }

@@ -9,6 +9,7 @@ import type {
   NetworkEipListResponse,
   NetworkSecurityGroupBindingResponse,
   SetSecurityGroupsInput,
+  SetSecurityGroupsRequest,
 } from "./types";
 
 const securityGroupsScope = createIdempotencyScope("eip-security-groups", ["PUT"]);
@@ -50,13 +51,18 @@ export function getEipSecurityGroups(id: string, signal?: AbortSignal) {
     signal,
   });
 }
-export function setEipSecurityGroups(id: string, input: SetSecurityGroupsInput): Promise<void> {
+export function setEipSecurityGroups(
+  id: string,
+  input: SetSecurityGroupsInput,
+): Promise<NetworkSecurityGroupBindingResponse> {
   return runIdempotentRequest(
     securityGroupsScope,
     input,
-    async (data) => {
-      await coreRequest(`${eipPath(id)}/security-groups`, { method: "PUT", data: { data } });
-    },
+    (data) =>
+      coreRequest<NetworkSecurityGroupBindingResponse, SetSecurityGroupsRequest>(
+        `${eipPath(id)}/security-groups`,
+        { method: "PUT", data: { data } },
+      ),
     [id],
   );
 }

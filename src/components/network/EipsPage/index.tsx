@@ -11,6 +11,7 @@ import {
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import CreateEipModal from "../CreateEipModal";
+import EipBindingStatus from "../EipBindingStatus";
 
 export default function EipsPage() {
   const [securityGroupsEip, setSecurityGroupsEip] = useState<NetworkEip>();
@@ -27,6 +28,15 @@ export default function EipsPage() {
         action: "公网 IP 列表加载",
         fallback: "请求失败，请稍后重试",
       },
+      refetchInterval: (query) =>
+        query.state.data?.items.some(
+          (eip) =>
+            ["pending", "provisioning", "deleting"].includes(eip.state) ||
+            eip.binding_state === "reserved" ||
+            ["pending", "provisioning", "deleting"].includes(eip.binding_target?.state ?? ""),
+        )
+          ? 5000
+          : false,
       queryFn: ({ cursor, limit }, signal) =>
         listNetworkEips(
           {
@@ -48,17 +58,47 @@ export default function EipsPage() {
     },
     {
       key: "state",
-      title: "状态",
+      title: "资源状态",
       width: 120,
       render: (_, item) => <StatusBadge status={item.state} reason={item.reason} />,
     },
+    {
+      key: "binding-state",
+      title: "绑定状态",
+      width: 120,
+      render: (_, item) => <EipBindingStatus eip={item} />,
+    },
     { key: "address", title: "公网 IP", dataIndex: "address", ellipsis: true, width: 160 },
-    // TODO: EIP 契约提供网络关联字段后展示网络；不根据绑定目标拼接 VPC 信息。
-    { key: "network", title: "网络", render: () => "-", width: 120 },
+    {
+      key: "network",
+      title: "VPC",
+      width: 220,
+      render: (_, item) =>
+        item.binding_target?.vpc_id ? (
+          <ResourceNameId name="VPC" id={item.binding_target.vpc_id} type="vpc" />
+        ) : (
+          "-"
+        ),
+    },
     {
       key: "resource",
       title: "关联资源",
-      dataIndex: "binding_target.id",
+      render: (_, item) =>
+        item.binding_target?.id ? (
+          <ResourceNameId
+            name={
+              item.binding_target.kind === "vpc_snat"
+                ? "VPC 公网出口"
+                : item.binding_target.kind === "load_balancer"
+                  ? "负载均衡器"
+                  : item.binding_target.kind || "关联资源"
+            }
+            id={item.binding_target.id}
+            openable={false}
+          />
+        ) : (
+          "-"
+        ),
       ellipsis: true,
       width: 200,
     },

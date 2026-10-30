@@ -4,6 +4,7 @@ export type NetworkResourceState =
   | "pending"
   | "provisioning"
   | "available"
+  | "degraded"
   | "failed"
   | "deleting"
   | "deleted";
@@ -32,6 +33,24 @@ export interface NetworkVPC {
   observation_stale?: boolean;
   last_operation_id?: string;
   subnet_count?: string;
+  public_egress?: NetworkVpcPublicEgress;
+}
+
+/** Current public association from the same VPC read snapshot. */
+export interface NetworkVpcPublicEgress {
+  binding_id: string;
+  eip_id: string;
+  eip_address?: string;
+  binding_state: "reserved" | "bound";
+  state: NetworkResourceState;
+  reason?: string;
+  reason_message?: string;
+  desired_enabled: boolean;
+  applied_enabled?: boolean;
+  observed_at?: string;
+  observation_stale: boolean;
+  version: string;
+  last_operation_id?: string;
 }
 
 export interface NetworkSubnet {
@@ -182,6 +201,9 @@ export interface SetSecurityGroupsInput {
   security_group_ids: string[];
   expected_version: string;
 }
+export type SetSecurityGroupsRequest = {
+  data: SetSecurityGroupsInput & { idempotency_key: string };
+};
 export interface NetworkSecurityGroupBindingResponse {
   binding: NetworkSecurityGroupBinding;
   operation?: NetworkOperation;
@@ -370,7 +392,7 @@ export interface NetworkEip {
   binding_state?: string;
   scope?: string;
   managed_by?: string;
-  binding_target?: { kind?: string; id?: string; state?: string };
+  binding_target?: { kind?: string; id?: string; state?: string; vpc_id?: string };
 }
 // TODO(pagination-migration): 后端 ListEIPsRequest 仍仅支持 limit/cursor，暂保留原参数；待后端改造后迁移至 PageParams，不能复用 VPC 页码契约。
 export interface NetworkEipListParams extends CursorPageParams {
@@ -385,6 +407,7 @@ export interface NetworkEipListResponse {
 export interface CreateNetworkEipInput {
   name: string;
   description?: string;
+  security_group_ids: string[];
 }
 export type CreateNetworkEipRequest = CreateNetworkEipInput & { idempotency_key: string };
 export interface NetworkSnat {
