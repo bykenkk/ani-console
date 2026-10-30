@@ -22,7 +22,7 @@ export default function VmSetMediaModal({ vm, slot, onCancel, onSubmitted }: VmS
   });
   const mutation = useVMMutation<VmSetMediaFormValues>({
     vmId: vm.id,
-    action: "设置介质",
+    action: "设置光盘",
     actionId: "vm-media-set",
     onSubmitted,
     mutationFn: (values) =>
@@ -32,7 +32,7 @@ export default function VmSetMediaModal({ vm, slot, onCancel, onSubmitted }: VmS
   return (
     <Modal
       visible
-      title={`${slot === "INSTALL" ? "安装" : "驱动"}介质 · ${vm.name}`}
+      title={`${slot === "INSTALL" ? "系统安装光盘" : "驱动光盘"} · ${vm.name}`}
       onCancel={onCancel}
       confirmLoading={mutation.isPending}
       okButtonProps={{ disabled: vmIsClosed(vm) || mutation.busy || media.isFetching }}
@@ -41,19 +41,22 @@ export default function VmSetMediaModal({ vm, slot, onCancel, onSubmitted }: VmS
         await mutation.mutateAsync(await validateForm(form));
       }}
     >
-      <Alert type="info" content="介质变更可能需要重启后生效，请以实际介质及待重启状态为准。" />
+      <Alert
+        type="info"
+        content={`${slot === "INSTALL" ? "选择用于安装操作系统的 ISO 光盘。" : "选择用于安装磁盘、网络等驱动的 ISO 光盘。"}保存后不会自动重启云主机；如提示“下次启动生效”，请在适当时间正常关机再启动。`}
+      />
       <Form form={form} layout="vertical" className="mt-4">
         <Form.Item
           field="mediaKey"
-          label="介质"
+          label="ISO 光盘"
           rules={[
-            { required: true, message: "请选择介质" },
+            { required: true, message: "请选择 ISO 光盘" },
             {
               validator: (value, callback) => {
                 if (
                   !media.data?.items.some((item) => item.mediaKey === value && item.kind === kind)
                 )
-                  callback("请选择对应类型的可用 ISO 介质");
+                  callback("请选择对应用途的可用 ISO 光盘");
               },
             },
           ]}
@@ -61,10 +64,10 @@ export default function VmSetMediaModal({ vm, slot, onCancel, onSubmitted }: VmS
           <Select
             loading={media.isFetching}
             filterOption={false}
-            placeholder="请选择介质"
+            placeholder="请选择 ISO 光盘"
             options={(media.data?.items ?? []).map((item) => ({
               value: item.mediaKey,
-              label: `${item.name} · ${item.kind} · ${item.mediaKey}`,
+              label: `${item.name} · ${item.kind === "INSTALL_ISO" ? "系统安装光盘" : item.kind === "DRIVER_ISO" ? "驱动光盘" : "系统镜像"} · ${item.mediaKey}`,
               disabled: item.kind !== kind,
             }))}
           />

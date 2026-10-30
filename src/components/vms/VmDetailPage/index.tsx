@@ -5,13 +5,12 @@ import {
   DetailPageFrame,
   DetailPagePlaceholder,
   ResourceId,
+  ResourceNameId,
   StatusBadge,
 } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
-import InstanceEvents from "@/components/instances/InstanceEvents";
 import InstanceLogs from "@/components/instances/InstanceLogs";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
-import InstanceOperations from "@/components/instances/InstanceOperations";
 import InstanceStorage from "@/components/instances/InstanceStorage";
 import { useVMActions } from "@/hooks/useVMActions";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
@@ -25,6 +24,9 @@ import VmSnapshots from "./VmSnapshots";
 // import VmSshAccess from "./VmSshAccess";
 import VmDisks from "./VmDisks";
 import VmMediaDevices from "./VmMediaDevices";
+import VmNetwork from "./VmNetwork";
+import VmConfiguration from "./VmConfiguration";
+import VmGuestInfo from "./VmGuestInfo";
 
 type VmDetailPageProps = {
   instanceId: string;
@@ -46,7 +48,6 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
     vm.cpuMillis ? `${Number(vm.cpuMillis) / 1000}C` : "-",
     vm.memoryMib ? `${Number(vm.memoryMib) / 1024} GiB` : "-",
   ].join(" / ");
-  // TODO(vm-detail-fields): 新详情缺少终止保护、节点、自动启动、安全组及网络关联，保留原字段占位。
   // TODO(vm-integration): 新详情、磁盘、介质及快照流程仍需在已部署且允许访问的环境联调。
   return (
     <>
@@ -56,21 +57,32 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
         status={<StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />}
         icon={<AliIcon name="yunzhuji" size={28} />}
         headerItems={[{ label: "CPU / 内存", value: compute }]}
-        actions={<ResourceActionMenu record={vm} actions={actions} />}
+        actions={
+          <ResourceActionMenu
+            record={vm}
+            actions={actions.filter((action) => action.key !== "termination-protection")}
+          />
+        }
         cards={[
           {
             key: "basic",
             title: "基本信息",
             fields: [
               { label: "ID", value: <ResourceId value={vm.id} /> },
-              { label: "终止保护", value: "-" },
               { label: "CPU / 内存", value: compute },
+              {
+                label: "创建时规格",
+                value: (
+                  <ResourceNameId name={vm.presetName || "-"} id={vm.presetId} openable={false} />
+                ),
+              },
               { label: "系统盘", value: vm.systemDiskSizeGb ? `${vm.systemDiskSizeGb} GB` : "-" },
               {
-                label: "操作系统",
+                label: "创建时操作系统",
                 value: [vm.osFamily, vm.osVersion].filter(Boolean).join(" ") || "-",
               },
-              { label: "节点", value: "-" },
+              { label: "当前节点", value: vm.runtime?.nodeName || "-" },
+              { label: "本次运行开始", value: formatDateTime(vm.runtime?.startedAt) },
               {
                 label: "IP 地址",
                 value:
@@ -79,13 +91,33 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
                     .filter(Boolean)
                     .join(" · ") || "-",
               },
-              { label: "自动启动", value: "-" },
-              { label: "安全组", value: "-" },
+              {
+                label: "创建方式",
+                value:
+                  vm.sourceKind === "DISK_IMAGE"
+                    ? "系统镜像"
+                    : vm.sourceKind === "INSTALL_ISO"
+                      ? "安装光盘（ISO）"
+                      : "-",
+              },
               { label: "创建时间", value: formatDateTime(vm.createdAt) },
               {
-                label: "状态",
+                label: "实际状态",
                 value: <StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />,
               },
+              {
+                label: "目标状态",
+                value: <StatusBadge status={vm.desiredState} loading={false} />,
+              },
+              { label: "状态更新时间", value: formatDateTime(vm.observedAt) },
+              ...(vm.closing
+                ? [
+                    {
+                      label: "删除状态",
+                      value: <StatusBadge status="deleting">删除中</StatusBadge>,
+                    },
+                  ]
+                : []),
               { label: "DNS 服务器", value: vm.dns?.nameservers?.join(" · ") || "-" },
             ],
           },
@@ -93,11 +125,56 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
             key: "related-summary",
             title: "关联摘要",
             fields: [
-              { label: "VPC", value: "-" },
-              { label: "子网", value: "-" },
-              { label: "安全组", value: "-" },
-              { label: "文件存储", value: "-" },
-              { label: "镜像", value: vm.mediaKey || "-" },
+              {
+                label: "VPC",
+                value: (
+                  <ResourceNameId
+                    name={vm.relations?.vpc?.name || "-"}
+                    id={vm.relations?.vpc?.id}
+                    type="vpc"
+                  />
+                ),
+              },
+              {
+                label: "子网",
+                value: (
+                  <ResourceNameId
+                    name={vm.relations?.subnet?.name || "-"}
+                    id={vm.relations?.subnet?.id}
+                    type="subnet"
+                  />
+                ),
+              },
+              {
+                label: "安全组",
+                value: vm.security_group_ids?.length ? (
+                  <div className="flex flex-col gap-2">
+                    {vm.security_group_ids.map((id) => (
+                      <ResourceNameId
+                        key={id}
+                        name={
+                          vm.relations?.securityGroups?.find((group) => group.id === id)?.name ||
+                          "-"
+                        }
+                        id={id}
+                        type="security-group"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  "-"
+                ),
+              },
+              {
+                label: "创建时系统来源",
+                value: (
+                  <ResourceNameId
+                    name={vm.sourceMedia?.name || "-"}
+                    id={vm.mediaKey}
+                    openable={false}
+                  />
+                ),
+              },
               { label: "密钥", value: "-" },
               { label: "负载均衡", value: "-" },
             ],
@@ -115,7 +192,10 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
             label: "存储挂载",
             content: <InstanceStorage diskContent={<VmDisks vm={vm} />} />,
           },
-          { key: "media", label: "介质与启动", content: <VmMediaDevices vm={vm} /> },
+          { key: "network", label: "网络", content: <VmNetwork vm={vm} /> },
+          { key: "configuration", label: "创建配置", content: <VmConfiguration vm={vm} /> },
+          { key: "guest", label: "来宾信息", content: <VmGuestInfo vm={vm} /> },
+          { key: "media", label: "光盘与启动", content: <VmMediaDevices vm={vm} /> },
           { key: "snapshots", label: "快照", content: <VmSnapshots vm={vm} /> },
           // TODO(vm-metrics): Gov 新版部署后联调 VM ID 的实例指标查询与 instance:read 权限。
           {
@@ -135,10 +215,6 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
               />
             ),
           },
-          // TODO(vm-events): VM 事件契约尚未提供，沿用公共组件空态。
-          { key: "events", label: "事件", content: <InstanceEvents /> },
-          // TODO(vm-operations): VM 操作查询及历史记录统一暂缓，保留原有入口。
-          { key: "operations", label: "操作记录", content: <InstanceOperations /> },
         ]}
         activeTabKey={tab}
         onTabChange={onTabChange}

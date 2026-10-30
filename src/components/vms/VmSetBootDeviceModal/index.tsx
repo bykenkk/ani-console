@@ -40,7 +40,7 @@ export default function VmSetBootDeviceModal({
     >
       <Alert
         type="warning"
-        content="切换会改变云主机的启动设备。选择安装介质前请确认已插入可启动的安装 ISO；本操作不会自动重启云主机。"
+        content="选择下次启动时使用的设备。安装系统时选择系统安装光盘（ISO），安装完成后切回系统盘。请先确认已插入可启动的安装光盘；本操作不会自动重启云主机。"
       />
       <Form
         form={form}
@@ -50,13 +50,13 @@ export default function VmSetBootDeviceModal({
       >
         <Form.Item
           field="bootDevice"
-          label="启动设备"
+          label="下次启动设备"
           rules={[{ required: true, message: "请选择启动设备" }]}
         >
           <Select
             options={[
               { value: "SYSTEM_DISK", label: "系统盘" },
-              { value: "INSTALL_MEDIA", label: "安装介质" },
+              { value: "INSTALL_MEDIA", label: "系统安装光盘（ISO）" },
             ]}
           />
         </Form.Item>
