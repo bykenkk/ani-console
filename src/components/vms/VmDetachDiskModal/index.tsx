@@ -1,6 +1,6 @@
 import { Alert, Checkbox, Form, Modal } from "@arco-design/web-react";
 import { detachVmDisk, type VirtualMachine, type VmDisk } from "@/api/vms";
-import { useVmResourceMutation } from "@/hooks/useVmResourceMutation";
+import { useVMMutation } from "@/hooks/useVMMutation";
 import { validateForm } from "@/lib/form";
 import { vmIsClosed } from "@/lib/vms";
 
@@ -19,7 +19,7 @@ export default function VmDetachDiskModal({
   onSubmitted,
 }: VmDetachDiskModalProps) {
   const [form] = Form.useForm<VmDetachDiskFormValues>();
-  const mutation = useVmResourceMutation<VmDetachDiskFormValues>({
+  const mutation = useVMMutation<VmDetachDiskFormValues>({
     vmId: vm.id,
     action: "卸载数据盘",
     actionId: "vm-disk-detach",

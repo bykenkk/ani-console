@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Alert, Checkbox, Modal, Space } from "@arco-design/web-react";
 import { forceStopVm, stopVm, type VirtualMachine } from "@/api/vms";
-import { useVmResourceMutation } from "@/hooks/useVmResourceMutation";
+import { useVMMutation } from "@/hooks/useVMMutation";
 import { vmIsClosed } from "@/lib/vms";
 
 type VmShutdownModalProps = {
@@ -13,7 +13,7 @@ type VmShutdownModalProps = {
 export default function VmShutdownModal({ vm, onCancel, onSubmitted }: VmShutdownModalProps) {
   const [force, setForce] = useState(false);
   const [confirmedVersion, setConfirmedVersion] = useState<string>();
-  const mutation = useVmResourceMutation({
+  const mutation = useVMMutation({
     vmId: vm.id,
     action: force ? "强制关机" : "关机",
     actionId: force ? "vm-force-stop" : "vm-stop",

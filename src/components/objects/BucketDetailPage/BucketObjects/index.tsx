@@ -1,11 +1,11 @@
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
-import { useBucketUpload } from "@/hooks/useBucketUpload";
+import { uploadStorageObjectFile } from "@/api/storage/objects/legacy";
 import { useObjectActions } from "@/hooks/useObjectActions";
 import { listBucketObjects, type StorageBucketRecord } from "@/api/storage/buckets/legacy";
 import ObjectBrowser from "@/components/objects/ObjectBrowser";
 import { withId } from "@/lib/id";
 import { Button, Upload } from "@arco-design/web-react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import BucketFolderCreateModal from "@/components/objects/BucketFolderCreateModal";
 
@@ -33,7 +33,25 @@ export default function BucketObjects({ bucketId, bucket }: BucketObjectsProps) 
     },
   });
   const { actions } = useObjectActions(bucketId);
-  const upload = useBucketUpload(bucketId, prefix);
+  const upload = useMutation({
+    meta: {
+      feedback: {
+        channel: "notification",
+        id: "object-upload",
+        action: "上传",
+        errorFallback: "上传失败",
+      },
+    },
+    mutationFn: ({ file, prefix }: { file: File; prefix: string }) =>
+      uploadStorageObjectFile({ bucketId, file, prefix }),
+    onSuccess: async (_, { prefix }) => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["bucket", bucketId], exact: true }),
+        qc.invalidateQueries({ queryKey: ["bucket-objects", bucketId, prefix] }),
+        qc.invalidateQueries({ queryKey: ["buckets"], refetchType: "none" }),
+      ]);
+    },
+  });
   const dialogNode = folderVisible ? (
     <BucketFolderCreateModal
       bucketId={bucketId}
@@ -61,7 +79,7 @@ export default function BucketObjects({ bucketId, bucket }: BucketObjectsProps) 
         primaryAction={
           <Upload
             showUploadList={false}
-            customRequest={(option) => upload.mutate(option.file as File)}
+            customRequest={(option) => upload.mutate({ file: option.file as File, prefix })}
           >
             <Button type="primary" loading={upload.isPending}>
               上传对象

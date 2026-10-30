@@ -1,6 +1,6 @@
 import { Form, Input, InputNumber, Modal } from "@arco-design/web-react";
 import { createVmDisk, type VirtualMachine } from "@/api/vms";
-import { useVmResourceMutation } from "@/hooks/useVmResourceMutation";
+import { useVMMutation } from "@/hooks/useVMMutation";
 import { validateForm } from "@/lib/form";
 import { vmIsClosed } from "@/lib/vms";
 
@@ -9,7 +9,7 @@ type VmCreateDiskFormValues = { name: string; sizeGb: number };
 
 export default function VmCreateDiskModal({ vm, onCancel, onSubmitted }: VmCreateDiskModalProps) {
   const [form] = Form.useForm<VmCreateDiskFormValues>();
-  const mutation = useVmResourceMutation<VmCreateDiskFormValues>({
+  const mutation = useVMMutation<VmCreateDiskFormValues>({
     vmId: vm.id,
     action: "创建数据盘",
     actionId: "vm-disk-create",

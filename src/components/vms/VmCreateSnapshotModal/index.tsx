@@ -1,6 +1,6 @@
 import { Checkbox, Form, Input, Modal } from "@arco-design/web-react";
 import { createVmSnapshot, type VirtualMachine } from "@/api/vms";
-import { useVmResourceMutation } from "@/hooks/useVmResourceMutation";
+import { useVMMutation } from "@/hooks/useVMMutation";
 import { validateForm } from "@/lib/form";
 import { vmIsClosed } from "@/lib/vms";
 
@@ -17,7 +17,7 @@ export default function VmCreateSnapshotModal({
   onSubmitted,
 }: VmCreateSnapshotModalProps) {
   const [form] = Form.useForm<VmCreateSnapshotFormValues>();
-  const mutation = useVmResourceMutation<VmCreateSnapshotFormValues>({
+  const mutation = useVMMutation<VmCreateSnapshotFormValues>({
     vmId: vm.id,
     action: "创建快照",
     actionId: "vm-snapshot-create",

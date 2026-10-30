@@ -6,7 +6,7 @@ import { DataTable, ResourceNameId, StatusBadge, type RowAction } from "@/compon
 import VmCreateSnapshotModal from "@/components/vms/VmCreateSnapshotModal";
 import VmRestoreSnapshotModal from "@/components/vms/VmRestoreSnapshotModal";
 import VmSnapshotDetailModal from "@/components/vms/VmSnapshotDetailModal";
-import { useVmResourceMutation } from "@/hooks/useVmResourceMutation";
+import { useVMMutation } from "@/hooks/useVMMutation";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 import { vmIsClosed } from "@/lib/vms";
@@ -22,7 +22,7 @@ export default function VmSnapshots({ vm }: VmSnapshotsProps) {
     queryFn: ({ signal }) => listVmSnapshots(vm.id, signal),
     meta: { errorNotification: { id: withId("vm-snapshots", vm.id), action: "快照列表加载" } },
   });
-  const remove = useVmResourceMutation<VmSnapshot>({
+  const remove = useVMMutation<VmSnapshot>({
     vmId: vm.id,
     action: "删除快照",
     actionId: "vm-snapshot-delete",

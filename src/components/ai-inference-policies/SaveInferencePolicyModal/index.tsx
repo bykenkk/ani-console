@@ -1,13 +1,12 @@
 import { useRef, useState } from "react";
 import { Alert, Form, Modal } from "@arco-design/web-react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   createInferencePolicy,
   updateInferencePolicy,
   type InferencePolicy,
   type InferencePolicyInput,
 } from "@/api/inference-policies";
-import { useRefreshInferencePolicies } from "@/hooks/useInferencePolicy";
 import { validateForm } from "@/lib/form";
 import InferencePolicyFormFields, {
   type InferencePolicyFormValues,
@@ -53,7 +52,7 @@ export default function SaveInferencePolicyModal({
   const [form] = Form.useForm<InferencePolicyFormValues>();
   const [emptyModelInput, setEmptyModelInput] = useState<InferencePolicyInput>();
   const submitting = useRef(false);
-  const refresh = useRefreshInferencePolicies();
+  const queryClient = useQueryClient();
   const save = useMutation({
     mutationFn: (input: InferencePolicyInput) =>
       policy ? updateInferencePolicy(policy.id, input) : createInferencePolicy(input),
@@ -65,7 +64,18 @@ export default function SaveInferencePolicyModal({
       },
     },
     onSuccess: async () => {
-      await refresh();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["governance-inference-policies"] }),
+        ...(policy
+          ? [
+              queryClient.invalidateQueries({
+                queryKey: ["governance-inference-policy", policy.id],
+                exact: true,
+              }),
+            ]
+          : []),
+        queryClient.resetQueries({ queryKey: ["governance-inference-keys", "options"] }),
+      ]);
       onSaved();
     },
   });

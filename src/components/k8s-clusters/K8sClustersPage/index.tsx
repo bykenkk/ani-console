@@ -1,18 +1,20 @@
 import CreateK8sClusterModal from "@/components/k8s-clusters/CreateK8sClusterModal";
 import { useK8sClusterActions } from "@/hooks/useK8sClusterActions";
 
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { listK8sClusters, type K8sCluster } from "@/api/k8s-clusters";
+import { getK8sClusterKubeconfig, listK8sClusters, type K8sCluster } from "@/api/k8s-clusters";
 import {
   StatusBadge,
   ResourceNameId,
   ListPageFrame,
   type ListColumn,
   ListDataTable,
+  type RowAction,
 } from "@/components/common";
 
 import { formatDateTime } from "@/lib/format";
+import { downloadBlob } from "@/lib/browser";
 import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 type Cluster = K8sCluster;
 type ClusterStatusFilter = "all" | NonNullable<Cluster["state"]>;
@@ -49,7 +51,35 @@ export default function K8sClustersPage() {
     },
   });
   const { isFetching } = clusters;
-  const { actions } = useK8sClusterActions(resetPagination);
+  const { actions: clusterActions } = useK8sClusterActions(resetPagination);
+  const downloadKubeconfig = useMutation({
+    meta: {
+      feedback: {
+        channel: "notification",
+        id: "kubeconfig-download",
+        action: "下载 Kubeconfig",
+        errorFallback: "下载失败",
+      },
+    },
+    mutationFn: async (clusterId: string | undefined) => {
+      if (!clusterId) throw new Error("缺少集群 ID");
+      const data = await getK8sClusterKubeconfig(clusterId);
+      if (!data.kubeconfig?.trim()) throw new Error("未返回有效的 Kubeconfig");
+      downloadBlob(
+        new Blob([data.kubeconfig], { type: "text/yaml" }),
+        `kubeconfig-${clusterId}.yaml`,
+      );
+    },
+  });
+  const actions: RowAction<Cluster>[] = [
+    {
+      key: "kubeconfig",
+      label: "kubeconfig",
+      loading: () => downloadKubeconfig.isPending,
+      onClick: (cluster) => downloadKubeconfig.mutate(cluster.id),
+    },
+    ...clusterActions,
+  ];
 
   useEffect(() => {
     setSelectedKeys([]);

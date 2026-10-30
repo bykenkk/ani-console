@@ -1,10 +1,10 @@
 import { Form, Select, Spin } from "@arco-design/web-react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { listInferencePolicies } from "@/api/inference-policies";
+import { getInferencePolicy, listInferencePolicies } from "@/api/inference-policies";
 import { withFirst100 } from "@/api/pagination";
 import InferencePolicyRules from "@/components/ai-inference-policies/InferencePolicyRules";
-import { useInferencePolicy } from "@/hooks/useInferencePolicy";
+import { withId } from "@/lib/id";
 
 type ModelApiKeyPolicyFieldProps = { disabled?: boolean; showRules?: boolean };
 type ModelApiKeyPolicyInputProps = {
@@ -27,7 +27,17 @@ function ModelApiKeyPolicyInput({
     meta: { errorNotification: { id: "inference-policies", action: "访问策略列表加载" } },
   });
   // 单个详情用于策略摘要及前 100 项之外的原绑定回显。
-  const selected = useInferencePolicy(value);
+  const selected = useQuery({
+    queryKey: ["governance-inference-policy", value],
+    queryFn: ({ signal }) => getInferencePolicy(value!, signal),
+    enabled: Boolean(value),
+    meta: {
+      errorNotification: {
+        id: withId("inference-policy", value),
+        action: "访问策略详情加载",
+      },
+    },
+  });
   const options = (policies.data?.items ?? []).map((policy) => ({
     value: policy.id,
     label: `${policy.name} / ${policy.id}`,

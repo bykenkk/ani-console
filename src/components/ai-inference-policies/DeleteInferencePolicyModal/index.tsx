@@ -1,9 +1,8 @@
 import { useRef } from "react";
-import { Modal, Space } from "@arco-design/web-react";
-import { useMutation } from "@tanstack/react-query";
+import { Modal } from "@arco-design/web-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteInferencePolicy, type InferencePolicy } from "@/api/inference-policies";
 import { ResourceNameId } from "@/components/common";
-import { useRefreshInferencePolicies } from "@/hooks/useInferencePolicy";
 import { withId } from "@/lib/id";
 
 type DeleteInferencePolicyModalProps = {
@@ -18,7 +17,7 @@ export default function DeleteInferencePolicyModal({
   onDeleted,
 }: DeleteInferencePolicyModalProps) {
   const submitting = useRef(false);
-  const refresh = useRefreshInferencePolicies();
+  const queryClient = useQueryClient();
   const remove = useMutation({
     mutationFn: () => deleteInferencePolicy(policy.id),
     meta: {
@@ -30,7 +29,15 @@ export default function DeleteInferencePolicyModal({
       },
     },
     onSuccess: async () => {
-      await refresh(policy.id);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["governance-inference-policies"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["governance-inference-policy", policy.id],
+          exact: true,
+          refetchType: "none",
+        }),
+        queryClient.resetQueries({ queryKey: ["governance-inference-keys", "options"] }),
+      ]);
       onDeleted();
     },
   });
@@ -61,10 +68,10 @@ export default function DeleteInferencePolicyModal({
       maskClosable={false}
       cancelButtonProps={{ disabled: remove.isPending }}
     >
-      <Space direction="vertical" size={16} className="w-full">
+      <div className="flex w-full flex-col gap-4">
         <ResourceNameId name={policy.name} id={policy.id} openable={false} />
         <div>删除后不可恢复。仍被 API Key 绑定的策略无法删除。</div>
-      </Space>
+      </div>
     </Modal>
   );
 }

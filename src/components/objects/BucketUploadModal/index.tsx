@@ -1,7 +1,8 @@
-import { useBucketUpload } from "@/hooks/useBucketUpload";
+import { uploadStorageObjectFile } from "@/api/storage/objects/legacy";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { StorageBucketRecord } from "@/api/storage/buckets/legacy";
 
-import { Button, Modal, Space, Typography, Upload } from "@arco-design/web-react";
+import { Button, Modal, Typography, Upload } from "@arco-design/web-react";
 
 type BucketUploadModalProps = {
   bucket: StorageBucketRecord;
@@ -9,7 +10,26 @@ type BucketUploadModalProps = {
 };
 
 export default function BucketUploadModal({ bucket, onCancel }: BucketUploadModalProps) {
-  const upload = useBucketUpload(bucket.id, "/", onCancel);
+  const queryClient = useQueryClient();
+  const upload = useMutation({
+    meta: {
+      feedback: {
+        channel: "notification",
+        id: "object-upload",
+        action: "上传",
+        errorFallback: "上传失败",
+      },
+    },
+    mutationFn: (file: File) => uploadStorageObjectFile({ bucketId: bucket.id, file, prefix: "/" }),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["bucket", bucket.id], exact: true }),
+        queryClient.invalidateQueries({ queryKey: ["bucket-objects", bucket.id, "/"] }),
+        queryClient.invalidateQueries({ queryKey: ["buckets"], refetchType: "none" }),
+      ]);
+      onCancel();
+    },
+  });
 
   return (
     <Modal
@@ -19,7 +39,7 @@ export default function BucketUploadModal({ bucket, onCancel }: BucketUploadModa
       onCancel={onCancel}
       unmountOnExit
     >
-      <Space direction="vertical" size={16} className="w-full">
+      <div className="flex w-full flex-col gap-4">
         <Typography.Text type="secondary">
           文件将上传到存储桶根目录，选择文件后立即开始上传。
         </Typography.Text>
@@ -35,7 +55,7 @@ export default function BucketUploadModal({ bucket, onCancel }: BucketUploadModa
             选择文件并上传
           </Button>
         </Upload>
-      </Space>
+      </div>
     </Modal>
   );
 }

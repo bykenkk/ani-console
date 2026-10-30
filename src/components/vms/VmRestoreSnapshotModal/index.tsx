@@ -9,7 +9,7 @@ import {
   type VmRestorePreview,
 } from "@/api/vms";
 import { DataTable } from "@/components/common";
-import { useVmResourceMutation } from "@/hooks/useVmResourceMutation";
+import { useVMMutation } from "@/hooks/useVMMutation";
 import { withId } from "@/lib/id";
 import { vmIsClosed } from "@/lib/vms";
 
@@ -44,7 +44,7 @@ export default function VmRestoreSnapshotModal({
   const token = data
     ? `${vm.version}:${data.version}:${data.snapshotUid}:${data.previewDigest}`
     : undefined;
-  const mutation = useVmResourceMutation<VmRestorePreview>({
+  const mutation = useVMMutation<VmRestorePreview>({
     vmId: vm.id,
     action: "恢复快照",
     actionId: "vm-snapshot-restore",

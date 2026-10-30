@@ -2,7 +2,7 @@ import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-quer
 import { ApiError } from "@/api/request";
 import { withId } from "@/lib/id";
 
-type VmResourceMutationOptions<TVariables> = {
+type VMMutationOptions<TVariables> = {
   vmId: string;
   action: string;
   actionId: string;
@@ -12,7 +12,7 @@ type VmResourceMutationOptions<TVariables> = {
   onConflict?: () => void;
 };
 
-export function useVmResourceMutation<TVariables = void>({
+export function useVMMutation<TVariables = void>({
   vmId,
   action,
   actionId,
@@ -20,7 +20,7 @@ export function useVmResourceMutation<TVariables = void>({
   mutationFn,
   onSubmitted,
   onConflict,
-}: VmResourceMutationOptions<TVariables>) {
+}: VMMutationOptions<TVariables>) {
   const client = useQueryClient();
   const pending = useIsMutating({ mutationKey: ["vm-write"] });
   const refresh = () =>

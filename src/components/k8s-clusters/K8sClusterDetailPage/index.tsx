@@ -1,24 +1,25 @@
 import { useK8sClusterActions } from "@/hooks/useK8sClusterActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
-import { getK8sCluster } from "@/api/k8s-clusters";
+import { getK8sCluster, getK8sClusterKubeconfig, type K8sCluster } from "@/api/k8s-clusters";
 import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
   ResourceId,
   StatusBadge,
+  type RowAction,
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
+import { downloadBlob } from "@/lib/browser";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { useCallback, useState } from "react";
 
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import K8sEvents from "./K8sEvents";
-import K8sKubeconfig from "./K8sKubeconfig";
 import K8sNodePools from "./K8sNodePools";
 import K8sWorkloads from "./K8sWorkloads";
 
@@ -47,7 +48,35 @@ export default function K8sClusterDetailPage({
     queryKey: ["k8s-cluster", clusterId],
     queryFn: () => getK8sCluster(clusterId),
   });
-  const { actions } = useK8sClusterActions(goBack);
+  const { actions: clusterActions } = useK8sClusterActions(goBack);
+  const downloadKubeconfig = useMutation({
+    meta: {
+      feedback: {
+        channel: "notification",
+        id: "kubeconfig-download",
+        action: "下载 Kubeconfig",
+        errorFallback: "下载失败",
+      },
+    },
+    mutationFn: async (clusterId: string | undefined) => {
+      if (!clusterId) throw new Error("缺少集群 ID");
+      const data = await getK8sClusterKubeconfig(clusterId);
+      if (!data.kubeconfig?.trim()) throw new Error("未返回有效的 Kubeconfig");
+      downloadBlob(
+        new Blob([data.kubeconfig], { type: "text/yaml" }),
+        `kubeconfig-${clusterId}.yaml`,
+      );
+    },
+  });
+  const actions: RowAction<K8sCluster>[] = [
+    {
+      key: "kubeconfig",
+      label: "kubeconfig",
+      loading: () => downloadKubeconfig.isPending,
+      onClick: (cluster) => downloadKubeconfig.mutate(cluster.id),
+    },
+    ...clusterActions,
+  ];
 
   if (!detail.data) return <DetailPagePlaceholder loading={detail.isLoading} />;
 
@@ -98,11 +127,6 @@ export default function K8sClusterDetailPage({
           key: "workloads",
           label: "工作负载",
           content: <K8sWorkloads clusterId={clusterId} />,
-        },
-        {
-          key: "kubeconfig",
-          label: "kubeconfig",
-          content: <K8sKubeconfig clusterId={clusterId} />,
         },
         { key: "events", label: "事件", content: <K8sEvents /> },
       ]}
