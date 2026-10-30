@@ -9,11 +9,11 @@ import {
   type ListColumn,
   StatusBadge,
   ListDataTable,
-  type RowAction,
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import CreateVpcModal from "../CreateVpcModal";
 import BindVpcEipModal from "../BindVpcEipModal";
+import VpcPublicEgressStatus from "../VpcPublicEgressStatus";
 
 type Vpc = NetworkVPC;
 type VpcStatusFilter = "" | NetworkResourceStateFilter;
@@ -43,19 +43,19 @@ export default function VpcsPage() {
       });
       return { ...data, total: Number(data.total) };
     },
+    refetchInterval: (query) =>
+      query.state.data?.items.some(
+        (vpc) =>
+          ["pending", "provisioning", "deleting"].includes(vpc.state) ||
+          vpc.public_egress?.binding_state === "reserved" ||
+          ["pending", "provisioning", "deleting"].includes(vpc.public_egress?.state ?? ""),
+      )
+        ? 5000
+        : false,
   });
   const items = vpcs.data?.items ?? [];
   const refresh = () => vpcs.refetch();
-  const { actions } = useVpcActions(resetPagination);
-  const rowActions: RowAction<Vpc>[] = [
-    {
-      key: "bind-eip",
-      label: "绑定公网 IP",
-      disabled: (vpc) => vpc.state === "deleting" || vpc.state === "deleted",
-      onClick: setBindingVpc,
-    },
-    ...actions,
-  ];
+  const { actions } = useVpcActions(resetPagination, setBindingVpc);
   const columns: Array<ListColumn<Vpc>> = [
     {
       key: "name",
@@ -76,6 +76,23 @@ export default function VpcsPage() {
       width: 150,
       ellipsis: true,
       dataIndex: "cidr",
+    },
+    {
+      key: "public-egress",
+      title: "公网 IP",
+      width: 240,
+      render: (_, vpc) => (
+        <div className="flex flex-col gap-1">
+          {vpc.public_egress && (
+            <ResourceNameId
+              name={vpc.public_egress.eip_address || "分配中"}
+              id={vpc.public_egress.eip_id}
+              openable={false}
+            />
+          )}
+          <VpcPublicEgressStatus binding={vpc.public_egress} />
+        </div>
+      ),
     },
     {
       key: "subnets",
@@ -143,7 +160,7 @@ export default function VpcsPage() {
           data={items}
           columns={columns}
           loading={vpcs.isFetching}
-          rowActions={rowActions}
+          rowActions={actions}
           tableLabel="VPC 列表"
           pagination={{
             mode: "total",

@@ -2,6 +2,7 @@ import { Form, Input, InputNumber, Modal, Typography } from "@arco-design/web-re
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createNetworkEip, type CreateNetworkEipInput } from "@/api/network";
 import { validateForm } from "@/lib/form";
+import SecurityGroupSelect from "@/components/security-groups/SecurityGroupSelect";
 
 type CreateEipModalProps = {
   onCancel: () => void;
@@ -11,6 +12,7 @@ type CreateEipModalProps = {
 type CreateEipFormValues = {
   name: string;
   description?: string;
+  security_group_ids: string[];
 };
 
 export default function CreateEipModal({ onCancel, onCreated }: CreateEipModalProps) {
@@ -28,7 +30,11 @@ export default function CreateEipModal({ onCancel, onCreated }: CreateEipModalPr
     },
     onSuccess: async () => {
       // TODO: 资源 task 跟踪统一开放后接入创建进度；当前仅刷新列表。
-      await queryClient.invalidateQueries({ queryKey: ["network-eips"] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["network-eips"] }),
+        queryClient.invalidateQueries({ queryKey: ["network-security-groups"] }),
+        queryClient.invalidateQueries({ queryKey: ["network-security-group-bindings"] }),
+      ]);
       onCreated();
     },
   });
@@ -50,10 +56,16 @@ export default function CreateEipModal({ onCancel, onCreated }: CreateEipModalPr
         await create.mutateAsync({
           name: values.name.trim(),
           description: values.description?.trim() || undefined,
+          security_group_ids: values.security_group_ids ?? [],
         });
       }}
     >
-      <Form form={form} layout="vertical" disabled={create.isPending}>
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{ security_group_ids: [] }}
+        disabled={create.isPending}
+      >
         <Form.Item
           label="名称"
           field="name"
@@ -75,6 +87,13 @@ export default function CreateEipModal({ onCancel, onCreated }: CreateEipModalPr
             showWordLimit
             autoSize={{ minRows: 2, maxRows: 4 }}
           />
+        </Form.Item>
+        <Form.Item
+          label="安全组"
+          field="security_group_ids"
+          extra="可多选；创建公网 IP 时一并绑定。"
+        >
+          <SecurityGroupSelect disabled={create.isPending} />
         </Form.Item>
         {/* TODO: EIP 创建契约提供带宽字段后接入上下行带宽配置。 */}
         <Typography.Paragraph type="secondary">上下行带宽暂不支持配置。</Typography.Paragraph>
