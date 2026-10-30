@@ -15,6 +15,7 @@ export function buildContainerCreateInput(values: ContainerCreateFormValues): Cr
       mount_path: mount.mount_path,
       read_only: mount.read_only,
     })),
+    security_group_ids: values.security_group_ids,
     network:
       values.vpc_id && values.subnet_id
         ? { vpc_id: values.vpc_id, subnet_id: values.subnet_id }

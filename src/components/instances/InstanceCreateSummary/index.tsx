@@ -11,6 +11,7 @@ type InstanceCreateSummaryProps = {
     volume_mounts: InstanceVolumeMount[];
     vpc_id: string;
     subnet_id: string;
+    security_group_ids?: string[];
     env: InstanceEnvVar[];
     labels: InstanceEnvVar[];
     annotations: InstanceEnvVar[];
@@ -38,6 +39,7 @@ export default function InstanceCreateSummary({ values }: InstanceCreateSummaryP
         },
         { label: "VPC", value: values.vpc_id || "-" },
         { label: "子网", value: values.subnet_id || "-" },
+        { label: "安全组", value: values.security_group_ids?.join(" · ") || "未绑定" },
         { label: "工作目录", value: values.workspace_mount_path },
         {
           label: "存储卷挂载",

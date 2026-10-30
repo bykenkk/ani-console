@@ -16,6 +16,7 @@ import {
 import { createVm, listVmMedia, type VmInitialDisk, type VmDns, type VmMedia } from "@/api/vms";
 import type { InstancePreset } from "@/api/instances";
 import InstanceComputePresetSelect from "@/components/instances/InstanceComputeSelect/PresetSelect";
+import SecurityGroupSelect from "@/components/security-groups/SecurityGroupSelect";
 import VmInitialDiskEditor from "../VmInitialDiskEditor";
 import VmNetworkFields from "../VmNetworkFields";
 import { validateForm } from "@/lib/form";
@@ -30,6 +31,7 @@ type VmCreateFormValues = {
   data_disks: VmInitialDisk[];
   vpc_id: string;
   subnet_id: string;
+  security_group_ids: string[];
   start_after_create: boolean;
   dns_mode: VmDns["mode"];
   nameservers: string;
@@ -50,6 +52,7 @@ const INITIAL: VmCreateFormValues = {
   data_disks: [],
   vpc_id: "",
   subnet_id: "",
+  security_group_ids: [],
   start_after_create: false,
   dns_mode: "PLATFORM_DEFAULT",
   nameservers: "",
@@ -103,6 +106,7 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
         media_key: current.media_key,
         system_disk_size_gb: String(current.system_disk_size_gb),
         data_disks: current.data_disks.map((disk) => ({ ...disk, name: disk.name.trim() })),
+        security_group_ids: current.security_group_ids,
         network: { vpc_id: current.vpc_id, subnet_id: current.subnet_id },
         start_after_create: current.start_after_create,
         dns:
@@ -195,6 +199,9 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
           vpcId={values.vpc_id}
           onVpcChange={() => form.setFieldValue("subnet_id", "")}
         />
+        <Form.Item field="security_group_ids" label="安全组" extra="可多选；留空表示不绑定安全组。">
+          <SecurityGroupSelect />
+        </Form.Item>
         <Form.Item field="start_after_create" label="创建后开机" triggerPropName="checked">
           <Switch />
         </Form.Item>

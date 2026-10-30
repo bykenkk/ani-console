@@ -1,4 +1,4 @@
-import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
+import { useListPagination } from "@/hooks/useListPagination";
 import { listNetworkSecurityGroupRules, deleteNetworkSecurityGroupRule } from "@/api/network";
 import { DataTable, type RowAction } from "@/components/common";
 import SecurityGroupRuleModal, {
@@ -7,7 +7,7 @@ import SecurityGroupRuleModal, {
 
 import { withId } from "@/lib/id";
 import { Button, Space, Tag, Typography, Modal } from "@arco-design/web-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 type SecurityGroupRulesProps = {
@@ -19,30 +19,38 @@ export default function SecurityGroupRules({
   securityGroupId,
   direction,
 }: SecurityGroupRulesProps) {
-  const {
-    query: rules,
-    items: pageItems,
-    pagination,
-  } = useClientPaginatedQuery({
-    errorNotification: {
-      id: withId("security-group-rules", securityGroupId),
-      action: `安全组规则加载`,
-      fallback: "请求失败，请稍后重试",
+  const paging = useListPagination(`${securityGroupId}:${direction}`, 20);
+  const rules = useQuery({
+    queryKey: [
+      "network-security-group-rules",
+      securityGroupId,
+      { direction, page: paging.page, pageSize: paging.pageSize },
+    ],
+    queryFn: ({ signal }) =>
+      listNetworkSecurityGroupRules(
+        securityGroupId,
+        { direction, page: paging.page, pageSize: paging.pageSize },
+        signal,
+      ),
+    meta: {
+      errorNotification: {
+        id: withId("security-group-rules", securityGroupId),
+        action: "安全组规则加载",
+      },
     },
-    queryKey: ["network-security-group-rules", securityGroupId],
-    filterScope: direction,
-    filter: (rule) => rule.direction === direction,
-    queryFn: () => listNetworkSecurityGroupRules(securityGroupId),
   });
-
   const qc = useQueryClient();
-  const [ruleEditor, setRuleEditor] = useState<SecurityGroupRuleResource | null | undefined>();
+  const [ruleEditor, setRuleEditor] = useState<{
+    rule: SecurityGroupRuleResource | null;
+    version: string;
+  }>();
   const deleteRule = useMutation({
     meta: {
       feedback: {
         channel: "notification",
         id: "security-group-rule-delete",
-        action: "删除",
+        action: "删除安全组规则",
+        successText: "规则删除已提交",
         errorFallback: "请求失败",
       },
     },
@@ -59,11 +67,19 @@ export default function SecurityGroupRules({
     },
   });
   const actions: RowAction<SecurityGroupRuleResource>[] = [
-    { key: "edit", label: "编辑", onClick: setRuleEditor },
+    {
+      key: "edit",
+      label: "编辑",
+      disabled: (rule) => rule.is_default,
+      tooltip: (rule) => (rule.is_default ? "默认规则不可编辑" : undefined),
+      onClick: (rule) => setRuleEditor({ rule, version: rules.data!.version }),
+    },
     {
       key: "delete",
       label: "删除",
       intent: "danger",
+      disabled: (rule) => rule.is_default,
+      tooltip: (rule) => (rule.is_default ? "默认规则不可删除" : undefined),
       loading: (rule) => deleteRule.isPending && deleteRule.variables?.id === rule.id,
       onClick: (rule) => {
         Modal.confirm({
@@ -81,24 +97,23 @@ export default function SecurityGroupRules({
         <SecurityGroupRuleModal
           securityGroupId={securityGroupId}
           direction={direction}
-          rule={ruleEditor}
+          expectedVersion={ruleEditor.version}
+          rule={ruleEditor.rule}
           onCancel={() => setRuleEditor(undefined)}
         />
       )}
     </>
   );
-  const openCreate = () => setRuleEditor(null);
-  const items = (rules.data?.items ?? []) as SecurityGroupRuleResource[];
-  const directionRules = items.filter((rule) => rule.direction === direction);
+  const openCreate = () => setRuleEditor({ rule: null, version: rules.data!.version });
 
   return (
     <Space direction="vertical" size={12} className="w-full">
       <div className="flex items-center justify-between">
         <Typography.Text>
-          共 <Typography.Text bold>{directionRules.length}</Typography.Text> 条
+          共 <Typography.Text bold>{rules.data?.total ?? "0"}</Typography.Text> 条
           {direction === "ingress" ? "入站" : "出站"}规则
         </Typography.Text>
-        <Button type="primary" onClick={openCreate}>
+        <Button type="primary" onClick={openCreate} disabled={!rules.data}>
           添加规则
         </Button>
       </div>
@@ -106,17 +121,33 @@ export default function SecurityGroupRules({
         loading={rules.isLoading}
         rowActions={actions}
         columns={[
-          { title: "优先级", width: 100, dataIndex: "priority" },
+          {
+            title: "优先级",
+            width: 140,
+            render: (_, rule) => (
+              <Space>
+                {rule.priority}
+                {rule.is_default && <Tag>默认</Tag>}
+              </Space>
+            ),
+          },
           {
             title: "协议",
             width: 140,
             render: (_, rule) => (rule.protocol === "all" ? "全部" : rule.protocol.toUpperCase()),
           },
-          { title: "端口范围", width: 100, dataIndex: "port_range" },
+          {
+            title: "端口范围",
+            width: 150,
+            render: (_, rule) =>
+              rule.port_ranges
+                .map(({ min, max }) => (min === max ? String(min) : `${min}-${max}`))
+                .join(", ") || "全部",
+          },
           {
             title: direction === "ingress" ? "来源 CIDR" : "目标 CIDR",
             width: 200,
-            dataIndex: "cidr",
+            render: (_, rule) => rule.remote_addresses.join(", ") || "全部",
           },
           {
             title: "策略",
@@ -129,8 +160,14 @@ export default function SecurityGroupRules({
           },
           { title: "描述", width: 320, dataIndex: "description" },
         ]}
-        data={pageItems}
-        pagination={pagination}
+        data={rules.data?.items ?? []}
+        pagination={{
+          page: paging.page,
+          pageSize: paging.pageSize,
+          total: Number(rules.data?.total ?? "0"),
+          onPageChange: paging.setPage,
+          onPageSizeChange: paging.setPageSize,
+        }}
       />
       {dialogNode}
     </Space>

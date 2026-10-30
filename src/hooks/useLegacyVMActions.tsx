@@ -290,7 +290,7 @@ export function useLegacyVMActions(
       <VmChangeSecurityGroupsModal
         instance={dialog.instance}
         onCancel={closeDialog}
-        onSubmitted={onDialogSubmitted}
+        onSubmitted={closeDialog}
       />
     )
   ) : null;

@@ -31,6 +31,7 @@ const createScope = createIdempotencyScope("governance-instance-create", ["POST"
 const startScope = createIdempotencyScope("governance-instance-start", ["POST"]);
 const stopScope = createIdempotencyScope("governance-instance-stop", ["POST"]);
 const deleteScope = createIdempotencyScope("governance-instance-delete", ["DELETE"]);
+const securityGroupsScope = createIdempotencyScope("instance-security-groups", ["PUT"]);
 const execScope = createIdempotencyScope("governance-instance-exec", ["POST"]);
 const instancePath = (id: string) => `/instances/${encodeURIComponent(id)}`;
 export function listInstances(params: InstanceListParams = {}, signal?: AbortSignal) {
@@ -176,3 +177,17 @@ export async function createInstanceExecSession(
   );
 }
 export type * from "./types";
+
+export function setInstanceSecurityGroups(
+  id: string,
+  input: import("@/api/network").SetSecurityGroupsInput,
+): Promise<void> {
+  return runIdempotentRequest(
+    securityGroupsScope,
+    input,
+    async (data) => {
+      await coreRequest(`${instancePath(id)}/security-groups`, { method: "PUT", data: { data } });
+    },
+    [id],
+  );
+}

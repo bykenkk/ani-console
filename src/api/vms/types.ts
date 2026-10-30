@@ -31,6 +31,7 @@ export interface VirtualMachine {
   id: string;
   name: string;
   version: string;
+  security_group_ids?: string[];
   osFamily: string;
   osVersion: string;
   desiredState: string;
@@ -80,6 +81,7 @@ export interface VmInitialDisk {
   size_gb: string;
 }
 export interface CreateVmInput {
+  security_group_ids?: string[];
   name: string;
   preset_id: string;
   source_kind: VmSourceKind;

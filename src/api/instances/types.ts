@@ -21,6 +21,7 @@ export interface InstanceRecord {
   id: string;
   name: string;
   version: string;
+  security_group_ids?: string[];
   desiredState: string;
   observedState: ObservedState;
   reason?: string;
@@ -85,6 +86,7 @@ export interface InstancePresetListResponse {
   gpu_catalog_reason?: string;
 }
 export interface CreateInstanceInput {
+  security_group_ids?: string[];
   name: string;
   image_id: string;
   image_scope: "tenant" | "platform";

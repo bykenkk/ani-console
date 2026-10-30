@@ -31,6 +31,7 @@ export type ContainerCreateFormValues = {
   volume_mounts: InstanceVolumeMount[];
   vpc_id: string;
   subnet_id: string;
+  security_group_ids: string[];
   env: InstanceEnvVar[];
   labels: InstanceEnvVar[];
   annotations: InstanceEnvVar[];
@@ -45,6 +46,7 @@ const INITIAL_VALUES: ContainerCreateFormValues = {
   volume_mounts: [],
   vpc_id: "",
   subnet_id: "",
+  security_group_ids: [],
   env: [],
   labels: [],
   annotations: [],
@@ -55,6 +57,7 @@ const RESOURCE_FIELDS: (keyof ContainerCreateFormValues)[] = [
   "volume_mounts",
   "vpc_id",
   "subnet_id",
+  "security_group_ids",
   "env",
   "labels",
   "annotations",

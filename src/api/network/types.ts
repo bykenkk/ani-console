@@ -98,96 +98,94 @@ export type CreateNetworkSubnetRequest = CreateNetworkSubnetInput & { idempotenc
 
 export interface NetworkSecurityGroupRule {
   direction: "ingress" | "egress";
-  protocol: "tcp" | "udp" | "icmp" | "all";
-  port_range: string;
-  cidr: string;
-  action: "allow" | "deny";
+  protocol: "tcp" | "udp" | "icmp" | "ipip" | "gre" | "all";
+  remote_addresses: string[];
+  port_ranges: Array<{ min: number; max: number }>;
+  action: "allow" | "drop";
+  priority: number;
+  description?: string;
 }
-
 export interface NetworkSecurityGroupRuleResource extends NetworkSecurityGroupRule {
   id: string;
   security_group_id: string;
-  priority: number;
-  description?: string | null;
-  created_at: string;
-  updated_at?: string | null;
+  is_default: boolean;
 }
-
 export interface NetworkSecurityGroup {
   id: string;
-  tenant_id: string;
   name: string;
-  vpc_id?: string | null;
-  description?: string | null;
-  rules: NetworkSecurityGroupRule[];
-  readonly rule_count?: number;
-  readonly bound_instance_count?: number;
-  state: NetworkResourceState;
-  reason?: string | null;
-  dev_profile?: CoreDevProfileInfo;
+  description?: string;
+  rules: NetworkSecurityGroupRuleResource[];
+  state: string;
+  reason?: string;
+  version: string;
+  bound_resource_count: string;
+  last_operation_id?: string;
   created_at: string;
   updated_at: string;
+  observed_at?: string;
 }
-
-export interface NetworkSecurityGroupListParams {
-  vpc_id?: string;
+export interface NetworkSecurityGroupListParams extends PageParams {
+  name?: string;
   state?: string;
-  search_field?: "name" | "id";
-  keyword?: string;
 }
 export interface NetworkSecurityGroupListResponse {
   items: NetworkSecurityGroup[];
-  total: number;
-  next_cursor?: string | null;
+  total: string;
 }
-
 export interface CreateNetworkSecurityGroupInput {
   name: string;
-  vpc_id?: string | null;
-  description?: string | null;
+  description?: string;
   rules?: NetworkSecurityGroupRule[];
 }
-export type CreateNetworkSecurityGroupRequest = CreateNetworkSecurityGroupInput & {
-  idempotency_key: string;
+export type CreateNetworkSecurityGroupRequest = {
+  data: CreateNetworkSecurityGroupInput & {
+    idempotency_key: string;
+  };
 };
-
-export type NetworkSecurityGroupBindingTargetType =
-  | "instance"
-  | "network_interface"
-  | "load_balancer";
+export type NetworkSecurityGroupBindingTargetType = "eip" | "container" | "vm";
 export interface NetworkSecurityGroupBinding {
-  id: string;
-  security_group_id: string;
   target_type: NetworkSecurityGroupBindingTargetType;
   target_id: string;
-  created_at: string;
+  security_group_ids: string[];
+  applied_security_group_ids: string[];
+  state: string;
+  reason?: string;
+  version: string;
+  last_operation_id?: string;
+  observed_at?: string;
 }
-export interface NetworkSecurityGroupBindingListParams {
+export interface NetworkSecurityGroupBindingListParams extends PageParams {
   target_type?: NetworkSecurityGroupBindingTargetType;
 }
 export interface NetworkSecurityGroupBindingListResponse {
   items: NetworkSecurityGroupBinding[];
-  total: number;
-  next_cursor?: string | null;
+  total: string;
 }
-
+export interface NetworkSecurityGroupRuleListParams extends PageParams {
+  direction?: NetworkSecurityGroupRule["direction"];
+}
 export interface NetworkSecurityGroupRuleListResponse {
   items: NetworkSecurityGroupRuleResource[];
-  total: number;
-  next_cursor?: string | null;
+  total: string;
+  version: string;
 }
 export interface SaveNetworkSecurityGroupRuleInput {
-  priority: number;
-  direction: "ingress" | "egress";
-  protocol: "tcp" | "udp" | "icmp" | "all";
-  port_range: string;
-  cidr: string;
-  action: "allow" | "deny";
-  description?: string | null;
+  rule: NetworkSecurityGroupRule;
+  expected_version: string;
 }
-export type SaveNetworkSecurityGroupRuleRequest = SaveNetworkSecurityGroupRuleInput & {
-  idempotency_key: string;
+export type SaveNetworkSecurityGroupRuleRequest = {
+  data: SaveNetworkSecurityGroupRuleInput & {
+    idempotency_key: string;
+  };
 };
+export interface SetSecurityGroupsInput {
+  security_group_ids: string[];
+  expected_version: string;
+}
+export interface NetworkSecurityGroupBindingResponse {
+  binding: NetworkSecurityGroupBinding;
+  operation?: NetworkOperation;
+}
 
 export type NetworkLoadBalancerProtocol =
   | "LOAD_BALANCER_LISTENER_PROTOCOL_HTTP"

@@ -41,6 +41,7 @@ const bootScope = createIdempotencyScope("vm-boot", ["PUT"]);
 const createSnapshotScope = createIdempotencyScope("vm-snapshot-create", ["POST"]);
 const deleteSnapshotScope = createIdempotencyScope("vm-snapshot-delete", ["DELETE"]);
 const restoreSnapshotScope = createIdempotencyScope("vm-snapshot-restore", ["POST"]);
+const securityGroupsScope = createIdempotencyScope("vm-security-groups", ["PUT"]);
 const consoleScope = createIdempotencyScope("vm-console", ["POST"]);
 const vmPath = (id: string) => `/virtual-machines/${encodeURIComponent(id)}`;
 const diskPath = (id: string, diskId: string) =>
@@ -191,3 +192,17 @@ export async function createVmConsoleSession(id: string, signal?: AbortSignal) {
   );
 }
 export type * from "./types";
+
+export function setVmSecurityGroups(
+  id: string,
+  input: import("@/api/network").SetSecurityGroupsInput,
+): Promise<void> {
+  return runIdempotentRequest(
+    securityGroupsScope,
+    input,
+    async (data) => {
+      await coreRequest(`${vmPath(id)}/security-groups`, { method: "PUT", data: { data } });
+    },
+    [id],
+  );
+}
