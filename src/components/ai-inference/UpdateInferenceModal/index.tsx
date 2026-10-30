@@ -8,7 +8,9 @@ import {
   type UpdateInferenceInput,
 } from "@/api/inference";
 import { getModelVersion } from "@/api/models";
+import type { ImageRegistration } from "@/api/images";
 import { EngineSelect, ModelSelect, ModelVersionSelect } from "@/components/ai-models";
+import InstanceImageSelect from "@/components/instances/InstanceImageSelect";
 import { showMessage } from "@/lib/feedback";
 import { validateForm } from "@/lib/form";
 import { withId } from "@/lib/id";
@@ -16,7 +18,7 @@ import { withId } from "@/lib/id";
 type UpdateInferenceFormValues = {
   model_version_id: string;
   engine_type: string;
-  engine_image: string;
+  image?: Pick<ImageRegistration, "image_id" | "scope">;
   command: string;
 };
 type UpdateInferenceModalProps = {
@@ -60,7 +62,10 @@ export default function UpdateInferenceModal({
     form.setFieldsValue({
       model_version_id: item.model_version_id,
       engine_type: item.engine_type,
-      engine_image: item.engine_image,
+      image:
+        item.image_id && item.image_scope
+          ? { image_id: item.image_id, scope: item.image_scope }
+          : undefined,
       command: item.command,
     });
   }, [detail.data, detail.isFetching, detail.isError, form, snapshot]);
@@ -88,6 +93,7 @@ export default function UpdateInferenceModal({
     submitting.current = true;
     try {
       const values = await validateForm<UpdateInferenceFormValues>(form);
+      if (!values.image) return;
       const input: UpdateInferenceInput = {
         expected_generation: snapshot.generation,
         update_mask: [],
@@ -97,14 +103,16 @@ export default function UpdateInferenceModal({
         input.update_mask.push("modelVersionId");
       }
       const engineType = values.engine_type.trim();
-      const engineImage = values.engine_image.trim();
       if (
         engineType !== snapshot.engine_type ||
-        engineImage !== snapshot.engine_image ||
+        values.image.image_id !== snapshot.image_id ||
+        values.image.scope !== snapshot.image_scope ||
         values.command !== snapshot.command
       ) {
+        // engine 整组替换，修改命令或类型时也必须携带当前镜像目录身份。
         input.engine_type = engineType;
-        input.engine_image = engineImage;
+        input.image_id = values.image.image_id;
+        input.image_scope = values.image.scope;
         input.command = values.command;
         input.update_mask.push("engine");
       }
@@ -153,8 +161,16 @@ export default function UpdateInferenceModal({
         <Form.Item field="engine_type" label="引擎类型" rules={required("请选择引擎类型")}>
           <EngineSelect />
         </Form.Item>
-        <Form.Item field="engine_image" label="运行镜像" rules={required("请输入运行镜像地址")}>
-          <Input />
+        <Form.Item
+          field="image"
+          label="运行镜像"
+          validateTrigger="onSelect"
+          rules={[{ type: "object", required: true, message: "请选择已注册的镜像" }]}
+        >
+          {/* TODO(inference-image-pagination): 后端支持 page/pageSize 后统一迁移镜像选项查询。 */}
+          <InstanceImageSelect
+            onScopeChange={() => form.setFields({ image: { error: undefined } })}
+          />
         </Form.Item>
         {/* FIXME(inference-model-name): 命令中的模型名可能与自动生成的服务模型名不一致；若网关未做名称映射，外部调用可能失败，待核对后处理。 */}
         <Form.Item field="command" label="完整启动命令" rules={required("请输入完整启动命令")}>
