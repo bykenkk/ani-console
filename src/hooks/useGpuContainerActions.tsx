@@ -1,3 +1,4 @@
+import GpuContainerChangeSecurityGroupsModal from "@/components/gpu-containers/GpuContainerChangeSecurityGroupsModal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { startInstance, type InstanceRecord } from "@/api/instances";
@@ -17,15 +18,16 @@ const UNAVAILABLE_ACTIONS = [
   // TODO(feature-visibility): 待文件存储支持后恢复 NFS 挂载入口。
   // { key: "attach_filesystem", label: "挂载 NFS" },
   { key: "bind_secret", label: "绑定密钥" },
-  // TODO(feature-visibility): 待安全组支持后恢复更换入口。
-  // { key: "change_security_groups", label: "更换安全组" },
   { key: "copy-endpoint", label: "复制访问地址" },
   { key: "protection", label: "终止保护" },
 ];
 
 export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => void) {
   const qc = useQueryClient();
-  const [dialog, setDialog] = useState<{ action: "stop" | "delete"; instance: InstanceRecord }>();
+  const [dialog, setDialog] = useState<{
+    action: "stop" | "delete" | "security-groups";
+    instance: InstanceRecord;
+  }>();
   const start = useMutation({
     mutationFn: (instance: InstanceRecord) =>
       startInstance(instance.id, {
@@ -79,6 +81,12 @@ export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => 
         setDialog({ action: "stop", instance });
       },
     },
+    {
+      key: "change_security_groups",
+      label: "更换安全组",
+      disabled: unavailable,
+      onClick: (instance) => setDialog({ action: "security-groups", instance }),
+    },
     // TODO(gpu-container-actions): 当前缺少对应正式契约，入口保持禁用；后端开放后逐项接入，不使用其他实例契约补齐。
     ...UNAVAILABLE_ACTIONS.map(({ key, label }) => unavailableAction<InstanceRecord>(key, label)),
     {
@@ -115,6 +123,13 @@ export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => 
   };
   const dialogNode = (
     <>
+      {dialog?.action === "security-groups" && (
+        <GpuContainerChangeSecurityGroupsModal
+          instance={dialog.instance}
+          onCancel={() => setDialog(undefined)}
+          onSubmitted={submitted}
+        />
+      )}
       {dialog?.action === "stop" && (
         <GpuContainerStopModal
           instance={dialog.instance}

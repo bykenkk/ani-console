@@ -1,3 +1,4 @@
+import ContainerChangeSecurityGroupsModal from "@/components/containers/ContainerChangeSecurityGroupsModal";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { getInstance, startInstance, type InstanceRecord } from "@/api/instances";
@@ -17,8 +18,6 @@ const UNAVAILABLE_ACTIONS = [
   // TODO(feature-visibility): 待文件存储支持后恢复 NFS 挂载入口。
   // { key: "attach_filesystem", label: "挂载 NFS" },
   { key: "bind_secret", label: "绑定密钥" },
-  // TODO(feature-visibility): 待安全组支持后恢复更换入口。
-  // { key: "change_security_groups", label: "更换安全组" },
   { key: "load-balancer", label: "挂到负载均衡" },
   { key: "copy-endpoint", label: "复制访问地址" },
   { key: "protection", label: "终止保护" },
@@ -26,7 +25,10 @@ const UNAVAILABLE_ACTIONS = [
 
 export function useContainerActions(onChanged: () => void, onDeleted?: () => void) {
   const qc = useQueryClient();
-  const [dialog, setDialog] = useState<{ action: "stop" | "delete"; instance: InstanceRecord }>();
+  const [dialog, setDialog] = useState<{
+    action: "stop" | "delete" | "security-groups";
+    instance: InstanceRecord;
+  }>();
   const start = useMutation({
     mutationFn: async (instance: InstanceRecord) =>
       startInstance(instance.id, {
@@ -71,6 +73,12 @@ export function useContainerActions(onChanged: () => void, onDeleted?: () => voi
         setDialog({ action: "stop", instance });
       },
     },
+    {
+      key: "change_security_groups",
+      label: "更换安全组",
+      disabled: unavailable,
+      onClick: (instance) => setDialog({ action: "security-groups", instance }),
+    },
     // TODO(container-actions): 当前缺少对应正式契约，入口保持禁用；后端开放后逐项接入，不使用其他实例契约补齐。
     ...UNAVAILABLE_ACTIONS.map(({ key, label }) => unavailableAction<InstanceRecord>(key, label)),
     {
@@ -93,6 +101,13 @@ export function useContainerActions(onChanged: () => void, onDeleted?: () => voi
   };
   const dialogNode = (
     <>
+      {dialog?.action === "security-groups" && (
+        <ContainerChangeSecurityGroupsModal
+          instance={dialog.instance}
+          onCancel={() => setDialog(undefined)}
+          onSubmitted={submitted}
+        />
+      )}
       {dialog?.action === "stop" && (
         <ContainerStopModal
           instance={dialog.instance}

@@ -1,146 +1,105 @@
-// TODO(submit-result): 安全组尚未完成 governance 对齐；后续对接时确认创建响应用途，清理当前无人使用的 onCreated 回传。
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Form, Input, Modal, Select, Typography } from "@arco-design/web-react";
-import { useState } from "react";
-import {
-  createNetworkSecurityGroup,
-  listNetworkVpcs,
-  type NetworkSecurityGroup,
-  type NetworkSecurityGroupRule,
-  type NetworkVPC,
-} from "@/api/network";
-import { withFirst100 } from "@/api/pagination";
+import { createNetworkSecurityGroup, type NetworkSecurityGroupRule } from "@/api/network";
+import { validateForm } from "@/lib/form";
 
-type CreateSecurityGroupModalProps = {
-  defaultVpcId?: string;
-  onCancel: () => void;
-  onCreated?: (securityGroup: NetworkSecurityGroup) => void;
-};
-
-const listVpcOptions = withFirst100(listNetworkVpcs);
-
-type SecurityGroupRule = NetworkSecurityGroupRule;
-type Vpc = NetworkVPC;
+type CreateSecurityGroupModalProps = { onCancel: () => void };
 type RuleTemplate = "common" | "open" | "custom";
-
-const RULE_TEMPLATES: Record<RuleTemplate, SecurityGroupRule[]> = {
+type CreateSecurityGroupFormValues = {
+  name: string;
+  description?: string;
+  rule_template: RuleTemplate;
+};
+const RULE_TEMPLATES: Record<RuleTemplate, NetworkSecurityGroupRule[]> = {
   common: [
-    { direction: "ingress", protocol: "tcp", port_range: "22", cidr: "0.0.0.0/0", action: "allow" },
     {
       direction: "ingress",
       protocol: "tcp",
-      port_range: "3389",
-      cidr: "0.0.0.0/0",
+      port_ranges: [{ min: 22, max: 22 }],
+      remote_addresses: ["0.0.0.0/0"],
       action: "allow",
+      priority: 100,
+    },
+    {
+      direction: "ingress",
+      protocol: "tcp",
+      port_ranges: [{ min: 3389, max: 3389 }],
+      remote_addresses: ["0.0.0.0/0"],
+      action: "allow",
+      priority: 101,
     },
     {
       direction: "ingress",
       protocol: "icmp",
-      port_range: "all",
-      cidr: "0.0.0.0/0",
+      port_ranges: [],
+      remote_addresses: ["0.0.0.0/0"],
       action: "allow",
+      priority: 102,
     },
   ],
   open: [
     {
       direction: "ingress",
       protocol: "all",
-      port_range: "all",
-      cidr: "0.0.0.0/0",
+      port_ranges: [],
+      remote_addresses: [],
       action: "allow",
+      priority: 100,
     },
-    { direction: "egress", protocol: "all", port_range: "all", cidr: "0.0.0.0/0", action: "allow" },
   ],
   custom: [],
 };
-
-export default function CreateSecurityGroupModal({
-  defaultVpcId,
-  onCancel,
-  onCreated,
-}: CreateSecurityGroupModalProps) {
+export default function CreateSecurityGroupModal({ onCancel }: CreateSecurityGroupModalProps) {
+  const [form] = Form.useForm<CreateSecurityGroupFormValues>();
   const qc = useQueryClient();
-  const [name, setName] = useState("");
-  const [vpcId, setVpcId] = useState(defaultVpcId ?? "");
-  const [ruleTemplate, setRuleTemplate] = useState<RuleTemplate>("common");
-  const vpcs = useQuery({
-    meta: {
-      errorNotification: {
-        id: "vpcs",
-        action: "VPC 列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-vpcs", "security-group-create", "options"],
-    queryFn: () => listVpcOptions({}),
-  });
-
   const create = useMutation({
-    meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
-    mutationFn: async () => {
-      const trimmedName = name.trim();
-      if (!trimmedName) throw new Error("请输入安全组名称");
-      if (!vpcId) throw new Error("请选择绑定的 VPC");
-      const submitData = {
-        name: trimmedName,
-        vpc_id: vpcId,
-        rules: RULE_TEMPLATES[ruleTemplate],
-      };
-      return createNetworkSecurityGroup(submitData);
-    },
-    onSuccess: (data) => {
-      qc.invalidateQueries({ queryKey: ["network-security-groups"] });
-      onCreated?.(data);
+    meta: { feedback: { channel: "message", action: "创建安全组", successText: "创建已提交" } },
+    mutationFn: ({ name, description, rule_template }: CreateSecurityGroupFormValues) =>
+      createNetworkSecurityGroup({
+        name: name.trim(),
+        description: description?.trim() || undefined,
+        rules: RULE_TEMPLATES[rule_template],
+      }),
+    onSuccess: async () => {
+      await qc.invalidateQueries({ queryKey: ["network-security-groups"] });
       onCancel();
     },
   });
-
   return (
     <Modal
       visible
       title="创建安全组"
       onCancel={onCancel}
-      onOk={() => create.mutateAsync()}
+      onOk={async () => create.mutateAsync(await validateForm(form))}
       confirmLoading={create.isPending}
-      unmountOnExit
     >
-      <Form layout="vertical">
-        <Form.Item label="名称" required>
-          <Input
-            value={name}
-            onChange={setName}
-            placeholder="请输入安全组名称"
-            maxLength={64}
-            showWordLimit
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{ rule_template: "custom" }}
+        disabled={create.isPending}
+      >
+        <Form.Item
+          field="name"
+          label="名称"
+          rules={[{ required: true, message: "请输入安全组名称" }, { maxLength: 64 }]}
+        >
+          <Input maxLength={64} showWordLimit />
+        </Form.Item>
+        <Form.Item field="description" label="描述">
+          <Input.TextArea maxLength={200} showWordLimit />
+        </Form.Item>
+        <Form.Item field="rule_template" label="规则模板" rules={[{ required: true }]}>
+          <Select
+            options={[
+              { value: "common", label: "常用远程端口（22 / 3389 / ICMP），拒绝其他入站流量" },
+              { value: "open", label: "放通全部（仅试验）" },
+              { value: "custom", label: "自定义（仅默认入站拒绝）" },
+            ]}
           />
         </Form.Item>
-        <Form.Item label="绑定 VPC" required>
-          <Select
-            value={vpcId || undefined}
-            onChange={setVpcId}
-            loading={vpcs.isLoading}
-            placeholder="请选择 VPC"
-            showSearch
-            filterOption={(inputValue, option) =>
-              String(option.props.children).toLowerCase().includes(inputValue.toLowerCase())
-            }
-          >
-            {((vpcs.data?.items ?? []) as Vpc[]).map((vpc) => (
-              <Select.Option key={vpc.id} value={vpc.id}>
-                {vpc.name} · {vpc.cidr}
-              </Select.Option>
-            ))}
-          </Select>
-        </Form.Item>
-        <Form.Item label="规则模板" required>
-          <Select value={ruleTemplate} onChange={setRuleTemplate}>
-            <Select.Option value="common">常用远程端口（22 / 3389 / ICMP）</Select.Option>
-            <Select.Option value="open">放通全部（仅试验）</Select.Option>
-            <Select.Option value="custom">自定义空规则</Select.Option>
-          </Select>
-        </Form.Item>
         <Typography.Text type="secondary">
-          创建后可在安全组详情页逐条添加或编辑入站、出站规则。
+          默认拒绝入站流量，出站保持放行。常用模板允许指定远程端口；同组成员也按规则匹配。
         </Typography.Text>
       </Form>
     </Modal>

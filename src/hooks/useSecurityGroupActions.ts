@@ -15,6 +15,7 @@ export function useSecurityGroupActions(
         channel: "notification",
         id: "security-group-copy",
         action: "复制安全组",
+        successText: "复制安全组已提交",
         errorFallback: "请求失败",
       },
     },

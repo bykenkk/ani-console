@@ -1,3 +1,4 @@
+import ChangeSecurityGroupsModal from "@/components/security-groups/ChangeSecurityGroupsModal";
 import { useState } from "react";
 import { listNetworkEips, type NetworkEip, type NetworkResourceStateFilter } from "@/api/network";
 import {
@@ -12,6 +13,7 @@ import { formatDateTime } from "@/lib/format";
 import CreateEipModal from "../CreateEipModal";
 
 export default function EipsPage() {
+  const [securityGroupsEip, setSecurityGroupsEip] = useState<NetworkEip>();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<"" | NetworkResourceStateFilter>("");
   const [searchText, setSearchText] = useState("");
@@ -123,9 +125,25 @@ export default function EipsPage() {
           columns={columns}
           loading={query.isFetching}
           pagination={pagination}
+          rowActions={[
+            {
+              key: "security-groups",
+              label: "更换安全组",
+              disabled: (eip) => ["deleted", "deleting"].includes(eip.state),
+              onClick: setSecurityGroupsEip,
+            },
+          ]}
           tableLabel="公网 IP 列表"
         />
       </ListPageFrame>
+      {securityGroupsEip && (
+        <ChangeSecurityGroupsModal
+          targetType="eip"
+          id={securityGroupsEip.id}
+          name={securityGroupsEip.name}
+          onCancel={() => setSecurityGroupsEip(undefined)}
+        />
+      )}
       {createVisible && (
         <CreateEipModal
           onCancel={() => setCreateVisible(false)}

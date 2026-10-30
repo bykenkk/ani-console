@@ -6,12 +6,13 @@ import { startVm, restartVm, deleteVm, type VirtualMachine } from "@/api/vms";
 import { unavailableAction, type RowAction } from "@/components/common/DataTable/RowActions";
 import VmCreateSnapshotModal from "@/components/vms/VmCreateSnapshotModal";
 import VmShutdownModal from "@/components/vms/VmShutdownModal";
+import ChangeSecurityGroupsModal from "@/components/security-groups/ChangeSecurityGroupsModal";
 import { openInstanceVncWindow } from "@/lib/instances";
 import { vmIsClosed } from "@/lib/vms";
 import { withId } from "@/lib/id";
 
 type VmPowerAction = "start" | "restart" | "delete";
-type VmActionDialog = { action: "stop" | "snapshot"; vm: VirtualMachine };
+type VmActionDialog = { action: "stop" | "snapshot" | "security-groups"; vm: VirtualMachine };
 const LABELS: Record<VmPowerAction, string> = {
   start: "开机",
   restart: "重启",
@@ -110,8 +111,12 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
     unavailableAction("detach-volume", "卸载云盘"),
     // TODO(feature-visibility): 待文件存储支持后恢复 NFS 挂载入口。
     // unavailableAction("attach-filesystem", "挂载 NFS"),
-    // TODO(feature-visibility): 待安全组支持后恢复更换入口。
-    // unavailableAction("change-security-groups", "更换安全组"),
+    {
+      key: "change-security-groups",
+      label: "更换安全组",
+      disabled: unavailable,
+      onClick: (vm) => setDialog({ action: "security-groups", vm }),
+    },
     unavailableAction("termination-protection", "终止保护"),
     {
       key: "console",
@@ -132,6 +137,13 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
     dialogVm && dialog ? (
       dialog.action === "stop" ? (
         <VmShutdownModal vm={dialogVm} onCancel={closeDialog} onSubmitted={closeDialog} />
+      ) : dialog.action === "security-groups" ? (
+        <ChangeSecurityGroupsModal
+          targetType="vm"
+          id={dialogVm.id}
+          name={dialogVm.name}
+          onCancel={closeDialog}
+        />
       ) : (
         <VmCreateSnapshotModal vm={dialogVm} onCancel={closeDialog} onSubmitted={closeDialog} />
       )

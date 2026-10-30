@@ -7,8 +7,11 @@ import type {
   NetworkEip,
   NetworkEipListParams,
   NetworkEipListResponse,
+  NetworkSecurityGroupBindingResponse,
+  SetSecurityGroupsInput,
 } from "./types";
 
+const securityGroupsScope = createIdempotencyScope("eip-security-groups", ["PUT"]);
 const createScope = createIdempotencyScope("network-eip-create", ["POST"]);
 const eipPath = (id: string) => `/networks/eips/${encodeURIComponent(id)}`;
 
@@ -39,4 +42,21 @@ export async function deleteNetworkEip(id: string, signal?: AbortSignal): Promis
     method: "DELETE",
     signal,
   });
+}
+
+export function getEipSecurityGroups(id: string, signal?: AbortSignal) {
+  return coreRequest<NetworkSecurityGroupBindingResponse>(`${eipPath(id)}/security-groups`, {
+    method: "GET",
+    signal,
+  });
+}
+export function setEipSecurityGroups(id: string, input: SetSecurityGroupsInput): Promise<void> {
+  return runIdempotentRequest(
+    securityGroupsScope,
+    input,
+    async (data) => {
+      await coreRequest(`${eipPath(id)}/security-groups`, { method: "PUT", data: { data } });
+    },
+    [id],
+  );
 }

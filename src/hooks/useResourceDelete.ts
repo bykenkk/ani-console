@@ -64,10 +64,11 @@ const resourceDeletion = {
       channel: "notification",
       id: "security-group-delete",
       action: "删除安全组",
+      successText: "删除安全组已提交",
       errorFallback: "请求失败",
     },
     title: "删除安全组",
-    content: (item) => `确定删除「${item.name}」？安全组被实例使用时无法删除，请先解除关联。`,
+    content: (item) => `确定删除「${item.name}」？安全组被资源使用时无法删除，请先解除关联。`,
     remove: deleteNetworkSecurityGroup,
   },
   "network-route": {

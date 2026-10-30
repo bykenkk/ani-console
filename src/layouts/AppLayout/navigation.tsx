@@ -89,12 +89,11 @@ export const menuItems: readonly MenuItem[] = [
           { key: "/vpcs", label: "VPC 网络", icon: <AliIcon name="VPCwangluo" /> },
           { key: "/subnets", label: "VPC 子网", icon: <AliIcon name="ziwang" /> },
           { key: "/eips", label: "公网 IP", icon: <AliIcon name="wangluo" /> },
-          // TODO(feature-visibility): 待安全组支持后恢复此菜单入口。
-          // {
-          //   key: "/security-groups",
-          //   label: "安全组",
-          //   icon: <AliIcon name="anquanzu" />,
-          // },
+          {
+            key: "/security-groups",
+            label: "安全组",
+            icon: <AliIcon name="anquanzu" />,
+          },
           // TODO(feature-visibility): 待路由支持后恢复此菜单入口。
           // { key: "/routes", label: "路由", icon: <AliIcon name="VPCluyouqi" /> },
           {

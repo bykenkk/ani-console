@@ -9,128 +9,127 @@ import type {
   NetworkSecurityGroupBindingListResponse,
   NetworkSecurityGroupListParams,
   NetworkSecurityGroupListResponse,
+  NetworkSecurityGroupRuleListParams,
   NetworkSecurityGroupRuleListResponse,
-  NetworkSecurityGroupRuleResource,
   SaveNetworkSecurityGroupRuleInput,
   SaveNetworkSecurityGroupRuleRequest,
 } from "./types";
 
 const createScope = createIdempotencyScope("network-security-group-create", ["POST"]);
 const createRuleScope = createIdempotencyScope("network-security-group-rule-create", ["POST"]);
-const updateRuleScope = createIdempotencyScope("network-security-group-rule-update", ["PUT"]);
-const securityGroupPath = (securityGroupId: string) =>
-  `/networks/security-groups/${encodeURIComponent(securityGroupId)}`;
+const updateRuleScope = createIdempotencyScope("network-security-group-rule-update", ["PATCH"]);
+const securityGroupPath = (id: string) => `/networks/security-groups/${encodeURIComponent(id)}`;
 
+// TODO(security-group-live): 部署后核对规则、绑定、版本冲突及幂等重试；静态接入不代表数据面已生效。
 export function listNetworkSecurityGroups(
   params: NetworkSecurityGroupListParams = {},
-): Promise<NetworkSecurityGroupListResponse> {
+  signal?: AbortSignal,
+) {
   return coreRequest<NetworkSecurityGroupListResponse>("/networks/security-groups", {
     method: "GET",
     params,
+    signal,
   });
 }
-
-// TODO(submit-result): 接入 governance 后按实际契约确认提交返回值；普通创建、操作默认丢弃响应，并清理无用回传及创建后跳转。
-export function createNetworkSecurityGroup(
-  submitData: CreateNetworkSecurityGroupInput,
-): Promise<NetworkSecurityGroup> {
-  return runIdempotentRequest(createScope, submitData, (body) =>
-    coreRequest<NetworkSecurityGroup, CreateNetworkSecurityGroupRequest>(
-      "/networks/security-groups",
-      { method: "POST", data: body },
-    ),
-  );
+export function createNetworkSecurityGroup(input: CreateNetworkSecurityGroupInput): Promise<void> {
+  return runIdempotentRequest(createScope, input, async (data) => {
+    await coreRequest<void, CreateNetworkSecurityGroupRequest>("/networks/security-groups", {
+      method: "POST",
+      data: { data },
+    });
+  });
 }
-
-export function copyNetworkSecurityGroup(
-  source: NetworkSecurityGroup,
-): Promise<NetworkSecurityGroup> {
-  const submitData: CreateNetworkSecurityGroupInput = {
+export function copyNetworkSecurityGroup(source: NetworkSecurityGroup): Promise<void> {
+  return createNetworkSecurityGroup({
     name: `${source.name}-copy`,
-    vpc_id: source.vpc_id,
     description: source.description,
-    rules: source.rules,
-  };
-  return runIdempotentRequest(
-    createScope,
-    submitData,
-    (body) =>
-      coreRequest<NetworkSecurityGroup, CreateNetworkSecurityGroupRequest>(
-        "/networks/security-groups",
-        { method: "POST", data: body },
+    rules: source.rules
+      .filter((rule) => !rule.is_default)
+      .map(
+        ({
+          direction,
+          protocol,
+          remote_addresses,
+          port_ranges,
+          action,
+          priority,
+          description,
+        }) => ({
+          direction,
+          protocol,
+          remote_addresses,
+          port_ranges,
+          action,
+          priority,
+          description,
+        }),
       ),
-    [source.id],
-  );
-}
-
-export function getNetworkSecurityGroup(securityGroupId: string): Promise<NetworkSecurityGroup> {
-  return coreRequest<NetworkSecurityGroup>(securityGroupPath(securityGroupId), { method: "GET" });
-}
-
-export function deleteNetworkSecurityGroup(securityGroupId: string): Promise<NetworkSecurityGroup> {
-  return coreRequest<NetworkSecurityGroup>(securityGroupPath(securityGroupId), {
-    method: "DELETE",
   });
 }
-
+export function getNetworkSecurityGroup(id: string, signal?: AbortSignal) {
+  return coreRequest<NetworkSecurityGroup>(securityGroupPath(id), { method: "GET", signal });
+}
+// DELETE 的正式合同未声明客户端幂等字段，不添加 body 或 Header。
+export async function deleteNetworkSecurityGroup(id: string): Promise<void> {
+  await coreRequest(securityGroupPath(id), { method: "DELETE" });
+}
 export function listNetworkSecurityGroupBindings(
-  securityGroupId: string,
+  id: string,
   params: NetworkSecurityGroupBindingListParams = {},
-): Promise<NetworkSecurityGroupBindingListResponse> {
-  return coreRequest<NetworkSecurityGroupBindingListResponse>(
-    `${securityGroupPath(securityGroupId)}/bindings`,
-    { method: "GET", params },
-  );
+  signal?: AbortSignal,
+) {
+  return coreRequest<NetworkSecurityGroupBindingListResponse>(`${securityGroupPath(id)}/bindings`, {
+    method: "GET",
+    params,
+    signal,
+  });
 }
-
 export function listNetworkSecurityGroupRules(
-  securityGroupId: string,
-): Promise<NetworkSecurityGroupRuleListResponse> {
-  return coreRequest<NetworkSecurityGroupRuleListResponse>(
-    `${securityGroupPath(securityGroupId)}/rules`,
-    { method: "GET" },
-  );
+  id: string,
+  params: NetworkSecurityGroupRuleListParams = {},
+  signal?: AbortSignal,
+) {
+  return coreRequest<NetworkSecurityGroupRuleListResponse>(`${securityGroupPath(id)}/rules`, {
+    method: "GET",
+    params,
+    signal,
+  });
 }
-
 export function createNetworkSecurityGroupRule(
-  securityGroupId: string,
-  submitData: SaveNetworkSecurityGroupRuleInput,
-): Promise<NetworkSecurityGroupRuleResource> {
+  id: string,
+  input: SaveNetworkSecurityGroupRuleInput,
+): Promise<void> {
   return runIdempotentRequest(
     createRuleScope,
-    submitData,
-    (body) =>
-      coreRequest<NetworkSecurityGroupRuleResource, SaveNetworkSecurityGroupRuleRequest>(
-        `${securityGroupPath(securityGroupId)}/rules`,
-        { method: "POST", data: body },
-      ),
-    [securityGroupId],
+    input,
+    async (data) => {
+      await coreRequest<void, SaveNetworkSecurityGroupRuleRequest>(
+        `${securityGroupPath(id)}/rules`,
+        { method: "POST", data: { data } },
+      );
+    },
+    [id],
   );
 }
-
 export function updateNetworkSecurityGroupRule(
-  securityGroupId: string,
+  id: string,
   ruleId: string,
-  submitData: SaveNetworkSecurityGroupRuleInput,
-): Promise<NetworkSecurityGroupRuleResource> {
+  input: SaveNetworkSecurityGroupRuleInput,
+): Promise<void> {
   return runIdempotentRequest(
     updateRuleScope,
-    submitData,
-    (body) =>
-      coreRequest<NetworkSecurityGroupRuleResource, SaveNetworkSecurityGroupRuleRequest>(
-        `${securityGroupPath(securityGroupId)}/rules/${encodeURIComponent(ruleId)}`,
-        { method: "PUT", data: body },
-      ),
-    [securityGroupId, ruleId],
+    input,
+    async (data) => {
+      await coreRequest<void, SaveNetworkSecurityGroupRuleRequest>(
+        `${securityGroupPath(id)}/rules/${encodeURIComponent(ruleId)}`,
+        { method: "PATCH", data: { data } },
+      );
+    },
+    [id, ruleId],
   );
 }
-
-export function deleteNetworkSecurityGroupRule(
-  securityGroupId: string,
-  ruleId: string,
-): Promise<NetworkSecurityGroupRuleListResponse> {
-  return coreRequest<NetworkSecurityGroupRuleListResponse>(
-    `${securityGroupPath(securityGroupId)}/rules/${encodeURIComponent(ruleId)}`,
-    { method: "DELETE" },
-  );
+export async function deleteNetworkSecurityGroupRule(id: string, ruleId: string): Promise<void> {
+  await coreRequest(`${securityGroupPath(id)}/rules/${encodeURIComponent(ruleId)}`, {
+    method: "DELETE",
+  });
 }

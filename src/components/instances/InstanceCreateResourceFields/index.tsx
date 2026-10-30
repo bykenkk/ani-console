@@ -4,6 +4,7 @@ import { listNetworkVpcs, listNetworkSubnets } from "@/api/network";
 import type { InstanceEnvVar } from "@/api/instances";
 import { withFirst100 } from "@/api/pagination";
 import { withId } from "@/lib/id";
+import SecurityGroupSelect from "@/components/security-groups/SecurityGroupSelect";
 import InstanceKeyValueEditor from "@/components/instances/InstanceKeyValueEditor";
 import InstanceVolumeMountEditor from "@/components/instances/InstanceVolumeMountEditor";
 import {
@@ -19,6 +20,7 @@ type InstanceCreateResourceFieldsProps = {
   values: {
     workspace_mount_path: string;
     vpc_id: string;
+    security_group_ids: string[];
     labels: InstanceEnvVar[];
     annotations: InstanceEnvVar[];
   };
@@ -50,7 +52,15 @@ export default function InstanceCreateResourceFields({
   return (
     <>
       <div className="grid grid-cols-2 items-start gap-4">
-        <Form.Item field="vpc_id" label="VPC">
+        <Form.Item
+          field="vpc_id"
+          label="VPC"
+          rules={
+            values.security_group_ids.length
+              ? [{ required: true, message: "绑定安全组时请选择 VPC" }]
+              : undefined
+          }
+        >
           <Select
             allowClear
             showSearch
@@ -81,6 +91,9 @@ export default function InstanceCreateResourceFields({
           />
         </Form.Item>
       </div>
+      <Form.Item field="security_group_ids" label="安全组" extra="可多选；留空表示不绑定安全组。">
+        <SecurityGroupSelect />
+      </Form.Item>
       <Form.Item
         field="workspace_mount_path"
         label="工作目录"

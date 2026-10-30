@@ -30,6 +30,7 @@ type GpuContainerCreateFormValues = {
   volume_mounts: InstanceVolumeMount[];
   vpc_id: string;
   subnet_id: string;
+  security_group_ids: string[];
   env: InstanceEnvVar[];
   labels: InstanceEnvVar[];
   annotations: InstanceEnvVar[];
@@ -44,6 +45,7 @@ const INITIAL_VALUES: GpuContainerCreateFormValues = {
   volume_mounts: [],
   vpc_id: "",
   subnet_id: "",
+  security_group_ids: [],
   env: [],
   labels: [],
   annotations: [],
@@ -54,6 +56,7 @@ const RESOURCE_FIELDS: (keyof GpuContainerCreateFormValues)[] = [
   "volume_mounts",
   "vpc_id",
   "subnet_id",
+  "security_group_ids",
   "env",
   "labels",
   "annotations",
@@ -134,6 +137,7 @@ export default function GpuContainerCreateModal({
           mount_path: mount.mount_path,
           read_only: mount.read_only,
         })),
+        security_group_ids: currentValues.security_group_ids,
         network:
           currentValues.vpc_id && currentValues.subnet_id
             ? { vpc_id: currentValues.vpc_id, subnet_id: currentValues.subnet_id }
