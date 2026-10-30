@@ -36,10 +36,10 @@ export default function InstanceCreateBasicFields({ computeType }: InstanceCreat
       </Form.Item>
       <Form.Item
         field="preset"
-        label="实例预设"
+        label="算力规格"
         validateTrigger="onSelect"
         rules={[
-          { type: "object", required: true, message: "请选择实例预设" },
+          { type: "object", required: true, message: "请选择算力规格" },
           {
             validator: (value: InstancePreset | undefined, callback) =>
               callback(
@@ -48,7 +48,7 @@ export default function InstanceCreateBasicFields({ computeType }: InstanceCreat
                   value.selectable &&
                   (computeType !== "gpu" || value.gpu)
                   ? undefined
-                  : "预设不可用，请重新选择",
+                  : "算力规格不可用，请重新选择",
               ),
           },
         ]}

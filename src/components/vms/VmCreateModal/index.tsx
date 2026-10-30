@@ -93,7 +93,7 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
         !source ||
         source.kind === "DRIVER_ISO"
       ) {
-        showMessage({ type: "error", content: "请选择可用的 CPU 算力规格和系统介质" });
+        showMessage({ type: "error", content: "请选择可用的 算力规格和系统介质" });
         return;
       }
       await create.mutateAsync({

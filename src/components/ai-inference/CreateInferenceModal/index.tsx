@@ -103,7 +103,7 @@ export default function CreateInferenceModal({
 
       if (!values.image) return;
       if (!values.preset?.enabled || !values.preset.selectable) {
-        showMessage({ type: "error", content: "请选择可用的推理算力规格" });
+        showMessage({ type: "error", content: "请选择可用的算力规格" });
         return;
       }
       if (
@@ -218,7 +218,7 @@ export default function CreateInferenceModal({
           field="preset"
           label="算力规格"
           validateTrigger="onSelect"
-          rules={[{ required: true, message: "请选择推理算力规格" }]}
+          rules={[{ required: true, message: "请选择算力规格" }]}
         >
           <InstanceComputeSelect
             usage="INFERENCE"

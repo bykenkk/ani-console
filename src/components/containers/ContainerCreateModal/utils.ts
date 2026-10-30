@@ -3,7 +3,7 @@ import type { ContainerCreateFormValues } from ".";
 
 export function buildContainerCreateInput(values: ContainerCreateFormValues): CreateInstanceInput {
   const { image, preset } = values;
-  if (!image || !preset) throw new Error("请选择镜像和实例预设");
+  if (!image || !preset) throw new Error("请选择镜像和算力规格");
   return {
     name: values.name.trim(),
     image_id: image.image_id,

@@ -85,9 +85,9 @@ export default function SandboxDetailPage({
             { label: "ID", value: <ResourceId value={sandbox.id} /> },
             { label: "版本", value: sandbox.version },
             { label: "期望状态", value: sandbox.desired_state },
-            { label: "计算预设", value: snapshot?.preset_name || snapshot?.preset_code || "-" },
+            { label: "算力规格", value: snapshot?.preset_name || snapshot?.preset_code || "-" },
             {
-              label: "预设 ID",
+              label: "算力规格 ID",
               value: snapshot?.preset_id ? <ResourceId value={snapshot.preset_id} /> : "-",
             },
             { label: "镜像引用", value: snapshot?.image_reference || "-" },

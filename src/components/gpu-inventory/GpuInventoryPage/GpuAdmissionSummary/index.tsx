@@ -78,7 +78,7 @@ export default function GpuAdmissionSummary() {
             showIcon
             content={
               canCreate
-                ? "当前存在可用规格，可进入创建流程选择具体规格和调度队列。"
+                ? "当前存在可用规格，可进入创建流程选择算力规格和调度队列。"
                 : "当前没有满足配额与设备条件的规格，创建请求可能被拒绝。"
             }
           />
