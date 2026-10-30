@@ -1,4 +1,4 @@
-import { Button, Select, Space } from "@arco-design/web-react";
+import { Button, Select } from "@arco-design/web-react";
 import { IconPlayArrowFill, IconRecordStop, IconRefresh } from "@arco-design/web-react/icon";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -59,8 +59,8 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
   );
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
-      <div className="flex shrink-0 flex-wrap items-center justify-between gap-3">
-        <Space wrap>
+      <div className="flex shrink-0 items-center justify-between gap-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <Select
             aria-label="日志级别"
             placeholder="全部级别"
@@ -105,6 +105,8 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
             options={containers.map((name) => ({ value: name, label: name }))}
             onChange={(value: string | undefined) => setContainer(value ?? "")}
           />
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
           <Button
             size="small"
             icon={live ? <IconRecordStop /> : <IconPlayArrowFill />}
@@ -122,7 +124,7 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
             loading={!live && logs.isFetching}
             onClick={() => logs.refetch()}
           />
-        </Space>
+        </div>
       </div>
       <LogViewer
         key={JSON.stringify([serviceId, selectedInstance?.name, selectedContainer, level, live])}

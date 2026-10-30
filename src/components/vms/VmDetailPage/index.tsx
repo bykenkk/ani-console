@@ -9,8 +9,7 @@ import {
 } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import InstanceEvents from "@/components/instances/InstanceEvents";
-// TODO(feature-visibility): 待云主机日志支持后恢复日志 Tab 及组件导入。
-// import InstanceLogs from "@/components/instances/InstanceLogs";
+import InstanceLogs from "@/components/instances/InstanceLogs";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceOperations from "@/components/instances/InstanceOperations";
 import InstanceStorage from "@/components/instances/InstanceStorage";
@@ -123,8 +122,18 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
             label: "资源监控",
             content: <InstanceMetrics instanceId={vm.id} />,
           },
-          // TODO(feature-visibility): 待云主机日志支持后恢复此 Tab 入口。
-          // { key: "logs", label: "日志", content: <InstanceLogs active={tab === "logs"} /> },
+          {
+            key: "logs",
+            label: "日志",
+            content: (
+              <InstanceLogs
+                instanceId={vm.id}
+                resourceType="vm"
+                active={tab === "logs"}
+                onNotFound={goBack}
+              />
+            ),
+          },
           // TODO(vm-events): VM 事件契约尚未提供，沿用公共组件空态。
           { key: "events", label: "事件", content: <InstanceEvents /> },
           // TODO(vm-operations): VM 操作查询及历史记录统一暂缓，保留原有入口。

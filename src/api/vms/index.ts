@@ -22,6 +22,7 @@ import type {
   VmSnapshotCreateInput,
   VmSnapshotRestoreInput,
   VmConsoleSession,
+  VmLogParams,
 } from "./types";
 
 const createScope = createIdempotencyScope("vm-create", ["POST"]);
@@ -54,6 +55,17 @@ export function listVms(params: VmListParams, signal?: AbortSignal) {
 }
 export function getVm(id: string, signal?: AbortSignal) {
   return coreRequest<VirtualMachine>(vmPath(id), { method: "GET", signal });
+}
+export function streamVmLogs(id: string, params: VmLogParams, signal: AbortSignal) {
+  // TODO(vm-logs): 在登录环境验证持续跟随、连接限额、401 刷新及结束后重连。
+  return coreRequest<ReadableStream<Uint8Array>>(`${vmPath(id)}/logs`, {
+    method: "GET",
+    params,
+    signal,
+    headers: { Accept: "text/event-stream" },
+    adapter: "fetch",
+    responseType: "stream",
+  });
 }
 export function listVmPresets(params: InstancePresetListParams = {}, signal?: AbortSignal) {
   return coreRequest<InstancePresetListResponse>("/compute-presets", {
