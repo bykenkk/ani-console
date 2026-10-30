@@ -6,7 +6,7 @@ import { startVm, restartVm, deleteVm, type VirtualMachine } from "@/api/vms";
 import { unavailableAction, type RowAction } from "@/components/common/DataTable/RowActions";
 import VmCreateSnapshotModal from "@/components/vms/VmCreateSnapshotModal";
 import VmShutdownModal from "@/components/vms/VmShutdownModal";
-import ChangeSecurityGroupsModal from "@/components/security-groups/ChangeSecurityGroupsModal";
+import VmChangeSecurityGroupsModal from "@/components/vms/VmChangeSecurityGroupsModal";
 import { openInstanceVncWindow } from "@/lib/instances";
 import { vmIsClosed } from "@/lib/vms";
 import { withId } from "@/lib/id";
@@ -138,12 +138,7 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
       dialog.action === "stop" ? (
         <VmShutdownModal vm={dialogVm} onCancel={closeDialog} onSubmitted={closeDialog} />
       ) : dialog.action === "security-groups" ? (
-        <ChangeSecurityGroupsModal
-          targetType="vm"
-          id={dialogVm.id}
-          name={dialogVm.name}
-          onCancel={closeDialog}
-        />
+        <VmChangeSecurityGroupsModal instance={dialogVm} onCancel={closeDialog} />
       ) : (
         <VmCreateSnapshotModal vm={dialogVm} onCancel={closeDialog} onSubmitted={closeDialog} />
       )

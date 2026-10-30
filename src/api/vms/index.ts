@@ -203,11 +203,9 @@ export async function createVmConsoleSession(id: string, signal?: AbortSignal) {
     [id],
   );
 }
-export type * from "./types";
-
 export function setVmSecurityGroups(
   id: string,
-  input: import("@/api/network").SetSecurityGroupsInput,
+  input: { security_group_ids: string[]; expected_version: string },
 ): Promise<void> {
   return runIdempotentRequest(
     securityGroupsScope,
@@ -218,3 +216,4 @@ export function setVmSecurityGroups(
     [id],
   );
 }
+export type * from "./types";

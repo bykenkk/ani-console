@@ -1,5 +1,9 @@
-import GpuContainerChangeSecurityGroupsModal from "@/components/gpu-containers/GpuContainerChangeSecurityGroupsModal";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
+import { instanceIntentUnavailable } from "@/hooks/useInstanceCommandMutation";
+import InstanceRestartModal from "@/components/instances/InstanceRestartModal";
+import InstanceAttachPvcModal from "@/components/instances/InstanceAttachPvcModal";
+import InstanceDetachPvcModal from "@/components/instances/InstanceDetachPvcModal";
+import ContainerChangeSecurityGroupsModal from "@/components/instances/ContainerChangeSecurityGroupsModal";
 import { useState } from "react";
 import { startInstance, type InstanceRecord } from "@/api/instances";
 import { unavailableAction, type RowAction } from "@/components/common/DataTable/RowActions";
@@ -8,13 +12,10 @@ import GpuContainerStopModal from "@/components/gpu-containers/GpuContainerStopM
 import GpuContainerDeleteModal from "@/components/gpu-containers/GpuContainerDeleteModal";
 
 const UNAVAILABLE_ACTIONS = [
-  { key: "restart", label: "重启" },
   { key: "scale", label: "扩缩容" },
   { key: "update_image", label: "更新镜像" },
   { key: "resize", label: "变配" },
   { key: "rollback", label: "回滚发布" },
-  { key: "attach_volume", label: "挂载云盘" },
-  { key: "detach_volume", label: "卸载云盘" },
   // TODO(feature-visibility): 待文件存储支持后恢复 NFS 挂载入口。
   // { key: "attach_filesystem", label: "挂载 NFS" },
   { key: "bind_secret", label: "绑定密钥" },
@@ -25,9 +26,10 @@ const UNAVAILABLE_ACTIONS = [
 export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => void) {
   const qc = useQueryClient();
   const [dialog, setDialog] = useState<{
-    action: "stop" | "delete" | "security-groups";
+    action: "stop" | "delete" | "restart" | "attach" | "detach" | "security-groups";
     instance: InstanceRecord;
   }>();
+  const submitting = useIsMutating({ mutationKey: ["instance-command"] }) > 0;
   const start = useMutation({
     mutationFn: (instance: InstanceRecord) =>
       startInstance(instance.id, {
@@ -54,6 +56,8 @@ export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => 
     },
   });
   const unavailable = (instance: InstanceRecord) =>
+    submitting ||
+    Boolean(instance.activeOperationId) ||
     instance.instance_kind !== "container" ||
     instance.compute_type !== "gpu" ||
     start.isPending ||
@@ -80,6 +84,27 @@ export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => 
         if (instance.observedState === "stopped") return start.mutateAsync(instance);
         setDialog({ action: "stop", instance });
       },
+    },
+    {
+      key: "restart",
+      label: "重启",
+      disabled: (instance) =>
+        unavailable(instance) ||
+        instanceIntentUnavailable(instance) ||
+        instance.observedState !== "running",
+      onClick: (instance) => setDialog({ action: "restart", instance }),
+    },
+    {
+      key: "attach_volume",
+      label: "挂载云盘",
+      disabled: (instance) => unavailable(instance) || instanceIntentUnavailable(instance),
+      onClick: (instance) => setDialog({ action: "attach", instance }),
+    },
+    {
+      key: "detach_volume",
+      label: "卸载云盘",
+      disabled: (instance) => unavailable(instance) || instanceIntentUnavailable(instance),
+      onClick: (instance) => setDialog({ action: "detach", instance }),
     },
     {
       key: "change_security_groups",
@@ -123,8 +148,29 @@ export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => 
   };
   const dialogNode = (
     <>
+      {dialog?.action === "restart" && (
+        <InstanceRestartModal
+          instance={dialog.instance}
+          onCancel={() => setDialog(undefined)}
+          onSubmitted={submitted}
+        />
+      )}
+      {dialog?.action === "attach" && (
+        <InstanceAttachPvcModal
+          instance={dialog.instance}
+          onCancel={() => setDialog(undefined)}
+          onSubmitted={submitted}
+        />
+      )}
+      {dialog?.action === "detach" && (
+        <InstanceDetachPvcModal
+          instance={dialog.instance}
+          onCancel={() => setDialog(undefined)}
+          onSubmitted={submitted}
+        />
+      )}
       {dialog?.action === "security-groups" && (
-        <GpuContainerChangeSecurityGroupsModal
+        <ContainerChangeSecurityGroupsModal
           instance={dialog.instance}
           onCancel={() => setDialog(undefined)}
           onSubmitted={submitted}

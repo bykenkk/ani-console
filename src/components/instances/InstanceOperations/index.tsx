@@ -13,6 +13,9 @@ const ACTION_LABELS: Record<string, string> = {
   start: "启动",
   stop: "停止",
   delete: "删除",
+  restart: "重启",
+  "attach-pvc": "挂载云盘",
+  "detach-pvc": "卸载云盘",
 };
 
 export default function InstanceOperations({ operationId }: InstanceOperationsProps) {
@@ -20,6 +23,12 @@ export default function InstanceOperations({ operationId }: InstanceOperationsPr
     queryKey: ["governance-instance-operation", operationId],
     enabled: Boolean(operationId),
     queryFn: ({ signal }) => getInstanceOperation(operationId!, signal),
+    refetchInterval: (query) =>
+      query.state.data &&
+      ["restart", "attach-pvc", "detach-pvc"].includes(query.state.data.action) &&
+      !["completed", "failed", "superseded"].includes(query.state.data.state)
+        ? 4000
+        : false,
     meta: {
       errorNotification: { id: withId("instance-operation", operationId), action: "操作状态加载" },
     },
@@ -41,7 +50,20 @@ export default function InstanceOperations({ operationId }: InstanceOperationsPr
         {
           title: "状态",
           width: 120,
-          render: (_, row) => <StatusBadge status={row.state} reason={row.reason} />,
+          render: (_, row) => (
+            <StatusBadge
+              status={row.state}
+              reason={row.failure_reason || row.reason}
+              tone={
+                row.state === "completed"
+                  ? "success"
+                  : row.state === "blocked"
+                    ? "warning"
+                    : undefined
+              }
+              loading={row.state === "blocked" ? true : undefined}
+            />
+          ),
         },
       ]}
     />

@@ -1,4 +1,4 @@
-import ChangeSecurityGroupsModal from "@/components/security-groups/ChangeSecurityGroupsModal";
+import EipChangeSecurityGroupsModal from "@/components/network/EipChangeSecurityGroupsModal";
 import { useState } from "react";
 import { listNetworkEips, type NetworkEip, type NetworkResourceStateFilter } from "@/api/network";
 import {
@@ -137,10 +137,8 @@ export default function EipsPage() {
         />
       </ListPageFrame>
       {securityGroupsEip && (
-        <ChangeSecurityGroupsModal
-          targetType="eip"
-          id={securityGroupsEip.id}
-          name={securityGroupsEip.name}
+        <EipChangeSecurityGroupsModal
+          eip={securityGroupsEip}
           onCancel={() => setSecurityGroupsEip(undefined)}
         />
       )}

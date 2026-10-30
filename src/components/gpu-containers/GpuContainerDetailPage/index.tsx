@@ -1,6 +1,6 @@
 import { getInstance, getInstanceConfiguration, getInstanceRuntime } from "@/api/instances";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Empty, Space, Tooltip } from "@arco-design/web-react";
+import { Button, Empty, Tooltip } from "@arco-design/web-react";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import {
   AliIcon,
@@ -23,6 +23,7 @@ import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceNetwork from "@/components/instances/InstanceNetwork";
 import InstanceOperations from "@/components/instances/InstanceOperations";
 import InstanceStorage from "@/components/instances/InstanceStorage";
+import InstanceOperationObserver from "@/components/instances/InstanceOperationObserver";
 
 type GpuContainerDetailPageProps = {
   instanceId: string;
@@ -39,6 +40,7 @@ export default function GpuContainerDetailPage({
   const current = useQuery({
     queryKey: ["governance-instance", instanceId],
     queryFn: ({ signal }) => getInstance(instanceId, signal),
+    refetchInterval: (query) => (query.state.data?.activeOperationId ? 4000 : false),
     meta: { errorNotification: { id: withId("instance", instanceId), action: "实例详情加载" } },
   });
   const isGpu = current.data?.instance_kind === "container" && current.data.compute_type === "gpu";
@@ -94,7 +96,7 @@ export default function GpuContainerDetailPage({
           },
         ]}
         actions={
-          <Space>
+          <div className="flex items-center gap-2">
             <Button
               type="primary"
               disabled={!primaryAction || primaryAction.disabled?.(record)}
@@ -107,7 +109,7 @@ export default function GpuContainerDetailPage({
               record={record}
               actions={actions.filter((action) => action.key !== "terminal")}
             />
-          </Space>
+          </div>
         }
         cards={[
           {
@@ -186,6 +188,7 @@ export default function GpuContainerDetailPage({
             label: "数据卷",
             content: (
               <InstanceStorage
+                instance={record}
                 configuration={configuration.data}
                 runtime={runtime.data}
                 loading={configuration.isFetching}
@@ -235,7 +238,9 @@ export default function GpuContainerDetailPage({
             label: "操作记录",
             content: (
               <InstanceOperations
-                operationId={record.lastOperationId || record.createOperationId}
+                operationId={
+                  record.activeOperationId || record.lastOperationId || record.createOperationId
+                }
               />
             ),
           },
@@ -243,6 +248,11 @@ export default function GpuContainerDetailPage({
         activeTabKey={tab}
         onTabChange={onTabChange}
         onBack={goBack}
+      />
+      <InstanceOperationObserver
+        key={instanceId}
+        instanceId={instanceId}
+        operationId={record.activeOperationId}
       />
       {dialogNode}
     </>

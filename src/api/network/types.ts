@@ -178,10 +178,6 @@ export type SaveNetworkSecurityGroupRuleRequest = {
     idempotency_key: string;
   };
 };
-export interface SetSecurityGroupsInput {
-  security_group_ids: string[];
-  expected_version: string;
-}
 export interface NetworkSecurityGroupBindingResponse {
   binding: NetworkSecurityGroupBinding;
   operation?: NetworkOperation;

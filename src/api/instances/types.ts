@@ -40,6 +40,9 @@ export interface InstanceRecord {
   scheduling?: SchedulingOptions;
   createOperationId?: string;
   lastOperationId?: string;
+  activeOperationId?: string;
+  executionRunState?: string;
+  appliedMountVersion?: string;
   computeCleaned?: boolean;
   workspaceCleaned?: boolean;
   quotaReturned?: boolean;
@@ -53,6 +56,9 @@ export interface InstanceListParams extends PageParams {
   compute_type?: ComputeType;
   observedState?: ObservedState;
   name?: string;
+  /** 不区分大小写的 ID 子串，服务端去首尾空白后按最多 36 个 Unicode 字符校验。 */
+  // TODO(governance-instance-filter): 对接文档规定 36 字节，Gov/Resource 实现为 36 个 Unicode 字符；待后端统一长度契约后同步核对。
+  id?: string;
 }
 export interface InstanceListResponse {
   items: InstanceRecord[];
@@ -121,6 +127,14 @@ export interface InstanceConfigurationData {
   labels: Record<string, string>;
   annotations: Record<string, string>;
   env: InstanceEnvVar[];
+  version: string;
+  applied_mount_version: string;
+  pending_change: {
+    operation_id: string;
+    intent_version: string;
+    phase: string;
+    target_configuration: { volume_mounts: InstanceVolumeMount[] } | null;
+  } | null;
 }
 export type InstanceMetricCode =
   | "cpu.usage_cores"
@@ -192,7 +206,30 @@ export interface InstanceOperation {
   intentVersion?: string;
   state: string;
   reason?: string;
+  phase?: string;
+  target_configuration?: { volume_mounts: InstanceVolumeMount[] } | null;
+  final_run_state?: string;
+  applied_mount_version?: string;
+  completion_scope?: string;
+  failure_reason?: string;
 }
+export interface RestartInstanceInput {
+  expectedVersion: string;
+}
+export interface AttachInstancePvcInput extends RestartInstanceInput, InstanceVolumeMount {
+  restart_if_running: boolean;
+}
+export interface DetachInstancePvcInput extends RestartInstanceInput {
+  mount_path: string;
+  restart_if_running: boolean;
+}
+export type RestartInstanceRequest = { data: RestartInstanceInput & { idempotencyKey: string } };
+export type AttachInstancePvcRequest = {
+  data: AttachInstancePvcInput & { idempotencyKey: string };
+};
+export type DetachInstancePvcRequest = {
+  data: DetachInstancePvcInput & { idempotencyKey: string };
+};
 export interface InstanceRuntime {
   instance_id: string;
   version: string;

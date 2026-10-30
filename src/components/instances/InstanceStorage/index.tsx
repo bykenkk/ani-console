@@ -1,9 +1,14 @@
-import { Button, Space } from "@arco-design/web-react";
+import { Button } from "@arco-design/web-react";
 import { DataTable } from "@/components/common";
-import type { InstanceConfigurationData, InstanceRuntime } from "@/api/instances";
-import type { ReactNode } from "react";
+import type { InstanceConfigurationData, InstanceRuntime, InstanceRecord } from "@/api/instances";
+import { useIsMutating } from "@tanstack/react-query";
+import InstanceAttachPvcModal from "@/components/instances/InstanceAttachPvcModal";
+import InstanceDetachPvcModal from "@/components/instances/InstanceDetachPvcModal";
+import { instanceIntentUnavailable } from "@/hooks/useInstanceCommandMutation";
+import { useState, type ReactNode } from "react";
 
 type InstanceStorageProps = {
+  instance?: InstanceRecord;
   configuration?: InstanceConfigurationData;
   runtime?: InstanceRuntime;
   loading?: boolean;
@@ -19,23 +24,45 @@ type InstanceStorageProps = {
 // };
 
 export default function InstanceStorage({
+  instance,
   configuration,
   runtime,
   loading = false,
   diskContent,
 }: InstanceStorageProps) {
-  // 冻结配置的挂载路径唯一；运行态卷名不是 PVC 名，按同一实例的容器内路径对应。
+  const [dialog, setDialog] = useState<
+    | { action: "attach"; instance: InstanceRecord }
+    | { action: "detach"; instance: InstanceRecord; mountPath: string }
+  >();
+  const submitting = useIsMutating({ mutationKey: ["instance-command"] }) > 0;
+  const unavailable =
+    !instance ||
+    !configuration ||
+    loading ||
+    Boolean(dialog) ||
+    submitting ||
+    Boolean(configuration.pending_change) ||
+    instanceIntentUnavailable(instance);
+  // 当前权威配置的挂载路径唯一；运行态卷名不是 PVC 名，按同一实例的容器内路径对应。
   const runtimeMounts =
     runtime?.instance_id === configuration?.instance_id ? (runtime?.pod?.mounts ?? []) : [];
-  // TODO(instance-volume-management): 创建后挂载、卸载操作待正式契约补齐并联调后接入。
   // TODO(instance-volume-type): 联调核对运行态类型；无观测、路径不唯一或只读属性不一致时保留占位。
   return (
-    <Space direction="vertical" size={24} className="w-full">
+    <div className="flex w-full flex-col gap-6">
       {diskContent ?? (
         <DataTable
           header={{
             title: "挂载点",
-            extra: <Button disabled>挂载云盘</Button>,
+            extra: (
+              <Button
+                disabled={unavailable || (configuration?.volume_mounts.length ?? 0) >= 8}
+                onClick={() => {
+                  if (instance && !unavailable) setDialog({ action: "attach", instance });
+                }}
+              >
+                挂载云盘
+              </Button>
+            ),
           }}
           data={configuration?.volume_mounts ?? []}
           loading={loading}
@@ -61,7 +88,46 @@ export default function InstanceStorage({
               width: 100,
               render: (_, volume) => (volume.read_only ? "只读" : "读写"),
             },
+            ...(instance
+              ? [
+                  {
+                    title: "操作",
+                    width: 100,
+                    render: (
+                      _: unknown,
+                      volume: NonNullable<InstanceConfigurationData["volume_mounts"]>[number],
+                    ) =>
+                      volume.mount_path === configuration?.workspace_mount_path ? null : (
+                        <Button
+                          type="text"
+                          status="danger"
+                          disabled={unavailable}
+                          onClick={() =>
+                            setDialog({ action: "detach", instance, mountPath: volume.mount_path })
+                          }
+                        >
+                          卸载
+                        </Button>
+                      ),
+                  },
+                ]
+              : []),
           ]}
+        />
+      )}
+      {dialog?.action === "attach" && (
+        <InstanceAttachPvcModal
+          instance={dialog.instance}
+          onCancel={() => setDialog(undefined)}
+          onSubmitted={() => setDialog(undefined)}
+        />
+      )}
+      {dialog?.action === "detach" && (
+        <InstanceDetachPvcModal
+          instance={dialog.instance}
+          mountPath={dialog.mountPath}
+          onCancel={() => setDialog(undefined)}
+          onSubmitted={() => setDialog(undefined)}
         />
       )}
       {/* TODO(instance-nfs): 新接口未提供 NFS 关联与管理能力，保留原表格和按钮，待契约补齐并联调后接入。 */}
@@ -82,6 +148,6 @@ export default function InstanceStorage({
           { title: "状态", width: 120, dataIndex: "status" },
         ]}
       /> */}
-    </Space>
+    </div>
   );
 }

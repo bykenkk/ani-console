@@ -12,6 +12,7 @@ import { useListPagination } from "@/hooks/useListPagination";
 import { useGpuContainerActions } from "@/hooks/useGpuContainerActions";
 import GpuContainerCreateModal from "@/components/gpu-containers/GpuContainerCreateModal";
 import { formatDateTime } from "@/lib/format";
+import InstanceOperationObserver from "@/components/instances/InstanceOperationObserver";
 
 type StatusFilter = "all" | Exclude<ObservedState, "deleted">;
 export default function GpuContainersPage() {
@@ -21,17 +22,13 @@ export default function GpuContainersPage() {
   const [createVisible, setCreateVisible] = useState(false);
   const keyword = searchText.trim();
   const observedState = status === "all" ? undefined : status;
-  // FIXME(governance-instance-filter): 新列表没有 ID 搜索契约，对应选项保留但禁用，不回退旧列表。
-  // TODO(governance-instance-filter): 后端提供 ID 查询后启用选项；状态仅使用新 observedState，不恢复旧扩展状态。
-  const canQuery = searchField === "name";
   const paging = useListPagination(JSON.stringify({ status, searchField, keyword }), 10);
   const query = useQuery({
     queryKey: [
       "governance-instances",
       "gpu",
-      { page: paging.page, pageSize: paging.pageSize, observedState, keyword },
+      { page: paging.page, pageSize: paging.pageSize, observedState, searchField, keyword },
     ],
-    enabled: canQuery,
     meta: {
       errorNotification: {
         id: "gpu_container-instances",
@@ -47,19 +44,22 @@ export default function GpuContainersPage() {
           instance_kind: "container",
           compute_type: "gpu",
           observedState,
-          name: keyword || undefined,
+          name: searchField === "name" ? keyword || undefined : undefined,
+          id: searchField === "id" ? keyword || undefined : undefined,
         },
         signal,
       );
       return { ...data, total: Number(data.total) };
     },
+    refetchInterval: (query) =>
+      query.state.data?.items.some((instance) => instance.activeOperationId) ? 4000 : false,
   });
   const { page, setPage } = paging;
   useEffect(() => {
-    if (canQuery && query.isSuccess && !query.isFetching && !query.data.items.length && page > 1) {
+    if (query.isSuccess && !query.isFetching && !query.data.items.length && page > 1) {
       setPage(page - 1);
     }
-  }, [canQuery, query.isSuccess, query.isFetching, query.data, page, setPage]);
+  }, [query.isSuccess, query.isFetching, query.data, page, setPage]);
   const { actions, dialogNode } = useGpuContainerActions(paging.resetPagination);
   const columns: ListColumn<InstanceRecord>[] = [
     {
@@ -134,7 +134,7 @@ export default function GpuContainersPage() {
           search: {
             fields: [
               { value: "name", label: "名称" },
-              { value: "id", label: "ID", disabled: true },
+              { value: "id", label: "ID" },
             ],
             field: searchField,
             value: searchText,
@@ -144,25 +144,24 @@ export default function GpuContainersPage() {
           refresh: {
             label: "刷新",
             spinning: query.isFetching,
-            disabled: !canQuery,
             onClick: () => query.refetch(),
           },
         }}
       >
         <ListDataTable
-          data={canQuery ? (query.data?.items ?? []) : []}
+          data={query.data?.items ?? []}
           columns={columns}
           rowActions={actions}
-          loading={canQuery && query.isFetching}
+          loading={query.isFetching}
           tableLabel="GPU 容器列表"
           pagination={{
             mode: "total",
             page: paging.page,
             pageSize: paging.pageSize,
-            total: canQuery ? (query.data?.total ?? 0) : 0,
+            total: query.data?.total ?? 0,
             onPageChange: paging.setPage,
             onPageSizeChange: paging.setPageSize,
-            disabled: !canQuery || query.isFetching,
+            disabled: query.isFetching,
           }}
         />
       </ListPageFrame>
@@ -175,6 +174,13 @@ export default function GpuContainersPage() {
           }}
         />
       )}
+      {(query.data?.items ?? []).map((instance) => (
+        <InstanceOperationObserver
+          key={instance.id}
+          instanceId={instance.id}
+          operationId={instance.activeOperationId}
+        />
+      ))}
       {dialogNode}
     </>
   );

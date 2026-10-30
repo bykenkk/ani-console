@@ -8,7 +8,6 @@ import type {
   NetworkEipListParams,
   NetworkEipListResponse,
   NetworkSecurityGroupBindingResponse,
-  SetSecurityGroupsInput,
 } from "./types";
 
 const securityGroupsScope = createIdempotencyScope("eip-security-groups", ["PUT"]);
@@ -50,7 +49,10 @@ export function getEipSecurityGroups(id: string, signal?: AbortSignal) {
     signal,
   });
 }
-export function setEipSecurityGroups(id: string, input: SetSecurityGroupsInput): Promise<void> {
+export function setEipSecurityGroups(
+  id: string,
+  input: { security_group_ids: string[]; expected_version: string },
+): Promise<void> {
   return runIdempotentRequest(
     securityGroupsScope,
     input,

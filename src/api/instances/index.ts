@@ -11,6 +11,12 @@ import type {
   CreateInstanceRequest,
   ChangeInstanceInput,
   ChangeInstanceRequest,
+  RestartInstanceInput,
+  RestartInstanceRequest,
+  AttachInstancePvcInput,
+  AttachInstancePvcRequest,
+  DetachInstancePvcInput,
+  DetachInstancePvcRequest,
   InstanceOperation,
   InstanceRuntime,
   InstanceEventsResponse,
@@ -30,13 +36,16 @@ import type {
 const createScope = createIdempotencyScope("governance-instance-create", ["POST"]);
 const startScope = createIdempotencyScope("governance-instance-start", ["POST"]);
 const stopScope = createIdempotencyScope("governance-instance-stop", ["POST"]);
+const restartScope = createIdempotencyScope("instance-restart", ["POST"]);
+const attachScope = createIdempotencyScope("instance-attach-pvc", ["POST"]);
+const detachScope = createIdempotencyScope("instance-detach-pvc", ["POST"]);
 const deleteScope = createIdempotencyScope("governance-instance-delete", ["DELETE"]);
 const securityGroupsScope = createIdempotencyScope("instance-security-groups", ["PUT"]);
 const execScope = createIdempotencyScope("governance-instance-exec", ["POST"]);
 const instancePath = (id: string) => `/instances/${encodeURIComponent(id)}`;
 export function listInstances(params: InstanceListParams = {}, signal?: AbortSignal) {
-  // FIXME(governance-instance-filter): 新列表不支持 ID 搜索，对应选项暂时禁用，不回退旧列表。
-  // TODO(governance-instance-filter): 后端补齐 ID 查询契约后启用选项；状态只按新 observedState 筛选。
+  // 不传 observedState 时由服务端排除已删除实例，筛选与 total 均由服务端计算。
+  // TODO(governance-instance-filter): 后端发布 ID 搜索与默认删除过滤后，联调验证片段匹配、组合筛选和分页总数。
   return coreRequest<InstanceListResponse>("/instances", { method: "GET", params, signal });
 }
 export function getInstance(id: string, signal?: AbortSignal) {
@@ -67,6 +76,43 @@ export function listMountablePvcs(params: MountablePvcListParams = {}, signal?: 
     signal,
   });
 }
+export function listInstanceMountablePvcs(
+  id: string,
+  params: MountablePvcListParams = {},
+  signal?: AbortSignal,
+) {
+  return coreRequest<MountablePvcListResponse>(`${instancePath(id)}/mountable-pvcs`, {
+    method: "GET",
+    params,
+    signal,
+  });
+}
+export function attachInstancePvc(id: string, input: AttachInstancePvcInput): Promise<void> {
+  return runIdempotentRequest(
+    attachScope,
+    input,
+    async ({ idempotency_key, ...values }) => {
+      await coreRequest<void, AttachInstancePvcRequest>(`${instancePath(id)}:attach-pvc`, {
+        method: "POST",
+        data: { data: { ...values, idempotencyKey: idempotency_key } },
+      });
+    },
+    [id],
+  );
+}
+export function detachInstancePvc(id: string, input: DetachInstancePvcInput): Promise<void> {
+  return runIdempotentRequest(
+    detachScope,
+    input,
+    async ({ idempotency_key, ...values }) => {
+      await coreRequest<void, DetachInstancePvcRequest>(`${instancePath(id)}:detach-pvc`, {
+        method: "POST",
+        data: { data: { ...values, idempotencyKey: idempotency_key } },
+      });
+    },
+    [id],
+  );
+}
 export function startInstance(id: string, input: ChangeInstanceInput): Promise<void> {
   return runIdempotentRequest(
     startScope,
@@ -88,6 +134,20 @@ export function stopInstance(id: string, input: ChangeInstanceInput): Promise<vo
       await coreRequest<void, ChangeInstanceRequest>(`${instancePath(id)}:stop`, {
         method: "POST",
         data: { data },
+      });
+    },
+    [id],
+  );
+}
+export function restartInstance(id: string, input: RestartInstanceInput): Promise<void> {
+  // TODO(instance-intents): 联调核对 CPU/GPU 重启、运行态挂卸、版本冲突及丢失响应后的幂等重放。
+  return runIdempotentRequest(
+    restartScope,
+    input,
+    async ({ idempotency_key, ...values }) => {
+      await coreRequest<void, RestartInstanceRequest>(`${instancePath(id)}:restart`, {
+        method: "POST",
+        data: { data: { ...values, idempotencyKey: idempotency_key } },
       });
     },
     [id],
@@ -176,11 +236,9 @@ export async function createInstanceExecSession(
     [id],
   );
 }
-export type * from "./types";
-
 export function setInstanceSecurityGroups(
   id: string,
-  input: import("@/api/network").SetSecurityGroupsInput,
+  input: { security_group_ids: string[]; expected_version: string },
 ): Promise<void> {
   return runIdempotentRequest(
     securityGroupsScope,
@@ -191,3 +249,4 @@ export function setInstanceSecurityGroups(
     [id],
   );
 }
+export type * from "./types";

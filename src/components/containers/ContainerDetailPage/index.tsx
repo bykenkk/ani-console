@@ -1,4 +1,4 @@
-import { Button, Empty, Space } from "@arco-design/web-react";
+import { Button, Empty } from "@arco-design/web-react";
 import { getInstance, getInstanceConfiguration, getInstanceRuntime } from "@/api/instances";
 import { useQuery } from "@tanstack/react-query";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
@@ -22,6 +22,7 @@ import InstanceStorage from "@/components/instances/InstanceStorage";
 import InstanceNetwork from "@/components/instances/InstanceNetwork";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceOperations from "@/components/instances/InstanceOperations";
+import InstanceOperationObserver from "@/components/instances/InstanceOperationObserver";
 
 type ContainerDetailPageProps = {
   instanceId: string;
@@ -38,6 +39,7 @@ export default function ContainerDetailPage({
   const current = useQuery({
     queryKey: ["governance-instance", instanceId],
     queryFn: ({ signal }) => getInstance(instanceId, signal),
+    refetchInterval: (query) => (query.state.data?.activeOperationId ? 4000 : false),
     meta: { errorNotification: { id: withId("instance", instanceId), action: "实例详情加载" } },
   });
   const isContainer =
@@ -84,7 +86,7 @@ export default function ContainerDetailPage({
           { label: "私网 IP", value: "-" },
         ]}
         actions={
-          <Space>
+          <div className="flex items-center gap-2">
             <Button
               type="primary"
               disabled={!primaryAction || primaryAction.disabled?.(record)}
@@ -97,7 +99,7 @@ export default function ContainerDetailPage({
               record={record}
               actions={actions.filter((action) => action.key !== "terminal")}
             />
-          </Space>
+          </div>
         }
         cards={[
           {
@@ -152,6 +154,7 @@ export default function ContainerDetailPage({
             label: "数据卷",
             content: (
               <InstanceStorage
+                instance={record}
                 configuration={configuration.data}
                 runtime={runtime.data}
                 loading={configuration.isFetching}
@@ -188,7 +191,9 @@ export default function ContainerDetailPage({
             label: "操作记录",
             content: (
               <InstanceOperations
-                operationId={record.lastOperationId || record.createOperationId}
+                operationId={
+                  record.activeOperationId || record.lastOperationId || record.createOperationId
+                }
               />
             ),
           },
@@ -196,6 +201,11 @@ export default function ContainerDetailPage({
         activeTabKey={tab}
         onTabChange={onTabChange}
         onBack={goBack}
+      />
+      <InstanceOperationObserver
+        key={instanceId}
+        instanceId={instanceId}
+        operationId={record.activeOperationId}
       />
       {dialogNode}
     </>
