@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteNetworkVpc } from "@/api/network";
 import { deleteNetworkSubnet } from "@/api/network";
 import { deleteNetworkSecurityGroup } from "@/api/network";
-import { deleteNetworkRoute } from "@/api/network";
 import { deleteNetworkLoadBalancer } from "@/api/network";
 import { deleteVolume } from "@/api/storage/volumes/legacy";
 import { deleteFilesystem } from "@/api/storage/filesystems";
@@ -17,8 +16,6 @@ import type { MutationFeedbackMeta } from "@/vite-env";
 type ResourceDeleteTarget = {
   id?: string;
   name?: string;
-  description?: string | null;
-  destination_cidr?: string;
 };
 type DeleteConfig = {
   listQueryKey: string;
@@ -70,20 +67,6 @@ const resourceDeletion = {
     title: "删除安全组",
     content: (item) => `确定删除「${item.name}」？安全组被资源使用时无法删除，请先解除关联。`,
     remove: deleteNetworkSecurityGroup,
-  },
-  "network-route": {
-    listQueryKey: "network-routes",
-    detailQueryKey: "network-route",
-    feedback: {
-      channel: "notification",
-      id: "route-delete",
-      action: "删除路由",
-      errorFallback: "请求失败",
-    },
-    title: "删除路由",
-    content: (item) =>
-      `确定删除「${item.description?.trim() || item.destination_cidr}」？删除后该转发规则将立即失效。`,
-    remove: deleteNetworkRoute,
   },
   "load-balancer": {
     listQueryKey: "network-load-balancers",

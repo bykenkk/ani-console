@@ -336,37 +336,6 @@ export type CreateNetworkLoadBalancerRequest = CreateNetworkLoadBalancerInput & 
   idempotency_key: string;
 };
 
-export interface NetworkRoute {
-  id: string;
-  vpc_id: string;
-  destination_cidr: string;
-  next_hop_type: "gateway" | "instance" | "nat";
-  next_hop_id: string;
-  description?: string | null;
-  created_at: string;
-  dev_profile: CoreDevProfileInfo;
-}
-export interface NetworkRouteListParams {
-  vpc_id?: string;
-  subnet_id?: string;
-  status?: string;
-  search_field?: "description" | "id";
-  keyword?: string;
-}
-export interface NetworkRouteListResponse {
-  items: NetworkRoute[];
-  total: number;
-  next_cursor?: string | null;
-}
-export interface CreateNetworkRouteInput {
-  vpc_id: string;
-  destination_cidr: string;
-  next_hop_type: "gateway" | "instance" | "nat";
-  next_hop_id: string;
-  description?: string;
-}
-export type CreateNetworkRouteRequest = CreateNetworkRouteInput & { idempotency_key: string };
-
 /** Governance network DTOs; int64 fields retain their JSON string representation. */
 export interface NetworkEip {
   id: string;

@@ -20,9 +20,6 @@ const resourceListRoutes = {
   // TODO(feature-visibility): 待安全组支持后恢复列表返回目标。
   // "security-group": "/security-groups",
   "security-group": "/",
-  // TODO(feature-visibility): 待路由支持后恢复列表返回目标。
-  // "network-route": "/routes",
-  "network-route": "/",
   "load-balancer": "/load-balancers",
   volume: "/volumes",
   // TODO(feature-visibility): 待文件存储支持后恢复列表返回目标。

@@ -47,8 +47,6 @@ import { Route as AuthenticatedAppObjectsIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedAppObjectsBucketIdRouteImport } from './routes/_authenticated/_app/objects/$bucketId'
 import { Route as AuthenticatedAppOverviewComputeIndexRouteImport } from './routes/_authenticated/_app/overview-compute/index'
 import { Route as AuthenticatedAppRegistryIndexRouteImport } from './routes/_authenticated/_app/registry/index'
-import { Route as AuthenticatedAppRoutesIndexRouteImport } from './routes/_authenticated/_app/routes/index'
-import { Route as AuthenticatedAppRoutesRouteIdRouteImport } from './routes/_authenticated/_app/routes/$routeId'
 import { Route as AuthenticatedAppSandboxesIndexRouteImport } from './routes/_authenticated/_app/sandboxes/index'
 import { Route as AuthenticatedAppSandboxesInstanceIdRouteImport } from './routes/_authenticated/_app/sandboxes/$instanceId'
 import { Route as AuthenticatedAppSecurityGroupsIndexRouteImport } from './routes/_authenticated/_app/security-groups/index'
@@ -283,18 +281,6 @@ const AuthenticatedAppRegistryIndexRoute =
     path: '/registry/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAppRoutesIndexRoute =
-  AuthenticatedAppRoutesIndexRouteImport.update({
-    id: '/routes/',
-    path: '/routes/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppRoutesRouteIdRoute =
-  AuthenticatedAppRoutesRouteIdRouteImport.update({
-    id: '/routes/$routeId',
-    path: '/routes/$routeId',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
 const AuthenticatedAppSandboxesIndexRoute =
   AuthenticatedAppSandboxesIndexRouteImport.update({
     id: '/sandboxes/',
@@ -410,7 +396,6 @@ export interface FileRoutesByFullPath {
   '/kb/$kbId': typeof AuthenticatedAppKbKbIdRoute
   '/load-balancers/$loadBalancerId': typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
   '/objects/$bucketId': typeof AuthenticatedAppObjectsBucketIdRouteWithChildren
-  '/routes/$routeId': typeof AuthenticatedAppRoutesRouteIdRoute
   '/sandboxes/$instanceId': typeof AuthenticatedAppSandboxesInstanceIdRoute
   '/security-groups/$securityGroupId': typeof AuthenticatedAppSecurityGroupsSecurityGroupIdRoute
   '/subnets/$subnetId': typeof AuthenticatedAppSubnetsSubnetIdRoute
@@ -437,7 +422,6 @@ export interface FileRoutesByFullPath {
   '/objects/': typeof AuthenticatedAppObjectsIndexRoute
   '/overview-compute/': typeof AuthenticatedAppOverviewComputeIndexRoute
   '/registry/': typeof AuthenticatedAppRegistryIndexRoute
-  '/routes/': typeof AuthenticatedAppRoutesIndexRoute
   '/sandboxes/': typeof AuthenticatedAppSandboxesIndexRoute
   '/security-groups/': typeof AuthenticatedAppSecurityGroupsIndexRoute
   '/subnets/': typeof AuthenticatedAppSubnetsIndexRoute
@@ -464,7 +448,6 @@ export interface FileRoutesByTo {
   '/k8s-clusters/$clusterId': typeof AuthenticatedAppK8sClustersClusterIdRoute
   '/kb/$kbId': typeof AuthenticatedAppKbKbIdRoute
   '/load-balancers/$loadBalancerId': typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
-  '/routes/$routeId': typeof AuthenticatedAppRoutesRouteIdRoute
   '/sandboxes/$instanceId': typeof AuthenticatedAppSandboxesInstanceIdRoute
   '/security-groups/$securityGroupId': typeof AuthenticatedAppSecurityGroupsSecurityGroupIdRoute
   '/subnets/$subnetId': typeof AuthenticatedAppSubnetsSubnetIdRoute
@@ -491,7 +474,6 @@ export interface FileRoutesByTo {
   '/objects': typeof AuthenticatedAppObjectsIndexRoute
   '/overview-compute': typeof AuthenticatedAppOverviewComputeIndexRoute
   '/registry': typeof AuthenticatedAppRegistryIndexRoute
-  '/routes': typeof AuthenticatedAppRoutesIndexRoute
   '/sandboxes': typeof AuthenticatedAppSandboxesIndexRoute
   '/security-groups': typeof AuthenticatedAppSecurityGroupsIndexRoute
   '/subnets': typeof AuthenticatedAppSubnetsIndexRoute
@@ -523,7 +505,6 @@ export interface FileRoutesById {
   '/_authenticated/_app/kb/$kbId': typeof AuthenticatedAppKbKbIdRoute
   '/_authenticated/_app/load-balancers/$loadBalancerId': typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
   '/_authenticated/_app/objects/$bucketId': typeof AuthenticatedAppObjectsBucketIdRouteWithChildren
-  '/_authenticated/_app/routes/$routeId': typeof AuthenticatedAppRoutesRouteIdRoute
   '/_authenticated/_app/sandboxes/$instanceId': typeof AuthenticatedAppSandboxesInstanceIdRoute
   '/_authenticated/_app/security-groups/$securityGroupId': typeof AuthenticatedAppSecurityGroupsSecurityGroupIdRoute
   '/_authenticated/_app/subnets/$subnetId': typeof AuthenticatedAppSubnetsSubnetIdRoute
@@ -550,7 +531,6 @@ export interface FileRoutesById {
   '/_authenticated/_app/objects/': typeof AuthenticatedAppObjectsIndexRoute
   '/_authenticated/_app/overview-compute/': typeof AuthenticatedAppOverviewComputeIndexRoute
   '/_authenticated/_app/registry/': typeof AuthenticatedAppRegistryIndexRoute
-  '/_authenticated/_app/routes/': typeof AuthenticatedAppRoutesIndexRoute
   '/_authenticated/_app/sandboxes/': typeof AuthenticatedAppSandboxesIndexRoute
   '/_authenticated/_app/security-groups/': typeof AuthenticatedAppSecurityGroupsIndexRoute
   '/_authenticated/_app/subnets/': typeof AuthenticatedAppSubnetsIndexRoute
@@ -581,7 +561,6 @@ export interface FileRouteTypes {
     | '/kb/$kbId'
     | '/load-balancers/$loadBalancerId'
     | '/objects/$bucketId'
-    | '/routes/$routeId'
     | '/sandboxes/$instanceId'
     | '/security-groups/$securityGroupId'
     | '/subnets/$subnetId'
@@ -608,7 +587,6 @@ export interface FileRouteTypes {
     | '/objects/'
     | '/overview-compute/'
     | '/registry/'
-    | '/routes/'
     | '/sandboxes/'
     | '/security-groups/'
     | '/subnets/'
@@ -635,7 +613,6 @@ export interface FileRouteTypes {
     | '/k8s-clusters/$clusterId'
     | '/kb/$kbId'
     | '/load-balancers/$loadBalancerId'
-    | '/routes/$routeId'
     | '/sandboxes/$instanceId'
     | '/security-groups/$securityGroupId'
     | '/subnets/$subnetId'
@@ -662,7 +639,6 @@ export interface FileRouteTypes {
     | '/objects'
     | '/overview-compute'
     | '/registry'
-    | '/routes'
     | '/sandboxes'
     | '/security-groups'
     | '/subnets'
@@ -693,7 +669,6 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/kb/$kbId'
     | '/_authenticated/_app/load-balancers/$loadBalancerId'
     | '/_authenticated/_app/objects/$bucketId'
-    | '/_authenticated/_app/routes/$routeId'
     | '/_authenticated/_app/sandboxes/$instanceId'
     | '/_authenticated/_app/security-groups/$securityGroupId'
     | '/_authenticated/_app/subnets/$subnetId'
@@ -720,7 +695,6 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/objects/'
     | '/_authenticated/_app/overview-compute/'
     | '/_authenticated/_app/registry/'
-    | '/_authenticated/_app/routes/'
     | '/_authenticated/_app/sandboxes/'
     | '/_authenticated/_app/security-groups/'
     | '/_authenticated/_app/subnets/'
@@ -1005,20 +979,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppRegistryIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/_app/routes/': {
-      id: '/_authenticated/_app/routes/'
-      path: '/routes'
-      fullPath: '/routes/'
-      preLoaderRoute: typeof AuthenticatedAppRoutesIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/routes/$routeId': {
-      id: '/_authenticated/_app/routes/$routeId'
-      path: '/routes/$routeId'
-      fullPath: '/routes/$routeId'
-      preLoaderRoute: typeof AuthenticatedAppRoutesRouteIdRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
     '/_authenticated/_app/sandboxes/': {
       id: '/_authenticated/_app/sandboxes/'
       path: '/sandboxes'
@@ -1166,7 +1126,6 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppKbKbIdRoute: typeof AuthenticatedAppKbKbIdRoute
   AuthenticatedAppLoadBalancersLoadBalancerIdRoute: typeof AuthenticatedAppLoadBalancersLoadBalancerIdRoute
   AuthenticatedAppObjectsBucketIdRoute: typeof AuthenticatedAppObjectsBucketIdRouteWithChildren
-  AuthenticatedAppRoutesRouteIdRoute: typeof AuthenticatedAppRoutesRouteIdRoute
   AuthenticatedAppSandboxesInstanceIdRoute: typeof AuthenticatedAppSandboxesInstanceIdRoute
   AuthenticatedAppSecurityGroupsSecurityGroupIdRoute: typeof AuthenticatedAppSecurityGroupsSecurityGroupIdRoute
   AuthenticatedAppSubnetsSubnetIdRoute: typeof AuthenticatedAppSubnetsSubnetIdRoute
@@ -1193,7 +1152,6 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppObjectsIndexRoute: typeof AuthenticatedAppObjectsIndexRoute
   AuthenticatedAppOverviewComputeIndexRoute: typeof AuthenticatedAppOverviewComputeIndexRoute
   AuthenticatedAppRegistryIndexRoute: typeof AuthenticatedAppRegistryIndexRoute
-  AuthenticatedAppRoutesIndexRoute: typeof AuthenticatedAppRoutesIndexRoute
   AuthenticatedAppSandboxesIndexRoute: typeof AuthenticatedAppSandboxesIndexRoute
   AuthenticatedAppSecurityGroupsIndexRoute: typeof AuthenticatedAppSecurityGroupsIndexRoute
   AuthenticatedAppSubnetsIndexRoute: typeof AuthenticatedAppSubnetsIndexRoute
@@ -1226,7 +1184,6 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
     AuthenticatedAppLoadBalancersLoadBalancerIdRoute,
   AuthenticatedAppObjectsBucketIdRoute:
     AuthenticatedAppObjectsBucketIdRouteWithChildren,
-  AuthenticatedAppRoutesRouteIdRoute: AuthenticatedAppRoutesRouteIdRoute,
   AuthenticatedAppSandboxesInstanceIdRoute:
     AuthenticatedAppSandboxesInstanceIdRoute,
   AuthenticatedAppSecurityGroupsSecurityGroupIdRoute:
@@ -1262,7 +1219,6 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppOverviewComputeIndexRoute:
     AuthenticatedAppOverviewComputeIndexRoute,
   AuthenticatedAppRegistryIndexRoute: AuthenticatedAppRegistryIndexRoute,
-  AuthenticatedAppRoutesIndexRoute: AuthenticatedAppRoutesIndexRoute,
   AuthenticatedAppSandboxesIndexRoute: AuthenticatedAppSandboxesIndexRoute,
   AuthenticatedAppSecurityGroupsIndexRoute:
     AuthenticatedAppSecurityGroupsIndexRoute,

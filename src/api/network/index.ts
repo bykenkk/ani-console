@@ -1,7 +1,6 @@
 export * from "./eips";
 export * from "./load-balancers";
 export * from "./operations";
-export * from "./routes";
 export * from "./security-groups";
 export * from "./snat";
 export * from "./subnets";

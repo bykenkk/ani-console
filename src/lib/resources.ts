@@ -14,7 +14,6 @@ export type ResourceDetailType =
   | "vpc"
   | "subnet"
   | "security-group"
-  | "network-route"
   | "load-balancer"
   | "volume"
   | "filesystem"
@@ -96,10 +95,6 @@ export function navigateToResourceDetail(
       //   to: "/security-groups/$securityGroupId",
       //   params: { securityGroupId: resource.id },
       // });
-      return;
-    case "network-route":
-      // TODO(feature-visibility): 待路由支持后恢复详情跳转。
-      // navigate({ to: "/routes/$routeId", params: { routeId: resource.id } });
       return;
     case "load-balancer":
       navigate({

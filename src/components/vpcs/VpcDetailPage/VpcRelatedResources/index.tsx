@@ -6,10 +6,8 @@ import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 
 import {
   listNetworkLoadBalancers,
-  listNetworkRoutes,
   listNetworkSubnets,
   type NetworkLoadBalancer,
-  type NetworkRoute,
   type NetworkSubnet,
 } from "@/api/network";
 import { DataTable, StatusBadge, type ListColumn } from "@/components/common";
@@ -21,7 +19,7 @@ type VpcRelatedResourcesProps = { vpcId: string };
 
 type RelatedResource = {
   id: string;
-  kind: "子网" | "路由" | "负载均衡" | "实例";
+  kind: "子网" | "负载均衡" | "实例";
   name: string;
   status: string;
   group: "网络" | "算力";
@@ -38,17 +36,6 @@ export default function VpcRelatedResources({ vpcId }: VpcRelatedResourcesProps)
     },
     queryKey: ["network-subnets", vpcId],
     queryFn: () => listNetworkSubnets({ vpc_id: vpcId }),
-  });
-  const routes = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("vpc-routes", vpcId),
-        action: `路由加载`,
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-routes", vpcId],
-    queryFn: () => listNetworkRoutes({ vpc_id: vpcId }),
   });
   // TODO(pagination-migration): 负载均衡仅支持 limit/cursor，暂独立分页；后端提供统一关联页码契约后移除此兼容。
   const { query: loadBalancers, pagination: loadBalancerPagination } = useCursorPaginatedQuery({
@@ -78,13 +65,6 @@ export default function VpcRelatedResources({ vpcId }: VpcRelatedResourcesProps)
       status: item.state,
       group: "网络" as const,
     })),
-    ...((routes.data?.items ?? []) as NetworkRoute[]).map((item) => ({
-      id: item.id,
-      kind: "路由" as const,
-      name: item.description || item.destination_cidr,
-      status: "-",
-      group: "网络" as const,
-    })),
     ...((loadBalancers.data?.items ?? []) as NetworkLoadBalancer[]).map((item) => ({
       id: item.id,
       kind: "负载均衡" as const,
@@ -107,8 +87,7 @@ export default function VpcRelatedResources({ vpcId }: VpcRelatedResourcesProps)
   const loadBalancerResources = resources.filter((resource) => resource.kind === "负载均衡");
   const computeResources = resources.filter((resource) => resource.group === "算力");
   const networkPage = useClientPagination(networkResources, vpcId);
-  const loading =
-    subnets.isLoading || routes.isLoading || loadBalancers.isLoading || instances.isLoading;
+  const loading = subnets.isLoading || loadBalancers.isLoading || instances.isLoading;
   const columns: Array<ListColumn<RelatedResource>> = [
     { title: "类型", width: 120, render: (_, resource) => <Tag>{resource.kind}</Tag> },
     { title: "名称", width: 200, dataIndex: "name" },

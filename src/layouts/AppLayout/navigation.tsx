@@ -94,8 +94,6 @@ export const menuItems: readonly MenuItem[] = [
             label: "安全组",
             icon: <AliIcon name="anquanzu" />,
           },
-          // TODO(feature-visibility): 待路由支持后恢复此菜单入口。
-          // { key: "/routes", label: "路由", icon: <AliIcon name="VPCluyouqi" /> },
           {
             key: "/load-balancers",
             label: "负载均衡",
@@ -253,7 +251,6 @@ const PATH_SUBMENU: { prefix: string; key: string }[] = [
   { prefix: "/subnets", key: "network-management" },
   { prefix: "/eips", key: "network-management" },
   { prefix: "/security-groups", key: "network-management" },
-  { prefix: "/routes", key: "network-management" },
   { prefix: "/load-balancers", key: "network-management" },
   { prefix: "/registry", key: "registry-management" },
   { prefix: "/api-keys", key: "security-identity" },

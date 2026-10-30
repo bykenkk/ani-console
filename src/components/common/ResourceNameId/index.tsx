@@ -32,7 +32,6 @@ export default function ResourceNameId(props: ResourceNameIdProps) {
     props.type !== "filesystem" &&
     props.type !== "vector-store" &&
     props.type !== "security-group" &&
-    props.type !== "network-route" &&
     props.type !== "knowledge-base";
 
   const handleOpen = () => {

@@ -18,8 +18,6 @@ import { getNetworkVpc, type NetworkVPC } from "@/api/network";
 import { formatDateTime } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import VpcRelatedResources from "./VpcRelatedResources";
-// TODO(feature-visibility): 待路由支持后恢复标签页及组件导入。
-// import VpcRoutes from "./VpcRoutes";
 import VpcSubnets from "./VpcSubnets";
 import BindVpcEipModal from "../BindVpcEipModal";
 import VpcPublicEgressStatus from "../VpcPublicEgressStatus";
@@ -106,12 +104,6 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
             label: "子网",
             content: <VpcSubnets vpcId={vpcId} />,
           },
-          // TODO(feature-visibility): 待路由支持后恢复此标签页入口。
-          // {
-          //   key: "routes",
-          //   label: "路由",
-          //   content: <VpcRoutes vpcId={vpcId} />,
-          // },
           {
             key: "related",
             label: "关联资源",
