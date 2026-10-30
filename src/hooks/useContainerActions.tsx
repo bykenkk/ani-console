@@ -1,5 +1,4 @@
 import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
-import { instanceIntentUnavailable } from "@/hooks/useInstanceCommandMutation";
 import InstanceRestartModal from "@/components/instances/InstanceRestartModal";
 import InstanceAttachPvcModal from "@/components/instances/InstanceAttachPvcModal";
 import InstanceDetachPvcModal from "@/components/instances/InstanceDetachPvcModal";
@@ -7,7 +6,7 @@ import ContainerChangeSecurityGroupsModal from "@/components/instances/Container
 import { useState } from "react";
 import { getInstance, startInstance, type InstanceRecord } from "@/api/instances";
 import { unavailableAction, type RowAction } from "@/components/common/DataTable/RowActions";
-import { openInstanceTerminalWindow } from "@/lib/instances";
+import { instanceIntentUnavailable, openInstanceTerminalWindow } from "@/lib/instances";
 import ContainerStopModal from "@/components/containers/ContainerStopModal";
 import ContainerDeleteModal from "@/components/containers/ContainerDeleteModal";
 

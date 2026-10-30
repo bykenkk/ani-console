@@ -1,10 +1,13 @@
 import { Checkbox, Form, Input, Modal } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
-import { attachInstancePvc, getInstanceConfiguration, type InstanceRecord } from "@/api/instances";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  useInstanceCommandMutation,
-  instanceIntentUnavailable,
-} from "@/hooks/useInstanceCommandMutation";
+  attachInstancePvc,
+  getInstance,
+  getInstanceConfiguration,
+  type InstanceRecord,
+} from "@/api/instances";
+import { ApiError } from "@/api/request";
+import { instanceIntentUnavailable } from "@/lib/instances";
 import InstancePvcSelect from "@/components/instances/InstancePvcSelect";
 import { validateForm } from "@/lib/form";
 import { withId } from "@/lib/id";
@@ -27,6 +30,7 @@ export default function InstanceAttachPvcModal({
   onCancel,
   onSubmitted,
 }: InstanceAttachPvcModalProps) {
+  const qc = useQueryClient();
   const [form] = Form.useForm<InstanceAttachPvcFormValues>();
   const configuration = useQuery({
     queryKey: ["governance-instance-configuration", instance.id],
@@ -39,15 +43,48 @@ export default function InstanceAttachPvcModal({
       },
     },
   });
-  const mutation = useInstanceCommandMutation<InstanceAttachPvcFormValues>(
-    instance.id,
-    "attach-pvc",
-    "挂载云盘",
-    "message",
-    (input: InstanceAttachPvcFormValues & { expectedVersion: string }) =>
-      attachInstancePvc(instance.id, input),
-    onSubmitted,
-  );
+  const mutation = useMutation({
+    mutationKey: ["instance-command", instance.id, "attach-pvc"],
+    retry: false,
+    mutationFn: async (input: InstanceAttachPvcFormValues) => {
+      const latest = await getInstance(instance.id);
+      if (latest.activeOperationId || latest.desiredState === "deleted") {
+        throw new Error("实例已有进行中的操作或正在删除，请刷新后确认");
+      }
+      try {
+        await attachInstancePvc(instance.id, { ...input, expectedVersion: latest.version });
+      } catch (error) {
+        if (error instanceof ApiError) {
+          if (error.code === "INSTANCE_VERSION_CONFLICT") {
+            error.message = "实例版本已变化，请重新打开操作并确认";
+          } else if (error.status === 503 && error.code === "INSTANCE_ACTION_UNAVAILABLE") {
+            error.message = "当前环境暂未开放此操作";
+          } else if (error.code === "INSTANCE_OPERATION_IN_PROGRESS") {
+            error.message = "实例已有进行中的操作，请等待完成后再操作";
+          } else if (error.code === "INSTANCE_REQUIRES_STOP") {
+            error.message = "实例正在运行，请确认允许重启后再提交";
+          }
+        }
+        throw error;
+      }
+    },
+    meta: {
+      feedback: {
+        channel: "message",
+        action: "挂载云盘",
+        successText: "挂载云盘已提交",
+        errorFallback: "挂载云盘失败，请稍后重试",
+      },
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["governance-instances"] }),
+        qc.invalidateQueries({ queryKey: ["governance-instance", instance.id] }),
+        qc.invalidateQueries({ queryKey: ["governance-instance-configuration", instance.id] }),
+      ]);
+      onSubmitted();
+    },
+  });
   const running = instance.observedState === "running";
   const disabled =
     !configuration.data ||

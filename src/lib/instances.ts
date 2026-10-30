@@ -1,3 +1,5 @@
+import type { InstanceRecord } from "@/api/instances";
+
 type ComputeSpecLabel = `${number}C${number}G`;
 
 const INSTANCE_COMPUTE_SPEC_CATALOG = {
@@ -132,4 +134,15 @@ export function getSandboxProviderLabel(instance: ProviderLike): string {
   if (realProvider === true && provider === "kubernetes_rest") return "真实 Kubernetes/Kata 后端";
   if (realProvider === false && provider !== "-") return `${provider}（real_provider=false）`;
   return provider;
+}
+
+export function instanceIntentUnavailable(instance: InstanceRecord) {
+  return (
+    Boolean(instance.activeOperationId) ||
+    !["running", "stopped"].includes(instance.observedState) ||
+    instance.desiredState !== instance.observedState ||
+    instance.executionRunState !== instance.observedState ||
+    !instance.appliedMountVersion ||
+    instance.appliedMountVersion === "0"
+  );
 }

@@ -4,7 +4,7 @@ import type { InstanceConfigurationData, InstanceRuntime, InstanceRecord } from 
 import { useIsMutating } from "@tanstack/react-query";
 import InstanceAttachPvcModal from "@/components/instances/InstanceAttachPvcModal";
 import InstanceDetachPvcModal from "@/components/instances/InstanceDetachPvcModal";
-import { instanceIntentUnavailable } from "@/hooks/useInstanceCommandMutation";
+import { instanceIntentUnavailable } from "@/lib/instances";
 import { useState, type ReactNode } from "react";
 
 type InstanceStorageProps = {
