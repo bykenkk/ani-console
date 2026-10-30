@@ -1,17 +1,26 @@
-import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { Button, Tooltip } from "@arco-design/web-react";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@arco-design/web-react";
 import { listStorageObjects } from "@/api/storage/objects";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { useStorageObjectActions } from "@/hooks/useStorageObjectActions";
 import ObjectBrowser, { type ObjectBrowserEntry } from "@/components/objects/ObjectBrowser";
 import { withId } from "@/lib/id";
+import StorageBucketUploadModal from "@/components/objects/StorageBucketUploadModal";
 
-type StorageBucketObjectsProps = { bucketId: string; bucketName: string };
+type StorageBucketObjectsProps = {
+  bucketId: string;
+  bucketName: string;
+  refreshVersion: number;
+};
 
-export default function StorageBucketObjects({ bucketId, bucketName }: StorageBucketObjectsProps) {
+export default function StorageBucketObjects({
+  bucketId,
+  bucketName,
+  refreshVersion,
+}: StorageBucketObjectsProps) {
   const [prefix, setPrefix] = useState("");
-  const navigate = useNavigate();
+  const [uploadVisible, setUploadVisible] = useState(false);
+  const lastRefreshVersion = useRef(refreshVersion);
   const { query, items, pagination, refresh } = useCursorPaginatedQuery<ObjectBrowserEntry>({
     queryKey: ["storage", "objects", bucketId, prefix],
     queryFn: async (params, signal) => {
@@ -30,6 +39,7 @@ export default function StorageBucketObjects({ bucketId, bucketName }: StorageBu
             name: object.key.slice(prefix.length) || object.key,
             size_bytes: object.size,
             updated_at: object.last_modified,
+            etag: object.etag,
           })),
         ],
         next_cursor: page.is_truncated ? page.next_cursor : undefined,
@@ -40,38 +50,38 @@ export default function StorageBucketObjects({ bucketId, bucketName }: StorageBu
       action: "对象列表加载",
     },
   });
-  const { actions } = useStorageObjectActions(bucketId);
+  const { actions } = useStorageObjectActions(bucketId, refresh);
+  useEffect(() => {
+    if (lastRefreshVersion.current !== refreshVersion) {
+      lastRefreshVersion.current = refreshVersion;
+      refresh();
+    }
+  }, [refreshVersion, refresh]);
   return (
-    <ObjectBrowser
-      bucketName={bucketName}
-      prefix={prefix}
-      rootPrefix=""
-      entries={items}
-      pagination={pagination}
-      aclLabel="-"
-      loading={query.isFetching}
-      actions={actions}
-      readOnly
-      // TODO(storage-migration): 上传和新建目录保留 BucketObjects 旧实现，待新契约补齐后恢复。
-      primaryAction={
-        <Tooltip content="暂未支持">
-          <Button type="primary" disabled>
+    <>
+      <ObjectBrowser
+        prefix={prefix}
+        rootPrefix=""
+        entries={items}
+        pagination={pagination}
+        loading={query.isFetching}
+        actions={actions}
+        primaryAction={
+          <Button type="primary" onClick={() => setUploadVisible(true)}>
             上传对象
           </Button>
-        </Tooltip>
-      }
-      onRefresh={refresh}
-      onNavigate={setPrefix}
-      onCreateFolder={() => {}}
-      onOpenObject={(entry) => {
-        // 点号独立作为路径段会被浏览器归一化；仅这两种 key 通过搜索参数原样传递。
-        const dotKey = entry.key === "." || entry.key === "..";
-        navigate({
-          to: "/objects/$bucketId/$objectId",
-          params: { bucketId, objectId: dotKey ? "object" : entry.key },
-          search: { key: dotKey ? entry.key : undefined },
-        });
-      }}
-    />
+        }
+        onRefresh={refresh}
+        onNavigate={setPrefix}
+      />
+      {uploadVisible ? (
+        <StorageBucketUploadModal
+          bucket={{ id: bucketId, name: bucketName }}
+          prefix={prefix}
+          onCancel={() => setUploadVisible(false)}
+          onUploaded={refresh}
+        />
+      ) : null}
+    </>
   );
 }

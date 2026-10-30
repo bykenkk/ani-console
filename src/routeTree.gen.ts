@@ -62,7 +62,6 @@ import { Route as AuthenticatedAppVolumesVolumeIdRouteImport } from './routes/_a
 import { Route as AuthenticatedAppVpcsIndexRouteImport } from './routes/_authenticated/_app/vpcs/index'
 import { Route as AuthenticatedAppVpcsVpcIdRouteImport } from './routes/_authenticated/_app/vpcs/$vpcId'
 import { Route as AuthenticatedAppObjectsBucketIdIndexRouteImport } from './routes/_authenticated/_app/objects/$bucketId/index'
-import { Route as AuthenticatedAppObjectsBucketIdObjectIdRouteImport } from './routes/_authenticated/_app/objects/$bucketId/$objectId'
 
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
@@ -371,12 +370,6 @@ const AuthenticatedAppObjectsBucketIdIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedAppObjectsBucketIdRoute,
   } as any)
-const AuthenticatedAppObjectsBucketIdObjectIdRoute =
-  AuthenticatedAppObjectsBucketIdObjectIdRouteImport.update({
-    id: '/$objectId',
-    path: '/$objectId',
-    getParentRoute: () => AuthenticatedAppObjectsBucketIdRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedAppIndexRoute
@@ -429,7 +422,6 @@ export interface FileRoutesByFullPath {
   '/vms/': typeof AuthenticatedAppVmsIndexRoute
   '/volumes/': typeof AuthenticatedAppVolumesIndexRoute
   '/vpcs/': typeof AuthenticatedAppVpcsIndexRoute
-  '/objects/$bucketId/$objectId': typeof AuthenticatedAppObjectsBucketIdObjectIdRoute
   '/objects/$bucketId/': typeof AuthenticatedAppObjectsBucketIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -481,7 +473,6 @@ export interface FileRoutesByTo {
   '/vms': typeof AuthenticatedAppVmsIndexRoute
   '/volumes': typeof AuthenticatedAppVolumesIndexRoute
   '/vpcs': typeof AuthenticatedAppVpcsIndexRoute
-  '/objects/$bucketId/$objectId': typeof AuthenticatedAppObjectsBucketIdObjectIdRoute
   '/objects/$bucketId': typeof AuthenticatedAppObjectsBucketIdIndexRoute
 }
 export interface FileRoutesById {
@@ -538,7 +529,6 @@ export interface FileRoutesById {
   '/_authenticated/_app/vms/': typeof AuthenticatedAppVmsIndexRoute
   '/_authenticated/_app/volumes/': typeof AuthenticatedAppVolumesIndexRoute
   '/_authenticated/_app/vpcs/': typeof AuthenticatedAppVpcsIndexRoute
-  '/_authenticated/_app/objects/$bucketId/$objectId': typeof AuthenticatedAppObjectsBucketIdObjectIdRoute
   '/_authenticated/_app/objects/$bucketId/': typeof AuthenticatedAppObjectsBucketIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -594,7 +584,6 @@ export interface FileRouteTypes {
     | '/vms/'
     | '/volumes/'
     | '/vpcs/'
-    | '/objects/$bucketId/$objectId'
     | '/objects/$bucketId/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -646,7 +635,6 @@ export interface FileRouteTypes {
     | '/vms'
     | '/volumes'
     | '/vpcs'
-    | '/objects/$bucketId/$objectId'
     | '/objects/$bucketId'
   id:
     | '__root__'
@@ -702,7 +690,6 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/vms/'
     | '/_authenticated/_app/volumes/'
     | '/_authenticated/_app/vpcs/'
-    | '/_authenticated/_app/objects/$bucketId/$objectId'
     | '/_authenticated/_app/objects/$bucketId/'
   fileRoutesById: FileRoutesById
 }
@@ -1084,25 +1071,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppObjectsBucketIdIndexRouteImport
       parentRoute: typeof AuthenticatedAppObjectsBucketIdRoute
     }
-    '/_authenticated/_app/objects/$bucketId/$objectId': {
-      id: '/_authenticated/_app/objects/$bucketId/$objectId'
-      path: '/$objectId'
-      fullPath: '/objects/$bucketId/$objectId'
-      preLoaderRoute: typeof AuthenticatedAppObjectsBucketIdObjectIdRouteImport
-      parentRoute: typeof AuthenticatedAppObjectsBucketIdRoute
-    }
   }
 }
 
 interface AuthenticatedAppObjectsBucketIdRouteChildren {
-  AuthenticatedAppObjectsBucketIdObjectIdRoute: typeof AuthenticatedAppObjectsBucketIdObjectIdRoute
   AuthenticatedAppObjectsBucketIdIndexRoute: typeof AuthenticatedAppObjectsBucketIdIndexRoute
 }
 
 const AuthenticatedAppObjectsBucketIdRouteChildren: AuthenticatedAppObjectsBucketIdRouteChildren =
   {
-    AuthenticatedAppObjectsBucketIdObjectIdRoute:
-      AuthenticatedAppObjectsBucketIdObjectIdRoute,
     AuthenticatedAppObjectsBucketIdIndexRoute:
       AuthenticatedAppObjectsBucketIdIndexRoute,
   }

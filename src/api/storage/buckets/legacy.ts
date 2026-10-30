@@ -7,8 +7,6 @@ import type {
   BucketObjectPresignedUrlInput,
   BucketObjectPresignedUrlRequest,
   BucketObjectPresignedUrlResponse,
-  BucketPrefixCreateInput,
-  BucketPrefixCreateRequest,
   CreateStorageBucketInput,
   CreateStorageBucketRequest,
   StorageBucketAclUpdateInput,
@@ -23,14 +21,12 @@ import type {
   StorageBucketListResponse,
   StorageBucketObjectListParams,
   StorageBucketObjectListResponse,
-  StorageBucketObjectEntry,
   StorageBucketRecord,
 } from "./types-legacy";
 
 const createScope = createIdempotencyScope("storage-bucket-create", ["POST"]);
 const aclScope = createIdempotencyScope("storage-bucket-acl-update", ["PUT"]);
 const classScope = createIdempotencyScope("storage-bucket-class-update", ["PUT"]);
-const prefixScope = createIdempotencyScope("storage-bucket-prefix-create", ["POST"]);
 const presignedUrlScope = createIdempotencyScope("storage-bucket-object-presigned-url", ["POST"]);
 const lifecycleScope = createIdempotencyScope("storage-bucket-lifecycle-rule-create", ["POST"]);
 const bucketPath = (bucketId: string) => `/buckets/${encodeURIComponent(bucketId)}`;
@@ -117,22 +113,6 @@ export function deleteBucketObject(
   });
 }
 
-export function createBucketPrefix(
-  bucketId: string,
-  submitData: BucketPrefixCreateInput,
-): Promise<StorageBucketObjectEntry> {
-  return runIdempotentRequest(
-    prefixScope,
-    submitData,
-    (body) =>
-      coreRequest<StorageBucketObjectEntry, BucketPrefixCreateRequest>(
-        `${bucketPath(bucketId)}/prefixes`,
-        { method: "POST", data: body },
-      ),
-    [bucketId],
-  );
-}
-
 export function generateBucketObjectPresignedUrl(
   bucketId: string,
   submitData: BucketObjectPresignedUrlInput,
@@ -189,8 +169,6 @@ export type {
   BucketObjectPresignedUrlInput,
   BucketObjectPresignedUrlRequest,
   BucketObjectPresignedUrlResponse,
-  BucketPrefixCreateInput,
-  BucketPrefixCreateRequest,
   CreateStorageBucketInput,
   CreateStorageBucketRequest,
   StorageBucketAcl,

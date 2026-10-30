@@ -83,11 +83,6 @@ export interface StorageBucketObjectListResponse {
   next_cursor?: string | null;
 }
 
-export interface BucketPrefixCreateInput {
-  prefix: string;
-}
-export type BucketPrefixCreateRequest = BucketPrefixCreateInput & { idempotency_key: string };
-
 export interface BucketObjectDeleteResponse {
   bucket_id: string;
   key: string;

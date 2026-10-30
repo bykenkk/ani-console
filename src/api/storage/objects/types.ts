@@ -30,3 +30,23 @@ export interface StorageObjectDownloadInfo {
   url: string;
   expires_at: string;
 }
+export interface StorageObjectDeleteInput extends StorageObjectInput {
+  expected_etag?: string;
+}
+export interface StorageObjectUploadInput extends StorageObjectInput {
+  content_type: string;
+  size: number;
+  overwrite: boolean;
+}
+export interface StorageObjectUploadTicket {
+  url: string;
+  headers: Record<string, string>;
+  expires_at: string;
+  key: string;
+}
+export interface UploadStorageObjectFileInput {
+  bucketId: string;
+  key: string;
+  file: File;
+  signal?: AbortSignal;
+}

@@ -1,54 +1,27 @@
-// TODO(submit-result): governance 对接后确认 ACL/存储类型配置所需桶 ID 的取得方式，再清理创建响应和无人使用的 onCreated 回传。
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Form, Input, Modal, Select, Typography } from "@arco-design/web-react";
-import { useState } from "react";
-import {
-  createBucket,
-  updateBucketAcl,
-  updateBucketStorageClass,
-  type StorageBucketAcl,
-  type StorageBucketClass,
-  type StorageBucketRecord,
-} from "@/api/storage/buckets/legacy";
+import { createBucket } from "@/api/storage/buckets";
+import { validateForm } from "@/lib/form";
 
-import { bucketNamePattern } from "@/lib/validators";
-
-type CreateBucketModalProps = {
-  onCancel: () => void;
-  onCreated?: (bucket: Bucket) => void;
-};
-
-type Bucket = StorageBucketRecord;
-type Acl = StorageBucketAcl;
-type StorageClass = StorageBucketClass;
+type CreateBucketModalProps = { onCancel: () => void; onCreated?: () => void };
+type CreateBucketFormValues = { name: string };
 
 export default function CreateBucketModal({ onCancel, onCreated }: CreateBucketModalProps) {
-  const qc = useQueryClient();
-  const [name, setName] = useState("");
-  const [acl, setAcl] = useState<Acl>("private");
-  const [storageClass, setStorageClass] = useState<StorageClass>("standard");
-
+  const [form] = Form.useForm<CreateBucketFormValues>();
+  const queryClient = useQueryClient();
   const create = useMutation({
-    meta: { feedback: { channel: "message", action: "创建", errorFallback: "请求失败" } },
-    mutationFn: async (_: undefined) => {
-      const trimmedName = name.trim();
-      if (!bucketNamePattern.test(trimmedName)) {
-        throw new Error("存储桶名称需为 3-63 位小写字母、数字或连字符，且首尾必须是字母或数字");
-      }
-      const createData = { name: trimmedName, access_mode: "private" as const };
-      const data = await createBucket(createData);
-      const bucketId = data.id;
-      if (acl !== "private") {
-        await updateBucketAcl(bucketId, { acl });
-      }
-      if (storageClass !== "standard") {
-        await updateBucketStorageClass(bucketId, { storage_class: storageClass });
-      }
-      return { ...data, acl, storage_class: storageClass } as Bucket;
+    meta: {
+      feedback: {
+        channel: "message",
+        action: "创建存储桶",
+        successText: "存储桶已创建",
+        errorFallback: "创建失败",
+      },
     },
-    onSuccess: (data) => {
-      qc.invalidateQueries({ queryKey: ["buckets"] });
-      onCreated?.(data);
+    mutationFn: (values: CreateBucketFormValues) => createBucket({ name: values.name.trim() }),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["storage", "buckets"] });
+      onCreated?.();
       onCancel();
     },
   });
@@ -57,34 +30,48 @@ export default function CreateBucketModal({ onCancel, onCreated }: CreateBucketM
       visible
       title="创建存储桶"
       onCancel={onCancel}
-      onOk={() => create.mutateAsync(undefined)}
+      onOk={async () => {
+        const values = await validateForm<CreateBucketFormValues>(form);
+        await create.mutateAsync(values);
+      }}
       confirmLoading={create.isPending}
-      unmountOnExit
     >
-      <Form layout="vertical">
-        <Form.Item label="名称" required>
+      <Form form={form} layout="vertical">
+        <Form.Item
+          label="名称"
+          field="name"
+          required
+          rules={[
+            { required: true, message: "请输入存储桶名称" },
+            {
+              validator: (value, callback) => {
+                const name = typeof value === "string" ? value.trim() : "";
+                callback(
+                  !/^[a-z0-9](?:[a-z0-9-]{0,30}[a-z0-9])?$/.test(name) || name.includes("--")
+                    ? "名称需为 1–32 位小写字母、数字或连字符，首尾为字母或数字，不能连续使用连字符"
+                    : undefined,
+                );
+              },
+            },
+          ]}
+        >
           <Input
-            value={name}
-            onChange={setName}
-            placeholder="3-63 位小写字母、数字或连字符"
-            maxLength={63}
+            placeholder="1–32 位小写字母、数字或连字符"
+            maxLength={32}
+            disabled={create.isPending}
           />
         </Form.Item>
         <Form.Item label="权限" required>
-          <Select value={acl} onChange={setAcl}>
+          <Select value="private" disabled>
             <Select.Option value="private">私有</Select.Option>
-            <Select.Option value="tenant_read">租户内读</Select.Option>
           </Select>
         </Form.Item>
         <Form.Item label="存储类型" required>
-          <Select value={storageClass} onChange={setStorageClass}>
-            <Select.Option value="standard">标准</Select.Option>
-            <Select.Option value="infrequent_access">低频</Select.Option>
+          <Select value="STANDARD" disabled>
+            <Select.Option value="STANDARD">标准</Select.Option>
           </Select>
         </Form.Item>
-        <Typography.Text type="secondary">
-          创建后可在存储桶详情页上传对象或登记对象元数据。
-        </Typography.Text>
+        <Typography.Text type="secondary">创建后可在存储桶详情页上传对象。</Typography.Text>
       </Form>
     </Modal>
   );

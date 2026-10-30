@@ -1,22 +1,19 @@
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { uploadStorageObjectFile } from "@/api/storage/objects/legacy";
 import { useObjectActions } from "@/hooks/useObjectActions";
-import { listBucketObjects, type StorageBucketRecord } from "@/api/storage/buckets/legacy";
+import { listBucketObjects } from "@/api/storage/buckets/legacy";
 import ObjectBrowser from "@/components/objects/ObjectBrowser";
 import { withId } from "@/lib/id";
 import { Button, Upload } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import BucketFolderCreateModal from "@/components/objects/BucketFolderCreateModal";
 
 type BucketObjectsProps = {
   bucketId: string;
-  bucket: StorageBucketRecord;
 };
 
-export default function BucketObjects({ bucketId, bucket }: BucketObjectsProps) {
+export default function BucketObjects({ bucketId }: BucketObjectsProps) {
   const qc = useQueryClient();
-  const [folderVisible, setFolderVisible] = useState(false);
   const [prefix, setPrefix] = useState("/");
 
   const {
@@ -52,28 +49,12 @@ export default function BucketObjects({ bucketId, bucket }: BucketObjectsProps) 
       ]);
     },
   });
-  const dialogNode = folderVisible ? (
-    <BucketFolderCreateModal
-      bucketId={bucketId}
-      prefix={prefix}
-      onCancel={() => setFolderVisible(false)}
-      onCreated={() => {
-        qc.invalidateQueries({ queryKey: ["bucket", bucketId] });
-        qc.invalidateQueries({ queryKey: ["bucket-objects", bucketId] });
-        qc.invalidateQueries({ queryKey: ["buckets"] });
-      }}
-    />
-  ) : null;
-  const openFolder = () => setFolderVisible(true);
-  const aclLabel = bucket.acl === "tenant_read" ? "租户内读" : "私有";
   return (
     <>
       <ObjectBrowser
-        bucketName={bucket.name}
         prefix={prefix}
         entries={entries}
         pagination={pagination}
-        aclLabel={aclLabel}
         loading={objects.isLoading}
         actions={actions}
         primaryAction={
@@ -89,9 +70,7 @@ export default function BucketObjects({ bucketId, bucket }: BucketObjectsProps) 
         onNavigate={(target) => {
           setPrefix(target);
         }}
-        onCreateFolder={openFolder}
       />
-      {dialogNode}
     </>
   );
 }

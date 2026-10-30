@@ -1,13 +1,67 @@
-import { useMutation } from "@tanstack/react-query";
-import { getStorageObjectDownload } from "@/api/storage/objects";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Modal } from "@arco-design/web-react";
+import { ApiError } from "@/api/request";
+import {
+  deleteStorageObject,
+  getStorageObject,
+  getStorageObjectDownload,
+} from "@/api/storage/objects";
 import type { RowAction } from "@/components/common";
 import { reserveExternalWindow } from "@/lib/browser";
 import { copyToClipboard } from "@/lib/clipboard";
 import { showMessage } from "@/lib/feedback";
 
-type StorageObjectTarget = { key: string; kind?: "object" | "prefix" };
+type StorageObjectTarget = { key: string; kind?: "object" | "prefix"; etag?: string };
 
-export function useStorageObjectActions(bucketId: string) {
+export function useStorageObjectActions(bucketId: string, onDeleted?: () => void) {
+  const queryClient = useQueryClient();
+  const remove = useMutation({
+    meta: {
+      feedback: {
+        channel: "notification",
+        id: "storage-object-delete",
+        action: "删除对象",
+        successText: "对象已删除",
+        errorFallback: "删除失败",
+      },
+    },
+    mutationFn: async (item: StorageObjectTarget) => {
+      const object = item.etag
+        ? item
+        : await getStorageObject({ bucket_id: bucketId, key: item.key });
+      await deleteStorageObject({
+        bucket_id: bucketId,
+        key: item.key,
+        expected_etag: object.etag || undefined,
+      });
+    },
+    onSuccess: async (_, item) => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["storage", "objects", bucketId],
+          refetchType: onDeleted ? "none" : "active",
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["storage", "object", bucketId, item.key],
+          exact: true,
+          refetchType: "none",
+        }),
+        queryClient.invalidateQueries({ queryKey: ["storage", "bucket-stats", bucketId] }),
+      ]);
+      onDeleted?.();
+    },
+    onError: async (error) => {
+      if (
+        error instanceof ApiError &&
+        (error.code === "OBJECT_IDENTITY_CHANGED" || error.code === "STORAGE_RESOURCE_CONFLICT")
+      ) {
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ["storage", "objects", bucketId] }),
+          queryClient.invalidateQueries({ queryKey: ["storage", "object", bucketId] }),
+        ]);
+      }
+    },
+  });
   const link = useMutation({
     meta: {
       feedback: {
@@ -70,14 +124,22 @@ export function useStorageObjectActions(bucketId: string) {
       disabled: () => link.isPending,
       onClick: (item) => link.mutate({ item, copy: true }),
     },
-    // TODO(storage-migration): 对象/目录删除及上传完成确认保留 useObjectActions 旧实现；新逻辑桶不调用旧接口。
+    // TODO(storage-migration): 新接口不支持递归删除目录；保留原目录删除入口待后端提供契约。
     {
       key: "delete",
       label: "删除",
       intent: "danger",
-      disabled: () => true,
-      tooltip: "暂未支持",
-      onClick: () => {},
+      disabled: (item) => remove.isPending || item.kind === "prefix",
+      tooltip: (item) => (item.kind === "prefix" ? "暂未支持" : undefined),
+      onClick: (item) => {
+        if (item.kind === "prefix" || remove.isPending) return;
+        Modal.confirm({
+          title: "删除对象",
+          content: `确定删除「${item.key}」？`,
+          okButtonProps: { status: "danger" },
+          onOk: () => remove.mutateAsync(item),
+        });
+      },
     },
   ];
   return { actions };

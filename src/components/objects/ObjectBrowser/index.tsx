@@ -1,16 +1,8 @@
 import type { ListPagination } from "@/components/common/DataTable";
 import type { RowAction } from "@/components/common";
-import {
-  Breadcrumb,
-  Button,
-  Space,
-  Tag,
-  Typography,
-  type TableColumnProps,
-} from "@arco-design/web-react";
-import { IconArrowLeft, IconFile, IconFolder, IconRefresh } from "@arco-design/web-react/icon";
-import type { ReactNode } from "react";
-import clsx from "clsx";
+import { Button, type TableColumnProps } from "@arco-design/web-react";
+import { IconFile, IconFolder, IconHome, IconRefresh } from "@arco-design/web-react/icon";
+import { useLayoutEffect, useRef, type ReactNode } from "react";
 import { DataTable } from "@/components/common";
 import { formatBytes, formatDateTime } from "@/lib/format";
 import styles from "./index.module.css";
@@ -22,23 +14,20 @@ export type ObjectBrowserEntry = {
   size_bytes?: number | string | null;
   updated_at?: string | null;
   storage_class?: string | null;
+  etag?: string;
+  isParent?: boolean;
 };
 
 type ObjectBrowserProps = {
-  bucketName: string;
   prefix: string;
   entries: ObjectBrowserEntry[];
   pagination: ListPagination;
-  aclLabel: string;
   loading?: boolean;
   actions: RowAction<ObjectBrowserEntry>[];
   primaryAction?: ReactNode;
   rootPrefix?: string;
-  readOnly?: boolean;
-  onOpenObject?: (entry: ObjectBrowserEntry) => void;
   onRefresh?: () => void;
   onNavigate: (prefix: string) => void;
-  onCreateFolder: () => void;
 };
 
 function prefixSegments(prefix: string, rootPrefix: string) {
@@ -57,50 +46,56 @@ function parentPrefix(prefix: string, rootPrefix: string): string {
 }
 
 export default function ObjectBrowser({
-  bucketName,
   prefix,
   entries,
   pagination,
-  aclLabel,
   loading,
   actions,
   primaryAction,
   rootPrefix = "/",
-  readOnly = false,
-  onOpenObject,
   onRefresh,
   onNavigate,
-  onCreateFolder,
 }: ObjectBrowserProps) {
-  const segments = prefixSegments(prefix, rootPrefix);
+  const pathRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (pathRef.current) pathRef.current.scrollLeft = pathRef.current.scrollWidth;
+  }, [prefix]);
   const canGoUp = prefix !== rootPrefix;
+  // 导航行不属于服务端资源，不参与分页计数，也不提供资源操作。
+  const rows: ObjectBrowserEntry[] = canGoUp
+    ? [
+        { kind: "prefix", key: parentPrefix(prefix, rootPrefix), name: "..", isParent: true },
+        ...entries,
+      ]
+    : entries;
+  const rowActions = actions.map((action) => ({
+    ...action,
+    visible: (entry: ObjectBrowserEntry) => !entry.isParent && action.visible?.(entry) !== false,
+  }));
   const columns: Array<TableColumnProps<ObjectBrowserEntry>> = [
     {
       title: "名称",
       width: 200,
+      ellipsis: true,
       render: (_, entry) => {
-        const canNavigate = entry.kind === "prefix" || Boolean(onOpenObject);
         const target = entry.key;
+        if (entry.kind === "object")
+          return (
+            <span className="inline-flex min-w-0 items-center gap-2.5">
+              <IconFile className={styles.fileIcon} />
+              <span>{entry.name}</span>
+            </span>
+          );
 
         return (
           <button
             type="button"
-            className={clsx(
-              "inline-flex min-w-0 items-center gap-2.5 border-0 bg-transparent p-0 text-left text-app-text [font:inherit]!",
-              canNavigate &&
-                "cursor-pointer focus-visible:outline-2! focus-visible:outline-solid! focus-visible:outline-app-primary! focus-visible:outline-offset-3 [&:hover>span]:text-app-primary",
-            )}
-            onClick={
-              entry.kind === "prefix" ? () => onNavigate(target) : () => onOpenObject?.(entry)
-            }
-            aria-label={entry.kind === "prefix" ? `进入文件夹 ${entry.name}` : `查看 ${entry.name}`}
+            className="inline-flex min-w-0 cursor-pointer items-center gap-2.5 border-0 bg-transparent p-0 text-left text-app-text [font:inherit]! focus-visible:outline-2! focus-visible:outline-solid! focus-visible:outline-app-primary! focus-visible:outline-offset-3 [&:hover>span]:text-app-primary"
+            onClick={() => onNavigate(target)}
+            aria-label={entry.isParent ? "返回上一级" : `进入文件夹 ${entry.name}`}
           >
-            {entry.kind === "prefix" ? (
-              <IconFolder className={styles.folderIcon} />
-            ) : (
-              <IconFile className={styles.fileIcon} />
-            )}
-            <span className="truncate">{entry.name}</span>
+            <IconFolder className={styles.folderIcon} />
+            <span>{entry.name}</span>
           </button>
         );
       },
@@ -116,6 +111,7 @@ export default function ObjectBrowser({
       width: 180,
       render: (_, entry) => (entry.updated_at ? formatDateTime(entry.updated_at) : "-"),
     },
+    { title: "ETag", dataIndex: "etag", width: 280, ellipsis: true },
     {
       title: "存储类型",
       width: 100,
@@ -132,60 +128,45 @@ export default function ObjectBrowser({
 
   return (
     <div className="min-w-0">
-      <div className="mb-3 flex items-center justify-between gap-4">
-        <Breadcrumb className={styles.breadcrumb}>
-          <Breadcrumb.Item>
-            <Button type="text" size="mini" onClick={() => onNavigate(rootPrefix)}>
-              {bucketName}
-            </Button>
-          </Breadcrumb.Item>
-          {segments.map(({ label, target }) => {
-            return (
-              <Breadcrumb.Item key={target}>
-                <Button type="text" size="mini" onClick={() => onNavigate(target)}>
-                  {label}
-                </Button>
-              </Breadcrumb.Item>
-            );
-          })}
-        </Breadcrumb>
-        <Space>
-          {canGoUp ? (
-            <Button
-              icon={<IconArrowLeft />}
-              onClick={() => onNavigate(parentPrefix(prefix, rootPrefix))}
-            >
-              返回上一级
-            </Button>
-          ) : null}
-          <Typography.Text type="secondary">当前路径：{prefix || "/"}</Typography.Text>
-          <Tag>{aclLabel}</Tag>
-          {onRefresh ? (
-            <Button icon={<IconRefresh />} loading={loading} onClick={onRefresh}>
-              刷新
-            </Button>
-          ) : null}
-          <Button
-            onClick={onCreateFolder}
-            disabled={readOnly}
-            title={readOnly ? "暂未支持" : undefined}
-          >
-            新建文件夹
-          </Button>
+      <div className="mb-3 flex min-w-0 items-center gap-3">
+        <Button
+          type="text"
+          icon={<IconHome />}
+          aria-label="返回根目录"
+          title="返回根目录"
+          onClick={() => onNavigate(rootPrefix)}
+          className="shrink-0"
+        />
+        <div
+          ref={pathRef}
+          className="min-w-0 flex-1 overflow-x-auto whitespace-nowrap text-app-text-secondary"
+        >
+          {prefix || "/"}
+        </div>
+        <div className="flex shrink-0 items-center gap-3">
           {primaryAction}
-        </Space>
+          {onRefresh ? (
+            <Button
+              icon={<IconRefresh />}
+              loading={loading}
+              onClick={onRefresh}
+              aria-label="刷新"
+              title="刷新"
+            />
+          ) : null}
+        </div>
       </div>
 
       <DataTable<ObjectBrowserEntry>
         className={styles.table}
         tableLabel="文件"
-        rowKey={(entry) => `${entry.kind}:${entry.key}`}
+        rowKey={(entry) => (entry.isParent ? "parent-navigation" : `${entry.kind}:${entry.key}`)}
         columns={columns}
-        data={entries}
+        data={rows}
         loading={loading}
         pagination={pagination}
         scroll={{ x: "max-content" }}
-        rowActions={actions}
+        rowActions={rowActions}
       />
     </div>
   );

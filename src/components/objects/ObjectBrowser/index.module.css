@@ -3,10 +3,6 @@
   min-width: 0;
 }
 
-.breadcrumb {
-  min-width: 0;
-}
-
 .folderIcon {
   flex: 0 0 auto;
   color: rgb(var(--warning-6));
