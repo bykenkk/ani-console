@@ -1,27 +1,57 @@
 import { withId } from "@/lib/id";
-import { Empty, Spin } from "@arco-design/web-react";
+import { Empty, Skeleton } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import type { EChartsOption, LineSeriesOption } from "echarts";
 import clsx from "clsx";
 import { useMemo, useState } from "react";
 import { CoreLineBarChart } from "@/components/common";
 import { ApiError } from "@/api/request";
-import type { ResourceTrendUnit } from "@/api/observability";
-import { formatBytes } from "@/lib/format";
 import type {
-  HomeOverviewDataSource,
-  HomeResourceTrendMetric,
-  HomeTimeRange,
-  HomeTrendConfig,
-  HomeTrendSnapshot,
-} from "..";
+  ResourceTrendMetric,
+  ResourceTrendStatus,
+  ResourceTrendUnit,
+} from "@/api/observability";
+import { formatBytes } from "@/lib/format";
+import type { HomeTimeRange } from "..";
+import { getResourceTrend } from "./data-source";
 import PeriodSwitch from "../PeriodSwitch";
 import styles from "../index.module.css";
 
+export type HomeResourceTrendMetric = ResourceTrendMetric;
+
+type HomeTrendSeries = {
+  name: string;
+  color: string;
+  values: Array<number | null>;
+};
+
+type HomeTrendHeadline = {
+  label: string;
+  value: number | null;
+  unit: ResourceTrendUnit;
+  color: string;
+};
+
+export type HomeTrendSnapshot = {
+  labels: string[];
+  headlines: HomeTrendHeadline[];
+  series: HomeTrendSeries[];
+  unit: ResourceTrendUnit;
+  status: ResourceTrendStatus;
+};
+
+type HomeTrendConfig = {
+  title: string;
+};
+
 type TrendCardProps = {
-  config: HomeTrendConfig;
-  dataSource: HomeOverviewDataSource;
   metric: HomeResourceTrendMetric;
+};
+
+const homeTrendConfigs: Record<HomeResourceTrendMetric, HomeTrendConfig> = {
+  gpu: { title: "GPU 显存使用量趋势" },
+  cpu: { title: "CPU 使用量趋势" },
+  memory: { title: "内存使用量趋势" },
 };
 
 function areaColor(color: string) {
@@ -41,7 +71,8 @@ function formatResourceTrendValue(value: unknown, unit: ResourceTrendUnit): stri
   return unit === "bytes" ? formatBytes(value) : `${Number(value.toFixed(4))} 核`;
 }
 
-export default function TrendCard({ config, dataSource, metric }: TrendCardProps) {
+export default function TrendCard({ metric }: TrendCardProps) {
+  const config = homeTrendConfigs[metric];
   const [range, setRange] = useState<HomeTimeRange>("7d");
   const trendQuery = useQuery({
     meta: {
@@ -52,7 +83,7 @@ export default function TrendCard({ config, dataSource, metric }: TrendCardProps
       },
     },
     queryKey: ["governance-resource-trend", metric, range],
-    queryFn: ({ signal }) => dataSource.getResourceTrend(metric, range, signal),
+    queryFn: ({ signal }) => getResourceTrend(metric, range, signal),
     staleTime: 60_000,
     refetchInterval: ({ state }) =>
       state.error instanceof ApiError && [400, 401, 403].includes(state.error.status ?? 0)
@@ -132,18 +163,35 @@ export default function TrendCard({ config, dataSource, metric }: TrendCardProps
   }, [current]);
 
   return (
-    <section className={clsx(styles.panel, styles.trendPanel)}>
+    <section className={clsx(styles.panel, styles.trendPanel)} aria-busy={trendQuery.isLoading}>
       <header className="flex flex-none items-center justify-between">
         <h2 className="m-0! text-[16px]! leading-6 font-bold text-(--home-text)">{config.title}</h2>
         <PeriodSwitch value={range} onChange={setRange} ariaLabel={`${config.title}时间范围`} />
       </header>
       {trendQuery.isLoading ? (
-        <div
-          className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-4 text-(--home-text-secondary)"
-          role="status"
-        >
-          <Spin />
-          <span>正在加载趋势数据...</span>
+        <div className="flex min-h-0 flex-1 flex-col" role="status" aria-label="正在加载趋势数据">
+          <div className="flex flex-[0_0_42px] items-center gap-2 px-4">
+            <span className="size-2 flex-none rounded-[50%] bg-(--home-primary)" />
+            <span className="text-(--home-text-secondary)">当前</span>
+            <Skeleton loading animation text={{ rows: 1, width: 112, style: { height: 28 } }} />
+          </div>
+          <div className="min-h-0 flex-1 px-4 py-3">
+            <Skeleton
+              loading
+              animation
+              className="h-full"
+              text={{
+                rows: 5,
+                width: ["100%", "92%", "96%", "88%", "100%"],
+                style: {
+                  height: "100%",
+                  display: "flex",
+                  flexDirection: "column",
+                  justifyContent: "space-between",
+                },
+              }}
+            />
+          </div>
         </div>
       ) : !hasData ? (
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 p-4 text-(--home-text-secondary)">

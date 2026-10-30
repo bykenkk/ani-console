@@ -1,17 +1,43 @@
-import { Dropdown, Empty, Menu } from "@arco-design/web-react";
+import { Dropdown, Menu } from "@arco-design/web-react";
 import { IconDown, IconPlus } from "@arco-design/web-react/icon";
 import { Link } from "@tanstack/react-router";
 import clsx from "clsx";
 import { AliIcon } from "@/components/common";
-import type { HomeShortcut } from "..";
+import GpuQuota from "../GpuQuota";
 import styles from "../index.module.css";
 
-type WelcomePanelProps = { quickCreateItems: HomeShortcut[] };
+const homeQuickCreateItems = [
+  { id: "create-vm", name: "创建云主机", icon: "yunzhuji", route: "/vms" },
+  {
+    id: "create-container",
+    name: "创建容器",
+    icon: "rongqishili",
+    route: "/containers",
+  },
+  {
+    id: "create-gpu",
+    name: "创建 GPU 容器",
+    icon: "GPUrongqishili",
+    route: "/gpu-containers",
+  },
+  {
+    id: "create-sandbox",
+    name: "创建沙箱",
+    icon: "Sandbox",
+    route: "/sandboxes",
+  },
+  // {
+  //   id: "create-k8s",
+  //   name: "创建 K8s 集群",
+  //   icon: "jiqun",
+  //   route: "/k8s-clusters",
+  // },
+] as const;
 
-export default function WelcomePanel({ quickCreateItems }: WelcomePanelProps) {
+export default function WelcomePanel() {
   const quickCreateMenu = (
     <Menu className={styles.quickCreateMenu}>
-      {quickCreateItems.map((item) => (
+      {homeQuickCreateItems.map((item) => (
         <Menu.Item key={item.id}>
           <Link to={item.route} className={styles.quickCreateLink}>
             <AliIcon name={item.icon} size={16} />
@@ -44,15 +70,7 @@ export default function WelcomePanel({ quickCreateItems }: WelcomePanelProps) {
         </Dropdown>
       </div>
 
-      <div className="mx-0 my-5 flex flex-none items-center gap-2">
-        <span className="flex-1 [border-bottom:1px_dashed_var(--home-text-tertiary)]" />
-        <em className="text-[12px] leading-4 not-italic text-(--home-text-tertiary)">最近访问</em>
-        <span className="flex-1 [border-bottom:1px_dashed_var(--home-text-tertiary)]" />
-      </div>
-
-      <div className="flex min-h-30 items-center justify-center">
-        <Empty description="暂无最近访问" />
-      </div>
+      <GpuQuota />
     </section>
   );
 }
