@@ -27,3 +27,11 @@ export function bindNetworkVpcSnat(
     [vpcId],
   );
 }
+
+// The DELETE contract has no client idempotency field or header.
+export async function unbindNetworkVpcEip(bindingId: string, signal?: AbortSignal): Promise<void> {
+  await coreRequest(`/networks/snat/bindings/${encodeURIComponent(bindingId)}`, {
+    method: "DELETE",
+    signal,
+  });
+}

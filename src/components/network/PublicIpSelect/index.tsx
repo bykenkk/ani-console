@@ -18,10 +18,11 @@ export default function PublicIpSelect({ value, onChange, disabled }: PublicIpSe
   const [name, setName] = useState("");
   const [selectedOption, setSelectedOption] = useState<PublicIpOption>();
   const eips = useQuery({
-    queryKey: ["network-eips", "options", { name }],
+    queryKey: ["network-eips", "options", { name, state: "RESOURCE_STATE_AVAILABLE" }],
     // TODO(pagination-migration): 列表仍为 limit/cursor，每次只查询默认首批结果；后端支持 page/pageSize 后改用 withFirst100。
-    // TODO: 当前返回租户内的公网 IP，未限定可绑定范围；待后端提供未绑定等筛选条件后接入，不在前端筛选补偿。
-    queryFn: ({ signal }) => listNetworkEips({ name: name || undefined }, signal),
+    // TODO: 后端提供未绑定筛选条件后接入；当前保留已占用或观测过期的选项并禁用，不在前端筛选结果。
+    queryFn: ({ signal }) =>
+      listNetworkEips({ name: name || undefined, state: "RESOURCE_STATE_AVAILABLE" }, signal),
     meta: {
       errorNotification: {
         id: "eips",
@@ -32,6 +33,12 @@ export default function PublicIpSelect({ value, onChange, disabled }: PublicIpSe
   });
   const options = (eips.data?.items ?? []).map((item) => ({
     value: item.id,
+    disabled:
+      item.state !== "available" ||
+      item.binding_state !== "unbound" ||
+      !item.address ||
+      !item.observed_at ||
+      item.observation_stale === true,
     label:
       item.address && item.name
         ? `${item.address} · ${item.name}`
