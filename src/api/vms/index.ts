@@ -51,7 +51,6 @@ const snapshotPath = (id: string, snapshotId: string) =>
   `${vmPath(id)}/snapshots/${encodeURIComponent(snapshotId)}`;
 
 export function listVms(params: VmListParams, signal?: AbortSignal) {
-  // TODO(vm-filter): 当前 VM 合同仅支持 page/pageSize；后端开放筛选后再添加搜索和状态筛选。
   return coreRequest<VmListResponse>("/virtual-machines", { method: "GET", params, signal });
 }
 export function getVm(id: string, signal?: AbortSignal) {

@@ -17,6 +17,7 @@ import { useVMActions } from "@/hooks/useVMActions";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { withId } from "@/lib/id";
+import { formatDateTime } from "@/lib/format";
 // TODO(feature-visibility): 待云主机远程连接支持后恢复控制台打开方法导入。
 // import { openInstanceVncWindow } from "@/lib/instances";
 import VmSnapshots from "./VmSnapshots";
@@ -45,7 +46,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
     vm.cpuMillis ? `${Number(vm.cpuMillis) / 1000}C` : "-",
     vm.memoryMib ? `${Number(vm.memoryMib) / 1024} GiB` : "-",
   ].join(" / ");
-  // TODO(vm-detail-fields): 新详情缺少终止保护、节点、自动启动、安全组、创建时间及网络关联，保留原字段占位。
+  // TODO(vm-detail-fields): 新详情缺少终止保护、节点、自动启动、安全组及网络关联，保留原字段占位。
   // TODO(vm-integration): 新详情、磁盘、介质及快照流程仍需在已部署且允许访问的环境联调。
   return (
     <>
@@ -80,7 +81,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
               },
               { label: "自动启动", value: "-" },
               { label: "安全组", value: "-" },
-              { label: "创建时间", value: "-" },
+              { label: "创建时间", value: formatDateTime(vm.createdAt) },
               {
                 label: "状态",
                 value: <StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />,

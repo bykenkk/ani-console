@@ -38,6 +38,7 @@ export interface VirtualMachine {
   observedState: string;
   reason?: string;
   observedAt?: string;
+  createdAt: string;
   addresses: Array<{ nicName: string; address: string; observedAt: string }>;
   lastOperationId?: string;
   closing: boolean;
@@ -52,7 +53,21 @@ export interface VirtualMachine {
   mediaKey: string;
   dns?: VmDns;
 }
-export type VmListParams = PageParams;
+export type VmStateFilter =
+  | "all"
+  | "pending"
+  | "provisioning"
+  | "starting"
+  | "running"
+  | "stopping"
+  | "stopped"
+  | "failed"
+  | "deleting"
+  | "deleted";
+export interface VmListParams extends PageParams {
+  state?: VmStateFilter;
+  keyword?: string;
+}
 export interface VmLogParams {
   tailLines?: number;
   follow?: boolean;
