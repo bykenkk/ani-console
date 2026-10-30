@@ -8,7 +8,7 @@ import {
 } from "@/api/images";
 import { withId } from "@/lib/id";
 
-type InstanceImageSelectProps = {
+type RegisteredImageSelectProps = {
   value?: Pick<ImageRegistration, "image_id" | "scope"> & { displayName?: string };
   onChange?: (image?: ImageRegistration) => void;
   onSelect?: (image?: ImageRegistration) => void;
@@ -16,23 +16,25 @@ type InstanceImageSelectProps = {
   disabled?: boolean;
 };
 
-export default function InstanceImageSelect({
+export default function RegisteredImageSelect({
   value,
   onChange,
   onSelect,
   onScopeChange,
   disabled,
-}: InstanceImageSelectProps) {
+}: RegisteredImageSelectProps) {
   const [selectedScope, setSelectedScope] = useState<ImageRegistrationScope>(
     value?.scope ?? "tenant",
   );
   const scope = value?.scope ?? selectedScope;
   const query = useQuery({
-    // FIXME(instance-image-options): 镜像列表仍为 limit/cursor 契约，尚不支持选项请求 pageSize=100；保留原请求。
-    // TODO(instance-image-options): 后端分页契约对齐后改为 page=1、pageSize=100，保持一次请求且无额外翻页入口。
-    queryKey: ["instance-images", scope],
+    // FIXME(registered-image-options): 镜像列表仍为 limit/cursor 契约，尚不支持选项请求 pageSize=100；保留原请求。
+    // TODO(registered-image-options): 后端分页契约对齐后改为 page=1、pageSize=100，保持一次请求且无额外翻页入口。
+    queryKey: ["registered-images", scope],
     queryFn: ({ signal }) => listImageRegistrations({ scope }, signal),
-    meta: { errorNotification: { id: withId("instance-images", scope), action: "实例镜像加载" } },
+    meta: {
+      errorNotification: { id: withId("registered-images", scope), action: "已注册镜像加载" },
+    },
   });
   const items = query.data?.items ?? [];
   const options =

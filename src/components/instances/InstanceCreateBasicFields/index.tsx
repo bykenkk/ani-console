@@ -1,6 +1,6 @@
 import { Form, Input } from "@arco-design/web-react";
 import type { ComputeType, InstancePreset } from "@/api/instances";
-import InstanceImageSelect from "@/components/instances/InstanceImageSelect";
+import RegisteredImageSelect from "@/components/common/RegisteredImageSelect";
 import InstanceComputeSelect from "@/components/instances/InstanceComputeSelect";
 
 type InstanceCreateBasicFieldsProps = {
@@ -30,7 +30,7 @@ export default function InstanceCreateBasicFields({ computeType }: InstanceCreat
         validateTrigger="onSelect"
         rules={[{ type: "object", required: true, message: "请选择已注册的镜像" }]}
       >
-        <InstanceImageSelect
+        <RegisteredImageSelect
           onScopeChange={() => form.setFields({ image: { error: undefined } })}
         />
       </Form.Item>

@@ -16,7 +16,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { validateForm } from "@/lib/form";
 import type { ImageRegistration } from "@/api/images";
-import InstanceImageSelect from "@/components/instances/InstanceImageSelect";
+import RegisteredImageSelect from "@/components/common/RegisteredImageSelect";
 
 interface ImportModelFormValues {
   source: ModelSourceInputValue;
@@ -219,7 +219,7 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
           rules={[{ type: "object", required: true, message: "请选择已注册的镜像" }]}
         >
           {/* TODO(model-image-pagination): 暂用容器现有目录查询，后端支持 page/pageSize 后统一迁移。 */}
-          <InstanceImageSelect
+          <RegisteredImageSelect
             onScopeChange={() => form.setFields({ image: { error: undefined } })}
           />
         </Form.Item>
