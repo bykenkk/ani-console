@@ -20,7 +20,6 @@ import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import VpcRelatedResources from "./VpcRelatedResources";
 import VpcSubnets from "./VpcSubnets";
 import BindVpcEipModal from "../BindVpcEipModal";
-import VpcPublicEgressStatus from "../VpcPublicEgressStatus";
 
 type VpcDetailPageProps = {
   vpcId: string;
@@ -66,26 +65,9 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
             fields: [
               { label: "ID", value: <ResourceId value={vpc.id} /> },
               { label: "CIDR", value: vpc.cidr },
+              { label: "公网 IP", value: vpc.public_egress?.eip_address },
               { label: "创建时间", value: formatDateTime(vpc.created_at) },
               { label: "更新时间", value: formatDateTime(vpc.updated_at) },
-            ],
-          },
-          {
-            key: "public-egress",
-            title: "公网 IP",
-            fields: [
-              { label: "绑定状态", value: <VpcPublicEgressStatus binding={vpc.public_egress} /> },
-              ...(vpc.public_egress
-                ? [
-                    { label: "公网 IP", value: vpc.public_egress.eip_address || "分配中" },
-                    { label: "EIP ID", value: <ResourceId value={vpc.public_egress.eip_id} /> },
-                    {
-                      label: "绑定 ID",
-                      value: <ResourceId value={vpc.public_egress.binding_id} />,
-                    },
-                    { label: "观测时间", value: formatDateTime(vpc.public_egress.observed_at) },
-                  ]
-                : []),
             ],
           },
         ]}

@@ -1,9 +1,8 @@
 import CreateSubnetModal from "@/components/subnets/CreateSubnetModal";
 import { useSubnetActions } from "@/hooks/useSubnetActions";
 
-import { useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, Select } from "@arco-design/web-react";
+import { Select } from "@arco-design/web-react";
 import { useMemo, useState } from "react";
 import {
   listNetworkSubnets,
@@ -21,7 +20,6 @@ import {
 } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
-import { navigateToResourceDetail } from "@/lib/resources";
 import { withFirst100 } from "@/api/pagination";
 
 const listVpcOptions = withFirst100(listNetworkVpcs);
@@ -31,7 +29,6 @@ type SubnetStatusFilter = "all" | Subnet["state"];
 type SubnetSearchField = "name" | "id";
 
 export default function SubnetsPage() {
-  const navigate = useNavigate();
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<SubnetStatusFilter>("all");
@@ -97,13 +94,8 @@ export default function SubnetsPage() {
       key: "vpc",
       title: "VPC",
       width: 200,
-      render: (_, subnet) => (
-        <Link
-          onClick={() => navigateToResourceDetail(navigate, { type: "vpc", id: subnet.vpc_id })}
-        >
-          {vpcNames.get(subnet.vpc_id) || subnet.vpc_id}
-        </Link>
-      ),
+      ellipsis: true,
+      render: (_, subnet) => vpcNames.get(subnet.vpc_id) || subnet.vpc_id,
     },
     {
       key: "cidr",

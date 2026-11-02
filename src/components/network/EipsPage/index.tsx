@@ -63,34 +63,8 @@ export default function EipsPage() {
       key: "network",
       title: "VPC",
       width: 220,
-      render: (_, item) =>
-        item.binding_target?.vpc_id ? (
-          <ResourceNameId name="VPC" id={item.binding_target.vpc_id} type="vpc" />
-        ) : (
-          "-"
-        ),
-    },
-    {
-      key: "resource",
-      title: "关联资源",
-      render: (_, item) =>
-        item.binding_target?.id ? (
-          <ResourceNameId
-            name={
-              item.binding_target.kind === "vpc_snat"
-                ? "VPC 公网出口"
-                : item.binding_target.kind === "load_balancer"
-                  ? "负载均衡器"
-                  : item.binding_target.kind || "关联资源"
-            }
-            id={item.binding_target.id}
-            openable={false}
-          />
-        ) : (
-          "-"
-        ),
       ellipsis: true,
-      width: 200,
+      dataIndex: "binding_target.vpc_id",
     },
     {
       key: "description",

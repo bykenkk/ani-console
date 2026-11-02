@@ -13,7 +13,6 @@ import {
 import { formatDateTime } from "@/lib/format";
 import CreateVpcModal from "../CreateVpcModal";
 import BindVpcEipModal from "../BindVpcEipModal";
-import VpcPublicEgressStatus from "../VpcPublicEgressStatus";
 
 type Vpc = NetworkVPC;
 type VpcStatusFilter = "" | NetworkResourceStateFilter;
@@ -72,18 +71,8 @@ export default function VpcsPage() {
       key: "public-egress",
       title: "公网 IP",
       width: 240,
-      render: (_, vpc) => (
-        <div className="flex flex-col gap-1">
-          {vpc.public_egress && (
-            <ResourceNameId
-              name={vpc.public_egress.eip_address || "分配中"}
-              id={vpc.public_egress.eip_id}
-              openable={false}
-            />
-          )}
-          <VpcPublicEgressStatus binding={vpc.public_egress} />
-        </div>
-      ),
+      ellipsis: true,
+      dataIndex: "public_egress.eip_address",
     },
     {
       key: "subnets",
