@@ -2,8 +2,6 @@ import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
-  EnableImageSpaceInput,
-  EnableImageSpaceRequest,
   ImageSpace,
   ImagePublisherCredential,
   ImageCredentialDelivery,
@@ -11,7 +9,6 @@ import type {
   ImageCredentialVersionRequest,
 } from "./types";
 
-const enableScope = createIdempotencyScope("image-space-enable", ["POST"]);
 const issueScope = createIdempotencyScope("image-publisher-issue", ["POST"]);
 const resetScope = createIdempotencyScope("image-publisher-reset", ["POST"]);
 const disableScope = createIdempotencyScope("image-publisher-disable", ["POST"]);
@@ -19,18 +16,7 @@ const disableScope = createIdempotencyScope("image-publisher-disable", ["POST"])
 export function getImageSpace(signal?: AbortSignal): Promise<ImageSpace> {
   return coreRequest<ImageSpace>("/images/space", { method: "GET", signal });
 }
-export function enableImageSpace(
-  input: EnableImageSpaceInput,
-  signal?: AbortSignal,
-): Promise<void> {
-  return runIdempotentRequest(enableScope, input, async ({ idempotency_key, ...data }) => {
-    await coreRequest<unknown, EnableImageSpaceRequest>("/images/space:enable", {
-      method: "POST",
-      data: { ...data, idempotencyKey: idempotency_key },
-      signal,
-    });
-  });
-}
+
 export function getImagePublisherCredential(
   signal?: AbortSignal,
 ): Promise<ImagePublisherCredential> {

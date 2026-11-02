@@ -45,10 +45,10 @@ export default function CreateModelApiKeyModal({
       onCreated(credentials);
       return Promise.all([
         qc.invalidateQueries({
-          queryKey: ["governance-inference-keys"],
+          queryKey: ["inference-keys"],
           predicate: (query) => query.queryKey[1] !== "options",
         }),
-        qc.resetQueries({ queryKey: ["governance-inference-keys", "options"] }),
+        qc.resetQueries({ queryKey: ["inference-keys", "options"] }),
       ]);
     },
   });

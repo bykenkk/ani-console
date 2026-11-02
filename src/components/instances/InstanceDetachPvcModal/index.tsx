@@ -6,7 +6,6 @@ import {
   getInstanceConfiguration,
   type InstanceRecord,
 } from "@/api/instances";
-import { ApiError } from "@/api/request";
 import { instanceIntentUnavailable } from "@/lib/instances";
 import { validateForm } from "@/lib/form";
 import { withId } from "@/lib/id";
@@ -28,7 +27,7 @@ export default function InstanceDetachPvcModal({
   const qc = useQueryClient();
   const [form] = Form.useForm<InstanceDetachPvcFormValues>();
   const configuration = useQuery({
-    queryKey: ["governance-instance-configuration", instance.id],
+    queryKey: ["instance-configuration", instance.id],
     queryFn: ({ signal }) => getInstanceConfiguration(instance.id, signal),
     gcTime: 0,
     meta: {
@@ -46,22 +45,7 @@ export default function InstanceDetachPvcModal({
       if (latest.activeOperationId || latest.desiredState === "deleted") {
         throw new Error("实例已有进行中的操作或正在删除，请刷新后确认");
       }
-      try {
-        await detachInstancePvc(instance.id, { ...input, expectedVersion: latest.version });
-      } catch (error) {
-        if (error instanceof ApiError) {
-          if (error.code === "INSTANCE_VERSION_CONFLICT") {
-            error.message = "实例版本已变化，请重新打开操作并确认";
-          } else if (error.status === 503 && error.code === "INSTANCE_ACTION_UNAVAILABLE") {
-            error.message = "当前环境暂未开放此操作";
-          } else if (error.code === "INSTANCE_OPERATION_IN_PROGRESS") {
-            error.message = "实例已有进行中的操作，请等待完成后再操作";
-          } else if (error.code === "INSTANCE_REQUIRES_STOP") {
-            error.message = "实例正在运行，请确认允许重启后再提交";
-          }
-        }
-        throw error;
-      }
+      await detachInstancePvc(instance.id, { ...input, expectedVersion: latest.version });
     },
     meta: {
       feedback: {
@@ -73,9 +57,9 @@ export default function InstanceDetachPvcModal({
     },
     onSuccess: async () => {
       await Promise.all([
-        qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance", instance.id] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance-configuration", instance.id] }),
+        qc.invalidateQueries({ queryKey: ["instances", instance.compute_type] }),
+        qc.invalidateQueries({ queryKey: ["instance", instance.id] }),
+        qc.invalidateQueries({ queryKey: ["instance-configuration", instance.id] }),
       ]);
       onSubmitted();
     },

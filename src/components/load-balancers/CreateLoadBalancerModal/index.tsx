@@ -56,16 +56,21 @@ export default function CreateLoadBalancerModal({ onCancel }: CreateLoadBalancer
         errorFallback: "创建失败，请稍后重试",
       },
     },
-    onSuccess: async () => {
-      await Promise.all(
-        [
-          "network-load-balancers",
-          "network-subnets",
-          "network-subnet",
-          "network-eips",
-          "network-eip",
-        ].map((key) => qc.invalidateQueries({ queryKey: [key] })),
-      );
+    onSuccess: async (_, input) => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: ["network-load-balancers"] }),
+        qc.invalidateQueries({ queryKey: ["network-subnets"] }),
+        qc.invalidateQueries({ queryKey: ["network-subnet", input.subnet_id], exact: true }),
+        ...(input.public_eip_id
+          ? [
+              qc.invalidateQueries({ queryKey: ["network-eips"] }),
+              qc.invalidateQueries({
+                queryKey: ["network-eip", input.public_eip_id],
+                exact: true,
+              }),
+            ]
+          : []),
+      ]);
       onCancel();
     },
   });

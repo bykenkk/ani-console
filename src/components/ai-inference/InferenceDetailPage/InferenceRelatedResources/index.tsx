@@ -8,7 +8,7 @@ type InferenceRelatedResourcesProps = { service: InferenceService };
 
 export default function InferenceRelatedResources({ service }: InferenceRelatedResourcesProps) {
   const version = useQuery({
-    queryKey: ["governance-model-version", service.model_version_id],
+    queryKey: ["model-version", service.model_version_id],
     enabled: Boolean(service.model_version_id),
     queryFn: ({ signal }) => getModelVersion(service.model_version_id, signal),
     meta: {

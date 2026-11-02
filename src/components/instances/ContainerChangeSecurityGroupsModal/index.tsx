@@ -31,10 +31,12 @@ export default function ContainerChangeSecurityGroupsModal({
   const update = useMutation({
     mutationFn: async (values: ContainerChangeSecurityGroupsFormValues) => {
       if (!current.data) throw new Error("请等待绑定信息加载");
+      const previous = current.data;
       await setInstanceSecurityGroups(id, {
-        expected_version: current.data.version,
+        expected_version: previous.version,
         security_group_ids: values.security_group_ids ?? [],
       });
+      return previous;
     },
     meta: {
       feedback: {
@@ -43,13 +45,21 @@ export default function ContainerChangeSecurityGroupsModal({
         successText: "更换安全组已提交",
       },
     },
-    onSuccess: async () => {
+    onSuccess: async (previous, values) => {
+      const securityGroupIds = new Set([
+        ...(previous.security_group_ids ?? []),
+        ...(values.security_group_ids ?? []),
+      ]);
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["network-security-groups"] }),
-        qc.invalidateQueries({ queryKey: ["network-security-group-bindings"] }),
+        ...[...securityGroupIds].map((securityGroupId) =>
+          qc.invalidateQueries({
+            queryKey: ["network-security-group-bindings", securityGroupId],
+          }),
+        ),
         qc.invalidateQueries({ queryKey: ["security-group-selection", "instance", id] }),
-        qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance", id] }),
+        qc.invalidateQueries({ queryKey: ["instances", previous.compute_type] }),
+        qc.invalidateQueries({ queryKey: ["instance", id] }),
       ]);
       onSubmitted?.();
       onCancel();

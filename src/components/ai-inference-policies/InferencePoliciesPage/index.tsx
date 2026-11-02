@@ -33,7 +33,7 @@ export default function InferencePoliciesPage() {
   const [deleting, setDeleting] = useState<InferencePolicy>();
   const { page, pageSize, setPage, setPageSize } = useListPagination("inference-policies", 20);
   const policies = useQuery({
-    queryKey: ["governance-inference-policies", { page, pageSize }],
+    queryKey: ["inference-policies", { page, pageSize }],
     queryFn: ({ signal }) => listInferencePolicies({ page, pageSize }, signal),
     meta: { errorNotification: { id: "inference-policies", action: "访问策略列表加载" } },
   });

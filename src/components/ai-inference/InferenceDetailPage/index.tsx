@@ -37,7 +37,7 @@ export default function InferenceDetailPage({
   const goBack = useBackOrFallback("inference-service");
   const { actions, editing, closeEditor, onUpdated } = useInferenceActions(goBack);
   const service = useQuery({
-    queryKey: ["governance-inference-service", serviceId],
+    queryKey: ["inference-service", serviceId],
     queryFn: ({ signal }) => getInferenceService(serviceId, signal),
     meta: {
       errorNotification: { id: withId("inference-service", serviceId), action: "推理服务详情加载" },

@@ -53,10 +53,6 @@ export const GPU_INSTANCE_COMPUTE_SPECS = defineComputeSpecs([
   "32C128G",
 ] as const);
 
-export type GpuInstanceComputeSpec = (typeof GPU_INSTANCE_COMPUTE_SPECS)[number]["value"];
-
-export const DEFAULT_GPU_INSTANCE_COMPUTE_SPEC = GPU_INSTANCE_COMPUTE_SPECS[0].value;
-
 function openInstanceRemoteWindow(view: "vnc" | "terminal", instanceId: string) {
   const remoteWindow = window.open(
     `/${view}?instanceId=${encodeURIComponent(instanceId)}`,
@@ -115,25 +111,6 @@ export function getInstanceDisplayIp(instance: unknown): string {
     readNestedString(record, "ssh", "host") ??
     "-"
   );
-}
-
-type ProviderLike = {
-  provider?: string | null;
-  dev_profile?: {
-    mode?: string | null;
-    provider?: string | null;
-    real_provider?: boolean | null;
-  } | null;
-};
-
-export function getSandboxProviderLabel(instance: ProviderLike): string {
-  const provider = instance.provider ?? instance.dev_profile?.provider ?? "-";
-  const realProvider = instance.dev_profile?.real_provider;
-
-  if (instance.dev_profile?.mode === "local") return "本地开发模式";
-  if (realProvider === true && provider === "kubernetes_rest") return "真实 Kubernetes/Kata 后端";
-  if (realProvider === false && provider !== "-") return `${provider}（real_provider=false）`;
-  return provider;
 }
 
 export function instanceIntentUnavailable(instance: InstanceRecord) {

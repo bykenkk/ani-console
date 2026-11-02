@@ -3,12 +3,10 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { deleteBucket, type StorageBucketRecord } from "@/api/storage/buckets/legacy";
 import BucketAclModal from "@/components/objects/BucketAclModal";
-import BucketUploadModal from "@/components/objects/BucketUploadModal";
 import BucketStorageClassModal from "@/components/objects/BucketStorageClassModal";
 import type { RowAction } from "@/components/common";
 type Bucket = StorageBucketRecord;
 export function useBucketActions(onDeleted: () => void) {
-  const [uploadBucket, setUploadBucket] = useState<Bucket>();
   const [aclBucket, setAclBucket] = useState<Bucket>();
   const [storageClassBucket, setStorageClassBucket] = useState<Bucket>();
   const removeBucket = useMutation({
@@ -25,11 +23,6 @@ export function useBucketActions(onDeleted: () => void) {
   });
   const actions: RowAction<Bucket>[] = [
     { key: "storage-class", label: "存储类型", onClick: setStorageClassBucket },
-    {
-      key: "upload",
-      label: "上传",
-      onClick: setUploadBucket,
-    },
     {
       key: "permissions",
       label: "改权限",
@@ -52,9 +45,6 @@ export function useBucketActions(onDeleted: () => void) {
   ];
   const dialogNode = (
     <>
-      {uploadBucket && (
-        <BucketUploadModal bucket={uploadBucket} onCancel={() => setUploadBucket(undefined)} />
-      )}
       {aclBucket && <BucketAclModal bucket={aclBucket} onCancel={() => setAclBucket(undefined)} />}
       {storageClassBucket && (
         <BucketStorageClassModal

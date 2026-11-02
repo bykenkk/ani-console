@@ -2,10 +2,8 @@ import { runIdempotentRequest } from "@/api/idempotency";
 import { coreRequest } from "@/api/request";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
-  ImageRegistration,
   ImageRegistrationListParams,
   ImageRegistrationListResponse,
-  ImageRegistrationScope,
   RegisterImageInput,
   RegisterImageRequest,
   UpdateImageRegistrationInput,
@@ -29,17 +27,7 @@ export function listImageRegistrations(
     signal,
   });
 }
-export function getImageRegistration(
-  id: string,
-  scope: ImageRegistrationScope,
-  signal?: AbortSignal,
-): Promise<ImageRegistration> {
-  return coreRequest<ImageRegistration>(imagePath(id), {
-    method: "GET",
-    params: { scope },
-    signal,
-  });
-}
+
 export function registerImage(input: RegisterImageInput, signal?: AbortSignal): Promise<void> {
   return runIdempotentRequest(registerScope, input, async ({ idempotency_key, ...data }) => {
     await coreRequest<unknown, RegisterImageRequest>("/images/registrations", {

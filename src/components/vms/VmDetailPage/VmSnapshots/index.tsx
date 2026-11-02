@@ -26,6 +26,7 @@ export default function VmSnapshots({ vm }: VmSnapshotsProps) {
     vmId: vm.id,
     action: "删除快照",
     actionId: "vm-snapshot-delete",
+    refreshQueryKeys: [["vms", vm.id, "snapshots"]],
     channel: "notification",
     mutationFn: (snapshot) =>
       deleteVmSnapshot(vm.id, snapshot.snapshotId, { expected_version: vm.version }),

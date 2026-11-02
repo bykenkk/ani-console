@@ -372,19 +372,7 @@ export interface CreateNetworkEipInput {
   security_group_ids: string[];
 }
 export type CreateNetworkEipRequest = CreateNetworkEipInput & { idempotency_key: string };
-export interface NetworkSnat {
-  id: string;
-  vpc_id: string;
-  eip_id?: string;
-  eip_address?: string;
-  state: string;
-  reason?: string;
-  created_at?: string;
-  updated_at?: string;
-  version?: string;
-  desired_enabled?: boolean;
-  applied_enabled?: boolean;
-}
+
 export interface BindNetworkSnatInput {
   eip_id: string;
 }

@@ -23,7 +23,7 @@ const UNAVAILABLE_ACTIONS = [
   { key: "protection", label: "终止保护" },
 ];
 
-export function useContainerActions(onChanged: () => void, onDeleted?: () => void) {
+export function useContainerActions(onDeleted?: () => void) {
   const qc = useQueryClient();
   const [dialog, setDialog] = useState<{
     action: "stop" | "delete" | "restart" | "attach" | "detach" | "security-groups";
@@ -45,13 +45,12 @@ export function useContainerActions(onChanged: () => void, onDeleted?: () => voi
       },
     },
     // TODO(container-task): 后续统一接入任务跟踪，目前只刷新资源并提示已提交。
-    onSuccess: async () => {
+    onSuccess: async (_, instance) => {
       await Promise.all([
-        qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance"] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance-runtime"] }),
+        qc.invalidateQueries({ queryKey: ["instances", instance.compute_type] }),
+        qc.invalidateQueries({ queryKey: ["instance", instance.id] }),
+        qc.invalidateQueries({ queryKey: ["instance-runtime", instance.id] }),
       ]);
-      onChanged();
     },
   });
   const unavailable = (instance: InstanceRecord) =>
@@ -121,7 +120,6 @@ export function useContainerActions(onChanged: () => void, onDeleted?: () => voi
   ];
   const submitted = () => {
     setDialog(undefined);
-    onChanged();
   };
   const dialogNode = (
     <>

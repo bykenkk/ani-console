@@ -31,10 +31,12 @@ export default function VmChangeSecurityGroupsModal({
   const update = useMutation({
     mutationFn: async (values: VmChangeSecurityGroupsFormValues) => {
       if (!current.data) throw new Error("请等待绑定信息加载");
+      const previous = current.data;
       await setVmSecurityGroups(id, {
-        expected_version: current.data.version,
+        expected_version: previous.version,
         security_group_ids: values.security_group_ids ?? [],
       });
+      return previous;
     },
     meta: {
       feedback: {
@@ -43,12 +45,21 @@ export default function VmChangeSecurityGroupsModal({
         successText: "更换安全组已提交",
       },
     },
-    onSuccess: async () => {
+    onSuccess: async (previous, values) => {
+      const securityGroupIds = new Set([
+        ...(previous.security_group_ids ?? []),
+        ...(values.security_group_ids ?? []),
+      ]);
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["network-security-groups"] }),
-        qc.invalidateQueries({ queryKey: ["network-security-group-bindings"] }),
+        ...[...securityGroupIds].map((securityGroupId) =>
+          qc.invalidateQueries({
+            queryKey: ["network-security-group-bindings", securityGroupId],
+          }),
+        ),
         qc.invalidateQueries({ queryKey: ["security-group-selection", "vm", id] }),
-        qc.invalidateQueries({ queryKey: ["vms"] }),
+        qc.invalidateQueries({ queryKey: ["vms", "list"] }),
+        qc.invalidateQueries({ queryKey: ["vms", id], exact: true }),
       ]);
       onSubmitted?.();
       onCancel();

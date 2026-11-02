@@ -26,7 +26,7 @@ export default function ModelVersions({ modelId }: ModelVersionsProps) {
   const params = { page, pageSize, status: status === "all" ? undefined : status };
   // TODO(model-contract): 联调当前模型版本列表的分页、空列表和版本大小展示。
   const versions = useQuery({
-    queryKey: ["governance-model-versions", modelId, params],
+    queryKey: ["model-versions", modelId, params],
     queryFn: ({ signal }) => listModelVersions(modelId, params, signal),
     meta: {
       errorNotification: {

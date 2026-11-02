@@ -16,7 +16,7 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
   const [level, setLevel] = useState<InferenceLogLevel>();
   const [live, setLive] = useState(false);
   const runtime = useQuery({
-    queryKey: ["governance-inference-runtime", serviceId],
+    queryKey: ["inference-runtime", serviceId],
     queryFn: ({ signal }) => getInferenceRuntime(serviceId, signal),
     meta: {
       errorNotification: { id: withId("inference-runtime", serviceId), action: "推理运行诊断加载" },
@@ -46,7 +46,7 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
     enabled: live && canQueryLogs,
   });
   const logs = useQuery({
-    queryKey: ["governance-inference-logs", serviceId, params],
+    queryKey: ["inference-logs", serviceId, params],
     enabled: !live && canQueryLogs,
     queryFn: ({ signal }) => getInferenceLogs(serviceId, params, signal),
     meta: {

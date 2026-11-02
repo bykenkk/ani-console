@@ -78,16 +78,4 @@ export function rebuildVectorStoreIndex(vectorStoreId: string): Promise<AsyncTas
   );
 }
 
-export type {
-  CreateVectorStoreInput,
-  CreateVectorStoreRequest,
-  VectorMetric,
-  VectorStore,
-  VectorStoreListParams,
-  VectorStoreListResponse,
-  VectorStoreSearchHit,
-  VectorStoreSearchInput,
-  VectorStoreSearchRequest,
-  VectorStoreSearchResponse,
-  VectorStoreState,
-} from "./types";
+export type { VectorMetric, VectorStore, VectorStoreSearchHit } from "./types";

@@ -13,7 +13,7 @@ export default function ModelOperationHistory({ modelId }: ModelOperationHistory
   const paging = useListPagination(modelId, 10);
   const { page, pageSize } = paging;
   const operations = useQuery({
-    queryKey: ["governance-model-operations", modelId, { page, pageSize }],
+    queryKey: ["model-operations", modelId, { page, pageSize }],
     queryFn: ({ signal }) => listModelOperations(modelId, { page, pageSize }, signal),
     meta: {
       errorNotification: { id: withId("model-operations", modelId), action: "模型操作记录加载" },

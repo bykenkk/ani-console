@@ -48,8 +48,12 @@ export default function VmRestoreSnapshotModal({
     vmId: vm.id,
     action: "恢复快照",
     actionId: "vm-snapshot-restore",
+    refreshQueryKeys: [
+      ["vms", vm.id, "disks"],
+      ["vms", vm.id, "snapshots"],
+      ["vms", vm.id, "restore-preview"],
+    ],
     onSubmitted,
-    onConflict: () => setConfirmed(undefined),
     mutationFn: (acceptedPreview) =>
       restoreVmSnapshot(vm.id, snapshot.snapshotId, {
         expected_version: acceptedPreview.version,
@@ -111,7 +115,12 @@ export default function VmRestoreSnapshotModal({
           loading={preview.isFetching}
           onClick={() => {
             setConfirmed(undefined);
-            return client.invalidateQueries({ queryKey: ["vms", vm.id] });
+            return Promise.all([
+              client.invalidateQueries({ queryKey: ["vms", vm.id], exact: true }),
+              client.invalidateQueries({
+                queryKey: ["vms", vm.id, "restore-preview", snapshot.snapshotId],
+              }),
+            ]);
           }}
         >
           刷新预览

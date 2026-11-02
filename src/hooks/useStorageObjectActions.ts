@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Modal } from "@arco-design/web-react";
-import { ApiError } from "@/api/request";
 import {
   deleteStorageObject,
   getStorageObject,
@@ -49,17 +48,6 @@ export function useStorageObjectActions(bucketId: string, onDeleted?: () => void
         queryClient.invalidateQueries({ queryKey: ["storage", "bucket-stats", bucketId] }),
       ]);
       onDeleted?.();
-    },
-    onError: async (error) => {
-      if (
-        error instanceof ApiError &&
-        (error.code === "OBJECT_IDENTITY_CHANGED" || error.code === "STORAGE_RESOURCE_CONFLICT")
-      ) {
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: ["storage", "objects", bucketId] }),
-          queryClient.invalidateQueries({ queryKey: ["storage", "object", bucketId] }),
-        ]);
-      }
     },
   });
   const link = useMutation({

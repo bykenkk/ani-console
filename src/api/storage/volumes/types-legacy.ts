@@ -81,10 +81,6 @@ export interface CreateStorageVolumeInput {
 }
 
 export type CreateStorageVolumeRequest = CreateStorageVolumeInput & { idempotency_key: string };
-export interface StorageVolumeExpandInput {
-  size_gib: number;
-}
-export type StorageVolumeExpandRequest = StorageVolumeExpandInput & { idempotency_key: string };
 
 export interface StorageVolumeAutoSnapshotPolicyUpdateInput {
   enabled: boolean;

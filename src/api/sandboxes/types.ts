@@ -64,12 +64,3 @@ export interface ChangeSandboxInput {
 }
 export type CreateSandboxRequest = { data: CreateSandboxInput & { idempotency_key: string } };
 export type ChangeSandboxRequest = { data: ChangeSandboxInput & { idempotency_key: string } };
-export interface SandboxOperation {
-  id: string;
-  sandbox_id: string;
-  action: string;
-  intent_version: string;
-  state: string;
-  reason?: string;
-  created_at?: string;
-}

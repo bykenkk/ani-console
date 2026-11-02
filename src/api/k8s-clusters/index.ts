@@ -60,17 +60,4 @@ export function listK8sClusterWorkloads(
   });
 }
 
-export type {
-  CreateK8sClusterInput,
-  CreateK8sClusterRequest,
-  K8sCluster,
-  K8sClusterKubeconfig,
-  K8sClusterListParams,
-  K8sClusterListResponse,
-  K8sClusterNodePool,
-  K8sClusterNodePoolGpu,
-  K8sClusterNodePoolListResponse,
-  K8sClusterState,
-  K8sClusterWorkload,
-  K8sClusterWorkloadListResponse,
-} from "./types";
+export type { K8sCluster, K8sClusterNodePool, K8sClusterWorkload } from "./types";

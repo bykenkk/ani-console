@@ -8,7 +8,7 @@ type ModelApiKeyPolicyProps = { policyId?: string | null };
 export default function ModelApiKeyPolicy({ policyId }: ModelApiKeyPolicyProps) {
   // 当前页每个实际引用的 ID 共用详情缓存，不扫描全部策略分页建立映射。
   const policy = useQuery({
-    queryKey: ["governance-inference-policy", policyId],
+    queryKey: ["inference-policy", policyId],
     queryFn: ({ signal }) => getInferencePolicy(policyId!, signal),
     enabled: Boolean(policyId),
     meta: {

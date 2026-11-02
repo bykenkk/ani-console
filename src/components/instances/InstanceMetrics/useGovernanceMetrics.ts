@@ -110,7 +110,7 @@ function metricChart(
 export function useGovernanceMetrics(instanceId?: string, hasGpuMetrics = false) {
   // TODO(instance-metrics): Gov 新版部署后联调 GPU 非零值、多卡聚合及 VM 指标；缺失点保留 null，不补零。
   const latest = useQuery({
-    queryKey: ["governance-instance-metrics-latest", instanceId],
+    queryKey: ["instance-metrics-latest", instanceId],
     enabled: Boolean(instanceId),
     queryFn: ({ signal }) => getInstanceLatestMetrics(instanceId!, signal),
     meta: {
@@ -133,7 +133,7 @@ export function useGovernanceMetrics(instanceId?: string, hasGpuMetrics = false)
   ];
   const range = useQuery({
     queryKey: [
-      "governance-instance-metrics-range",
+      "instance-metrics-range",
       instanceId,
       METRIC_RANGE_HOURS,
       metricCodes,

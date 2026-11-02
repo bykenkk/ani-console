@@ -82,7 +82,7 @@ export default function TrendCard({ metric }: TrendCardProps) {
         fallback: "数据服务暂不可用",
       },
     },
-    queryKey: ["governance-resource-trend", metric, range],
+    queryKey: ["resource-trend", metric, range],
     queryFn: ({ signal }) => getResourceTrend(metric, range, signal),
     staleTime: 60_000,
     refetchInterval: ({ state }) =>

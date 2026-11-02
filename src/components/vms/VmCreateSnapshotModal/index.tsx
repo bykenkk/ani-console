@@ -21,6 +21,7 @@ export default function VmCreateSnapshotModal({
     vmId: vm.id,
     action: "创建快照",
     actionId: "vm-snapshot-create",
+    refreshQueryKeys: [["vms", vm.id, "snapshots"]],
     onSubmitted,
     mutationFn: (values) =>
       createVmSnapshot(vm.id, { expected_version: vm.version, name: values.name.trim() }),

@@ -25,7 +25,7 @@ export default function GpuContainersPage() {
   const paging = useListPagination(JSON.stringify({ status, searchField, keyword }), 10);
   const query = useQuery({
     queryKey: [
-      "governance-instances",
+      "instances",
       "gpu",
       { page: paging.page, pageSize: paging.pageSize, observedState, searchField, keyword },
     ],
@@ -60,7 +60,7 @@ export default function GpuContainersPage() {
       setPage(page - 1);
     }
   }, [query.isSuccess, query.isFetching, query.data, page, setPage]);
-  const { actions, dialogNode } = useGpuContainerActions(paging.resetPagination);
+  const { actions, dialogNode } = useGpuContainerActions();
   const columns: ListColumn<InstanceRecord>[] = [
     {
       key: "name",
@@ -178,6 +178,7 @@ export default function GpuContainersPage() {
         <InstanceOperationObserver
           key={instance.id}
           instanceId={instance.id}
+          computeType={instance.compute_type}
           operationId={instance.activeOperationId}
         />
       ))}

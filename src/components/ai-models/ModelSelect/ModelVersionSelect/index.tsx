@@ -29,14 +29,14 @@ export default function ModelVersionSelect({
 }: ModelVersionSelectProps) {
   const appliedId = useRef("");
   const model = useQuery({
-    queryKey: ["governance-model", modelId],
+    queryKey: ["model", modelId],
     enabled: Boolean(modelId),
     queryFn: ({ signal }) => getModel(modelId, signal),
     meta: { errorNotification: { id: withId("inference-model", modelId), action: "模型详情加载" } },
   });
   // TODO(model-contract): 联调版本归属、就绪状态及初始选择回显。
   const versions = useQuery({
-    queryKey: ["governance-model-versions", modelId, "options", { status: "ready" }],
+    queryKey: ["model-versions", modelId, "options", { status: "ready" }],
     enabled: Boolean(modelId),
     queryFn: ({ signal }) => listVersionOptions({ modelId, status: "ready" }, signal),
     meta: {

@@ -9,4 +9,4 @@ export function getTask(taskId: string): Promise<AsyncTask> {
   return coreRequest<AsyncTask>(`/tasks/${encodeURIComponent(taskId)}`, { method: "GET" });
 }
 
-export type { AsyncTask, AsyncTaskStatus, TaskListParams, TaskListResponse } from "./types";
+export type { AsyncTask, AsyncTaskStatus } from "./types";

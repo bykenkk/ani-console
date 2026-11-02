@@ -4,12 +4,8 @@ import { deleteNetworkVpc } from "@/api/network";
 import { deleteNetworkSubnet } from "@/api/network";
 import { deleteNetworkSecurityGroup } from "@/api/network";
 import { deleteNetworkLoadBalancer } from "@/api/network";
-import { deleteVolume } from "@/api/storage/volumes/legacy";
 import { deleteFilesystem } from "@/api/storage/filesystems";
 import { deleteVectorStore } from "@/api/storage/vector-stores";
-// FIXME(governance-migration): 此旧删除配置仅适用于 ANI 资源；新推理页已使用 useInferenceActions 的异步治理删除。
-// TODO(governance-migration): 确认无旧调用方后移除此推理删除配置，避免后续页面误用旧接口删除 governance ID。
-import { deleteInferenceService } from "@/api/inference/legacy";
 import { deleteKnowledgeBase } from "@/api/knowledge";
 import { deleteK8sCluster } from "@/api/k8s-clusters";
 import type { MutationFeedbackMeta } from "@/vite-env";
@@ -82,19 +78,6 @@ const resourceDeletion = {
     content: (item) => `确定删除「${item.name}」？`,
     remove: deleteNetworkLoadBalancer,
   },
-  volume: {
-    listQueryKey: "volumes",
-    detailQueryKey: "volume",
-    feedback: {
-      channel: "notification",
-      id: "volume-delete",
-      action: "删除块存储卷",
-      errorFallback: "请求失败",
-    },
-    title: "删除块存储卷",
-    content: (item) => `确定删除「${item.name}」？卷被实例挂载时无法删除。`,
-    remove: deleteVolume,
-  },
   filesystem: {
     listQueryKey: "filesystems",
     detailQueryKey: "filesystem",
@@ -120,20 +103,6 @@ const resourceDeletion = {
     title: "删除向量存储",
     content: (item) => `确定删除「${item.name}」？其中的向量数据将不可恢复。`,
     remove: deleteVectorStore,
-  },
-  "inference-service": {
-    listQueryKey: "inference-services",
-    detailQueryKey: "inference-service",
-    feedback: {
-      channel: "notification",
-      id: "inference-delete",
-      action: "删除推理服务",
-      successText: "删除推理服务已提交",
-      errorFallback: "请求失败",
-    },
-    title: "删除推理服务",
-    content: (item) => `确定删除「${item.name}」？删除请求提交后将异步停止并清理该服务。`,
-    remove: deleteInferenceService,
   },
   "knowledge-base": {
     listQueryKey: "knowledge-bases",

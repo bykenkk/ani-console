@@ -30,13 +30,13 @@ export default function DeleteInferencePolicyModal({
     },
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["governance-inference-policies"] }),
+        queryClient.invalidateQueries({ queryKey: ["inference-policies"] }),
         queryClient.invalidateQueries({
-          queryKey: ["governance-inference-policy", policy.id],
+          queryKey: ["inference-policy", policy.id],
           exact: true,
           refetchType: "none",
         }),
-        queryClient.resetQueries({ queryKey: ["governance-inference-keys", "options"] }),
+        queryClient.resetQueries({ queryKey: ["inference-keys", "options"] }),
       ]);
       onDeleted();
     },

@@ -46,7 +46,7 @@ export default function InferenceMetrics({ serviceId }: InferenceMetricsProps) {
   const [hours, setHours] = useState(1);
   const [step, setStep] = useState(60);
   const query = useQuery({
-    queryKey: ["governance-inference-metrics", serviceId, hours, step],
+    queryKey: ["inference-metrics", serviceId, hours, step],
     queryFn: ({ signal }) =>
       getInferenceMetrics(serviceId, { ...getPreviousHoursDateTimeRange(hours), step }, signal),
     meta: {

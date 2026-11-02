@@ -1,10 +1,8 @@
 import {
   compareDesc,
   constructNow,
-  differenceInMilliseconds,
   format,
   formatISO,
-  getTime,
   isPast,
   isValid,
   parseISO,
@@ -60,14 +58,6 @@ export function isDateTimeExpired(value?: string | null): boolean {
 
 export function getCurrentIsoDateTime(): string {
   return formatISO(constructNow(undefined));
-}
-
-export function getCurrentTimestamp(): number {
-  return getTime(constructNow(undefined));
-}
-
-export function hasElapsed(startedAt: number, durationMs: number): boolean {
-  return differenceInMilliseconds(constructNow(undefined), startedAt) >= durationMs;
 }
 
 export function getPreviousHoursDateTimeRange(hours: number): { start: string; end: string } {

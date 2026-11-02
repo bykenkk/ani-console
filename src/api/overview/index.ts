@@ -28,12 +28,4 @@ export async function getConsoleOverview(signal?: AbortSignal): Promise<ConsoleO
   }
 }
 
-export type {
-  ConsoleGpuQuotaOverview,
-  ConsoleGpuQuotaItem,
-  ConsoleOverviewStatistics,
-  InferenceServiceOverviewStatistics,
-  InstanceOverviewStatistics,
-  KnowledgeBaseOverviewStatistics,
-  ModelOverviewStatistics,
-} from "./types";
+export type { ConsoleOverviewStatistics } from "./types";

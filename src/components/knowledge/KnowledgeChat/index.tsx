@@ -47,7 +47,7 @@ export default function KnowledgeChat({
         fallback: "将使用知识库或平台默认模型",
       },
     },
-    queryKey: ["governance-inference-services", "options", "text-generation", "running"],
+    queryKey: ["inference-services", "options", "text-generation", "running"],
     queryFn: ({ signal }) =>
       listInferenceOptions({ capability: "text-generation", status: "running" }, signal),
   });

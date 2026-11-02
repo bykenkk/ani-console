@@ -73,7 +73,7 @@ export default function ModelApiKeysPage() {
   const [action, setAction] = useState<ModelApiKeyAction | null>(null);
   const { page, pageSize, setPage, setPageSize } = useListPagination("inference-keys", 20);
   const query = useQuery({
-    queryKey: ["governance-inference-keys", { page, pageSize }],
+    queryKey: ["inference-keys", { page, pageSize }],
     queryFn: async ({ signal }) => {
       const response = await listInferenceKeys({ page, pageSize }, signal);
       // 管理表格仅保存元数据，查看密钥由用户主动读取详情。

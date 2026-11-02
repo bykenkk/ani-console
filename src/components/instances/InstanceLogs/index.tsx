@@ -187,13 +187,11 @@ export default function InstanceLogs({
               onNotFound?.();
             const message =
               resourceType === "vm" && error instanceof ApiError
-                ? error.status === 409
-                  ? "云主机未运行或日志暂不可用"
-                  : error.status === 429
-                    ? "日志连接数已达上限，请稍后重试"
-                    : error.status === 404 && error.code !== "VM_NOT_FOUND"
-                      ? "云主机日志功能未上线"
-                      : undefined
+                ? error.status === 429
+                  ? "日志连接数已达上限，请稍后重试"
+                  : error.status === 404 && error.code !== "VM_NOT_FOUND"
+                    ? "云主机日志功能未上线"
+                    : undefined
                 : undefined;
             showNotification({
               id: withId(notificationScope, id),

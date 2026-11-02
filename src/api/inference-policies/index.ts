@@ -1,4 +1,4 @@
-import { ApiError, coreRequest } from "@/api/request";
+import { coreRequest } from "@/api/request";
 import type {
   InferencePolicy,
   InferencePolicyInput,
@@ -7,12 +7,7 @@ import type {
   SaveInferencePolicyRequest,
 } from "./types";
 
-export type {
-  InferencePolicy,
-  InferencePolicyInput,
-  InferencePolicyListParams,
-  InferencePolicyListResponse,
-} from "./types";
+export type { InferencePolicy, InferencePolicyInput } from "./types";
 
 // TODO(inference-policies): 部署后验证租户隔离、完整替换、空模型拒绝、零限额及绑定删除冲突。
 export function listInferencePolicies(
@@ -52,21 +47,7 @@ export async function updateInferencePolicy(
 }
 
 export async function deleteInferencePolicy(policyId: string): Promise<void> {
-  try {
-    await coreRequest<Record<string, never>>(
-      `/inference-policies/${encodeURIComponent(policyId)}`,
-      {
-        method: "DELETE",
-      },
-    );
-  } catch (error) {
-    if (
-      error instanceof ApiError &&
-      error.status === 409 &&
-      error.code === "INFERENCE_KEY_CONFLICT"
-    ) {
-      error.message = "该策略仍被 API Key 绑定，请先更换绑定策略后再删除";
-    }
-    throw error;
-  }
+  await coreRequest<Record<string, never>>(`/inference-policies/${encodeURIComponent(policyId)}`, {
+    method: "DELETE",
+  });
 }

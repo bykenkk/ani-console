@@ -11,7 +11,7 @@ export function useHomeOverview() {
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["governance-overview"],
+    queryKey: ["overview"],
     queryFn: ({ signal }) => getConsoleOverview(signal),
     staleTime: 60_000,
     refetchInterval: ({ state }) =>

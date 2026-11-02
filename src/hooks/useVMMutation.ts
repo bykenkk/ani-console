@@ -1,5 +1,4 @@
-import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiError } from "@/api/request";
+import { useIsMutating, useMutation, useQueryClient, type QueryKey } from "@tanstack/react-query";
 import { withId } from "@/lib/id";
 
 type VMMutationOptions<TVariables> = {
@@ -8,8 +7,8 @@ type VMMutationOptions<TVariables> = {
   actionId: string;
   channel?: "message" | "notification";
   mutationFn: (variables: TVariables) => Promise<void>;
+  refreshQueryKeys?: readonly QueryKey[];
   onSubmitted?: () => void;
-  onConflict?: () => void;
 };
 
 export function useVMMutation<TVariables = void>({
@@ -18,15 +17,16 @@ export function useVMMutation<TVariables = void>({
   actionId,
   channel = "message",
   mutationFn,
+  refreshQueryKeys = [],
   onSubmitted,
-  onConflict,
 }: VMMutationOptions<TVariables>) {
   const client = useQueryClient();
   const pending = useIsMutating({ mutationKey: ["vm-write"] });
   const refresh = () =>
     Promise.all([
-      client.invalidateQueries({ queryKey: ["vms", vmId] }),
+      client.invalidateQueries({ queryKey: ["vms", vmId], exact: true }),
       client.invalidateQueries({ queryKey: ["vms", "list"] }),
+      ...refreshQueryKeys.map((queryKey) => client.invalidateQueries({ queryKey })),
     ]);
   const mutation = useMutation({
     mutationKey: ["vm-write", vmId, actionId],
@@ -42,12 +42,6 @@ export function useVMMutation<TVariables = void>({
       // TODO(vm-task): 创建、删除的任务跟踪统一暂缓；只刷新资源，不查询操作结果。
       onSubmitted?.();
       await refresh();
-    },
-    onError: async (error) => {
-      if (error instanceof ApiError && error.status === 409) {
-        onConflict?.();
-        await refresh();
-      }
     },
   });
   return { ...mutation, busy: pending > 0 };

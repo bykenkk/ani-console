@@ -57,38 +57,6 @@ export interface GpuSpecAvailabilityListResponse {
   quota_remaining: number;
 }
 
-export interface GpuSpec {
-  id: string;
-  name: string;
-  gpu_type?: string;
-  vendor?: string;
-  model?: string;
-  gpu_count?: number;
-  shares?: number;
-  mb_per_share?: number;
-  cpu?: string;
-  memory?: string;
-  available?: boolean;
-  [key: string]: unknown;
-}
-export interface GpuSpecListResponse {
-  items: GpuSpec[];
-  total: number;
-  next_cursor?: string | null;
-}
-export interface GpuSchedulingQueue {
-  id: string;
-  name: string;
-  status?: string;
-  pending_count?: number;
-  [key: string]: unknown;
-}
-export interface GpuSchedulingQueueListResponse {
-  items: GpuSchedulingQueue[];
-  total: number;
-  next_cursor?: string | null;
-}
-
 export interface TenantQuotaItem {
   resource_type: string;
   total: number;

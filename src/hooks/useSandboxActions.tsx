@@ -1,6 +1,5 @@
 import { Modal } from "@arco-design/web-react";
 import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiError } from "@/api/request";
 import { pauseSandbox, resumeSandbox, deleteSandbox, type Sandbox } from "@/api/sandboxes";
 import { unavailableAction, type RowAction } from "@/components/common/DataTable/RowActions";
 import { withId } from "@/lib/id";
@@ -42,21 +41,19 @@ export function useSandboxActions(onDeleted?: () => void) {
         await qc.invalidateQueries({ queryKey: ["sandboxes", sandbox.id], refetchType: "none" });
         onDeleted?.();
         await qc.invalidateQueries({ queryKey: ["sandboxes", "list"] });
-      } else await qc.invalidateQueries({ queryKey: ["sandboxes"] });
-    },
-    onError: async (error, { sandbox }) => {
-      if (error instanceof ApiError && error.status === 409)
+      } else {
         await Promise.all([
-          qc.invalidateQueries({ queryKey: ["sandboxes", sandbox.id] }),
           qc.invalidateQueries({ queryKey: ["sandboxes", "list"] }),
+          qc.invalidateQueries({ queryKey: ["sandboxes", sandbox.id], exact: true }),
         ]);
+      }
     },
   });
   const closed = (sandbox: Sandbox) =>
     sandbox.desired_state === "deleted" || sandbox.observed_state === "deleted";
   const unavailable = (sandbox: Sandbox) => pending > 0 || closed(sandbox);
   const confirm = (sandbox: Sandbox, action: SandboxAction) => {
-    const dialog = Modal.confirm({
+    Modal.confirm({
       title: LABELS[action],
       content:
         action === "delete"
@@ -65,15 +62,7 @@ export function useSandboxActions(onDeleted?: () => void) {
             ? `确认暂停「${sandbox.snapshot?.name || sandbox.id}」？工作区文件保留，内存和运行中的进程不会保留。`
             : `确认恢复「${sandbox.snapshot?.name || sandbox.id}」？将使用原工作区重新启动运行环境。`,
       okButtonProps: { status: action === "delete" ? "danger" : "default" },
-      onOk: async () => {
-        try {
-          await mutation.mutateAsync({ sandbox, action });
-        } catch (error) {
-          // 冲突后关闭持有旧版本的确认框，基于刷新结果重新确认。
-          if (error instanceof ApiError && error.status === 409) dialog.close();
-          throw error;
-        }
-      },
+      onOk: () => mutation.mutateAsync({ sandbox, action }),
     });
   };
   const actions: RowAction<Sandbox>[] = [

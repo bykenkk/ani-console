@@ -18,7 +18,7 @@ export default function InferenceEvents({ serviceId }: InferenceEventsProps) {
   const { page, pageSize } = paging;
   const params = { page, pageSize, type: type || undefined, since };
   const events = useQuery({
-    queryKey: ["governance-inference-events", serviceId, params],
+    queryKey: ["inference-events", serviceId, params],
     queryFn: ({ signal }) => listInferenceEvents(serviceId, params, signal),
     meta: {
       errorNotification: { id: withId("inference-events", serviceId), action: "推理事件加载" },

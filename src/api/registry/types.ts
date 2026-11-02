@@ -16,51 +16,6 @@ export interface RegistryScanResult {
   scanned_at?: string;
 }
 
-export interface RegistryProject {
-  id: string;
-  tenant_id: string;
-  name: string;
-  public: boolean;
-  dev_profile?: CoreDevProfileInfo;
-  created_at: string;
-}
-
-export interface RegistryProjectListResponse {
-  items: RegistryProject[];
-  total: number;
-  next_cursor?: string | null;
-}
-
-export interface RegistryRepository {
-  project: string;
-  name: string;
-  artifact_count: number;
-  pull_count: number;
-  permission?: { actions?: string[] };
-  dev_profile?: CoreDevProfileInfo;
-}
-export interface RegistryRepositoryListResponse {
-  items: RegistryRepository[];
-  total: number;
-  next_cursor?: string | null;
-}
-export interface RegistryArtifact {
-  project: string;
-  repository: string;
-  digest: string;
-  tags: string[];
-  media_type: string;
-  size_bytes: number;
-  pushed_at?: string;
-  scan_status?: RegistryScanResult;
-  dev_profile?: CoreDevProfileInfo;
-}
-export interface RegistryArtifactListResponse {
-  items: RegistryArtifact[];
-  total: number;
-  next_cursor?: string | null;
-}
-
 export interface RegistryImage {
   name?: string | null;
   project: string;
@@ -92,20 +47,4 @@ export interface RegistryImageListResponse {
   items: RegistryImage[];
   total: number;
   next_cursor?: string | null;
-}
-
-export interface RegistryPushInstructions {
-  project: string;
-  registry: string;
-  repository_example: string;
-  commands: Array<{ label: string; command: string }>;
-  dev_profile?: CoreDevProfileInfo;
-}
-
-export interface RegistryTagDeleteResult {
-  project: string;
-  repository: string;
-  tag: string;
-  digest: string;
-  deleted_at: string;
 }

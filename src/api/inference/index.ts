@@ -11,8 +11,6 @@ import type {
   InferenceListParams,
   InferenceListResponse,
   InferenceService,
-  InferenceOperation,
-  InferenceOperationResponse,
   InferenceCommand,
   InferenceCommandInput,
   InferenceCommandRequest,
@@ -81,31 +79,7 @@ export function deleteInferenceService(
     [id],
   );
 }
-// TODO(inference-task): Governance 已注册操作查询；任务跟踪暂缓接入，后续统一处理并联调投递、退款状态。
-export async function getInferenceOperation(
-  id: string,
-  signal?: AbortSignal,
-): Promise<InferenceOperation> {
-  const response = await coreRequest<InferenceOperationResponse>(
-    `/inference/operations/${encodeURIComponent(id)}`,
-    {
-      method: "GET",
-      signal,
-    },
-  );
-  return {
-    id: response.id,
-    service_id: response.serviceId,
-    kind: response.kind,
-    phase: response.phase,
-    step: response.step,
-    target_generation: response.targetGeneration,
-    error_code: response.errorCode,
-    error_message: response.errorMessage,
-    created_at: response.createdAt,
-    completed_at: response.completedAt,
-  };
-}
+
 export type * from "./types";
 // TODO(inference-contract): 已核对顶层更新字段；联调更新掩码、generation 冲突及幂等重试。
 export function updateInferenceService(id: string, input: UpdateInferenceInput): Promise<void> {
@@ -144,9 +118,7 @@ export function applyInferenceCommand(
     [id],
   );
 }
-// FIXME(governance-migration): 尚未迁移的 Services 能力保留独立命名空间，逐项迁移后移除。
-// TODO(governance-migration): 迁移完成后移除该旧接口命名空间；不得用于新资源兜底。
-export * as legacyInference from "./legacy";
+
 export * from "./diagnostics";
 export * from "./policy";
 export * from "./invocation";

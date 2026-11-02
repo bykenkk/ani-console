@@ -53,7 +53,7 @@ export default function UpdateInferencePolicyModal({
       },
     },
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ["governance-inference-policy", serviceId] });
+      await qc.invalidateQueries({ queryKey: ["inference-policy", serviceId] });
       onCancel();
     },
   });

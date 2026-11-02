@@ -32,9 +32,9 @@ export default function ContainerDeleteModal({
     // TODO(container-task): 删除任务跟踪后续统一接入，当前仅提交请求并提示。
     onSuccess: async () => {
       await Promise.all([
-        qc.invalidateQueries({ queryKey: ["governance-instances"] }),
+        qc.invalidateQueries({ queryKey: ["instances", "cpu"] }),
         qc.invalidateQueries({
-          queryKey: ["governance-instance", instance.id],
+          queryKey: ["instance", instance.id],
           refetchType: "none",
         }),
       ]);

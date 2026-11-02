@@ -37,7 +37,7 @@ export default function CreateVectorStoreModal({
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["governance-inference-services", "options", "embedding", "running"],
+    queryKey: ["inference-services", "options", "embedding", "running"],
     queryFn: ({ signal }) =>
       listInferenceOptions({ capability: "embedding", status: "running" }, signal),
   });

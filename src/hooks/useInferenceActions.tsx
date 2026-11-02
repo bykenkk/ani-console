@@ -17,8 +17,8 @@ export function useInferenceActions(onDeleted?: () => void) {
   const [editing, setEditing] = useState<InferenceService>();
   const refresh = async (id: string) => {
     await Promise.all([
-      qc.invalidateQueries({ queryKey: ["governance-inference-service", id] }),
-      qc.invalidateQueries({ queryKey: ["governance-inference-services"] }),
+      qc.invalidateQueries({ queryKey: ["inference-service", id] }),
+      qc.invalidateQueries({ queryKey: ["inference-services"] }),
     ]);
   };
   const lifecycle = useMutation({
@@ -55,10 +55,10 @@ export function useInferenceActions(onDeleted?: () => void) {
     onSuccess: async (_, item) => {
       // TODO(inference-task): 后续统一接入删除任务跟踪；当前受理后刷新列表并返回。
       await qc.invalidateQueries({
-        queryKey: ["governance-inference-service", item.id],
+        queryKey: ["inference-service", item.id],
         refetchType: "none",
       });
-      await qc.invalidateQueries({ queryKey: ["governance-inference-services"] });
+      await qc.invalidateQueries({ queryKey: ["inference-services"] });
       onDeleted?.();
     },
   });

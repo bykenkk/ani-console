@@ -65,16 +65,16 @@ export default function SaveInferencePolicyModal({
     },
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["governance-inference-policies"] }),
+        queryClient.invalidateQueries({ queryKey: ["inference-policies"] }),
         ...(policy
           ? [
               queryClient.invalidateQueries({
-                queryKey: ["governance-inference-policy", policy.id],
+                queryKey: ["inference-policy", policy.id],
                 exact: true,
               }),
             ]
           : []),
-        queryClient.resetQueries({ queryKey: ["governance-inference-keys", "options"] }),
+        queryClient.resetQueries({ queryKey: ["inference-keys", "options"] }),
       ]);
       onSaved();
     },

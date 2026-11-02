@@ -18,7 +18,7 @@ export default function InferencePolicyDetailPage({ policyId }: InferencePolicyD
   const navigate = useNavigate();
   const goBack = useBackOrFallback("inference-policy");
   const policy = useQuery({
-    queryKey: ["governance-inference-policy", policyId],
+    queryKey: ["inference-policy", policyId],
     queryFn: ({ signal }) => getInferencePolicy(policyId, signal),
     enabled: Boolean(policyId),
     meta: {

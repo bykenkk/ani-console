@@ -2,8 +2,6 @@
 // TODO(governance-migration): 按能力逐项对齐后再移除旧字段，VM/沙箱等未迁移功能仍依赖这些类型。
 import type { CoreDevProfileInfo, CursorPageParams } from "@/api/types";
 
-export type { ObservabilityRangeQueryResponse } from "@/api/observability/legacy";
-
 export type InstanceKind =
   | "vm"
   | "container"
@@ -267,7 +265,7 @@ export interface CreateInstanceInput {
   gpu_config?: Record<string, unknown>;
   gpu_container_config?: Record<string, unknown>;
 }
-export type CreateInstanceRequest = CreateInstanceInput & { idempotency_key: string };
+
 export interface CreateInstanceResponse {
   instance: InstanceRecord;
   operation_id: string;
@@ -326,57 +324,6 @@ export interface InstanceLifecycleResponse {
   operation_id: string;
 }
 
-export interface InstanceOperation {
-  id: string;
-  instance_id: string;
-  tenant_id: string;
-  operation: string;
-  status: "accepted" | "in_progress" | "succeeded" | "failed" | "cancelled";
-  idempotency_key?: string | null;
-  requested_by: string;
-  precheck_result?: Record<string, unknown> | null;
-  failure_reason?: string | null;
-  failure_message?: string | null;
-  retry_eligible: boolean;
-  steps?: Array<{
-    step_name: string;
-    status: "pending" | "running" | "succeeded" | "failed" | "skipped";
-    message?: string | null;
-    started_at?: string | null;
-    completed_at?: string | null;
-  }>;
-  before_spec?: Record<string, unknown> | null;
-  after_spec?: Record<string, unknown> | null;
-  created_at: string;
-  updated_at?: string;
-}
-export interface InstanceOperationListResponse {
-  items: InstanceOperation[];
-  total: number;
-  next_cursor?: string | null;
-}
-export interface InstanceEvent {
-  id: string;
-  instance_id: string;
-  type: "Normal" | "Warning";
-  reason: string;
-  message: string;
-  count?: number;
-  occurred_at: string;
-}
-export interface InstanceMetrics {
-  instance_id: string;
-  timestamp: string;
-  cpu_utilization_pct?: number | null;
-  memory_used_mb?: number | null;
-  memory_total_mb?: number | null;
-  gpu_utilization_pct?: number | null;
-  gpu_memory_used_mb?: number | null;
-  gpu_memory_total_mb?: number | null;
-  network_rx_bytes?: number | null;
-  network_tx_bytes?: number | null;
-  dev_profile: CoreDevProfileInfo;
-}
 export interface InstanceSecurityEvent {
   id: string;
   instance_id: string;
@@ -385,30 +332,7 @@ export interface InstanceSecurityEvent {
   description?: string | null;
   occurred_at: string;
 }
-export interface InstanceExecSession {
-  id: string;
-  instance_id: string;
-  ws_url: string;
-  token?: string;
-  expires_at: string;
-  dev_profile: CoreDevProfileInfo;
-}
-export interface CreateInstanceExecSessionInput {
-  container?: string | null;
-  command: string[];
-  tty: boolean;
-  rows: number;
-  cols: number;
-}
-export interface InstanceConsoleSession {
-  operation_id?: string | null;
-  session_id: string;
-  protocol: "console" | "vnc" | "novnc" | "serial";
-  connect_url: string;
-  url: string;
-  token?: string;
-  expires_at: string;
-}
+
 export interface SandboxTemplate {
   id: string;
   name: string;

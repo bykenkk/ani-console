@@ -37,14 +37,14 @@ export default function UpdateInferenceModal({
   const [chosenModelId, setChosenModelId] = useState<string>();
   const submitting = useRef(false);
   const detail = useQuery({
-    queryKey: ["governance-inference-service", serviceId],
+    queryKey: ["inference-service", serviceId],
     queryFn: ({ signal }) => getInferenceService(serviceId, signal),
     meta: {
       errorNotification: { id: withId("inference-service", serviceId), action: "推理服务详情加载" },
     },
   });
   const currentVersion = useQuery({
-    queryKey: ["governance-model-version", snapshot?.model_version_id],
+    queryKey: ["model-version", snapshot?.model_version_id],
     enabled: Boolean(snapshot?.model_version_id),
     queryFn: ({ signal }) => getModelVersion(snapshot!.model_version_id, signal),
     meta: {

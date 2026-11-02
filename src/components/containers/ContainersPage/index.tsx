@@ -25,7 +25,7 @@ export default function ContainersPage() {
   const paging = useListPagination(JSON.stringify({ status, searchField, keyword }), 10);
   const query = useQuery({
     queryKey: [
-      "governance-instances",
+      "instances",
       "cpu",
       { page: paging.page, pageSize: paging.pageSize, observedState, searchField, keyword },
     ],
@@ -60,7 +60,7 @@ export default function ContainersPage() {
       setPage(page - 1);
     }
   }, [query.isSuccess, query.isFetching, query.data, page, setPage]);
-  const { actions, dialogNode } = useContainerActions(paging.resetPagination);
+  const { actions, dialogNode } = useContainerActions();
   const columns: ListColumn<InstanceRecord>[] = [
     {
       key: "name",
@@ -169,6 +169,7 @@ export default function ContainersPage() {
         <InstanceOperationObserver
           key={instance.id}
           instanceId={instance.id}
+          computeType={instance.compute_type}
           operationId={instance.activeOperationId}
         />
       ))}

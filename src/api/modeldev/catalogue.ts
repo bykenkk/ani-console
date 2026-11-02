@@ -6,7 +6,6 @@ import type {
   ModelDevImplementationListParams,
   ModelDevInputVersionListParams,
   ModelDevInputVersionListResponse,
-  ModelDevInputVersion,
   CheckFineTuningReadinessInput,
   FineTuningReadiness,
 } from "./types";
@@ -50,15 +49,6 @@ export function listModelDevInputVersions(
   return coreRequest<ModelDevInputVersionListResponse>("/modeldev/input-versions", {
     method: "GET",
     params,
-    signal,
-  });
-}
-export function getModelDevInputVersion(
-  id: string,
-  signal?: AbortSignal,
-): Promise<ModelDevInputVersion> {
-  return coreRequest<ModelDevInputVersion>(`/modeldev/input-versions/${encodeURIComponent(id)}`, {
-    method: "GET",
     signal,
   });
 }

@@ -8,7 +8,6 @@ import type {
   VmListParams,
   VmListResponse,
   VmChangeInput,
-  VmOperation,
   VmMedia,
   VmDisk,
   VmSnapshot,
@@ -78,12 +77,7 @@ export function listVmMedia(signal?: AbortSignal) {
   // TODO(pagination-migration): 介质目录暂为无分页 items；后端补齐正式分页后迁移选项加载。
   return coreRequest<{ items: VmMedia[] }>("/virtual-machine-media", { method: "GET", signal });
 }
-export function getVmDnsDefaults(signal?: AbortSignal) {
-  return coreRequest<{ nameservers: string[] }>("/virtual-machine-dns-defaults", {
-    method: "GET",
-    signal,
-  });
-}
+
 export function createVm(input: CreateVmInput): Promise<void> {
   return runIdempotentRequest(createScope, input, async (data) => {
     await coreRequest("/virtual-machines", { method: "POST", data: { data } });
@@ -120,12 +114,7 @@ export function forceStopVm(id: string, input: VmForceStopInput) {
 export function deleteVm(id: string, input: VmChangeInput) {
   return changeVm(deleteScope, vmPath(id), "DELETE", input, [id]);
 }
-export function getVmOperation(id: string, operationId: string, signal?: AbortSignal) {
-  return coreRequest<VmOperation>(`${vmPath(id)}/operations/${encodeURIComponent(operationId)}`, {
-    method: "GET",
-    signal,
-  });
-}
+
 export function listVmDisks(id: string, signal?: AbortSignal) {
   // TODO(pagination-migration): VM 磁盘暂按无分页 items 查询；后端补齐后迁移，不伪造 total。
   return coreRequest<{ items: VmDisk[] }>(`${vmPath(id)}/disks`, { method: "GET", signal });

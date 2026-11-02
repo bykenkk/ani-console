@@ -2,32 +2,21 @@ import { coreRequest } from "@/api/request";
 import { runIdempotentRequest } from "@/api/idempotency";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
-  CreateModelInput,
-  CreateModelRequest,
-  CreateModelVersionInput,
-  CreateModelVersionRequest,
   ImportModelBundleInput,
   ImportModelBundleRequest,
   ImportModelBundleResponse,
-  ImportModelInput,
-  ImportModelRequest,
-  ImportTask,
   Model,
   ModelListParams,
   ModelListResponse,
   ModelPageParams,
   ModelVersionListParams,
   ModelOperationListResponse,
-  ModelVersion,
   ModelVersionListResponse,
   ModelVersionResponse,
   SearchExternalModelsParams,
   SearchExternalModelsResponse,
 } from "./types";
 
-const createModelScope = createIdempotencyScope("model-create", ["POST"]);
-const createModelVersionScope = createIdempotencyScope("model-version-create", ["POST"]);
-const importScope = createIdempotencyScope("model-import", ["POST"]);
 const importBundleScope = createIdempotencyScope("model-import-bundle", ["POST"]);
 
 // TODO(model-contract): 联调页码分页、筛选、直接跳页和空页的 items/total。
@@ -67,31 +56,6 @@ export function searchExternalModels(
   });
 }
 
-// TODO(model-contract): 已核对顶层业务字段及幂等键；待部署后联调创建、重复提交及错误响应。
-export function createModel(submitData: CreateModelInput, signal?: AbortSignal): Promise<void> {
-  return runIdempotentRequest(createModelScope, submitData, async (body) => {
-    await coreRequest<{ model: Model }, CreateModelRequest>("/models", {
-      method: "POST",
-      data: body,
-      signal,
-    });
-  });
-}
-
-// TODO(model-contract): 已核对版本创建的顶层业务字段；待部署后联调版本字段、幂等及重复提交行为。
-export function createModelVersion(
-  submitData: CreateModelVersionInput,
-  signal?: AbortSignal,
-): Promise<void> {
-  return runIdempotentRequest(createModelVersionScope, submitData, async (body) => {
-    await coreRequest<{ version: ModelVersion }, CreateModelVersionRequest>("/model-versions", {
-      method: "POST",
-      data: body,
-      signal,
-    });
-  });
-}
-
 // FIXME(model-pagination): 当前后端将 page 误限为 1–100；待解除页码上限后复核直接跳页，不在前端截断 total 或模拟分页。
 // TODO(model-contract): 联调 status 服务端筛选、模型归属及空列表。
 export function listModelVersions(
@@ -124,16 +88,6 @@ export function getModelVersion(id: string, signal?: AbortSignal) {
   return coreRequest<ModelVersionResponse>(`/model-versions/${encodeURIComponent(id)}`, {
     method: "GET",
     signal,
-  });
-}
-// TODO(model-contract): 已核对模型导入的顶层业务字段；待部署后联调幂等及受理语义，任务跟踪后续统一接入。
-export function importModel(submitData: ImportModelInput, signal?: AbortSignal): Promise<void> {
-  return runIdempotentRequest(importScope, submitData, async (body) => {
-    await coreRequest<{ task: ImportTask }, ImportModelRequest>("/models:import", {
-      method: "POST",
-      data: body,
-      signal,
-    });
   });
 }
 

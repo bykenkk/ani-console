@@ -10,7 +10,6 @@ import type {
   CreateSandboxRequest,
   ChangeSandboxInput,
   ChangeSandboxRequest,
-  SandboxOperation,
 } from "./types";
 
 const createScope = createIdempotencyScope("sandbox-create", ["POST"]);
@@ -69,11 +68,5 @@ export function resumeSandbox(id: string, input: ChangeSandboxInput) {
 export function deleteSandbox(id: string, input: ChangeSandboxInput) {
   return changeSandbox(deleteScope, id, "delete", input);
 }
-// TODO(sandbox-task): 创建、删除的任务查询及跟踪弹窗暂缓接入页面。
-export function getSandboxOperation(operationId: string, signal?: AbortSignal) {
-  return coreRequest<SandboxOperation>(`/sandbox/operations/${encodeURIComponent(operationId)}`, {
-    method: "GET",
-    signal,
-  });
-}
+
 export type * from "./types";

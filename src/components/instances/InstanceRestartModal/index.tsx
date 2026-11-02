@@ -1,7 +1,6 @@
 import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { restartInstance, getInstance, type InstanceRecord } from "@/api/instances";
-import { ApiError } from "@/api/request";
 import { withId } from "@/lib/id";
 
 type InstanceRestartModalProps = {
@@ -24,20 +23,7 @@ export default function InstanceRestartModal({
       if (latest.activeOperationId || latest.desiredState === "deleted") {
         throw new Error("实例已有进行中的操作或正在删除，请刷新后确认");
       }
-      try {
-        await restartInstance(instance.id, { expectedVersion: latest.version });
-      } catch (error) {
-        if (error instanceof ApiError) {
-          if (error.code === "INSTANCE_VERSION_CONFLICT") {
-            error.message = "实例版本已变化，请重新打开操作并确认";
-          } else if (error.status === 503 && error.code === "INSTANCE_ACTION_UNAVAILABLE") {
-            error.message = "当前环境暂未开放此操作";
-          } else if (error.code === "INSTANCE_OPERATION_IN_PROGRESS") {
-            error.message = "实例已有进行中的操作，请等待完成后再操作";
-          }
-        }
-        throw error;
-      }
+      await restartInstance(instance.id, { expectedVersion: latest.version });
     },
     meta: {
       feedback: {
@@ -50,8 +36,8 @@ export default function InstanceRestartModal({
     },
     onSuccess: async () => {
       await Promise.all([
-        qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance", instance.id] }),
+        qc.invalidateQueries({ queryKey: ["instances", instance.compute_type] }),
+        qc.invalidateQueries({ queryKey: ["instance", instance.id] }),
       ]);
       onSubmitted();
     },

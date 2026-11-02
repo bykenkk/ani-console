@@ -32,10 +32,10 @@ export default function ContainerStopModal({
     // TODO(container-task): 停止受理后仅刷新资源并关闭确认框，任务进度后续统一接入。
     onSuccess: async () => {
       await Promise.all([
-        qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance-runtime", instance.id] }),
+        qc.invalidateQueries({ queryKey: ["instances", "cpu"] }),
+        qc.invalidateQueries({ queryKey: ["instance-runtime", instance.id] }),
         qc.invalidateQueries({
-          queryKey: ["governance-instance", instance.id],
+          queryKey: ["instance", instance.id],
           refetchType: "active",
         }),
       ]);

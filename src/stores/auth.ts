@@ -90,10 +90,6 @@ export const useAuthStore = create<AuthState>()(
   ),
 );
 
-export function isAuthHydrated(): boolean {
-  return useAuthStore.getState().hydrated;
-}
-
 export function isAuthenticated(): boolean {
   return !!useAuthStore.getState().tokens?.access_token;
 }

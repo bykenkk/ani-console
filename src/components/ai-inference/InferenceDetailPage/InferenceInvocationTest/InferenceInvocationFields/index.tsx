@@ -18,7 +18,7 @@ export default function InferenceInvocationFields({
 }: InferenceInvocationFieldsProps) {
   const { form, disabled } = Form.useFormContext();
   const keys = useQuery({
-    queryKey: ["governance-inference-keys", "options", service.served_model_name],
+    queryKey: ["inference-keys", "options", service.served_model_name],
     queryFn: ({ signal }) => listKeyOptions({ modelName: service.served_model_name }, signal),
     enabled: Boolean(service.served_model_name.trim()),
     gcTime: 0,

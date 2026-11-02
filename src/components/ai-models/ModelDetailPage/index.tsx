@@ -47,7 +47,7 @@ export default function ModelDetailPage({ modelId, tab, onTabChange }: ModelDeta
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["governance-model", modelId],
+    queryKey: ["model", modelId],
     queryFn: ({ signal }) => getModel(modelId, signal),
   });
   const { actions, dialogNode } = useModelActions(goBack);

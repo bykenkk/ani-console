@@ -17,7 +17,7 @@ export default function ModelApiKeyCredentialsModal({
   onCancel,
 }: ModelApiKeyCredentialsModalProps) {
   const detail = useQuery({
-    queryKey: ["governance-inference-key-secret", keyId],
+    queryKey: ["inference-key-secret", keyId],
     queryFn: ({ signal }) => getInferenceKey(keyId, signal),
     enabled: !initialSecret,
     // 主动查看和幂等重放均读取最新详情；卸载后不保留密钥缓存。

@@ -28,7 +28,7 @@ export default function TrainingTasksPage() {
   });
   const refresh = () => {
     paging.resetPagination();
-    qc.invalidateQueries({ queryKey: ["training-executions"] });
+    qc.invalidateQueries({ queryKey: ["training-executions", filters] });
   };
   const pagination = {
     mode: "total" as const,

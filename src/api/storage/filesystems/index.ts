@@ -94,17 +94,4 @@ export function expandFilesystem(
   );
 }
 
-export type {
-  CreateFilesystemMountTargetInput,
-  CreateFilesystemMountTargetRequest,
-  CreateStorageFilesystemInput,
-  CreateStorageFilesystemRequest,
-  FilesystemMountCommand,
-  FilesystemMountTarget,
-  FilesystemMountTargetListResponse,
-  StorageFilesystem,
-  StorageFilesystemExpandInput,
-  StorageFilesystemExpandRequest,
-  StorageFilesystemListParams,
-  StorageFilesystemListResponse,
-} from "./types";
+export type { FilesystemMountTarget, StorageFilesystem } from "./types";

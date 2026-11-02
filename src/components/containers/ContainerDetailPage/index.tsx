@@ -37,7 +37,7 @@ export default function ContainerDetailPage({
 }: ContainerDetailPageProps) {
   const goBack = useBackOrFallback("container-instance");
   const current = useQuery({
-    queryKey: ["governance-instance", instanceId],
+    queryKey: ["instance", instanceId],
     queryFn: ({ signal }) => getInstance(instanceId, signal),
     refetchInterval: (query) => (query.state.data?.activeOperationId ? 4000 : false),
     meta: { errorNotification: { id: withId("instance", instanceId), action: "实例详情加载" } },
@@ -45,7 +45,7 @@ export default function ContainerDetailPage({
   const isContainer =
     current.data?.instance_kind === "container" && current.data.compute_type === "cpu";
   const runtime = useQuery({
-    queryKey: ["governance-instance-runtime", instanceId],
+    queryKey: ["instance-runtime", instanceId],
     enabled: isContainer,
     queryFn: ({ signal }) => getInstanceRuntime(instanceId, signal),
     meta: {
@@ -53,7 +53,7 @@ export default function ContainerDetailPage({
     },
   });
   const configuration = useQuery({
-    queryKey: ["governance-instance-configuration", instanceId],
+    queryKey: ["instance-configuration", instanceId],
     enabled: isContainer,
     queryFn: ({ signal }) => getInstanceConfiguration(instanceId, signal),
     gcTime: 0,
@@ -64,7 +64,7 @@ export default function ContainerDetailPage({
       },
     },
   });
-  const { actions, dialogNode } = useContainerActions(() => {}, goBack);
+  const { actions, dialogNode } = useContainerActions(goBack);
   const primaryAction = actions.find((action) => action.key === "terminal");
   if (!current.data) return <DetailPagePlaceholder loading={current.isLoading} />;
   const record = current.data;
@@ -205,6 +205,7 @@ export default function ContainerDetailPage({
       <InstanceOperationObserver
         key={instanceId}
         instanceId={instanceId}
+        computeType={record.compute_type}
         operationId={record.activeOperationId}
       />
       {dialogNode}

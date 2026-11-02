@@ -48,7 +48,7 @@ export default function ModelsPage() {
   const paging = useListPagination(JSON.stringify(filters), 10);
   const { page, pageSize, resetPagination } = paging;
   const models = useQuery({
-    queryKey: ["governance-models", filters, { page, pageSize }],
+    queryKey: ["models", filters, { page, pageSize }],
     queryFn: ({ signal }) => listModels({ ...filters, page, pageSize }, signal),
     meta: {
       errorNotification: { id: "models", action: "模型列表加载", fallback: "请求失败，请稍后重试" },
@@ -66,7 +66,7 @@ export default function ModelsPage() {
   };
   const refresh = () => {
     resetPagination();
-    qc.invalidateQueries({ queryKey: ["governance-models"], refetchType: "none" });
+    qc.invalidateQueries({ queryKey: ["models"], refetchType: "none" });
     if (page === 1) models.refetch();
   };
   const { actions, dialogNode } = useModelActions(resetPagination);

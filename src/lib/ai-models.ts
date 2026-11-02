@@ -1,7 +1,7 @@
 import type { Model, ModelVersion } from "@/api/models";
 import { compareDateTimesDescending } from "./date";
 
-export type { Model, ModelVersion } from "@/api/models";
+export type { Model } from "@/api/models";
 
 export const MODEL_SOURCE_LABELS: Record<string, string> = {
   upload: "本地上传",

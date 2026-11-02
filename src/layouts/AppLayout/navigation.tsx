@@ -205,17 +205,6 @@ export function findMenuItem(key: string): MenuItem | undefined {
   return menuItems.find((item) => item.key === key);
 }
 
-/** 按菜单展示顺序递归查找第一个可访问的叶子路由。 */
-export function firstLeafPath(item: MenuItem): string | null {
-  if (item.hidden) return null;
-  if (!isGroupItem(item)) return item.key.startsWith("/") ? item.key : null;
-  for (const child of item.children) {
-    const path = firstLeafPath(child);
-    if (path) return path;
-  }
-  return null;
-}
-
 /** 根据当前 pathname 计算侧栏 Menu selectedKeys（最长前缀匹配）。 */
 export function matchSideMenuKey(pathname: string, routeKeys: string[]): string[] {
   const exact = routeKeys.find((key) => key === pathname);

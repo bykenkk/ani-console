@@ -23,6 +23,7 @@ export default function VmDetachDiskModal({
     vmId: vm.id,
     action: "卸载数据盘",
     actionId: "vm-disk-detach",
+    refreshQueryKeys: [["vms", vm.id, "disks"]],
     onSubmitted,
     mutationFn: (values) =>
       detachVmDisk(vm.id, disk.diskId, {

@@ -192,15 +192,7 @@ export interface VmSnapshotRestoreInput extends VmChangeInput {
   preview_digest: string;
   destructive_confirmation: boolean;
 }
-export interface VmOperation {
-  id: string;
-  vmId: string;
-  action: string;
-  intentVersion: string;
-  state: string;
-  reason?: string;
-  observedAt?: string;
-}
+
 export interface VmSnapshot {
   name?: string;
   createdAt?: string;

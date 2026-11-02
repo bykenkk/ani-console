@@ -30,6 +30,7 @@ export default function VmDisks({ vm }: VmDisksProps) {
     vmId: vm.id,
     action: "挂载数据盘",
     actionId: "vm-disk-attach",
+    refreshQueryKeys: [["vms", vm.id, "disks"]],
     channel: "notification",
     mutationFn: (disk) => attachVmDisk(vm.id, disk.diskId, { expected_version: vm.version }),
   });
@@ -37,6 +38,7 @@ export default function VmDisks({ vm }: VmDisksProps) {
     vmId: vm.id,
     action: "删除数据盘",
     actionId: "vm-disk-delete",
+    refreshQueryKeys: [["vms", vm.id, "disks"]],
     channel: "notification",
     mutationFn: (disk) => deleteVmDisk(vm.id, disk.diskId, { expected_version: vm.version }),
   });

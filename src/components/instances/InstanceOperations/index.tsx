@@ -20,7 +20,7 @@ const ACTION_LABELS: Record<string, string> = {
 
 export default function InstanceOperations({ operationId }: InstanceOperationsProps) {
   const query = useQuery({
-    queryKey: ["governance-instance-operation", operationId],
+    queryKey: ["instance-operation", operationId],
     enabled: Boolean(operationId),
     queryFn: ({ signal }) => getInstanceOperation(operationId!, signal),
     refetchInterval: (query) =>

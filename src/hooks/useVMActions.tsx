@@ -1,7 +1,6 @@
 import { Modal } from "@arco-design/web-react";
 import { useState } from "react";
 import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
-import { ApiError } from "@/api/request";
 import { startVm, restartVm, deleteVm, type VirtualMachine } from "@/api/vms";
 import { unavailableAction, type RowAction } from "@/components/common/DataTable/RowActions";
 import VmCreateSnapshotModal from "@/components/vms/VmCreateSnapshotModal";
@@ -48,19 +47,16 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
         await qc.invalidateQueries({ queryKey: ["vms", vm.id], refetchType: "none" });
         onDeleted?.();
         await qc.invalidateQueries({ queryKey: ["vms", "list"] });
-      } else await qc.invalidateQueries({ queryKey: ["vms"] });
-    },
-    onError: async (error, { vm }) => {
-      if (error instanceof ApiError && error.status === 409) {
+      } else {
         await Promise.all([
-          qc.invalidateQueries({ queryKey: ["vms", vm.id] }),
           qc.invalidateQueries({ queryKey: ["vms", "list"] }),
+          qc.invalidateQueries({ queryKey: ["vms", vm.id], exact: true }),
         ]);
       }
     },
   });
   const confirm = (action: VmPowerAction, vm: VirtualMachine) => {
-    const dialog = Modal.confirm({
+    Modal.confirm({
       title: `${LABELS[action]} ${vm.name}`,
       content:
         action === "delete"
@@ -69,15 +65,7 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
       okButtonProps: {
         status: action === "delete" ? "danger" : "default",
       },
-      onOk: async () => {
-        try {
-          await mutation.mutateAsync({ action, vm });
-        } catch (error) {
-          // 版本冲突后关闭持有旧行数据的确认框，由用户基于刷新后的资源重新确认。
-          if (error instanceof ApiError && error.status === 409) dialog.close();
-          throw error;
-        }
-      },
+      onOk: () => mutation.mutateAsync({ action, vm }),
     });
   };
   const unavailable = (vm: VirtualMachine) => vmIsClosed(vm) || pending > 0 || Boolean(dialog);

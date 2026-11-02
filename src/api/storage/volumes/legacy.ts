@@ -11,8 +11,6 @@ import type {
   StorageVolume,
   StorageVolumeAutoSnapshotPolicyUpdateInput,
   StorageVolumeAutoSnapshotPolicyUpdateRequest,
-  StorageVolumeExpandInput,
-  StorageVolumeExpandRequest,
   StorageVolumeListParams,
   StorageVolumeListResponse,
   VolumeOSInitCompleteInput,
@@ -22,7 +20,7 @@ import type {
 } from "./types-legacy";
 
 const createScope = createIdempotencyScope("storage-volume-create", ["POST"]);
-const expandScope = createIdempotencyScope("storage-volume-expand", ["POST"]);
+
 const autoSnapshotScope = createIdempotencyScope("storage-volume-auto-snapshot-policy", ["PUT"]);
 const snapshotScope = createIdempotencyScope("storage-volume-snapshot-create", ["POST"]);
 const osInitScope = createIdempotencyScope("storage-volume-os-init-complete", ["POST"]);
@@ -44,14 +42,6 @@ export function createVolume(submitData: CreateStorageVolumeInput): Promise<Stor
   );
 }
 
-export function getVolume(volumeId: string): Promise<StorageVolume> {
-  return coreRequest<StorageVolume>(volumePath(volumeId), { method: "GET" });
-}
-
-export function deleteVolume(volumeId: string): Promise<StorageVolume> {
-  return coreRequest<StorageVolume>(volumePath(volumeId), { method: "DELETE" });
-}
-
 export function listVolumeSnapshots(volumeId: string): Promise<VolumeSnapshotListResponse> {
   return coreRequest<VolumeSnapshotListResponse>(`${volumePath(volumeId)}/snapshots`, {
     method: "GET",
@@ -67,22 +57,6 @@ export function createVolumeSnapshot(
     submitData,
     (body) =>
       coreRequest<AsyncTask, CreateVolumeSnapshotRequest>(`${volumePath(volumeId)}/snapshots`, {
-        method: "POST",
-        data: body,
-      }),
-    [volumeId],
-  );
-}
-
-export function expandVolume(
-  volumeId: string,
-  submitData: StorageVolumeExpandInput,
-): Promise<AsyncTask> {
-  return runIdempotentRequest(
-    expandScope,
-    submitData,
-    (body) =>
-      coreRequest<AsyncTask, StorageVolumeExpandRequest>(`${volumePath(volumeId)}/expand`, {
         method: "POST",
         data: body,
       }),
@@ -129,25 +103,10 @@ export function completeVolumeOSInit(
 }
 
 export type {
-  CreateStorageVolumeInput,
-  CreateStorageVolumeRequest,
-  CreateVolumeSnapshotInput,
-  CreateVolumeSnapshotRequest,
   StorageResourceState,
   StorageVolume,
   StorageVolumeAutoSnapshotPolicy,
-  StorageVolumeAutoSnapshotPolicyUpdateInput,
-  StorageVolumeAutoSnapshotPolicyUpdateRequest,
-  StorageVolumeExpandInput,
-  StorageVolumeExpandRequest,
-  StorageVolumeListParams,
-  StorageVolumeListResponse,
   StorageVolumeMountHistoryEntry,
   StorageVolumeMode,
-  VolumeOSInitCompleteInput,
-  VolumeOSInitCompleteRequest,
-  VolumeOSInitGuide,
-  VolumeOSInitStep,
-  VolumeSnapshotListResponse,
   VolumeSnapshotRecord,
 } from "./types-legacy";

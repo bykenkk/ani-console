@@ -2,21 +2,17 @@ import VolumeOSInitGuideModal from "@/components/volumes/VolumeOSInitGuideModal"
 import { applyInstanceLifecycle } from "@/api/instances/legacy";
 import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useResourceDelete } from "@/hooks/useResourceDelete";
 import { useState } from "react";
 import { type StorageVolume } from "@/api/storage/volumes/legacy";
 import CreateVolumeSnapshotModal from "@/components/volumes/CreateVolumeSnapshotModal";
-import ExpandVolumeModal from "@/components/volumes/ExpandVolumeModal";
 import AttachVolumeModal from "@/components/volumes/AttachVolumeModal";
 import type { RowAction } from "@/components/common";
 type Volume = StorageVolume;
-export function useVolumeActions(onDeleted?: (item: Volume) => void) {
+export function useVolumeActions() {
   const queryClient = useQueryClient();
   const [attachTarget, setAttachTarget] = useState<Volume | null>(null);
-  const [expandTarget, setExpandTarget] = useState<Volume | null>(null);
   const [snapshotTarget, setSnapshotTarget] = useState<{ id: string } | null>(null);
   const [initGuideId, setInitGuideId] = useState<string>();
-  const deleteVolume = useResourceDelete<Volume>("volume", onDeleted);
   const detachVolume = useMutation({
     meta: {
       feedback: {
@@ -42,11 +38,6 @@ export function useVolumeActions(onDeleted?: (item: Volume) => void) {
   const isMounted = (item: Volume) => Boolean(item.mount_instance_id);
   const actions: RowAction<Volume>[] = [
     { key: "os-init", label: "初始化引导", onClick: (item) => setInitGuideId(item.id) },
-    {
-      key: "expand",
-      label: "扩容",
-      onClick: setExpandTarget,
-    },
     {
       key: "mount",
       label: "挂载",
@@ -74,14 +65,6 @@ export function useVolumeActions(onDeleted?: (item: Volume) => void) {
       label: "创建快照",
       onClick: setSnapshotTarget,
     },
-    {
-      key: "delete",
-      label: "删除",
-      disabled: deleteVolume.isDisabled,
-      loading: (item) => deleteVolume.isPending && deleteVolume.variables?.id === item.id,
-      intent: "danger",
-      onClick: (item) => deleteVolume.confirm(item),
-    },
   ];
   const dialogNode = (
     <>
@@ -90,9 +73,6 @@ export function useVolumeActions(onDeleted?: (item: Volume) => void) {
       )}
       {attachTarget && (
         <AttachVolumeModal volume={attachTarget} onCancel={() => setAttachTarget(null)} />
-      )}
-      {expandTarget && (
-        <ExpandVolumeModal volume={expandTarget} onCancel={() => setExpandTarget(null)} />
       )}
       {snapshotTarget && (
         <CreateVolumeSnapshotModal

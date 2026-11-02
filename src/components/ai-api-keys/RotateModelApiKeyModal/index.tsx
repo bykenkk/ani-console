@@ -33,16 +33,16 @@ export default function RotateModelApiKeyModal({
       },
     },
     onSuccess: async (credentials) => {
-      const secretKey = ["governance-inference-key-secret", apiKey.id];
+      const secretKey = ["inference-key-secret", apiKey.id];
       await qc.cancelQueries({ queryKey: secretKey });
       qc.removeQueries({ queryKey: secretKey });
       onRotated(credentials);
       return Promise.all([
         qc.invalidateQueries({
-          queryKey: ["governance-inference-keys"],
+          queryKey: ["inference-keys"],
           predicate: (query) => query.queryKey[1] !== "options",
         }),
-        qc.resetQueries({ queryKey: ["governance-inference-keys", "options"] }),
+        qc.resetQueries({ queryKey: ["inference-keys", "options"] }),
       ]);
     },
   });

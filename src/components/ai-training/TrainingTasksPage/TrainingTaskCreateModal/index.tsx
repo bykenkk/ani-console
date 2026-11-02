@@ -69,8 +69,8 @@ export default function TrainingTaskCreateModal({
         errorFallback: "创建失败，请稍后重试",
       },
     },
-    onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ["training-executions"] });
+    onSuccess: async (_, input) => {
+      await qc.invalidateQueries({ queryKey: ["training-executions", { kind: input.kind }] });
       // TODO(training-task): 后续统一接入创建任务跟踪，当前受理成功后关闭表单。
       onCreated?.();
       onCancel();

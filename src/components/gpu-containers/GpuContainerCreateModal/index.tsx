@@ -85,7 +85,7 @@ export default function GpuContainerCreateModal({
     // TODO(gpu-container-create): 联调验证 GPU 预设、目录不可用提示、资格与配额校验及冻结规格；GPU 执行参数由后端解析。
     // TODO(container-task): 创建任务跟踪后续统一接入，当前仅提交请求并提示。
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ["governance-instances"] });
+      await qc.invalidateQueries({ queryKey: ["instances", "gpu"] });
       onCreated();
     },
   });

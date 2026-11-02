@@ -78,7 +78,7 @@ export default function CreateInferenceModal({
       },
     },
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ["governance-inference-services"] });
+      await qc.invalidateQueries({ queryKey: ["inference-services"] });
       // TODO(inference-task): 后续统一接入部署任务跟踪；当前仅刷新列表并关闭表单。
       onCancel();
     },

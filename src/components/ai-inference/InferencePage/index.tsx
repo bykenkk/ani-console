@@ -21,7 +21,7 @@ export default function InferencePage() {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const query = useQuery({
-    queryKey: ["governance-inference-services", { page, pageSize }],
+    queryKey: ["inference-services", { page, pageSize }],
     queryFn: ({ signal }) => listInferenceServices({ page, pageSize }, signal),
     meta: {
       errorNotification: {
@@ -47,7 +47,7 @@ export default function InferencePage() {
   };
   const refresh = () => {
     qc.invalidateQueries({
-      queryKey: ["governance-inference-services"],
+      queryKey: ["inference-services"],
       refetchType: "none",
     });
     setPage(1);

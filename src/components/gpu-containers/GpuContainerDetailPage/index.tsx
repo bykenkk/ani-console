@@ -38,14 +38,14 @@ export default function GpuContainerDetailPage({
 }: GpuContainerDetailPageProps) {
   const goBack = useBackOrFallback("gpu-instance");
   const current = useQuery({
-    queryKey: ["governance-instance", instanceId],
+    queryKey: ["instance", instanceId],
     queryFn: ({ signal }) => getInstance(instanceId, signal),
     refetchInterval: (query) => (query.state.data?.activeOperationId ? 4000 : false),
     meta: { errorNotification: { id: withId("instance", instanceId), action: "实例详情加载" } },
   });
   const isGpu = current.data?.instance_kind === "container" && current.data.compute_type === "gpu";
   const runtime = useQuery({
-    queryKey: ["governance-instance-runtime", instanceId],
+    queryKey: ["instance-runtime", instanceId],
     enabled: isGpu,
     queryFn: ({ signal }) => getInstanceRuntime(instanceId, signal),
     meta: {
@@ -53,7 +53,7 @@ export default function GpuContainerDetailPage({
     },
   });
   const configuration = useQuery({
-    queryKey: ["governance-instance-configuration", instanceId],
+    queryKey: ["instance-configuration", instanceId],
     enabled: isGpu,
     gcTime: 0,
     queryFn: ({ signal }) => getInstanceConfiguration(instanceId, signal),
@@ -64,7 +64,7 @@ export default function GpuContainerDetailPage({
       },
     },
   });
-  const { actions, dialogNode } = useGpuContainerActions(() => {}, goBack);
+  const { actions, dialogNode } = useGpuContainerActions(goBack);
   const primaryAction = actions.find((action) => action.key === "terminal");
   if (!current.data) return <DetailPagePlaceholder loading={current.isLoading} />;
   const record = current.data;
@@ -252,6 +252,7 @@ export default function GpuContainerDetailPage({
       <InstanceOperationObserver
         key={instanceId}
         instanceId={instanceId}
+        computeType={record.compute_type}
         operationId={record.activeOperationId}
       />
       {dialogNode}

@@ -82,7 +82,7 @@ export default function ContainerCreateModal({ onCancel, onCreated }: ContainerC
     },
     // TODO(container-task): 创建任务跟踪后续统一接入，当前仅提交请求并提示。
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ["governance-instances"] });
+      await qc.invalidateQueries({ queryKey: ["instances", "cpu"] });
       onCreated();
     },
   });

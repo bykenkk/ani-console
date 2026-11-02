@@ -22,7 +22,7 @@ function InferencePolicyModelsInput({
   disabled,
 }: InferencePolicyModelsInputProps) {
   const services = useQuery({
-    queryKey: ["governance-inference-services", "options"],
+    queryKey: ["inference-services", "options"],
     queryFn: ({ signal }) => listServiceOptions({}, signal),
     meta: {
       errorNotification: { id: "inference-services", action: "推理服务列表加载" },

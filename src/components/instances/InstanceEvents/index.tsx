@@ -10,7 +10,7 @@ type InstanceEventsProps = { instanceId?: string };
 export default function InstanceEvents({ instanceId }: InstanceEventsProps) {
   // TODO(instance-events): 云主机、沙箱的新事件契约尚未提供，保留模板空态，待接口补齐后接入。
   const current = useQuery({
-    queryKey: ["governance-instance-events", instanceId],
+    queryKey: ["instance-events", instanceId],
     enabled: Boolean(instanceId),
     queryFn: ({ signal }) => listInstanceEvents(instanceId!, signal),
     meta: {

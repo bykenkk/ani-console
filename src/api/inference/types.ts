@@ -97,31 +97,6 @@ export interface InferenceListResponse {
   items: InferenceService[];
   total: number | string;
 }
-export interface InferenceOperation {
-  id: string;
-  service_id: string;
-  kind: string;
-  phase: string;
-  step?: string;
-  target_generation?: string;
-  error_code?: string;
-  error_message?: string;
-  created_at?: string;
-  completed_at?: string;
-}
-/** Owner Proto uses default camelCase JSON names, unlike the Governance DTOs. */
-export interface InferenceOperationResponse {
-  id: string;
-  serviceId: string;
-  kind: string;
-  phase: string;
-  step?: string;
-  targetGeneration?: string;
-  errorCode?: string;
-  errorMessage?: string;
-  createdAt?: string;
-  completedAt?: string;
-}
 
 export interface InferenceRuntimeInstance {
   name: string;

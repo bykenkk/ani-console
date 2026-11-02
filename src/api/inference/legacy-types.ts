@@ -1,96 +1,11 @@
 // 旧 ANI Services 响应类型，仅供 legacy.ts 及其存量调用方使用。
-// TODO(governance-migration): 随旧调用方迁移移除；不要把 status/generation/items 强转为新 phase/int64/services 契约。
-import type { CursorPageParams } from "@/api/types";
-
-export interface InferenceServiceAccelerator {
-  spec_id: string;
-  count_per_replica: number;
-  memory?: number;
-}
-
-export interface InferenceServiceResources {
-  cpu: string;
-  memory: string;
-  accelerator?: InferenceServiceAccelerator;
-}
-
-export interface InferenceServiceEngine {
-  env?: Array<{ name: string; value: string }>;
-  command?: string[];
-}
-
-export interface InferenceService {
-  id: string;
-  name: string;
-  model: string;
-  model_version_id?: string | null;
-  served_model_name: string;
-  image_id?: string | null;
-  image_ref?: string | null;
-  replicas: number;
-  ready_replicas: number;
-  resources?: InferenceServiceResources | null;
-  placement_mode: "auto" | "single_node" | "multi_node" | string;
-  engine?: InferenceServiceEngine | null;
-  gpu_type?: string | null;
-  gpu_count_per_pod: number;
-  max_concurrency: number;
-  status: string;
-  status_reason?: string | null;
-  status_message?: string | null;
-  generation: number;
-  observed_generation: number;
-  current_operation_id?: string | null;
-  invocation_url?: string | null;
-  endpoint_url?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
-}
-
-export interface InferenceServiceListParams extends CursorPageParams {
-  capability?: "embedding" | "text-generation" | "speech-to-text";
-  status?: string;
-  model?: string;
-  search_field?: "name" | "id";
-  keyword?: string;
-}
-
-export interface InferenceServiceListResponse {
-  items: InferenceService[];
-  next_cursor?: string | null;
-  total?: number;
-}
-
-export interface CreateInferenceServiceInput {
-  name: string;
-  model: string;
-  model_version_id?: string;
-  served_model_name?: string;
-  replicas?: number;
-  resources?: InferenceServiceResources;
-  placement_mode?: "auto" | "single_node" | "multi_node";
-  image_id?: string;
-  image_ref?: string;
-  engine?: InferenceServiceEngine;
-}
-
-export interface CreateInferenceServiceRequest extends CreateInferenceServiceInput {
-  idempotency_key: string;
-}
+// TODO(governance-migration): 随旧扩缩容和访问策略调用迁移移除；不得与 Governance 类型混用。
 
 export interface UpdateInferenceServiceInput {
   replicas: number;
 }
 
 export interface UpdateInferenceServiceRequest extends UpdateInferenceServiceInput {
-  idempotency_key: string;
-}
-
-export interface InferenceServiceLifecycleInput {
-  action: "start" | "stop" | "restart";
-}
-
-export interface InferenceServiceLifecycleRequest extends InferenceServiceLifecycleInput {
   idempotency_key: string;
 }
 
@@ -106,23 +21,6 @@ export interface InferenceOperation {
   error_message?: string | null;
   created_at?: string | null;
   completed_at?: string | null;
-}
-
-export interface InferenceServiceLog {
-  timestamp?: string | null;
-  level: string;
-  message: string;
-  container?: string | null;
-  stream?: string | null;
-}
-
-export interface InferenceServiceLogListParams extends CursorPageParams {
-  level?: "debug" | "info" | "warn" | "error";
-}
-
-export interface InferenceServiceLogListResponse {
-  items: InferenceServiceLog[];
-  next_cursor?: string | null;
 }
 
 export interface InferenceAccessPolicy {

@@ -18,7 +18,6 @@ export default function VmShutdownModal({ vm, onCancel, onSubmitted }: VmShutdow
     action: force ? "强制关机" : "关机",
     actionId: force ? "vm-force-stop" : "vm-stop",
     onSubmitted,
-    onConflict: () => setConfirmedVersion(undefined),
     mutationFn: () =>
       force
         ? forceStopVm(vm.id, { expected_version: vm.version, destructive_confirmation: true })

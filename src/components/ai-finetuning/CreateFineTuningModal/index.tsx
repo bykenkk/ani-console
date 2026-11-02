@@ -129,9 +129,8 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
         errorFallback: "创建失败，请稍后重试",
       },
     },
-    onSuccess: async () => {
-      // 统一失效执行列表缓存，覆盖按 kind 分开的训练与微调查询。
-      await qc.invalidateQueries({ queryKey: ["training-executions"] });
+    onSuccess: async (_, input) => {
+      await qc.invalidateQueries({ queryKey: ["training-executions", { kind: input.kind }] });
       // TODO(finetuning-task): 后续统一接入创建任务跟踪，当前受理成功后关闭表单。
       onCancel();
     },

@@ -99,7 +99,7 @@ export default function ImportModelModal({ onCancel }: ImportModelModalProps) {
         },
       }),
     onSuccess: async () => {
-      await qc.invalidateQueries({ queryKey: ["governance-models"] });
+      await qc.invalidateQueries({ queryKey: ["models"] });
       onCancel();
     },
   });

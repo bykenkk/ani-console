@@ -22,7 +22,7 @@ const UNAVAILABLE_ACTIONS = [
   { key: "protection", label: "终止保护" },
 ];
 
-export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => void) {
+export function useGpuContainerActions(onDeleted?: () => void) {
   const qc = useQueryClient();
   const [dialog, setDialog] = useState<{
     action: "stop" | "delete" | "restart" | "attach" | "detach" | "security-groups";
@@ -47,11 +47,10 @@ export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => 
     // TODO(container-task): 本阶段只提示已提交并刷新实例，任务跟踪后续统一接入。
     onSuccess: async (_, instance) => {
       await Promise.all([
-        qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance", instance.id] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance-runtime", instance.id] }),
+        qc.invalidateQueries({ queryKey: ["instances", instance.compute_type] }),
+        qc.invalidateQueries({ queryKey: ["instance", instance.id] }),
+        qc.invalidateQueries({ queryKey: ["instance-runtime", instance.id] }),
       ]);
-      onChanged();
     },
   });
   const unavailable = (instance: InstanceRecord) =>
@@ -143,7 +142,6 @@ export function useGpuContainerActions(onChanged: () => void, onDeleted?: () => 
   ];
   const submitted = () => {
     setDialog(undefined);
-    onChanged();
   };
   const dialogNode = (
     <>

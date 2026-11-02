@@ -69,17 +69,6 @@ export interface ModelVersionResponse {
   model: Model;
   version: ModelVersion;
 }
-export interface ImportModelInput {
-  source: ExternalModelProvider;
-  repo_id: string;
-  revision: string;
-  webhook_url?: string;
-  model_id: string;
-  model_version_id: string;
-}
-export interface ImportModelRequest extends ImportModelInput {
-  idempotency_key: string;
-}
 
 export interface ImportModelBundleModelInput {
   name: string;
@@ -143,27 +132,7 @@ export interface SearchExternalModelsResponse {
   items: ExternalModelCandidate[];
   hasMore: boolean;
 }
-export interface CreateModelInput {
-  name: string;
-  display_name?: string;
-  description?: string;
-  capabilities: ModelCapability[];
-  model_id?: string;
-}
-export interface CreateModelRequest extends CreateModelInput {
-  idempotency_key: string;
-}
-export interface CreateModelVersionInput {
-  model_id: string;
-  version: string;
-  format: ModelFormat;
-  engine_type: string;
-  startup_command: string;
-  engine_image: string;
-}
-export interface CreateModelVersionRequest extends CreateModelVersionInput {
-  idempotency_key: string;
-}
+
 export interface ImportTask {
   task_id: string;
   task_type: string;

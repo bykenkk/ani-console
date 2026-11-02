@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { getInstanceOperation } from "@/api/instances";
+import { getInstanceOperation, type ComputeType } from "@/api/instances";
 import { closeNotification, showNotification } from "@/lib/feedback";
 import { withId } from "@/lib/id";
 
-type InstanceOperationObserverProps = { instanceId: string; operationId?: string };
+type InstanceOperationObserverProps = {
+  instanceId: string;
+  computeType: ComputeType;
+  operationId?: string;
+};
 const LABELS: Record<string, string> = {
   restart: "重启",
   "attach-pvc": "挂载云盘",
@@ -13,6 +17,7 @@ const LABELS: Record<string, string> = {
 
 export default function InstanceOperationObserver({
   instanceId,
+  computeType,
   operationId,
 }: InstanceOperationObserverProps) {
   const qc = useQueryClient();
@@ -28,7 +33,7 @@ export default function InstanceOperationObserver({
     [trackedId],
   );
   const query = useQuery({
-    queryKey: ["governance-instance-operation", trackedId],
+    queryKey: ["instance-operation", trackedId],
     enabled: Boolean(trackedId),
     queryFn: ({ signal }) => getInstanceOperation(trackedId!, signal),
     // 创建、删除等旧操作仍按原边界暂缓跟踪，只轮询本批新增的三个动作。
@@ -74,15 +79,15 @@ export default function InstanceOperationObserver({
     if (terminal) {
       // 失败不代表回滚，始终重新查询当前实例和权威挂载集合。
       Promise.all([
-        qc.invalidateQueries({ queryKey: ["governance-instances"] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance", instanceId] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance-configuration", instanceId] }),
-        qc.invalidateQueries({ queryKey: ["governance-instance-runtime", instanceId] }),
+        qc.invalidateQueries({ queryKey: ["instances", computeType] }),
+        qc.invalidateQueries({ queryKey: ["instance", instanceId] }),
+        qc.invalidateQueries({ queryKey: ["instance-configuration", instanceId] }),
+        qc.invalidateQueries({ queryKey: ["instance-runtime", instanceId] }),
         qc.invalidateQueries({ queryKey: ["instance-mountable-pvcs", instanceId] }),
       ]).catch(() => {
         /* 查询失败由各查询的 errorNotification 处理。 */
       });
     }
-  }, [query.data, operationId, trackedId, instanceId, qc]);
+  }, [query.data, operationId, trackedId, instanceId, computeType, qc]);
   return null;
 }

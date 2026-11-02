@@ -23,7 +23,7 @@ export default function KnowledgeModelSelect({
   // FIXME(inference-contract): 当前推理调用对应的目标路由仍待确认。
   // TODO(inference-contract): 路由恢复后验证 capability/status 筛选及可调用模型选项。
   const models = useQuery({
-    queryKey: ["governance-inference-services", "options", capability, "running"],
+    queryKey: ["inference-services", "options", capability, "running"],
     queryFn: ({ signal }) => listInferenceOptions({ capability, status: "running" }, signal),
     meta: {
       errorNotification: {

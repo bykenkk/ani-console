@@ -24,9 +24,9 @@ export function useModelActions(onDeleted?: () => void) {
     },
     onSuccess: async (_, item) => {
       await Promise.all([
-        qc.invalidateQueries({ queryKey: ["governance-models"] }),
+        qc.invalidateQueries({ queryKey: ["models"] }),
         qc.invalidateQueries({
-          queryKey: ["governance-model", item.id],
+          queryKey: ["model", item.id],
           refetchType: "none",
         }),
       ]);

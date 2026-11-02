@@ -11,9 +11,7 @@ import { ConfiguredDataTableRowActions, type RowAction } from "./RowActions";
 
 import LegacyCursorPagination from "./LegacyCursorPagination";
 
-export { DataTableRowActionButton, DataTableRowActions } from "./RowActions";
 export type { RowAction } from "./RowActions";
-export type { DataTableSectionHeaderProps } from "./DataTableSectionHeader";
 
 export type ListColumn<T> = TableColumnProps<T>;
 

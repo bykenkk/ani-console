@@ -13,6 +13,7 @@ export default function VmCreateDiskModal({ vm, onCancel, onSubmitted }: VmCreat
     vmId: vm.id,
     action: "创建数据盘",
     actionId: "vm-disk-create",
+    refreshQueryKeys: [["vms", vm.id, "disks"]],
     onSubmitted,
     mutationFn: (values) =>
       createVmDisk(vm.id, {

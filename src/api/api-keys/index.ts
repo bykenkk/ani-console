@@ -48,11 +48,4 @@ export function resetApiKeySecret(keyId: number): Promise<ApiKeyCredentials> {
   });
 }
 
-export type {
-  ApiKeyCredentials,
-  ApiKeyListResponse,
-  ApiKeyRecord,
-  CreateApiKeyInput,
-  DeleteApiKeyResponse,
-  UpdateApiKeyInput,
-} from "./types";
+export type { ApiKeyCredentials, ApiKeyRecord } from "./types";

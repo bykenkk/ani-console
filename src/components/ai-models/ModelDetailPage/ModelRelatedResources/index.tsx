@@ -23,7 +23,7 @@ export default function ModelRelatedResources({ model }: ModelRelatedResourcesPr
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["governance-inference-services", "model-related", model.id, params],
+    queryKey: ["inference-services", "model-related", model.id, params],
     queryFn: ({ signal }) => listInferenceServices(params, signal),
   });
   const versionIds = new Set((model.versions ?? []).map((version) => version.id));
@@ -37,7 +37,7 @@ export default function ModelRelatedResources({ model }: ModelRelatedResourcesPr
   ];
   const versions = useQueries({
     queries: unresolvedIds.map((id) => ({
-      queryKey: ["governance-model-version", id],
+      queryKey: ["model-version", id],
       queryFn: ({ signal }: { signal: AbortSignal }) => getModelVersion(id, signal),
       meta: {
         errorNotification: {

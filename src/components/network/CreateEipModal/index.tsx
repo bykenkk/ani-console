@@ -28,12 +28,16 @@ export default function CreateEipModal({ onCancel, onCreated }: CreateEipModalPr
         errorFallback: "创建失败，请稍后重试",
       },
     },
-    onSuccess: async () => {
+    onSuccess: async (_, input) => {
       // TODO: 资源 task 跟踪统一开放后接入创建进度；当前仅刷新列表。
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["network-eips"] }),
         queryClient.invalidateQueries({ queryKey: ["network-security-groups"] }),
-        queryClient.invalidateQueries({ queryKey: ["network-security-group-bindings"] }),
+        ...[...new Set(input.security_group_ids ?? [])].map((securityGroupId) =>
+          queryClient.invalidateQueries({
+            queryKey: ["network-security-group-bindings", securityGroupId],
+          }),
+        ),
       ]);
       onCreated();
     },

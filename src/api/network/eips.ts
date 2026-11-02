@@ -4,7 +4,6 @@ import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
   CreateNetworkEipInput,
   CreateNetworkEipRequest,
-  NetworkEip,
   NetworkEipListParams,
   NetworkEipListResponse,
   NetworkSecurityGroupBindingResponse,
@@ -20,9 +19,7 @@ export function listNetworkEips(
 ): Promise<NetworkEipListResponse> {
   return coreRequest<NetworkEipListResponse>("/networks/eips", { method: "GET", params, signal });
 }
-export function getNetworkEip(id: string, signal?: AbortSignal): Promise<NetworkEip> {
-  return coreRequest<NetworkEip>(eipPath(id), { method: "GET", signal });
-}
+
 export function createNetworkEip(
   input: CreateNetworkEipInput,
   signal?: AbortSignal,
@@ -33,13 +30,6 @@ export function createNetworkEip(
       data,
       signal,
     });
-  });
-}
-// The DELETE contract has no client idempotency field or header.
-export async function deleteNetworkEip(id: string, signal?: AbortSignal): Promise<void> {
-  await coreRequest<unknown>(eipPath(id), {
-    method: "DELETE",
-    signal,
   });
 }
 

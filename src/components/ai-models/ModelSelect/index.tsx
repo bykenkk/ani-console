@@ -26,7 +26,7 @@ export default function ModelSelect({
   const [keyword, setKeyword] = useState("");
   // TODO(model-contract): 联调模型选项的远程搜索及初始选择回显。
   const models = useQuery({
-    queryKey: ["governance-models", "options", { keyword, status }],
+    queryKey: ["models", "options", { keyword, status }],
     queryFn: ({ signal }) => listModelOptions({ keyword: keyword || undefined, status }, signal),
     meta: { errorNotification: { id: "inference-models", action: "模型列表加载" } },
   });

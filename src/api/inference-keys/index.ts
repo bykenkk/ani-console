@@ -12,13 +12,7 @@ import type {
   RotateInferenceKeyRequest,
 } from "./types";
 
-export type {
-  CreateInferenceKeyInput,
-  InferenceKey,
-  InferenceKeyCredentials,
-  InferenceKeyListParams,
-  InferenceKeyListResponse,
-} from "./types";
+export type { InferenceKey, InferenceKeyCredentials } from "./types";
 
 const createScope = createIdempotencyScope("inference-key-create", ["POST"]);
 const rotateScope = createIdempotencyScope("inference-key-rotate", ["POST"]);

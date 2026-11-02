@@ -22,13 +22,13 @@ function ModelApiKeyPolicyInput({
   showRules,
 }: ModelApiKeyPolicyInputProps) {
   const policies = useQuery({
-    queryKey: ["governance-inference-policies", "options"],
+    queryKey: ["inference-policies", "options"],
     queryFn: ({ signal }) => listPolicyOptions({}, signal),
     meta: { errorNotification: { id: "inference-policies", action: "访问策略列表加载" } },
   });
   // 单个详情用于策略摘要及前 100 项之外的原绑定回显。
   const selected = useQuery({
-    queryKey: ["governance-inference-policy", value],
+    queryKey: ["inference-policy", value],
     queryFn: ({ signal }) => getInferencePolicy(value!, signal),
     enabled: Boolean(value),
     meta: {
