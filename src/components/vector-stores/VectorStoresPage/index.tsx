@@ -59,14 +59,7 @@ export default function VectorStoresPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => (
-        <ResourceNameId
-          name={item.name}
-          id={item.id}
-          type="vector-store"
-          search={{ tab: undefined }}
-        />
-      ),
+      render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="vector-store" />,
     },
     {
       key: "state",
@@ -113,7 +106,6 @@ export default function VectorStoresPage() {
         //       navigateToResourceDetail(navigate, {
         //         type: "knowledge-base",
         //         id: knowledgeBase.id,
-        //         search: { tab: "documents" },
         //       })
         //     }
         //   >

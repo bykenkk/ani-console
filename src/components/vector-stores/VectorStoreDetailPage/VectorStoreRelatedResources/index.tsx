@@ -83,7 +83,6 @@ export default function VectorStoreRelatedResources({ store }: VectorStoreRelate
               //       navigateToResourceDetail(navigate, {
               //         type: "knowledge-base",
               //         id: resource.id,
-              //         search: { tab: "documents" },
               //       })
               //     }
               //   >

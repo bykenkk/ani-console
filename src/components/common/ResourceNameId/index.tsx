@@ -1,25 +1,14 @@
 import { useNavigate } from "@tanstack/react-router";
-import {
-  navigateToResourceDetail,
-  type KnowledgeBaseDetailSearch,
-  type ResourceDetailTypeWithoutSearch,
-  type VectorStoreDetailSearch,
-} from "@/lib/resources";
+import { navigateToResourceDetail, type ResourceDetailType } from "@/lib/resources";
 import ResourceId from "../ResourceId";
 
-type ResourceNameIdBaseProps = {
+export type ResourceNameIdProps = {
   name: string;
   id?: string | null;
   openable?: boolean;
   copyable?: boolean;
+  type?: ResourceDetailType;
 };
-
-export type ResourceNameIdProps = ResourceNameIdBaseProps &
-  (
-    | { type?: ResourceDetailTypeWithoutSearch; search?: never }
-    | { type: "knowledge-base"; search: KnowledgeBaseDetailSearch }
-    | { type: "vector-store"; search: VectorStoreDetailSearch }
-  );
 
 export default function ResourceNameId(props: ResourceNameIdProps) {
   const { name, id, openable = true, copyable = true } = props;
@@ -36,14 +25,6 @@ export default function ResourceNameId(props: ResourceNameIdProps) {
 
   const handleOpen = () => {
     if (!openable || !props.type || !id || id === "-") return;
-    if (props.type === "knowledge-base") {
-      navigateToResourceDetail(navigate, { type: props.type, id, search: props.search });
-      return;
-    }
-    if (props.type === "vector-store") {
-      navigateToResourceDetail(navigate, { type: props.type, id, search: props.search });
-      return;
-    }
     navigateToResourceDetail(navigate, { type: props.type, id });
   };
 

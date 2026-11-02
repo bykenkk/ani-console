@@ -20,25 +20,10 @@ export type ResourceDetailType =
   | "bucket"
   | "vector-store";
 
-export type KnowledgeBaseDetailSearch = {
-  tab: string;
+export type ResourceDetailTarget = {
+  type: ResourceDetailType;
+  id: string;
 };
-
-export type VectorStoreDetailSearch = {
-  tab: string | undefined;
-};
-
-export type ResourceDetailSearch = KnowledgeBaseDetailSearch | VectorStoreDetailSearch;
-
-export type ResourceDetailTypeWithoutSearch = Exclude<
-  ResourceDetailType,
-  "knowledge-base" | "vector-store"
->;
-
-export type ResourceDetailTarget =
-  | { type: ResourceDetailTypeWithoutSearch; id: string }
-  | { type: "knowledge-base"; id: string; search: KnowledgeBaseDetailSearch }
-  | { type: "vector-store"; id: string; search: VectorStoreDetailSearch };
 
 export function navigateToResourceDetail(
   navigate: NavigateFn,
@@ -80,7 +65,6 @@ export function navigateToResourceDetail(
       // navigate({
       //   to: "/kb/$kbId",
       //   params: { kbId: resource.id },
-      //   search: resource.search,
       // });
       return;
     case "vpc":
@@ -120,7 +104,6 @@ export function navigateToResourceDetail(
       // navigate({
       //   to: "/vector-stores/$vectorStoreId",
       //   params: { vectorStoreId: resource.id },
-      //   search: resource.search,
       // });
       return;
   }

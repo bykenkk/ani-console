@@ -50,14 +50,7 @@ export default function KnowledgeBasesPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => (
-        <ResourceNameId
-          name={item.name}
-          id={item.id}
-          type="knowledge-base"
-          search={{ tab: "documents" }}
-        />
-      ),
+      render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="knowledge-base" />,
     },
     {
       key: "status",

@@ -19,7 +19,6 @@ export function useKnowledgeBaseActions(onDeleted: (item: KnowledgeBase) => void
     //     navigateToResourceDetail(navigate, {
     //       type: "knowledge-base",
     //       id: item.id,
-    //       search: { tab: "chat" },
     //     }),
     // },
     {
