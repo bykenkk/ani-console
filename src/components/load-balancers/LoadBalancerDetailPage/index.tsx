@@ -24,6 +24,7 @@ import {
 import { formatDateTime } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { loadBalancerLabel } from "@/lib/load-balancers";
+import VpcBaseConnectivityStatus from "@/components/vpcs/VpcBaseConnectivityStatus";
 import LoadBalancerBackends from "./LoadBalancerBackends";
 // TODO(feature-visibility): 待负载均衡事件支持后恢复此组件导入。
 // import LoadBalancerEvents from "./LoadBalancerEvents";
@@ -132,6 +133,14 @@ export default function LoadBalancerDetailPage({
               value: loadBalancerLabel(item.exposure),
             },
             { label: "VPC", value: parentVpc?.name ?? item.vpc_id },
+            {
+              label: "基础网络",
+              value: parentVpc ? (
+                <VpcBaseConnectivityStatus connectivity={parentVpc.base_connectivity} />
+              ) : (
+                "-"
+              ),
+            },
             {
               label: "子网",
               value: parentSubnet?.name ?? item.subnet_id ?? "-",

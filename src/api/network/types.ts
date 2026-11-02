@@ -33,7 +33,17 @@ export interface NetworkVPC {
   observation_stale?: boolean;
   last_operation_id?: string;
   subnet_count?: string;
+  base_connectivity?: NetworkVpcBaseConnectivity;
   public_egress?: NetworkVpcPublicEgress;
+}
+
+/** Read-only system connection; ready describes configuration, not traffic health. */
+export interface NetworkVpcBaseConnectivity {
+  state: "missing" | "pending" | "ready" | "degraded" | "deleting" | "deleted" | "unknown";
+  reason?: string;
+  reason_message?: string;
+  observed_at?: string;
+  observation_stale: boolean;
 }
 
 /** Current public association from the same VPC read snapshot. */

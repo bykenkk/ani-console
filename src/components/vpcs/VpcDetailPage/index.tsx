@@ -21,6 +21,7 @@ import VpcRelatedResources from "./VpcRelatedResources";
 import VpcSubnets from "./VpcSubnets";
 import BindVpcEipModal from "../BindVpcEipModal";
 import VpcPublicEgressStatus from "../VpcPublicEgressStatus";
+import VpcBaseConnectivityStatus from "../VpcBaseConnectivityStatus";
 
 type VpcDetailPageProps = {
   vpcId: string;
@@ -68,6 +69,16 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
               { label: "CIDR", value: vpc.cidr },
               { label: "创建时间", value: formatDateTime(vpc.created_at) },
               { label: "更新时间", value: formatDateTime(vpc.updated_at) },
+            ],
+          },
+          {
+            key: "base-connectivity",
+            title: "基础网络",
+            fields: [
+              {
+                label: "连接状态",
+                value: <VpcBaseConnectivityStatus connectivity={vpc.base_connectivity} />,
+              },
             ],
           },
           {

@@ -8,6 +8,7 @@ import { listNetworkSubnets, listNetworkVpcs } from "@/api/network";
 import type { LoadBalancerConfigurationFormValues } from "@/components/load-balancers/CreateLoadBalancerModal";
 import LoadBalancerPublicIpField from "@/components/load-balancers/LoadBalancerPublicIpField";
 import { withFirst100 } from "@/api/pagination";
+import VpcBaseConnectivityStatus from "@/components/vpcs/VpcBaseConnectivityStatus";
 
 type LoadBalancerNetworkFieldsProps = {
   form: Pick<
@@ -52,6 +53,7 @@ export default function LoadBalancerNetworkFields({
     },
   });
   const availableSubnets = subnets.data?.items ?? [];
+  const selectedVpc = vpcs.data?.items.find((item) => item.id === vpcId);
   return (
     <>
       <Form.Item noStyle shouldUpdate={(previous, next) => previous.scheme !== next.scheme}>
@@ -100,6 +102,11 @@ export default function LoadBalancerNetworkFields({
           </Form.Item>
         </Grid.Col>
       </Grid.Row>
+      {selectedVpc && (
+        <Form.Item label="基础网络">
+          <VpcBaseConnectivityStatus connectivity={selectedVpc.base_connectivity} />
+        </Form.Item>
+      )}
       <Form.Item noStyle shouldUpdate={(previous, next) => previous.subnet_id !== next.subnet_id}>
         {(values) =>
           scheme !== "public" && (
