@@ -4,10 +4,13 @@ import { useState } from "react";
 import type { NetworkLoadBalancerListener, NetworkLoadBalancerProtocol } from "@/api/network";
 import HealthCheckFields from "./HealthCheckFields";
 import ListenerOptions from "./ListenerOptions";
+import LoadBalancerBackendsField from "../LoadBalancerBackendsField";
 
 type LoadBalancerListenerFormProps = {
   form: FormInstance<LoadBalancerListenerFormValues>;
   usedPorts?: number[];
+  vpcId: string;
+  disabled?: boolean;
   initialValues?: LoadBalancerListenerFormValues;
 };
 
@@ -27,6 +30,8 @@ export type LoadBalancerListenerFormValues = {
 };
 export default function LoadBalancerListenerForm({
   form,
+  vpcId,
+  disabled,
   usedPorts = [],
   initialValues,
 }: LoadBalancerListenerFormProps) {
@@ -45,6 +50,7 @@ export default function LoadBalancerListenerForm({
   return (
     <Form
       form={form}
+      disabled={disabled}
       layout="vertical"
       initialValues={{
         name: "",
@@ -104,12 +110,8 @@ export default function LoadBalancerListenerForm({
           >
             <Input placeholder="请输入证书名称" />
           </Form.Item>
-          <Form.Item
-            label="证书命名空间"
-            field="certificate_ref.namespace"
-            rules={[{ required: true, match: /\S/ }]}
-          >
-            <Input />
+          <Form.Item label="证书命名空间" field="certificate_ref.namespace">
+            <Input placeholder="留空使用租户命名空间" />
           </Form.Item>
         </>
       )}
@@ -140,6 +142,9 @@ export default function LoadBalancerListenerForm({
             values.https_redirect_status_code
           ) && (
             <>
+              <Form.Item label="后端成员" field="backends">
+                <LoadBalancerBackendsField vpcId={vpcId} />
+              </Form.Item>
               <HealthCheckFields udp={udp} />
             </>
           )

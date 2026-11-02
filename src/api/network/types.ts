@@ -240,7 +240,7 @@ export interface NetworkLoadBalancerListener {
   port: number;
   backends: NetworkLoadBalancerBackendInput[];
   health_check?: NetworkLoadBalancerHealthCheck;
-  certificate_ref?: { name: string; namespace: string };
+  certificate_ref?: { name: string; namespace?: string };
   algorithm?: NetworkLoadBalancerAlgorithm;
   session_persistence?: { mode: NetworkLoadBalancerSessionMode; cookie_expiry_seconds?: number };
   max_connections?: number;
@@ -292,6 +292,8 @@ export interface NetworkLoadBalancerListenerResource extends Omit<
 > {
   id: string;
   backends?: NetworkLoadBalancerBackend[];
+  deployment_state?: string;
+  reason?: string;
 }
 export interface NetworkLoadBalancerBackend {
   id: string;
@@ -328,11 +330,19 @@ export interface CreateNetworkLoadBalancerInput {
     | "LOAD_BALANCER_EXPOSURE_PUBLIC"
     | "LOAD_BALANCER_EXPOSURE_PUBLIC_PRIVATE";
   flavor: "small" | "medium" | "large";
-  private_ip: string;
+  private_ip?: string;
   public_eip_id?: string;
   listeners: { items: NetworkLoadBalancerListener[] };
 }
 export type CreateNetworkLoadBalancerRequest = CreateNetworkLoadBalancerInput & {
+  idempotency_key: string;
+};
+export interface UpdateNetworkLoadBalancerInput {
+  expected_version: string;
+  data: { listeners: { items: NetworkLoadBalancerListener[] } };
+  update_mask: "listeners";
+}
+export type UpdateNetworkLoadBalancerRequest = UpdateNetworkLoadBalancerInput & {
   idempotency_key: string;
 };
 

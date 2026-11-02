@@ -20,7 +20,7 @@ export type LoadBalancerConfigurationFormValues = {
   subnet_id?: string;
   scheme: "internal" | "public" | "both";
   size: "small" | "medium" | "large";
-  vip: string;
+  vip?: string;
   publicIp?: string;
   listeners: LoadBalancerListenerFormValues[];
 };
@@ -38,13 +38,13 @@ export default function CreateLoadBalancerModal({ onCancel }: CreateLoadBalancer
         queryKey: ["network-subnet", input.subnet_id],
         queryFn: () => getNetworkSubnet(input.subnet_id),
       });
-      const reason = subnetIpUnavailableReason(subnet);
-      if (reason) throw new Error(reason);
-      if (
-        subnet.vpc_id !== input.vpc_id ||
-        !ipInRanges(parseIpRanges(subnet.available_ip_range) ?? [], input.private_ip)
-      ) {
-        throw new Error("所选 IP 已不在可用范围内，请重新选择");
+      if (subnet.vpc_id !== input.vpc_id) throw new Error("所选子网不属于当前 VPC");
+      if (input.exposure !== "LOAD_BALANCER_EXPOSURE_PUBLIC") {
+        const reason = subnetIpUnavailableReason(subnet);
+        if (reason) throw new Error(reason);
+        if (!ipInRanges(parseIpRanges(subnet.available_ip_range) ?? [], input.private_ip ?? "")) {
+          throw new Error("所选 IP 已不在可用范围内，请重新选择");
+        }
       }
       return createNetworkLoadBalancer(input);
     },
@@ -100,7 +100,7 @@ export default function CreateLoadBalancerModal({ onCancel }: CreateLoadBalancer
                 ? "LOAD_BALANCER_EXPOSURE_PUBLIC"
                 : "LOAD_BALANCER_EXPOSURE_PUBLIC_PRIVATE",
           flavor: values.size,
-          private_ip: values.vip,
+          private_ip: values.scheme === "public" ? undefined : values.vip,
           public_eip_id: values.scheme === "internal" ? undefined : values.publicIp,
           listeners: { items: values.listeners.map(listenerInput) },
         });
@@ -131,6 +131,10 @@ export default function CreateLoadBalancerModal({ onCancel }: CreateLoadBalancer
         <Form.Item label="网络类型" field="scheme">
           <Radio.Group
             type="button"
+            onChange={() => {
+              form.setFieldValue("vip", undefined);
+              setAvailable(false);
+            }}
             options={[
               { label: "公网", value: "public" },
               { label: "私网", value: "internal" },
@@ -138,7 +142,15 @@ export default function CreateLoadBalancerModal({ onCancel }: CreateLoadBalancer
             ]}
           />
         </Form.Item>
-        <LoadBalancerNetworkFields form={form} onAvailabilityChange={setAvailable} />
+        <Form.Item noStyle shouldUpdate={(prev, next) => prev.scheme !== next.scheme}>
+          {(values) => (
+            <LoadBalancerNetworkFields
+              form={form}
+              scheme={values.scheme}
+              onAvailabilityChange={setAvailable}
+            />
+          )}
+        </Form.Item>
         <Form.Item noStyle shouldUpdate={(prev, next) => prev.vpc_id !== next.vpc_id}>
           {(values) => (
             <Form.Item
@@ -146,7 +158,10 @@ export default function CreateLoadBalancerModal({ onCancel }: CreateLoadBalancer
               field="listeners"
               rules={[{ validator: (value, callback) => callback(listenerSetError(value)) }]}
             >
-              <LoadBalancerListenersField disabled={!values.vpc_id || create.isPending} />
+              <LoadBalancerListenersField
+                vpcId={values.vpc_id}
+                disabled={!values.vpc_id || create.isPending}
+              />
             </Form.Item>
           )}
         </Form.Item>

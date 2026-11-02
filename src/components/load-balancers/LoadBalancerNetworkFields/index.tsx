@@ -2,7 +2,7 @@ import LoadBalancerPrivateIpField from "../LoadBalancerPrivateIpField";
 import { Form, Grid, Select } from "@arco-design/web-react";
 import type { FormInstance } from "@arco-design/web-react/es/Form";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { listNetworkSubnets, listNetworkVpcs } from "@/api/network";
 
 import type { LoadBalancerConfigurationFormValues } from "@/components/load-balancers/CreateLoadBalancerModal";
@@ -14,6 +14,7 @@ type LoadBalancerNetworkFieldsProps = {
     FormInstance<LoadBalancerConfigurationFormValues>,
     "setFieldsValue" | "setFieldValue" | "getFieldValue"
   >;
+  scheme: LoadBalancerConfigurationFormValues["scheme"];
   onAvailabilityChange: (available: boolean) => void;
 };
 
@@ -21,9 +22,16 @@ const listVpcOptions = withFirst100(listNetworkVpcs);
 
 export default function LoadBalancerNetworkFields({
   form,
+  scheme,
   onAvailabilityChange,
 }: LoadBalancerNetworkFieldsProps) {
   const [vpcId, setVpcId] = useState<string>();
+  useEffect(() => {
+    if (scheme === "public") {
+      form.setFieldValue("vip", undefined);
+      onAvailabilityChange(true);
+    }
+  }, [scheme, form, onAvailabilityChange]);
   const vpcs = useQuery({
     queryKey: ["network-vpcs", "load-balancer-create", "options"],
     queryFn: () => listVpcOptions({}),
@@ -59,7 +67,7 @@ export default function LoadBalancerNetworkFields({
               loading={vpcs.isLoading}
               onChange={(value) => {
                 setVpcId(value);
-                onAvailabilityChange(false);
+                onAvailabilityChange(scheme === "public");
                 form.setFieldsValue({ subnet_id: undefined, vip: "", listeners: [] });
               }}
               options={(vpcs.data?.items ?? []).map((item) => ({
@@ -82,7 +90,7 @@ export default function LoadBalancerNetworkFields({
               allowClear
               onChange={() => {
                 form.setFieldValue("vip", "");
-                onAvailabilityChange(false);
+                onAvailabilityChange(scheme === "public");
               }}
               options={availableSubnets.map((item) => ({
                 value: item.id,
@@ -93,14 +101,16 @@ export default function LoadBalancerNetworkFields({
         </Grid.Col>
       </Grid.Row>
       <Form.Item noStyle shouldUpdate={(previous, next) => previous.subnet_id !== next.subnet_id}>
-        {(values) => (
-          <LoadBalancerPrivateIpField
-            key={values.subnet_id ?? "none"}
-            subnetId={values.subnet_id}
-            form={form}
-            onAvailabilityChange={onAvailabilityChange}
-          />
-        )}
+        {(values) =>
+          scheme !== "public" && (
+            <LoadBalancerPrivateIpField
+              key={values.subnet_id ?? "none"}
+              subnetId={values.subnet_id}
+              form={form}
+              onAvailabilityChange={onAvailabilityChange}
+            />
+          )
+        }
       </Form.Item>
     </>
   );
