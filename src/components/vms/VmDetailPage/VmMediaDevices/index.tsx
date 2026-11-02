@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Alert, Button, Descriptions, Modal } from "@arco-design/web-react";
 import { ejectVmMedia, type VirtualMachine, type VmMediaSlot, type VmMediaState } from "@/api/vms";
 import { DataTable, StatusBadge, type RowAction } from "@/components/common";
-import DataTableSectionHeader from "@/components/common/DataTable/DataTableSectionHeader";
 import VmSetMediaModal from "@/components/vms/VmSetMediaModal";
 import VmSetBootDeviceModal from "@/components/vms/VmSetBootDeviceModal";
 import { useVMMutation } from "@/hooks/useVMMutation";
@@ -106,26 +105,27 @@ export default function VmMediaDevices({ vm }: VmMediaDevicesProps) {
         ]}
       />
       <Descriptions
-        title={
-          <DataTableSectionHeader
-            title="下次从哪里启动"
-            className="mb-0"
-            extra={
-              <Button disabled={disabled} onClick={() => setEditingBoot(true)}>
-                切换启动设备
-              </Button>
-            }
-          />
-        }
+        title="下次从哪里启动"
         data={[
           {
             label: "已保存的启动设备",
-            value:
-              vm.bootDevice === "SYSTEM_DISK"
-                ? "系统盘"
-                : vm.bootDevice === "INSTALL_MEDIA"
-                  ? "系统安装光盘（ISO）"
-                  : "-",
+            value: (
+              <div className="flex items-center gap-2">
+                {vm.bootDevice === "SYSTEM_DISK"
+                  ? "系统盘"
+                  : vm.bootDevice === "INSTALL_MEDIA"
+                    ? "系统安装光盘（ISO）"
+                    : "-"}
+                <Button
+                  size="small"
+                  type="text"
+                  disabled={disabled}
+                  onClick={() => setEditingBoot(true)}
+                >
+                  切换启动设备
+                </Button>
+              </div>
+            ),
           },
         ]}
       />

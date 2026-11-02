@@ -1,6 +1,6 @@
 import { Descriptions } from "@arco-design/web-react";
 import type { VirtualMachine, VmResourceReference } from "@/api/vms";
-import { DataTable, ResourceNameId } from "@/components/common";
+import { DataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
 type VmNetworkProps = { vm: VirtualMachine };
@@ -16,27 +16,11 @@ export default function VmNetwork({ vm }: VmNetworkProps) {
         data={[
           {
             label: "VPC",
-            value: vm.relations?.vpc ? (
-              <ResourceNameId
-                name={referenceName(vm.relations.vpc)}
-                id={vm.relations.vpc.id}
-                type="vpc"
-              />
-            ) : (
-              "-"
-            ),
+            value: vm.relations?.vpc ? referenceName(vm.relations.vpc) : "-",
           },
           {
             label: "子网",
-            value: vm.relations?.subnet ? (
-              <ResourceNameId
-                name={referenceName(vm.relations.subnet)}
-                id={vm.relations.subnet.id}
-                type="subnet"
-              />
-            ) : (
-              "-"
-            ),
+            value: vm.relations?.subnet ? referenceName(vm.relations.subnet) : "-",
           },
         ]}
       />
@@ -96,14 +80,9 @@ export default function VmNetwork({ vm }: VmNetworkProps) {
             value: vm.security_group_ids?.length ? (
               <div className="flex flex-col gap-2">
                 {vm.security_group_ids.map((id) => (
-                  <ResourceNameId
-                    key={id}
-                    name={referenceName(
-                      vm.relations?.securityGroups?.find((group) => group.id === id),
-                    )}
-                    id={id}
-                    type="security-group"
-                  />
+                  <span key={id}>
+                    {referenceName(vm.relations?.securityGroups?.find((group) => group.id === id))}
+                  </span>
                 ))}
               </div>
             ) : (

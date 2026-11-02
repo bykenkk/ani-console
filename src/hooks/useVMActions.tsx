@@ -95,8 +95,6 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
       disabled: unavailable,
       onClick: (vm) => setDialog({ action: "snapshot", vm }),
     },
-    unavailableAction("attach-volume", "挂载云盘"),
-    unavailableAction("detach-volume", "卸载云盘"),
     // TODO(feature-visibility): 待文件存储支持后恢复 NFS 挂载入口。
     // unavailableAction("attach-filesystem", "挂载 NFS"),
     {

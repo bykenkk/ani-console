@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@arco-design/web-react";
 import { getVm } from "@/api/vms";
 import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
   ResourceId,
-  ResourceNameId,
   StatusBadge,
 } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
@@ -44,6 +44,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
   const { actions, dialogNode } = useVMActions(detail.data ? [detail.data] : [], goBack);
   if (!detail.data) return <DetailPagePlaceholder loading={detail.isLoading} />;
   const vm = detail.data;
+  const consoleAction = actions.find((action) => action.key === "console");
   const compute = [
     vm.cpuMillis ? `${Number(vm.cpuMillis) / 1000}C` : "-",
     vm.memoryMib ? `${Number(vm.memoryMib) / 1024} GiB` : "-",
@@ -58,10 +59,22 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
         icon={<AliIcon name="yunzhuji" size={28} />}
         headerItems={[{ label: "CPU / 内存", value: compute }]}
         actions={
-          <ResourceActionMenu
-            record={vm}
-            actions={actions.filter((action) => action.key !== "termination-protection")}
-          />
+          <div className="flex items-center gap-2">
+            <Button
+              type="primary"
+              disabled={!consoleAction || consoleAction.disabled?.(vm)}
+              loading={consoleAction?.loading?.(vm)}
+              onClick={() => consoleAction?.onClick(vm)}
+            >
+              打开控制台
+            </Button>
+            <ResourceActionMenu
+              record={vm}
+              actions={actions.filter(
+                (action) => action.key !== "termination-protection" && action.key !== "console",
+              )}
+            />
+          </div>
         }
         cards={[
           {
@@ -72,9 +85,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
               { label: "CPU / 内存", value: compute },
               {
                 label: "创建时规格",
-                value: (
-                  <ResourceNameId name={vm.presetName || "-"} id={vm.presetId} openable={false} />
-                ),
+                value: <span title={vm.presetName}>{vm.presetName || "-"}</span>,
               },
               { label: "系统盘", value: vm.systemDiskSizeGb ? `${vm.systemDiskSizeGb} GB` : "-" },
               {
@@ -128,38 +139,31 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
               {
                 label: "VPC",
                 value: (
-                  <ResourceNameId
-                    name={vm.relations?.vpc?.name || "-"}
-                    id={vm.relations?.vpc?.id}
-                    type="vpc"
-                  />
+                  <span title={vm.relations?.vpc?.name}>{vm.relations?.vpc?.name || "-"}</span>
                 ),
               },
               {
                 label: "子网",
                 value: (
-                  <ResourceNameId
-                    name={vm.relations?.subnet?.name || "-"}
-                    id={vm.relations?.subnet?.id}
-                    type="subnet"
-                  />
+                  <span title={vm.relations?.subnet?.name}>
+                    {vm.relations?.subnet?.name || "-"}
+                  </span>
                 ),
               },
               {
                 label: "安全组",
                 value: vm.security_group_ids?.length ? (
                   <div className="flex flex-col gap-2">
-                    {vm.security_group_ids.map((id) => (
-                      <ResourceNameId
-                        key={id}
-                        name={
-                          vm.relations?.securityGroups?.find((group) => group.id === id)?.name ||
-                          "-"
-                        }
-                        id={id}
-                        type="security-group"
-                      />
-                    ))}
+                    {vm.security_group_ids.map((id) => {
+                      const name = vm.relations?.securityGroups?.find(
+                        (group) => group.id === id,
+                      )?.name;
+                      return (
+                        <span key={id} title={name}>
+                          {name || "-"}
+                        </span>
+                      );
+                    })}
                   </div>
                 ) : (
                   "-"
@@ -167,13 +171,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
               },
               {
                 label: "创建时系统来源",
-                value: (
-                  <ResourceNameId
-                    name={vm.sourceMedia?.name || "-"}
-                    id={vm.mediaKey}
-                    openable={false}
-                  />
-                ),
+                value: <span title={vm.sourceMedia?.name}>{vm.sourceMedia?.name || "-"}</span>,
               },
               { label: "密钥", value: "-" },
               { label: "负载均衡", value: "-" },

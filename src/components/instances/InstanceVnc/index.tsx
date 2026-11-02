@@ -2,7 +2,8 @@ import { createVmConsoleSession } from "@/api/vms";
 import { StatusBadge, type StatusBadgeTone } from "@/components/common";
 import { useEffect, useRef, useState } from "react";
 import RFB from "@novnc/novnc/lib/rfb";
-import { Button, Radio, Spin } from "@arco-design/web-react";
+import { Button, Dropdown, Menu, Radio, Spin } from "@arco-design/web-react";
+import { IconDown } from "@arco-design/web-react/icon";
 import clsx from "clsx";
 import { resolveWebSocketUrl } from "@/lib/browser";
 import { isDateTimeExpired } from "@/lib/date";
@@ -17,6 +18,33 @@ type ConsoleStatus = "connecting" | "connected" | "disconnected" | "error" | "ex
 type ViewMode = "fit" | "native";
 
 const VNC_SUBPROTOCOL = "ani.vnc.v1";
+
+type VncKey = { keysym: number; code: string };
+
+const CONTROL_KEY: VncKey = { keysym: 0xffe3, code: "ControlLeft" };
+const ALT_KEY: VncKey = { keysym: 0xffe9, code: "AltLeft" };
+const WIN_KEY: VncKey = { keysym: 0xffeb, code: "MetaLeft" };
+const ESC_KEY: VncKey = { keysym: 0xff1b, code: "Escape" };
+
+const KEY_SHORTCUTS: { label: string; keys: VncKey[] }[] = [
+  {
+    label: "Ctrl+Alt+Del",
+    keys: [CONTROL_KEY, ALT_KEY, { keysym: 0xffff, code: "Delete" }],
+  },
+  {
+    label: "Ctrl+Shift+Esc",
+    keys: [CONTROL_KEY, { keysym: 0xffe1, code: "ShiftLeft" }, ESC_KEY],
+  },
+  { label: "Alt+Tab", keys: [ALT_KEY, { keysym: 0xff09, code: "Tab" }] },
+  { label: "Win", keys: [WIN_KEY] },
+  { label: "Win+R", keys: [WIN_KEY, { keysym: 0x72, code: "KeyR" }] },
+  { label: "Esc", keys: [ESC_KEY] },
+];
+
+const FUNCTION_KEYS = Array.from({ length: 12 }, (_, index) => ({
+  label: `F${index + 1}`,
+  keys: [{ keysym: 0xffbe + index, code: `F${index + 1}` }],
+}));
 
 const STATUS_META: Record<ConsoleStatus, { text: string; tone: StatusBadgeTone }> = {
   connecting: { text: "连接中", tone: "primary" },
@@ -147,11 +175,44 @@ export default function InstanceVnc({ instanceId }: InstanceVncProps) {
   const meta = STATUS_META[status];
   const canReconnect = status === "error" || status === "disconnected" || status === "expired";
 
+  const sendKeys = (keys: VncKey[]) => {
+    const rfb = rfbRef.current;
+    if (status !== "connected" || !rfb) return;
+    for (const key of keys) rfb.sendKey(key.keysym, key.code, true);
+    for (const key of [...keys].reverse()) rfb.sendKey(key.keysym, key.code, false);
+    rfb.focus();
+  };
+
   return (
     <div className="flex h-full min-h-0 flex-col bg-[#0b0e16] text-white">
       <div className="flex h-10 shrink-0 items-center justify-between border-b border-white/10 px-3">
         <div className="truncate text-sm text-gray-300">VNC 控制台</div>
         <div className="flex items-center gap-2">
+          <Dropdown
+            trigger="click"
+            position="br"
+            disabled={status !== "connected"}
+            droplist={
+              <Menu>
+                {KEY_SHORTCUTS.map((shortcut) => (
+                  <Menu.Item key={shortcut.label} onClick={() => sendKeys(shortcut.keys)}>
+                    {shortcut.label}
+                  </Menu.Item>
+                ))}
+                <Menu.SubMenu key="function-keys" title="F1～F12">
+                  {FUNCTION_KEYS.map((shortcut) => (
+                    <Menu.Item key={shortcut.label} onClick={() => sendKeys(shortcut.keys)}>
+                      {shortcut.label}
+                    </Menu.Item>
+                  ))}
+                </Menu.SubMenu>
+              </Menu>
+            }
+          >
+            <Button size="mini" disabled={status !== "connected"}>
+              发送按键 <IconDown />
+            </Button>
+          </Dropdown>
           <Radio.Group
             type="button"
             size="mini"
