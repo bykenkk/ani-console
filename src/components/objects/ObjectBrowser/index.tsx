@@ -23,6 +23,7 @@ type ObjectBrowserProps = {
   entries: ObjectBrowserEntry[];
   pagination: ListPagination;
   loading?: boolean;
+  refreshing?: boolean;
   actions: RowAction<ObjectBrowserEntry>[];
   primaryAction?: ReactNode;
   rootPrefix?: string;
@@ -50,6 +51,7 @@ export default function ObjectBrowser({
   entries,
   pagination,
   loading,
+  refreshing,
   actions,
   primaryAction,
   rootPrefix = "/",
@@ -148,7 +150,7 @@ export default function ObjectBrowser({
           {onRefresh ? (
             <Button
               icon={<IconRefresh />}
-              loading={loading}
+              loading={refreshing}
               onClick={onRefresh}
               aria-label="刷新"
               title="刷新"

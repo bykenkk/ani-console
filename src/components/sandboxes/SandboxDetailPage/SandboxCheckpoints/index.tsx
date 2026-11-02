@@ -114,7 +114,7 @@ export default function SandboxCheckpoints({
         <section>
           <div className="mb-3 flex items-center justify-end gap-3">
             <Space>
-              <Button size="small" loading={checkpoints.isFetching} onClick={refresh}>
+              <Button size="small" loading={checkpoints.isRefetching} onClick={refresh}>
                 刷新
               </Button>
               <Button size="small" type="primary" disabled={!canCheckpoint} onClick={openCreate}>
@@ -127,7 +127,7 @@ export default function SandboxCheckpoints({
             tableLabel="检查点"
             data={pageItems}
             rowKey="id"
-            loading={checkpoints.isLoading || checkpoints.isFetching}
+            loading={checkpoints.isFetching}
             pagination={pagination}
             rowActions={actions}
             columns={[

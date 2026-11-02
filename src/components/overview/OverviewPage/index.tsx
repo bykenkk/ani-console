@@ -52,8 +52,8 @@ export default function OverviewPage() {
       {/* <TasksPanel
           items={tasksQuery.data ?? []}
           filter={taskFilter}
-          loading={tasksQuery.isLoading}
-          refreshing={tasksQuery.isFetching && !tasksQuery.isLoading}
+          loading={tasksQuery.isFetching}
+          refreshing={tasksQuery.isRefetching}
           onFilterChange={setTaskFilter}
           onRefresh={() => tasksQuery.refetch()}
         /> */}

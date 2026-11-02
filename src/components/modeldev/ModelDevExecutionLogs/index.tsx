@@ -90,7 +90,7 @@ export default function ModelDevExecutionLogs({
             aria-label="刷新日志"
             title="刷新日志"
             disabled={refreshing}
-            loading={logs.isFetching}
+            loading={logs.isRefetching}
             onClick={() => logs.refetch()}
           />
         </div>

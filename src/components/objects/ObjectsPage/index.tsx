@@ -102,7 +102,7 @@ export default function ObjectsPage() {
           },
           refresh: {
             label: "刷新",
-            spinning: buckets.isFetching,
+            spinning: buckets.isRefetching,
             onClick: () => {
               buckets.refetch();
             },

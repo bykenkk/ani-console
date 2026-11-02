@@ -116,7 +116,7 @@ export default function BucketLifecycle({ bucketId }: BucketLifecycleProps) {
             },
           ]}
           data={pageItems}
-          loading={rules.isLoading}
+          loading={rules.isFetching}
           pagination={pagination}
           rowActions={actions}
         />

@@ -207,6 +207,7 @@ export default function CreateInferenceModal({
         >
           {/* TODO(inference-image-pagination): 暂用容器现有目录查询，后端支持 page/pageSize 后统一迁移。 */}
           <RegisteredImageSelect
+            purpose="inference"
             onScopeChange={() => form.setFields({ image: { error: undefined } })}
           />
         </Form.Item>

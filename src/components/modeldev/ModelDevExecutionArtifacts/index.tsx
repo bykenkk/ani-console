@@ -45,7 +45,7 @@ export default function ModelDevExecutionArtifacts({
   if (deliveryState !== "PUBLISHED") return <Empty description="暂无已发布产物" />;
   return (
     <>
-      <Button className="mb-4" loading={query.isFetching} onClick={refresh}>
+      <Button className="mb-4" loading={query.isRefetching} onClick={refresh}>
         刷新产物
       </Button>
       <DataTable<ModelDevArtifact>

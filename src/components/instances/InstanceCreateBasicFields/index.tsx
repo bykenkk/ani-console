@@ -31,6 +31,7 @@ export default function InstanceCreateBasicFields({ computeType }: InstanceCreat
         rules={[{ type: "object", required: true, message: "请选择已注册的镜像" }]}
       >
         <RegisteredImageSelect
+          purpose="container"
           onScopeChange={() => form.setFields({ image: { error: undefined } })}
         />
       </Form.Item>

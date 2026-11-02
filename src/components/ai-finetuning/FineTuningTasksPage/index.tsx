@@ -107,7 +107,7 @@ export default function FineTuningTasksPage() {
         ],
       }}
       toolbar={{
-        refresh: { onClick: refresh, spinning: query.isFetching, disabled: query.isFetching },
+        refresh: { onClick: refresh, spinning: query.isRefetching, disabled: query.isFetching },
       }}
     >
       <ListDataTable<ModelDevExecution>

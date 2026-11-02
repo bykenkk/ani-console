@@ -152,7 +152,7 @@ export default function FilesystemsPage() {
           },
           refresh: {
             label: "刷新",
-            spinning: filesystems.isFetching,
+            spinning: filesystems.isRefetching,
             onClick: refresh,
           },
         }}

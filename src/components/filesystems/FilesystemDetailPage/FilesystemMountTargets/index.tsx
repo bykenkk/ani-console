@@ -109,7 +109,7 @@ export default function FilesystemMountTargets({
             },
           ]}
           data={pageItems}
-          loading={mounts.isLoading}
+          loading={mounts.isFetching}
           pagination={pagination}
           rowActions={actions}
         />

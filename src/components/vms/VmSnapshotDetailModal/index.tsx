@@ -26,7 +26,7 @@ export default function VmSnapshotDetailModal({
       onCancel={onCancel}
       footer={
         <Space>
-          <Button loading={query.isFetching} onClick={() => query.refetch()}>
+          <Button loading={query.isRefetching} onClick={() => query.refetch()}>
             刷新
           </Button>
           <Button onClick={onCancel}>关闭</Button>

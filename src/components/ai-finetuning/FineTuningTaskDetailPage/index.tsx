@@ -29,12 +29,6 @@ export default function FineTuningTaskDetailPage({
   const detail = useQuery({
     queryKey: ["training-execution", executionId],
     queryFn: ({ signal }) => getModelDevExecution(executionId, signal),
-    refetchInterval: (query) =>
-      query.state.status !== "error" &&
-      query.state.data &&
-      shouldObserveModelDevExecution(query.state.data)
-        ? 5000
-        : false,
     // TODO(finetuning-detail): 待联调验证微调详情、状态刷新、日志、产物及登记恢复。
     meta: {
       errorNotification: {

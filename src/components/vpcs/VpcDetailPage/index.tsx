@@ -43,15 +43,6 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
     },
     queryKey: ["network-vpc", vpcId],
     queryFn: () => getNetworkVpc(vpcId),
-    refetchInterval: (query) => {
-      const vpc = query.state.data;
-      return vpc &&
-        (["pending", "provisioning", "deleting"].includes(vpc.state) ||
-          vpc.public_egress?.binding_state === "reserved" ||
-          ["pending", "provisioning", "deleting"].includes(vpc.public_egress?.state ?? ""))
-        ? 5000
-        : false;
-    },
   });
   const { actions } = useVpcActions(goBack, setBindingVpc);
 

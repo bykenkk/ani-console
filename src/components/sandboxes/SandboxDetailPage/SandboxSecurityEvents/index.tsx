@@ -52,7 +52,7 @@ export default function SandboxSecurityEvents({ instanceId }: SandboxSecurityEve
         <DataTable<SecurityEvent>
           tableLabel="安全事件"
           data={pageItems}
-          loading={query.isLoading || query.isFetching}
+          loading={query.isFetching}
           pagination={pagination}
           columns={[
             {

@@ -152,7 +152,7 @@ export default function KnowledgeChat({
         <div className="flex min-h-0 min-w-0 flex-auto overflow-hidden rounded-lg border border-solid border-app-border-strong bg-app-surface">
           <KnowledgeSessionsSidebar
             sessions={sessions.data}
-            loading={sessions.isLoading}
+            loading={sessions.isFetching}
             error={sessions.error}
             activeSessionId={activeSessionId}
             deletingSessionId={deleteSession.isPending ? deleteSession.variables?.id : undefined}
@@ -195,7 +195,7 @@ export default function KnowledgeChat({
       <KnowledgeCitationsDrawer
         visible={citationsVisible}
         citations={citations.data?.items}
-        loading={citations.isLoading}
+        loading={citations.isFetching}
         error={citations.error}
         onCancel={() => setCitationsVisible(false)}
         onSelectSession={(sessionId) => {

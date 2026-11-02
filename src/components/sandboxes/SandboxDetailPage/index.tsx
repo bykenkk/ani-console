@@ -48,7 +48,7 @@ export default function SandboxDetailPage({
   const snapshot = sandbox.snapshot;
   const refresh = (
     <Button
-      loading={detail.isFetching}
+      loading={detail.isRefetching}
       onClick={() => {
         detail.refetch();
       }}

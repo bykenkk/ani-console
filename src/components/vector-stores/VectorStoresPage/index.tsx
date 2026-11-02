@@ -182,7 +182,7 @@ export default function VectorStoresPage() {
           },
           refresh: {
             label: "刷新",
-            spinning: stores.isFetching,
+            spinning: stores.isRefetching,
             onClick: refresh,
           },
         }}

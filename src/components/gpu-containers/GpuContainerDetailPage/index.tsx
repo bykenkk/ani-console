@@ -40,7 +40,6 @@ export default function GpuContainerDetailPage({
   const current = useQuery({
     queryKey: ["instance", instanceId],
     queryFn: ({ signal }) => getInstance(instanceId, signal),
-    refetchInterval: (query) => (query.state.data?.activeOperationId ? 4000 : false),
     meta: { errorNotification: { id: withId("instance", instanceId), action: "实例详情加载" } },
   });
   const isGpu = current.data?.instance_kind === "container" && current.data.compute_type === "gpu";

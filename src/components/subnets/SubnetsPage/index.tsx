@@ -204,7 +204,7 @@ export default function SubnetsPage() {
           ),
           refresh: {
             label: "刷新",
-            spinning: subnets.isFetching || vpcs.isFetching,
+            spinning: subnets.isRefetching || vpcs.isRefetching,
             onClick: () => {
               refresh();
               vpcs.refetch();

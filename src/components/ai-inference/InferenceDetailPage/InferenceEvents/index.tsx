@@ -52,7 +52,7 @@ export default function InferenceEvents({ serviceId }: InferenceEventsProps) {
                 setSince(value ? getPreviousHoursDateTimeRange(value).start : undefined);
               }}
             />
-            <Button loading={events.isFetching} onClick={() => events.refetch()}>
+            <Button loading={events.isRefetching} onClick={() => events.refetch()}>
               刷新
             </Button>
           </Space>

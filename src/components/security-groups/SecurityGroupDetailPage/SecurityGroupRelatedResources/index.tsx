@@ -52,7 +52,7 @@ export default function SecurityGroupRelatedResources({
       </div>
       <DataTable<NetworkSecurityGroupBinding>
         rowKey={(item) => `${item.target_type}:${item.target_id}`}
-        loading={bindings.isLoading}
+        loading={bindings.isFetching}
         data={bindings.data?.items ?? []}
         columns={[
           { title: "类型", width: 110, render: (_, item) => TYPES[item.target_type] },

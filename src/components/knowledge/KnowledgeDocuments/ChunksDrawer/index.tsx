@@ -190,7 +190,7 @@ export default function ChunksDrawer({ kbId, document, visible, onCancel }: Chun
       onCancel={onCancel}
       unmountOnExit
     >
-      {chunks.isLoading ? (
+      {chunks.isFetching ? (
         <div className="flex justify-center py-16">
           <Spin />
         </div>

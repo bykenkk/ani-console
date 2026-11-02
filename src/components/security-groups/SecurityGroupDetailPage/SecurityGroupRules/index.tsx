@@ -118,7 +118,7 @@ export default function SecurityGroupRules({
         </Button>
       </div>
       <DataTable<SecurityGroupRuleResource>
-        loading={rules.isLoading}
+        loading={rules.isFetching}
         rowActions={actions}
         columns={[
           {

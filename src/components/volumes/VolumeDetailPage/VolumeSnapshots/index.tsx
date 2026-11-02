@@ -45,7 +45,7 @@ export default function VolumeSnapshots({ volumeId, onCreateSnapshot }: VolumeSn
             { title: "创建时间", width: 180, render: (_, row) => formatDateTime(row.created_at) },
           ]}
           data={pageItems}
-          loading={snapshots.isLoading}
+          loading={snapshots.isFetching}
           pagination={pagination}
         />
       </div>

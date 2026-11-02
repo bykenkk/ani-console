@@ -122,7 +122,7 @@ export default function InferencePage() {
             },
           ],
         }}
-        toolbar={{ refresh: { spinning: query.isFetching, onClick: refresh } }}
+        toolbar={{ refresh: { spinning: query.isRefetching, onClick: refresh } }}
       >
         <ListDataTable
           data={items}

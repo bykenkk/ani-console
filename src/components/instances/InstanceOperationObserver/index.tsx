@@ -36,13 +36,6 @@ export default function InstanceOperationObserver({
     queryKey: ["instance-operation", trackedId],
     enabled: Boolean(trackedId),
     queryFn: ({ signal }) => getInstanceOperation(trackedId!, signal),
-    // 创建、删除等旧操作仍按原边界暂缓跟踪，只轮询本批新增的三个动作。
-    refetchInterval: (query) =>
-      query.state.data &&
-      (!LABELS[query.state.data.action] ||
-        ["completed", "failed", "superseded"].includes(query.state.data.state))
-        ? false
-        : 4000,
     meta: {
       errorNotification: { id: withId("instance-operation", trackedId), action: "操作状态加载" },
     },

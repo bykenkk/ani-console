@@ -108,7 +108,7 @@ export default function VolumesPage() {
           },
           refresh: {
             label: "刷新",
-            spinning: volumes.isFetching,
+            spinning: volumes.isRefetching,
             onClick: () => {
               volumes.refetch();
             },
@@ -120,7 +120,7 @@ export default function VolumesPage() {
           columns={columns}
           rowKey="pvc_name"
           rowActions={actions}
-          loading={volumes.isLoading}
+          loading={volumes.isFetching}
           tableLabel="块存储卷列表"
           pagination={{
             page,

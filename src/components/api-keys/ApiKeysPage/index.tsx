@@ -235,7 +235,7 @@ export function ApiKeysPage() {
           ),
           refresh: {
             label: "刷新",
-            spinning: apiKeys.isFetching,
+            spinning: apiKeys.isRefetching,
             onClick: () => {
               const now = getCurrentIsoDateTime();
               if (buildApiKeyFilter(status, expiration, searchField, searchText, now) === filter)

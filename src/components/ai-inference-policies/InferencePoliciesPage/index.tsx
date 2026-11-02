@@ -57,7 +57,7 @@ export default function InferencePoliciesPage() {
         toolbar={{
           refresh: {
             onClick: () => policies.refetch(),
-            spinning: policies.isFetching,
+            spinning: policies.isRefetching,
             disabled: policies.isFetching,
           },
         }}

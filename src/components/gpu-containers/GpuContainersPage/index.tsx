@@ -51,8 +51,6 @@ export default function GpuContainersPage() {
       );
       return { ...data, total: Number(data.total) };
     },
-    refetchInterval: (query) =>
-      query.state.data?.items.some((instance) => instance.activeOperationId) ? 4000 : false,
   });
   const { page, setPage } = paging;
   useEffect(() => {
@@ -143,7 +141,7 @@ export default function GpuContainersPage() {
           },
           refresh: {
             label: "刷新",
-            spinning: query.isFetching,
+            spinning: query.isRefetching,
             onClick: () => query.refetch(),
           },
         }}

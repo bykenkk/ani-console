@@ -112,7 +112,7 @@ export default function VmRestoreSnapshotModal({
         />
         <Button
           disabled={mutation.busy}
-          loading={preview.isFetching}
+          loading={preview.isRefetching}
           onClick={() => {
             setConfirmed(undefined);
             return Promise.all([

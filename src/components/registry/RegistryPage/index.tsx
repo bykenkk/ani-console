@@ -254,7 +254,7 @@ export default function RegistryPage() {
               />
             </Space>
           ),
-          refresh: { onClick: refresh, spinning: query.isFetching },
+          refresh: { onClick: refresh, spinning: query.isRefetching },
         }}
       >
         <ListDataTable
@@ -301,7 +301,7 @@ export default function RegistryPage() {
         <ManageImageSpaceModal
           space={space.data}
           loading={space.isLoading}
-          refreshing={space.isFetching}
+          refreshing={space.isRefetching}
           onRefresh={() => {
             space.refetch();
           }}

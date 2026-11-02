@@ -120,7 +120,7 @@ export default function SandboxesPage() {
           },
           refresh: {
             label: "刷新",
-            spinning: query.isFetching,
+            spinning: query.isRefetching,
             onClick: () => {
               query.refetch();
             },
@@ -131,7 +131,7 @@ export default function SandboxesPage() {
           data={query.data?.items ?? []}
           columns={columns}
           rowActions={actions}
-          loading={query.isLoading}
+          loading={query.isFetching}
           tableLabel="沙箱列表"
           pagination={{
             page,

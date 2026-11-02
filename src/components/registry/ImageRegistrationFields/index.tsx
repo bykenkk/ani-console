@@ -26,7 +26,11 @@ export default function ImageRegistrationFields({ creating }: ImageRegistrationF
       <Form.Item field="description" label="描述">
         <Input.TextArea autoSize={{ minRows: 2, maxRows: 4 }} />
       </Form.Item>
-      <Form.Item field="purposes" label="用途">
+      <Form.Item
+        field="purposes"
+        label="用途"
+        rules={[{ required: true, type: "array", minLength: 1, message: "请选择镜像用途" }]}
+      >
         <Select mode="multiple" allowClear options={IMAGE_PURPOSES} placeholder="选择镜像用途" />
       </Form.Item>
       <Form.Item field="accelerator" label="加速器">

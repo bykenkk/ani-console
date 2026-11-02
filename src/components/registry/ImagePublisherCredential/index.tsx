@@ -51,7 +51,7 @@ export default function ImagePublisherCredential({ available }: ImagePublisherCr
         <Typography.Title heading={6} className="m-0!">
           发布凭证
         </Typography.Title>
-        <Button size="small" loading={query.isFetching} onClick={() => query.refetch()}>
+        <Button size="small" loading={query.isRefetching} onClick={() => query.refetch()}>
           刷新
         </Button>
       </div>

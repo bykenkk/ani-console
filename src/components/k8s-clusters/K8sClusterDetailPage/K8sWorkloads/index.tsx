@@ -51,7 +51,7 @@ export default function K8sWorkloads({ clusterId }: K8sWorkloadsProps) {
           },
         ]}
         data={pageItems}
-        loading={workloads.isLoading}
+        loading={workloads.isFetching}
         rowKey={(row) => `${row.namespace}/${row.kind}/${row.name}`}
         pagination={pagination}
       />

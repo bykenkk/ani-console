@@ -183,7 +183,7 @@ export default function K8sClustersPage() {
           },
           refresh: {
             label: "刷新",
-            spinning: isFetching,
+            spinning: clusters.isRefetching,
             onClick: refresh,
           },
         }}

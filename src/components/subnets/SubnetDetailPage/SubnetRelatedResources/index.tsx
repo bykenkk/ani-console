@@ -45,7 +45,7 @@ export default function SubnetRelatedResources({ subnetId }: SubnetRelatedResour
         }}
         columns={columns}
         data={resources}
-        loading={instances.isLoading}
+        loading={instances.isFetching}
         pagination={pagination}
         tableLabel="子网关联资源"
       />

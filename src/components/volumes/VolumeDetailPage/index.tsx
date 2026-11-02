@@ -39,7 +39,7 @@ export default function VolumeDetailPage({ volumeId, tab, onTabChange }: VolumeD
               {
                 key: "refresh",
                 label: "刷新",
-                loading: () => detail.isFetching,
+                loading: () => detail.isRefetching,
                 onClick: () => detail.refetch(),
               },
               ...actions,

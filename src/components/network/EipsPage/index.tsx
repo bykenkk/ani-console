@@ -148,7 +148,7 @@ export default function EipsPage() {
               resetPagination();
             },
           },
-          refresh: { label: "刷新", spinning: query.isFetching, onClick: refresh },
+          refresh: { label: "刷新", spinning: query.isRefetching, onClick: refresh },
         }}
       >
         <ListDataTable

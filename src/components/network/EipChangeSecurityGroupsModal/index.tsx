@@ -35,11 +35,6 @@ export default function EipChangeSecurityGroupsModal({
     queryKey: ["security-group-selection", "eip", id],
     queryFn: async ({ signal }) => (await getEipSecurityGroups(id, signal)).binding,
     refetchOnWindowFocus: false,
-    refetchInterval: (query) =>
-      query.state.data &&
-      ["applying", "waiting_for_binding", "degraded"].includes(query.state.data.state)
-        ? 5000
-        : false,
     meta: {
       errorNotification: { id: withId("security-group-selection", id), action: "安全组绑定加载" },
     },

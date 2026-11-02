@@ -9,6 +9,7 @@ import {
 import { withId } from "@/lib/id";
 
 type RegisteredImageSelectProps = {
+  purpose: string;
   value?: Pick<ImageRegistration, "image_id" | "scope"> & { displayName?: string };
   onChange?: (image?: ImageRegistration) => void;
   onSelect?: (image?: ImageRegistration) => void;
@@ -17,6 +18,7 @@ type RegisteredImageSelectProps = {
 };
 
 export default function RegisteredImageSelect({
+  purpose,
   value,
   onChange,
   onSelect,
@@ -30,10 +32,13 @@ export default function RegisteredImageSelect({
   const query = useQuery({
     // FIXME(registered-image-options): 镜像列表仍为 limit/cursor 契约，尚不支持选项请求 pageSize=100；保留原请求。
     // TODO(registered-image-options): 后端分页契约对齐后改为 page=1、pageSize=100，保持一次请求且无额外翻页入口。
-    queryKey: ["registered-images", scope],
-    queryFn: ({ signal }) => listImageRegistrations({ scope }, signal),
+    queryKey: ["registered-images", "options", scope, purpose],
+    queryFn: ({ signal }) => listImageRegistrations({ scope, purposes: [purpose] }, signal),
     meta: {
-      errorNotification: { id: withId("registered-images", scope), action: "已注册镜像加载" },
+      errorNotification: {
+        id: withId("registered-images", scope, purpose),
+        action: "已注册镜像加载",
+      },
     },
   });
   const items = query.data?.items ?? [];

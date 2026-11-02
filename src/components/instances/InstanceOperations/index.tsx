@@ -23,12 +23,6 @@ export default function InstanceOperations({ operationId }: InstanceOperationsPr
     queryKey: ["instance-operation", operationId],
     enabled: Boolean(operationId),
     queryFn: ({ signal }) => getInstanceOperation(operationId!, signal),
-    refetchInterval: (query) =>
-      query.state.data &&
-      ["restart", "attach-pvc", "detach-pvc"].includes(query.state.data.action) &&
-      !["completed", "failed", "superseded"].includes(query.state.data.state)
-        ? 4000
-        : false,
     meta: {
       errorNotification: { id: withId("instance-operation", operationId), action: "操作状态加载" },
     },

@@ -169,6 +169,7 @@ export default function UpdateInferenceModal({
         >
           {/* TODO(inference-image-pagination): 后端支持 page/pageSize 后统一迁移镜像选项查询。 */}
           <RegisteredImageSelect
+            purpose="inference"
             onScopeChange={() => form.setFields({ image: { error: undefined } })}
           />
         </Form.Item>

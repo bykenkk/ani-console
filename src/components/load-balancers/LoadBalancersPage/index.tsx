@@ -228,7 +228,7 @@ export default function LoadBalancersPage() {
           ),
           refresh: {
             label: "刷新",
-            spinning: loadBalancers.isFetching || vpcs.isFetching,
+            spinning: loadBalancers.isRefetching || vpcs.isRefetching,
             onClick: () => {
               refresh();
               vpcs.refetch();

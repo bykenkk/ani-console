@@ -119,7 +119,7 @@ export default function ModelApiKeysPage() {
         toolbar={{
           refresh: {
             onClick: () => query.refetch(),
-            spinning: query.isFetching,
+            spinning: query.isRefetching,
             disabled: query.isFetching,
           },
         }}

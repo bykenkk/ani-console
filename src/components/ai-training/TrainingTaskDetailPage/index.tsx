@@ -29,12 +29,6 @@ export default function TrainingTaskDetailPage({
   const detail = useQuery({
     queryKey: ["training-execution", executionId],
     queryFn: ({ signal }) => getModelDevExecution(executionId, signal),
-    refetchInterval: (query) =>
-      query.state.status !== "error" &&
-      query.state.data &&
-      shouldObserveModelDevExecution(query.state.data)
-        ? 5000
-        : false,
     meta: {
       errorNotification: {
         id: withId("training-execution", executionId),

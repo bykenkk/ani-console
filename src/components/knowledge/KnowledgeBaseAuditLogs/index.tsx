@@ -46,7 +46,7 @@ export default function KnowledgeBaseAuditLogs({ kbId }: KnowledgeBaseAuditLogsP
         header={{
           title: "操作记录",
           extra: (
-            <Button size="small" loading={logs.isFetching} onClick={refresh}>
+            <Button size="small" loading={logs.isRefetching} onClick={refresh}>
               刷新
             </Button>
           ),

@@ -43,15 +43,6 @@ export default function VpcsPage() {
       });
       return { ...data, total: Number(data.total) };
     },
-    refetchInterval: (query) =>
-      query.state.data?.items.some(
-        (vpc) =>
-          ["pending", "provisioning", "deleting"].includes(vpc.state) ||
-          vpc.public_egress?.binding_state === "reserved" ||
-          ["pending", "provisioning", "deleting"].includes(vpc.public_egress?.state ?? ""),
-      )
-        ? 5000
-        : false,
   });
   const items = vpcs.data?.items ?? [];
   const refresh = () => vpcs.refetch();
@@ -151,7 +142,7 @@ export default function VpcsPage() {
           },
           refresh: {
             label: "刷新",
-            spinning: vpcs.isFetching,
+            spinning: vpcs.isRefetching,
             onClick: refresh,
           },
         }}

@@ -226,7 +226,7 @@ export default function ModelsPage() {
           ),
           refresh: {
             label: "刷新",
-            spinning: models.isFetching,
+            spinning: models.isRefetching,
             onClick: refresh,
           },
         }}

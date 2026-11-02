@@ -154,7 +154,7 @@ export default function KnowledgeBasesPage() {
           },
           refresh: {
             label: "刷新",
-            spinning: query.isFetching,
+            spinning: query.isRefetching,
             onClick: refresh,
           },
         }}

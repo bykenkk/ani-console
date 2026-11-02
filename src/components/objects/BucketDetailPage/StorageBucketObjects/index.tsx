@@ -65,6 +65,7 @@ export default function StorageBucketObjects({
         entries={items}
         pagination={pagination}
         loading={query.isFetching}
+        refreshing={query.isRefetching}
         actions={actions}
         primaryAction={
           <Button type="primary" onClick={() => setUploadVisible(true)}>

@@ -121,7 +121,7 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
             aria-label="刷新日志"
             title="刷新日志"
             disabled={live || !canQueryLogs}
-            loading={!live && logs.isFetching}
+            loading={!live && logs.isRefetching}
             onClick={() => logs.refetch()}
           />
         </div>

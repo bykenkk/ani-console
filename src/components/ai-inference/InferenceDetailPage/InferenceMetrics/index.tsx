@@ -81,7 +81,7 @@ export default function InferenceMetrics({ serviceId }: InferenceMetricsProps) {
           }))}
           onChange={setStep}
         />
-        <Button loading={query.isFetching} onClick={() => query.refetch()}>
+        <Button loading={query.isRefetching} onClick={() => query.refetch()}>
           刷新指标
         </Button>
       </Space>

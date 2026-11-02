@@ -95,14 +95,18 @@ export default function SecurityGroupsPage() {
             onFieldChange: () => {},
             onChange: setName,
           },
-          refresh: { label: "刷新", spinning: groups.isFetching, onClick: () => groups.refetch() },
+          refresh: {
+            label: "刷新",
+            spinning: groups.isRefetching,
+            onClick: () => groups.refetch(),
+          },
         }}
       >
         <ListDataTable
           data={groups.data?.items ?? []}
           columns={columns}
           rowActions={actions}
-          loading={groups.isLoading}
+          loading={groups.isFetching}
           tableLabel="安全组列表"
           pagination={{
             page: paging.page,

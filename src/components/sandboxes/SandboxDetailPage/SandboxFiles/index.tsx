@@ -130,7 +130,7 @@ export default function SandboxFiles({ instanceId, running, onChanged }: Sandbox
                 </Button>
               </span>
             </Tooltip>
-            <Button loading={files.isFetching} onClick={refresh}>
+            <Button loading={files.isRefetching} onClick={refresh}>
               刷新
             </Button>
           </div>
@@ -139,7 +139,7 @@ export default function SandboxFiles({ instanceId, running, onChanged }: Sandbox
             tableLabel="工作区文件"
             data={pageItems}
             rowKey="path"
-            loading={files.isLoading || files.isFetching}
+            loading={files.isFetching}
             pagination={pagination}
             rowActions={actions}
             columns={[

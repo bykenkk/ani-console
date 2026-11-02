@@ -24,7 +24,7 @@ export default function ModelOperationHistory({ modelId }: ModelOperationHistory
       header={{
         title: "模型操作记录",
         extra: (
-          <Button loading={operations.isFetching} onClick={() => operations.refetch()}>
+          <Button loading={operations.isRefetching} onClick={() => operations.refetch()}>
             刷新
           </Button>
         ),

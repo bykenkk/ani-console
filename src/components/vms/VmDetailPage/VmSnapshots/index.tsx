@@ -63,7 +63,7 @@ export default function VmSnapshots({ vm }: VmSnapshotsProps) {
           title: "快照",
           extra: (
             <Space>
-              <Button loading={query.isFetching} onClick={() => query.refetch()}>
+              <Button loading={query.isRefetching} onClick={() => query.refetch()}>
                 刷新
               </Button>
               <Button disabled={disabled} onClick={() => setCreating(true)}>
@@ -73,7 +73,7 @@ export default function VmSnapshots({ vm }: VmSnapshotsProps) {
           ),
         }}
         data={query.data?.items ?? []}
-        loading={query.isLoading}
+        loading={query.isFetching}
         rowKey="snapshotId"
         pagination={false}
         rowActions={actions}

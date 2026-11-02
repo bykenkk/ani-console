@@ -87,7 +87,7 @@ export default function VpcRelatedResources({ vpcId }: VpcRelatedResourcesProps)
   const loadBalancerResources = resources.filter((resource) => resource.kind === "负载均衡");
   const computeResources = resources.filter((resource) => resource.group === "算力");
   const networkPage = useClientPagination(networkResources, vpcId);
-  const loading = subnets.isLoading || loadBalancers.isLoading || instances.isLoading;
+  const loading = subnets.isFetching || loadBalancers.isFetching || instances.isFetching;
   const columns: Array<ListColumn<RelatedResource>> = [
     { title: "类型", width: 120, render: (_, resource) => <Tag>{resource.kind}</Tag> },
     { title: "名称", width: 200, dataIndex: "name" },
@@ -119,7 +119,7 @@ export default function VpcRelatedResources({ vpcId }: VpcRelatedResourcesProps)
           header={{ title: "负载均衡关联" }}
           columns={columns}
           data={loadBalancerResources}
-          loading={loadBalancers.isLoading}
+          loading={loadBalancers.isFetching}
           pagination={loadBalancerPagination}
           tableLabel="VPC 负载均衡关联资源"
         />

@@ -29,7 +29,7 @@ export default function GpuAnomalyList() {
       className="h-full rounded-lg!"
       extra={<Typography.Text type="secondary">{anomalies.length} 项</Typography.Text>}
     >
-      {anomalyQuery.isLoading ? (
+      {anomalyQuery.isFetching ? (
         <Skeleton animation text={{ rows: 4 }} />
       ) : anomalies.length === 0 ? (
         <div className="flex min-h-28 items-center justify-center">

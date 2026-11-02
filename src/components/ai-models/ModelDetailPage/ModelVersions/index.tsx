@@ -57,7 +57,7 @@ export default function ModelVersions({ modelId }: ModelVersionsProps) {
                 { value: "failed", label: "失败" },
               ]}
             />
-            <Button loading={versions.isFetching} onClick={() => versions.refetch()}>
+            <Button loading={versions.isRefetching} onClick={() => versions.refetch()}>
               刷新
             </Button>
           </Space>

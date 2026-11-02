@@ -86,7 +86,7 @@ export default function VmDisks({ vm }: VmDisksProps) {
           title: "磁盘",
           extra: (
             <Space>
-              <Button loading={query.isFetching} onClick={() => query.refetch()}>
+              <Button loading={query.isRefetching} onClick={() => query.refetch()}>
                 刷新
               </Button>
               <Button disabled={disabled} onClick={() => setCreating(true)}>
@@ -96,7 +96,7 @@ export default function VmDisks({ vm }: VmDisksProps) {
           ),
         }}
         data={query.data?.items ?? []}
-        loading={query.isLoading}
+        loading={query.isFetching}
         rowKey="diskId"
         pagination={false}
         rowActions={actions}

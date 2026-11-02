@@ -224,7 +224,7 @@ export default function KnowledgeDocuments({ kbId, action }: KnowledgeDocumentsP
       <DataTable<KBDocument>
         header={{ title: "文档列表", extra: action, className: "mb-0" }}
         columns={columns}
-        loading={documents.isLoading}
+        loading={documents.isFetching}
         data={rows}
         tableLabel="知识库文档与解析列表"
         scroll={{ x: 1370 }}

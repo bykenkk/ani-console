@@ -42,7 +42,7 @@ export default function InferencePolicies({ serviceId }: InferencePoliciesProps)
         header={{
           title: "已绑定访问策略",
           extra: (
-            <Button size="small" loading={policies.isFetching} onClick={() => policies.refetch()}>
+            <Button size="small" loading={policies.isRefetching} onClick={() => policies.refetch()}>
               刷新
             </Button>
           ),

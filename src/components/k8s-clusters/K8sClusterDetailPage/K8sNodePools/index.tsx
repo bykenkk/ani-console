@@ -42,7 +42,7 @@ export default function K8sNodePools({ clusterId, onNodeCountChange }: K8sNodePo
         },
       ]}
       data={pageItems}
-      loading={nodePools.isLoading}
+      loading={nodePools.isFetching}
       pagination={pagination}
     />
   );

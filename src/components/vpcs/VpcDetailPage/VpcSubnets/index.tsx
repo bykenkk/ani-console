@@ -33,7 +33,7 @@ export default function VpcSubnets({ vpcId }: VpcSubnetsProps) {
         },
       ]}
       data={pageItems}
-      loading={subnets.isLoading}
+      loading={subnets.isFetching}
       pagination={pagination}
     />
   );

@@ -46,7 +46,7 @@ export default function GpuModelInventory({ onCreate }: GpuModelInventoryProps) 
         }}
         rowKey="id"
         data={modelInventory}
-        loading={occupancy.isLoading}
+        loading={occupancy.isFetching}
         pagination={false}
         scroll={{ x: 850, y: false }}
         tableLabel="GPU 型号库存"
