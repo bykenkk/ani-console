@@ -29,7 +29,6 @@ export default function FineTuningTaskDetailPage({
   const detail = useQuery({
     queryKey: ["training-execution", executionId],
     queryFn: ({ signal }) => getModelDevExecution(executionId, signal),
-    // TODO(finetuning-detail): 待联调验证微调详情、状态刷新、日志、产物及登记恢复。
     meta: {
       errorNotification: {
         id: withId("training-execution", executionId),

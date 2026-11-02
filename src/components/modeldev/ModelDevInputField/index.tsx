@@ -27,7 +27,6 @@ export default function ModelDevInputField({ field, format, onSelect }: ModelDev
       },
     },
   });
-  // TODO(modeldev-input): 联调核对 READY 与 CSV/JSON 格式组合筛选。
   return (
     <Form.Item
       field={field}

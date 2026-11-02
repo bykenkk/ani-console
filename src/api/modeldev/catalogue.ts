@@ -1,4 +1,4 @@
-// TODO(modeldev-integration): 部署后验证实现目录、TRAINING 规格、READY 筛选、权限及空页；静态核对不代表可提交。
+// 静态核对不代表可提交。
 import { coreRequest } from "@/api/request";
 import type { InstancePresetListParams, InstancePresetListResponse } from "@/api/instances";
 import type {
@@ -25,7 +25,6 @@ export function listModelDevImplementations(
   params: ModelDevImplementationListParams,
   signal?: AbortSignal,
 ): Promise<ModelDevImplementationListResponse> {
-  // TODO(modeldev-catalogue): 待联调验证 device_mode / kind 组合筛选、分页 total、空页及部署版本。
   return coreRequest<ModelDevImplementationListResponse>("/modeldev/implementations", {
     method: "GET",
     params,

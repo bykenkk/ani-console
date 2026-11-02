@@ -67,7 +67,7 @@ export default function CreateInferenceModal({
     [form],
   );
   const create = useMutation({
-    // TODO(inference-model-config): 联调模型参数预填、用户修改及切换版本；提交采用用户确认的表单值。
+    // 提交采用用户确认的表单值。
     mutationFn: createInferenceService,
     meta: {
       feedback: {

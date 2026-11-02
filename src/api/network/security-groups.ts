@@ -20,7 +20,7 @@ const createRuleScope = createIdempotencyScope("network-security-group-rule-crea
 const updateRuleScope = createIdempotencyScope("network-security-group-rule-update", ["PATCH"]);
 const securityGroupPath = (id: string) => `/networks/security-groups/${encodeURIComponent(id)}`;
 
-// TODO(security-group-live): 部署后核对规则、绑定、版本冲突及幂等重试；静态接入不代表数据面已生效。
+// 静态接入不代表数据面已生效。
 export function listNetworkSecurityGroups(
   params: NetworkSecurityGroupListParams = {},
   signal?: AbortSignal,

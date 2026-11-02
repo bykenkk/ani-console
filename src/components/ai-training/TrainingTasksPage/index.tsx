@@ -17,7 +17,7 @@ export default function TrainingTasksPage() {
   const query = useQuery({
     queryKey: ["training-executions", filters, { page, pageSize }],
     queryFn: ({ signal }) => listModelDevExecutions({ ...filters, page, pageSize }, signal),
-    // TODO(training-list): 待联调验证 kind=GENERAL_TRAINING 的筛选、total、空结果与超界页行为；名称与状态筛选暂缓恢复。
+    // TODO(training-list): 名称与状态筛选暂缓恢复。
     meta: {
       errorNotification: {
         id: "training-executions",

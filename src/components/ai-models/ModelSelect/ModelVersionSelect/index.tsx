@@ -34,7 +34,6 @@ export default function ModelVersionSelect({
     queryFn: ({ signal }) => getModel(modelId, signal),
     meta: { errorNotification: { id: withId("inference-model", modelId), action: "模型详情加载" } },
   });
-  // TODO(model-contract): 联调版本归属、就绪状态及初始选择回显。
   const versions = useQuery({
     queryKey: ["model-versions", modelId, "options", { status: "ready" }],
     enabled: Boolean(modelId),

@@ -49,7 +49,6 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
     vm.cpuMillis ? `${Number(vm.cpuMillis) / 1000}C` : "-",
     vm.memoryMib ? `${Number(vm.memoryMib) / 1024} GiB` : "-",
   ].join(" / ");
-  // TODO(vm-integration): 新详情、磁盘、介质及快照流程仍需在已部署且允许访问的环境联调。
   return (
     <>
       <DetailPageFrame
@@ -195,7 +194,6 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
           { key: "guest", label: "来宾信息", content: <VmGuestInfo vm={vm} /> },
           { key: "media", label: "光盘与启动", content: <VmMediaDevices vm={vm} /> },
           { key: "snapshots", label: "快照", content: <VmSnapshots vm={vm} /> },
-          // TODO(vm-metrics): Gov 新版部署后联调 VM ID 的实例指标查询与 instance:read 权限。
           {
             key: "monitoring",
             label: "资源监控",

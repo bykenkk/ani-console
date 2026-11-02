@@ -45,7 +45,6 @@ const execScope = createIdempotencyScope("governance-instance-exec", ["POST"]);
 const instancePath = (id: string) => `/instances/${encodeURIComponent(id)}`;
 export function listInstances(params: InstanceListParams = {}, signal?: AbortSignal) {
   // 不传 observedState 时由服务端排除已删除实例，筛选与 total 均由服务端计算。
-  // TODO(governance-instance-filter): 后端发布 ID 搜索与默认删除过滤后，联调验证片段匹配、组合筛选和分页总数。
   return coreRequest<InstanceListResponse>("/instances", { method: "GET", params, signal });
 }
 export function getInstance(id: string, signal?: AbortSignal) {
@@ -53,7 +52,6 @@ export function getInstance(id: string, signal?: AbortSignal) {
 }
 export function listInstancePresets(params: InstancePresetListParams = {}, signal?: AbortSignal) {
   // 容器创建固定使用实例用途，不与训练、推理目录共享授权范围。
-  // TODO(instance-presets): 联调验证用途授权、分页及 GPU 目录降级反馈。
   return coreRequest<InstancePresetListResponse>("/compute-presets", {
     method: "GET",
     params: { ...params, usage: "CONTAINER_INSTANCE" },
@@ -61,7 +59,6 @@ export function listInstancePresets(params: InstancePresetListParams = {}, signa
   });
 }
 export function createInstance(input: CreateInstanceInput): Promise<void> {
-  // TODO(governance-instance-create): 联调验证配置保存、卷引用、网络门禁和幂等重试。
   return runIdempotentRequest(createScope, input, async (data) => {
     await coreRequest<void, CreateInstanceRequest>("/instances", {
       method: "POST",
@@ -140,7 +137,6 @@ export function stopInstance(id: string, input: ChangeInstanceInput): Promise<vo
   );
 }
 export function restartInstance(id: string, input: RestartInstanceInput): Promise<void> {
-  // TODO(instance-intents): 联调核对 CPU/GPU 重启、运行态挂卸、版本冲突及丢失响应后的幂等重放。
   return runIdempotentRequest(
     restartScope,
     input,
@@ -177,7 +173,7 @@ export function getInstanceRuntime(id: string, signal?: AbortSignal) {
   return coreRequest<InstanceRuntime>(`${instancePath(id)}/runtime`, { method: "GET", signal });
 }
 export function getInstanceConfiguration(id: string, signal?: AbortSignal) {
-  // TODO(instance-configuration): 联调核对冻结配置回显和 no-store 响应，不写入持久缓存。
+  // 冻结配置响应不写入持久缓存。
   return coreRequest<InstanceConfigurationData>(`${instancePath(id)}/configuration`, {
     method: "GET",
     signal,

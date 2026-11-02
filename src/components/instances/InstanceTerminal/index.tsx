@@ -1,5 +1,4 @@
 import { createInstanceExecSession } from "@/api/instances";
-// TODO(governance-instance-exec): 后续联调验证会话创建、WebSocket 连接、输入输出、窗口缩放和重连。
 import { StatusBadge, type StatusBadgeTone } from "@/components/common";
 import { useEffect, useRef, useState } from "react";
 import { Button, Space } from "@arco-design/web-react";

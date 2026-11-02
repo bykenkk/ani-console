@@ -1,4 +1,3 @@
-// TODO(inference-contract): Governance 已注册详情及删除路由；待部署后联调详情、删除返回与关联资源。
 // FIXME(inference-health): health 完整枚举、unknown 成因及探测更新机制仍待 owner 确认；保留后端原值，不由运行阶段推算。
 import { useQuery } from "@tanstack/react-query";
 import { getInferenceService } from "@/api/inference";

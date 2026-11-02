@@ -16,7 +16,6 @@ export function listBuckets(params: StorageBucketListParams = {}, signal?: Abort
 export type * from "./types";
 
 // 同名创建由服务端幂等处理；契约没有幂等 key 字段或 Header。
-// TODO(storage-runtime): 待前端联调验证创建、同名重放、数量上限和服务端错误。
 export async function createBucket(input: CreateStorageBucketInput): Promise<void> {
   await coreRequest("/storage/buckets", { method: "POST", data: { data: input } });
 }

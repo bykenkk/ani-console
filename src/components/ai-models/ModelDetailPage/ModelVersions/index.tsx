@@ -24,7 +24,6 @@ export default function ModelVersions({ modelId }: ModelVersionsProps) {
   const paging = useListPagination(JSON.stringify([modelId, status]), 10);
   const { page, pageSize } = paging;
   const params = { page, pageSize, status: status === "all" ? undefined : status };
-  // TODO(model-contract): 联调当前模型版本列表的分页、空列表和版本大小展示。
   const versions = useQuery({
     queryKey: ["model-versions", modelId, params],
     queryFn: ({ signal }) => listModelVersions(modelId, params, signal),

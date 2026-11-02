@@ -68,7 +68,6 @@ export default function GpuContainerDetailPage({
   if (!current.data) return <DetailPagePlaceholder loading={current.isLoading} />;
   const record = current.data;
   if (!isGpu) return <Empty description="当前资源不是 GPU 容器" />;
-  // TODO(instance-detail-migration): GPU 配置、网络及卷引用需完成实际联调验证后移除此标记。
   const relatedItems: Array<{ kind: string; name: string }> = [];
   if (configuration.data?.network) {
     relatedItems.push(

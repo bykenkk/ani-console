@@ -9,7 +9,6 @@ import type {
 
 export type { InferencePolicy, InferencePolicyInput } from "./types";
 
-// TODO(inference-policies): 部署后验证租户隔离、完整替换、空模型拒绝、零限额及绑定删除冲突。
 export function listInferencePolicies(
   params: InferencePolicyListParams = {},
   signal?: AbortSignal,

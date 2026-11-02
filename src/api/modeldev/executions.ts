@@ -1,4 +1,3 @@
-// TODO(modeldev-integration): 文档已声明部署；仍需前端联调验证停止、登记恢复、分页、日志、产物及下载。
 import { coreRequest } from "@/api/request";
 import { runIdempotentRequest } from "@/api/idempotency";
 import { createIdempotencyScope } from "@/lib/idempotency";
@@ -20,7 +19,6 @@ const createFineTuningScope = createIdempotencyScope("finetuning-create", ["POST
 const createTrainingScope = createIdempotencyScope("training-create", ["POST"]);
 const executionPath = (id: string) => `/modeldev/executions/${encodeURIComponent(id)}`;
 
-// TODO(training-create): 联调 CPU/GPU 准入、同意图重试及 202 异步受理。
 export function createTrainingExecution(input: CreateTrainingInput): Promise<void> {
   return runIdempotentRequest(createTrainingScope, input, async (data) => {
     await coreRequest<unknown, CreateTrainingRequest>("/modeldev/executions", {
@@ -30,7 +28,6 @@ export function createTrainingExecution(input: CreateTrainingInput): Promise<voi
   });
 }
 
-// TODO(finetuning-create): 联调三种登记模式、CPU/GPU 准入、失败后同意图重试及 202 异步受理。
 export function createFineTuningExecution(input: CreateFineTuningInput): Promise<void> {
   return runIdempotentRequest(createFineTuningScope, input, async (data) => {
     await coreRequest<unknown, CreateFineTuningRequest>("/modeldev/executions", {
@@ -40,7 +37,6 @@ export function createFineTuningExecution(input: CreateFineTuningInput): Promise
   });
 }
 
-// TODO(modeldev-list): 待联调验证 executions 接受 kind，并在分页前与名称、状态条件组合筛选，total 返回筛选后的总数。
 export function listModelDevExecutions(
   params: ModelDevExecutionListParams = {},
   signal?: AbortSignal,

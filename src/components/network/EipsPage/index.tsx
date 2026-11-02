@@ -19,7 +19,6 @@ export default function EipsPage() {
   const [status, setStatus] = useState<"" | NetworkResourceStateFilter>("");
   const [searchText, setSearchText] = useState("");
   // TODO(pagination-migration): EIP 后端仍为 limit/cursor；完成 page/pageSize 改造后改用 useListPagination 和真实 total。
-  // TODO: 部署后验证列表筛选、游标翻页及创建后的状态更新。
   const { query, items, pagination, resetPagination, refresh } =
     useCursorPaginatedQuery<NetworkEip>({
       queryKey: ["network-eips", { status, name: searchText.trim() }],

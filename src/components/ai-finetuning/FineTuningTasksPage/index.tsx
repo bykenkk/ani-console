@@ -75,7 +75,6 @@ export default function FineTuningTasksPage() {
   const query = useQuery({
     queryKey: ["training-executions", filters, { page, pageSize }],
     queryFn: ({ signal }) => listModelDevExecutions({ ...filters, page, pageSize }, signal),
-    // TODO(finetuning-list): 待联调验证 kind=FINETUNING 在服务端分页前筛选，total、空结果与超界页语义正确。
     meta: {
       errorNotification: {
         id: "finetuning-executions",

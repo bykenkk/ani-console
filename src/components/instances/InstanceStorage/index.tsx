@@ -46,7 +46,7 @@ export default function InstanceStorage({
   // 当前权威配置的挂载路径唯一；运行态卷名不是 PVC 名，按同一实例的容器内路径对应。
   const runtimeMounts =
     runtime?.instance_id === configuration?.instance_id ? (runtime?.pod?.mounts ?? []) : [];
-  // TODO(instance-volume-type): 联调核对运行态类型；无观测、路径不唯一或只读属性不一致时保留占位。
+  // 无观测、路径不唯一或只读属性不一致时保留占位。
   return (
     <div className="flex w-full flex-col gap-6">
       {diskContent ?? (

@@ -26,7 +26,7 @@ export default function GpuContainerStopModal({
         errorFallback: "停止失败，请刷新后重试",
       },
     },
-    // TODO(gpu-container-stop): 联调验证停止受理、expected_version 冲突及用户卷保留；停止不表示 GPU 配额已归还。
+    // 停止不表示 GPU 配额已归还。
     // TODO(container-task): 停止受理后仅刷新资源并关闭确认框，任务进度后续统一接入。
     onSuccess: async () => {
       await Promise.all([

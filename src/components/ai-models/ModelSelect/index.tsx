@@ -24,7 +24,6 @@ export default function ModelSelect({
   status,
 }: ModelSelectProps) {
   const [keyword, setKeyword] = useState("");
-  // TODO(model-contract): 联调模型选项的远程搜索及初始选择回显。
   const models = useQuery({
     queryKey: ["models", "options", { keyword, status }],
     queryFn: ({ signal }) => listModelOptions({ keyword: keyword || undefined, status }, signal),

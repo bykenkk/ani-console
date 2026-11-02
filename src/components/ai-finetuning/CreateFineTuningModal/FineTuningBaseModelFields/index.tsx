@@ -13,7 +13,7 @@ export default function FineTuningBaseModelFields({
   onModelSelect,
   onVersionChange,
 }: FineTuningBaseModelFieldsProps) {
-  // TODO(finetuning-model): 联调模型/版本权限、ready 筛选、切换后的回显；提交恢复时由后端复核基模可读及可下载。
+  // 提交恢复时由后端复核基模可读及可下载。
   return (
     <Grid.Row gutter={16}>
       <Grid.Col span={12}>

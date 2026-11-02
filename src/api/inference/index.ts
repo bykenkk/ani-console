@@ -29,7 +29,6 @@ const commandScopes = {
 const servicePath = (id: string) => `/inference/services/${encodeURIComponent(id)}`;
 
 // 与容器共用 ComputePreset DTO；用途由 API 固定，分别执行业务授权。
-// TODO(inference-presets): 联调 INFERENCE 权限、分页和 GPU 目录降级。
 export function listInferencePresets(params: InstancePresetListParams = {}, signal?: AbortSignal) {
   return coreRequest<InstancePresetListResponse>("/compute-presets", {
     method: "GET",
@@ -38,7 +37,6 @@ export function listInferencePresets(params: InstancePresetListParams = {}, sign
   });
 }
 
-// TODO(inference-contract): 已静态核对 Governance 列表路由及 page/pageSize、status/capability、items/total；待部署后联调。
 export function listInferenceServices(params: InferenceListParams = {}, signal?: AbortSignal) {
   return coreRequest<InferenceListResponse>("/inference/services", {
     method: "GET",
@@ -46,14 +44,13 @@ export function listInferenceServices(params: InferenceListParams = {}, signal?:
     signal,
   });
 }
-// TODO(inference-contract): 已静态核对 Governance 详情路由；待部署后联调资源状态与算力快照，不回退 legacy。
+// 详情查询不回退 legacy。
 export function getInferenceService(id: string, signal?: AbortSignal) {
   return coreRequest<InferenceService>(servicePath(id), {
     method: "GET",
     signal,
   });
 }
-// TODO(inference-contract): 联调 preset_id、CPU/GPU 创建、同意图幂等重试与异步受理。
 export function createInferenceService(input: CreateInferenceInput): Promise<void> {
   return runIdempotentRequest(createScope, input, async (data) => {
     await coreRequest<InferenceAcceptance, CreateInferenceRequest>("/inference/services", {
@@ -62,7 +59,6 @@ export function createInferenceService(input: CreateInferenceInput): Promise<voi
     });
   });
 }
-// TODO(inference-contract): 已静态核对 :delete 路由、幂等及异步受理；待部署后联调 CPU/GPU 删除与 generation 校验。
 export function deleteInferenceService(
   id: string,
   input: DeleteInferenceInput = {},
@@ -81,7 +77,6 @@ export function deleteInferenceService(
 }
 
 export type * from "./types";
-// TODO(inference-contract): 已核对顶层更新字段；联调更新掩码、generation 冲突及幂等重试。
 export function updateInferenceService(id: string, input: UpdateInferenceInput): Promise<void> {
   return runIdempotentRequest(
     updateScope,
@@ -97,7 +92,6 @@ export function updateInferenceService(id: string, input: UpdateInferenceInput):
   );
 }
 
-// TODO(inference-contract): 已核对顶层命令字段；联调启停、重启与异步受理。
 export function applyInferenceCommand(
   id: string,
   command: InferenceCommand,

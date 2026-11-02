@@ -81,7 +81,7 @@ export function getModelDevParameterError(
       (!Number.isFinite(Math.fround(decimal)) || Math.fround(decimal) <= 0)
     )
       return "请输入可表示的大于 0 的小数";
-    // TODO(modeldev-rules): 联调核对目录的开闭区间和可编辑规则；模型相关上限仍由后端校验。
+    // 模型相关上限仍由后端校验。
   }
 }
 

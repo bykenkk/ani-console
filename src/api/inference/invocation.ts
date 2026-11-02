@@ -16,7 +16,6 @@ export interface InferenceChatResponse {
 }
 
 // 推理响应本身即测试结果，保留返回体；该接口未声明客户端幂等字段，不自动重试。
-// TODO(inference-key-policy): 部署后验证模型授权、旧密钥失效、跨租户拒绝及真实推理限流。
 export async function invokeInferenceChat(
   invocationEndpoint: string | undefined,
   input: InferenceChatInput,

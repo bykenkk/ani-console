@@ -88,7 +88,6 @@ export interface InferenceService {
   publication_phase?: string;
   applied_generation?: string;
 }
-// TODO(inference-contract): 已静态核对列表筛选和页码分页；待部署后联调 total 的十进制字符串序列化。
 export interface InferenceListParams extends PageParams {
   status?: string;
   capability?: "embedding" | "text-generation" | "speech-to-text";

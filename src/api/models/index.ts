@@ -19,7 +19,6 @@ import type {
 
 const importBundleScope = createIdempotencyScope("model-import-bundle", ["POST"]);
 
-// TODO(model-contract): 联调页码分页、筛选、直接跳页和空页的 items/total。
 export function listModels(params: ModelListParams = {}, signal?: AbortSignal) {
   return coreRequest<ModelListResponse>("/models", {
     method: "GET",
@@ -27,7 +26,6 @@ export function listModels(params: ModelListParams = {}, signal?: AbortSignal) {
     signal,
   });
 }
-// TODO(model-contract): 已核对 HTTP 直接返回 Model；待部署后联调详情、版本回填及错误语义。
 export function getModel(id: string, signal?: AbortSignal): Promise<Model> {
   return coreRequest<Model>(`/models/${encodeURIComponent(id)}`, {
     method: "GET",
@@ -57,7 +55,6 @@ export function searchExternalModels(
 }
 
 // FIXME(model-pagination): 当前后端将 page 误限为 1–100；待解除页码上限后复核直接跳页，不在前端截断 total 或模拟分页。
-// TODO(model-contract): 联调 status 服务端筛选、模型归属及空列表。
 export function listModelVersions(
   id: string,
   params: ModelVersionListParams = {},
@@ -70,7 +67,7 @@ export function listModelVersions(
   });
 }
 // FIXME(model-pagination): 当前后端将操作记录的 page 误限为 1–100，超出会返回 400；待后端修复后复核。
-// TODO(model-operations): 联调租户隔离、真实 total、操作人及 accepted/succeeded/failed 结果，不将 accepted 展示为完成。
+// 不将 accepted 展示为完成。
 export function listModelOperations(
   id: string,
   params: ModelPageParams = {},
@@ -91,7 +88,7 @@ export function getModelVersion(id: string, signal?: AbortSignal) {
   });
 }
 
-// TODO(model-contract): 已核对组合导入的顶层 model/version/source 结构；待部署后联调幂等和失败重试，任务跟踪后续统一接入。
+// TODO(model-contract): 任务跟踪后续统一接入。
 export function importModelBundle(
   submitData: ImportModelBundleInput,
   signal?: AbortSignal,

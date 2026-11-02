@@ -26,7 +26,6 @@ export default function GpuContainerDeleteModal({
         errorFallback: "删除失败，请刷新后重试",
       },
     },
-    // TODO(gpu-container-delete): 联调验证删除受理、最终 GPU 释放与退额、工作空间清理和用户卷保留。
     // TODO(container-task): 删除任务跟踪后续统一接入，当前仅提交请求并提示。
     onSuccess: async () => {
       await Promise.all([

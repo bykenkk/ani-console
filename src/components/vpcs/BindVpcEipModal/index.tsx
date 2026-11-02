@@ -17,7 +17,6 @@ type BindVpcEipFormValues = {
 export default function BindVpcEipModal({ vpc, onCancel, onSubmitted }: BindVpcEipModalProps) {
   const [form] = Form.useForm<BindVpcEipFormValues>();
   const queryClient = useQueryClient();
-  // TODO: 部署后验证绑定状态、独占冲突、失败重试及重复提交的幂等行为。
   const bind = useMutation({
     mutationKey: ["vpc-eip-bind", vpc.id],
     mutationFn: (input: BindNetworkSnatInput) => bindNetworkVpcSnat(vpc.id, input),

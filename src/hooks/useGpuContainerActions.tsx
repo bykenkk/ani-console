@@ -43,7 +43,7 @@ export function useGpuContainerActions(onDeleted?: () => void) {
         errorFallback: "启动失败，请刷新后重试",
       },
     },
-    // TODO(gpu-container-command): 联调验证 GPU 启动、版本冲突和重复提交；不依据启停推断 GPU 配额归还。
+    // 不依据启停推断 GPU 配额归还。
     // TODO(container-task): 本阶段只提示已提交并刷新实例，任务跟踪后续统一接入。
     onSuccess: async (_, instance) => {
       await Promise.all([
@@ -119,7 +119,6 @@ export function useGpuContainerActions(onDeleted?: () => void) {
         unavailable(instance) ||
         instance.observedState !== "running" ||
         instance.desiredState !== "running",
-      // TODO(gpu-container-terminal): 联调核对 GPU 终端目标、实例版本绑定及未就绪反馈。
       onClick: (instance) => {
         if (
           unavailable(instance) ||

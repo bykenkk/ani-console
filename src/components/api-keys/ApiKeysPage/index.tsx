@@ -112,7 +112,7 @@ export function ApiKeysPage() {
     },
   });
 
-  // TODO(api-key-filters): 联调状态、过期时间与关键词的组合筛选、空结果及真实总数；筛选由后端执行。
+  // 筛选由后端执行。
   const columns: Array<ListColumn<ApiKeyRecord>> = [
     {
       key: "name",

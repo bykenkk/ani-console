@@ -32,7 +32,6 @@ export default function InferencePage() {
   });
   const items = query.data?.items ?? [];
   const total = Number(query.data?.total ?? 0);
-  // TODO(inference-contract): 已静态核对 page/pageSize 和 items/total；待部署后联调翻页、空页及权限过滤。
   const pagination: ListPagination = {
     mode: "total",
     page,

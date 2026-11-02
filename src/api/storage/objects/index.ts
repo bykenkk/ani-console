@@ -47,7 +47,6 @@ export function getStorageObjectDownload(input: StorageObjectInput, signal?: Abo
 export type * from "./types";
 
 // 删除自身幂等（DELETED/GONE 均成功）；取票也未声明幂等 key，不追加字段或 Header。
-// TODO(storage-runtime): 待前端联调验证 ETag 冲突、重复删除 GONE 和写后刷新。
 export async function deleteStorageObject(input: StorageObjectDeleteInput): Promise<void> {
   await coreRequest(`${bucketPath(input.bucket_id)}/objects:delete`, {
     method: "POST",
@@ -55,7 +54,6 @@ export async function deleteStorageObject(input: StorageObjectDeleteInput): Prom
   });
 }
 
-// TODO(storage-runtime): 待前端联调验证直传 CORS、取消、超时复核及重复提交。
 export async function uploadStorageObjectFile({
   bucketId,
   key,

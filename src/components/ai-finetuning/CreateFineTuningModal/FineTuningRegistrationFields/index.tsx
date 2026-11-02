@@ -13,7 +13,7 @@ export default function FineTuningRegistrationFields({
   mode,
   onTargetModelSelect,
 }: FineTuningRegistrationFieldsProps) {
-  // TODO(finetuning-registration): 联调已有模型选项及权限；登记随训练创建意图提交，不提前创建模型。
+  // 登记随训练创建意图提交，不提前创建模型。
   return (
     <>
       <Form.Item field="registrationMode" label="训练结果登记">
