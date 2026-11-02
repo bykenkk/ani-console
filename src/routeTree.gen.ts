@@ -18,6 +18,7 @@ import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/_app/index'
 import { Route as AuthenticatedAppAiApiKeysIndexRouteImport } from './routes/_authenticated/_app/ai-api-keys/index'
 import { Route as AuthenticatedAppAiFinetuningIndexRouteImport } from './routes/_authenticated/_app/ai-finetuning/index'
+import { Route as AuthenticatedAppAiFinetuningExecutionIdRouteImport } from './routes/_authenticated/_app/ai-finetuning/$executionId'
 import { Route as AuthenticatedAppAiInferencePoliciesIndexRouteImport } from './routes/_authenticated/_app/ai-inference-policies/index'
 import { Route as AuthenticatedAppAiInferencePoliciesPolicyIdRouteImport } from './routes/_authenticated/_app/ai-inference-policies/$policyId'
 import { Route as AuthenticatedAppAiInferenceIndexRouteImport } from './routes/_authenticated/_app/ai-inference/index'
@@ -106,6 +107,12 @@ const AuthenticatedAppAiFinetuningIndexRoute =
   AuthenticatedAppAiFinetuningIndexRouteImport.update({
     id: '/ai-finetuning/',
     path: '/ai-finetuning/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppAiFinetuningExecutionIdRoute =
+  AuthenticatedAppAiFinetuningExecutionIdRouteImport.update({
+    id: '/ai-finetuning/$executionId',
+    path: '/ai-finetuning/$executionId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppAiInferencePoliciesIndexRoute =
@@ -377,6 +384,7 @@ export interface FileRoutesByFullPath {
   '/terminal': typeof AuthenticatedTerminalRoute
   '/vnc': typeof AuthenticatedVncRoute
   '/login/': typeof LoginIndexRoute
+  '/ai-finetuning/$executionId': typeof AuthenticatedAppAiFinetuningExecutionIdRoute
   '/ai-inference-policies/$policyId': typeof AuthenticatedAppAiInferencePoliciesPolicyIdRoute
   '/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
   '/ai-models/$modelId': typeof AuthenticatedAppAiModelsModelIdRoute
@@ -429,6 +437,7 @@ export interface FileRoutesByTo {
   '/terminal': typeof AuthenticatedTerminalRoute
   '/vnc': typeof AuthenticatedVncRoute
   '/login': typeof LoginIndexRoute
+  '/ai-finetuning/$executionId': typeof AuthenticatedAppAiFinetuningExecutionIdRoute
   '/ai-inference-policies/$policyId': typeof AuthenticatedAppAiInferencePoliciesPolicyIdRoute
   '/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
   '/ai-models/$modelId': typeof AuthenticatedAppAiModelsModelIdRoute
@@ -484,6 +493,7 @@ export interface FileRoutesById {
   '/_authenticated/vnc': typeof AuthenticatedVncRoute
   '/login/': typeof LoginIndexRoute
   '/_authenticated/_app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/_app/ai-finetuning/$executionId': typeof AuthenticatedAppAiFinetuningExecutionIdRoute
   '/_authenticated/_app/ai-inference-policies/$policyId': typeof AuthenticatedAppAiInferencePoliciesPolicyIdRoute
   '/_authenticated/_app/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
   '/_authenticated/_app/ai-models/$modelId': typeof AuthenticatedAppAiModelsModelIdRoute
@@ -539,6 +549,7 @@ export interface FileRouteTypes {
     | '/terminal'
     | '/vnc'
     | '/login/'
+    | '/ai-finetuning/$executionId'
     | '/ai-inference-policies/$policyId'
     | '/ai-inference/$serviceId'
     | '/ai-models/$modelId'
@@ -591,6 +602,7 @@ export interface FileRouteTypes {
     | '/terminal'
     | '/vnc'
     | '/login'
+    | '/ai-finetuning/$executionId'
     | '/ai-inference-policies/$policyId'
     | '/ai-inference/$serviceId'
     | '/ai-models/$modelId'
@@ -645,6 +657,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vnc'
     | '/login/'
     | '/_authenticated/_app/'
+    | '/_authenticated/_app/ai-finetuning/$executionId'
     | '/_authenticated/_app/ai-inference-policies/$policyId'
     | '/_authenticated/_app/ai-inference/$serviceId'
     | '/_authenticated/_app/ai-models/$modelId'
@@ -761,6 +774,13 @@ declare module '@tanstack/react-router' {
       path: '/ai-finetuning'
       fullPath: '/ai-finetuning/'
       preLoaderRoute: typeof AuthenticatedAppAiFinetuningIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/ai-finetuning/$executionId': {
+      id: '/_authenticated/_app/ai-finetuning/$executionId'
+      path: '/ai-finetuning/$executionId'
+      fullPath: '/ai-finetuning/$executionId'
+      preLoaderRoute: typeof AuthenticatedAppAiFinetuningExecutionIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/ai-inference-policies/': {
@@ -1091,6 +1111,7 @@ const AuthenticatedAppObjectsBucketIdRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+  AuthenticatedAppAiFinetuningExecutionIdRoute: typeof AuthenticatedAppAiFinetuningExecutionIdRoute
   AuthenticatedAppAiInferencePoliciesPolicyIdRoute: typeof AuthenticatedAppAiInferencePoliciesPolicyIdRoute
   AuthenticatedAppAiInferenceServiceIdRoute: typeof AuthenticatedAppAiInferenceServiceIdRoute
   AuthenticatedAppAiModelsModelIdRoute: typeof AuthenticatedAppAiModelsModelIdRoute
@@ -1140,6 +1161,8 @@ interface AuthenticatedAppRouteChildren {
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+  AuthenticatedAppAiFinetuningExecutionIdRoute:
+    AuthenticatedAppAiFinetuningExecutionIdRoute,
   AuthenticatedAppAiInferencePoliciesPolicyIdRoute:
     AuthenticatedAppAiInferencePoliciesPolicyIdRoute,
   AuthenticatedAppAiInferenceServiceIdRoute:

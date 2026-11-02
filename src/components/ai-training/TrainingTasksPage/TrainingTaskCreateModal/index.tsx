@@ -8,7 +8,7 @@ import {
 } from "@/api/modeldev";
 import type { InstancePreset } from "@/api/instances";
 import WizardModal from "@/components/common/WizardModal";
-import ModelDevParameterFields from "@/components/ai-training/ModelDevParameterFields";
+import ModelDevParameterFields from "@/components/modeldev/ModelDevParameterFields";
 import { validateForm } from "@/lib/form";
 import { buildModelDevParameters } from "@/lib/modeldev";
 import TrainingTaskSummary from "./TrainingTaskSummary";

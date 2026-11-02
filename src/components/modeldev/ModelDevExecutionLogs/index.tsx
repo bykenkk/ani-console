@@ -8,9 +8,12 @@ import { withId } from "@/lib/id";
 import { formatDateTime } from "@/lib/date";
 import { normalizeLogText } from "@/lib/log-text";
 
-type TrainingTaskLogsProps = { executionId: string; observing: boolean };
+type ModelDevExecutionLogsProps = { executionId: string; observing: boolean };
 
-export default function TrainingTaskLogs({ executionId, observing }: TrainingTaskLogsProps) {
+export default function ModelDevExecutionLogs({
+  executionId,
+  observing,
+}: ModelDevExecutionLogsProps) {
   const [tailLines, setTailLines] = useState(200);
   const [maxBytes, setMaxBytes] = useState(16384);
   const [autoRefresh, setAutoRefresh] = useState(true);

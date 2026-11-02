@@ -1,6 +1,6 @@
 import type { ModelDevImplementation, ModelDevInputVersion } from "@/api/modeldev";
 import type { InstancePreset } from "@/api/instances";
-import ModelDevSummary from "@/components/ai-training/ModelDevSummary";
+import ModelDevSummary from "@/components/modeldev/ModelDevSummary";
 import { formatModelDevComputeResources, formatModelDevInputVersion } from "@/lib/modeldev";
 import type { TrainingTaskCreateFormValues } from "../index";
 

@@ -1,19 +1,23 @@
-import { Button } from "@arco-design/web-react";
+import { Button, Empty } from "@arco-design/web-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { listModelDevExecutionArtifacts, type ModelDevArtifact } from "@/api/modeldev";
 import { DataTable } from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { withId } from "@/lib/id";
 import { formatDateTime } from "@/lib/date";
-import TrainingArtifactDownload from "./TrainingArtifactDownload";
+import ModelDevArtifactDownload from "./ModelDevArtifactDownload";
 
-type TrainingTaskArtifactsProps = { executionId: string };
+type ModelDevExecutionArtifactsProps = { executionId: string; deliveryState: string };
 
-export default function TrainingTaskArtifacts({ executionId }: TrainingTaskArtifactsProps) {
+export default function ModelDevExecutionArtifacts({
+  executionId,
+  deliveryState,
+}: ModelDevExecutionArtifactsProps) {
   const qc = useQueryClient();
   const paging = useListPagination(executionId, 10);
   const { page, pageSize } = paging;
   const query = useQuery({
+    enabled: deliveryState === "PUBLISHED",
     queryKey: ["training-artifacts", executionId, { page, pageSize }],
     queryFn: ({ signal }) =>
       listModelDevExecutionArtifacts(executionId, { page, pageSize }, signal),
@@ -38,6 +42,7 @@ export default function TrainingTaskArtifacts({ executionId }: TrainingTaskArtif
     onPageChange: paging.setPage,
     onPageSizeChange: paging.setPageSize,
   };
+  if (deliveryState !== "PUBLISHED") return <Empty description="暂无已发布产物" />;
   return (
     <>
       <Button className="mb-4" loading={query.isFetching} onClick={refresh}>
@@ -56,7 +61,7 @@ export default function TrainingTaskArtifacts({ executionId }: TrainingTaskArtif
           {
             title: "操作",
             width: 100,
-            render: (_, row) => <TrainingArtifactDownload artifact={row} />,
+            render: (_, row) => <ModelDevArtifactDownload artifact={row} />,
           },
         ]}
       />

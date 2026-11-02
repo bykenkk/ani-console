@@ -5,6 +5,7 @@ import type { ResourceDetailType } from "@/lib/resources";
 const resourceListRoutes = {
   model: "/ai-models",
   "training-task": "/ai-training",
+  "finetuning-task": "/ai-finetuning",
   "inference-service": "/ai-inference",
   "inference-policy": "/ai-inference-policies",
   "vm-instance": "/vms",

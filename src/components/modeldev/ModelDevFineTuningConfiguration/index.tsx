@@ -2,7 +2,7 @@ import { Card, Descriptions, Empty } from "@arco-design/web-react";
 import type { ModelDevExecutionDetail } from "@/api/modeldev";
 import { ResourceId } from "@/components/common";
 
-type TrainingFineTuningConfigurationProps = {
+type ModelDevFineTuningConfigurationProps = {
   baseModel: ModelDevExecutionDetail["base_model"];
   managedSettings: ModelDevExecutionDetail["managed_settings"];
 };
@@ -40,10 +40,10 @@ const SETTING_LABELS: Record<
   logging_steps: "日志记录间隔",
 };
 
-export default function TrainingFineTuningConfiguration({
+export default function ModelDevFineTuningConfiguration({
   baseModel,
   managedSettings,
-}: TrainingFineTuningConfigurationProps) {
+}: ModelDevFineTuningConfigurationProps) {
   return (
     <>
       <Card title="基座模型" bordered={false}>

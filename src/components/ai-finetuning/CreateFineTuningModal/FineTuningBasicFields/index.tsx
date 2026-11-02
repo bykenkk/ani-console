@@ -1,9 +1,9 @@
 import { Card, Form, Input } from "@arco-design/web-react";
 import type { ModelDevImplementation, ModelDevInputVersion } from "@/api/modeldev";
 import type { Model, ModelVersion } from "@/api/models";
-import ModelDevImplementationField from "@/components/ai-training/ModelDevImplementationField";
+import ModelDevImplementationField from "@/components/modeldev/ModelDevImplementationField";
 import InstanceComputeSelect from "@/components/instances/InstanceComputeSelect";
-import ModelDevInputField from "@/components/ai-training/ModelDevInputField";
+import ModelDevInputField from "@/components/modeldev/ModelDevInputField";
 import type { CreateFineTuningFormValues } from "../index";
 import FineTuningBaseModelFields from "../FineTuningBaseModelFields";
 import FineTuningRegistrationFields from "../FineTuningRegistrationFields";

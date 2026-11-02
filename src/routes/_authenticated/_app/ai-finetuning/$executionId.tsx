@@ -1,0 +1,28 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import FineTuningTaskDetailPage from "@/components/ai-finetuning/FineTuningTaskDetailPage";
+
+export const Route = createFileRoute("/_authenticated/_app/ai-finetuning/$executionId")({
+  validateSearch: (search: Record<string, unknown>): { tab?: string } => ({
+    tab:
+      search.tab === "pipeline" ||
+      search.tab === "metrics" ||
+      search.tab === "logs" ||
+      search.tab === "artifacts" ||
+      search.tab === "snapshot"
+        ? search.tab
+        : undefined,
+  }),
+  component: function FineTuningTaskDetailRoute() {
+    const { executionId } = Route.useParams();
+    const { tab } = Route.useSearch();
+    const navigate = useNavigate({ from: Route.fullPath });
+    return (
+      <FineTuningTaskDetailPage
+        executionId={executionId}
+        tab={tab}
+        onTabChange={(nextTab) => navigate({ search: { tab: nextTab }, replace: true })}
+        onBack={() => navigate({ to: "/ai-finetuning" })}
+      />
+    );
+  },
+});

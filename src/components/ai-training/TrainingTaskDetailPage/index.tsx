@@ -1,16 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
-import { Empty } from "@arco-design/web-react";
 import { getModelDevExecution } from "@/api/modeldev";
 import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { useTrainingTaskActions } from "@/hooks/useTrainingTaskActions";
 import { withId } from "@/lib/id";
-import TrainingTaskLogs from "./TrainingTaskLogs";
-import TrainingTaskArtifacts from "./TrainingTaskArtifacts";
-import TrainingExecutionSnapshot from "./TrainingExecutionSnapshot";
-import TrainingTaskPipeline from "./TrainingTaskPipeline";
-import TrainingTaskMetrics from "./TrainingTaskMetrics";
+import ModelDevExecutionLogs from "@/components/modeldev/ModelDevExecutionLogs";
+import ModelDevExecutionArtifacts from "@/components/modeldev/ModelDevExecutionArtifacts";
+import ModelDevExecutionSnapshot from "@/components/modeldev/ModelDevExecutionSnapshot";
+import ModelDevExecutionPipeline from "@/components/modeldev/ModelDevExecutionPipeline";
+import ModelDevTrainingMetrics from "@/components/modeldev/ModelDevTrainingMetrics";
 import { formatDateTime } from "@/lib/date";
 import { shouldObserveModelDevExecution } from "@/lib/modeldev";
 
@@ -82,18 +81,18 @@ export default function TrainingTaskDetailPage({
         {
           key: "pipeline",
           label: "流水线",
-          content: <TrainingTaskPipeline steps={task.steps} failure={task.failure} />,
+          content: <ModelDevExecutionPipeline steps={task.steps} failure={task.failure} />,
         },
         {
           key: "metrics",
           label: "训练曲线",
-          content: <TrainingTaskMetrics metrics={task.metrics} />,
+          content: <ModelDevTrainingMetrics metrics={task.metrics} />,
         },
         {
           key: "logs",
           label: "日志",
           content: (
-            <TrainingTaskLogs
+            <ModelDevExecutionLogs
               key={executionId}
               executionId={executionId}
               observing={!detail.isError && shouldObserveModelDevExecution(task)}
@@ -103,17 +102,18 @@ export default function TrainingTaskDetailPage({
         {
           key: "snapshot",
           label: "配置与记录",
-          content: <TrainingExecutionSnapshot task={task} />,
+          content: <ModelDevExecutionSnapshot task={task} />,
         },
         {
           key: "artifacts",
           label: "产物",
-          content:
-            task.delivery_state === "PUBLISHED" ? (
-              <TrainingTaskArtifacts key={executionId} executionId={executionId} />
-            ) : (
-              <Empty description="暂无已发布产物" />
-            ),
+          content: (
+            <ModelDevExecutionArtifacts
+              key={executionId}
+              executionId={executionId}
+              deliveryState={task.delivery_state}
+            />
+          ),
         },
       ]}
       activeTabKey={tab}

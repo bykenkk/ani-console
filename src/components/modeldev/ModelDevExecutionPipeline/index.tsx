@@ -3,7 +3,7 @@ import type { ModelDevExecutionDetail, ModelDevExecutionStep } from "@/api/model
 import { StatusBadge, type StatusBadgeTone } from "@/components/common";
 import { formatDateTime } from "@/lib/date";
 
-type TrainingTaskPipelineProps = {
+type ModelDevExecutionPipelineProps = {
   steps: ModelDevExecutionStep[];
   failure: ModelDevExecutionDetail["failure"];
 };
@@ -16,7 +16,10 @@ const STEP_STATES: Record<string, { label: string; tone: StatusBadgeTone }> = {
   STOPPED: { label: "已停止", tone: "warning" },
 };
 
-export default function TrainingTaskPipeline({ steps, failure }: TrainingTaskPipelineProps) {
+export default function ModelDevExecutionPipeline({
+  steps,
+  failure,
+}: ModelDevExecutionPipelineProps) {
   return (
     <div className="flex flex-col gap-4">
       {failure && (

@@ -1,8 +1,8 @@
 import { Card, Form, Input } from "@arco-design/web-react";
 import type { ModelDevImplementation, ModelDevInputVersion } from "@/api/modeldev";
-import ModelDevImplementationField from "@/components/ai-training/ModelDevImplementationField";
+import ModelDevImplementationField from "@/components/modeldev/ModelDevImplementationField";
 import InstanceComputeSelect from "@/components/instances/InstanceComputeSelect";
-import ModelDevInputField from "@/components/ai-training/ModelDevInputField";
+import ModelDevInputField from "@/components/modeldev/ModelDevInputField";
 import type { TrainingTaskCreateFormValues } from "../index";
 
 type TrainingTaskBasicFieldsProps = {

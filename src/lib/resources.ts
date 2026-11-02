@@ -3,6 +3,7 @@ import type { NavigateFn } from "@tanstack/react-router";
 export type ResourceDetailType =
   | "model"
   | "training-task"
+  | "finetuning-task"
   | "inference-service"
   | "inference-policy"
   | "vm-instance"
@@ -32,6 +33,9 @@ export function navigateToResourceDetail(
   switch (resource.type) {
     case "training-task":
       navigate({ to: "/ai-training/$executionId", params: { executionId: resource.id } });
+      return;
+    case "finetuning-task":
+      navigate({ to: "/ai-finetuning/$executionId", params: { executionId: resource.id } });
       return;
     case "model":
       navigate({ to: "/ai-models/$modelId", params: { modelId: resource.id } });

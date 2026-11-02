@@ -12,7 +12,7 @@ import type { Model, ModelVersion } from "@/api/models";
 import WizardModal from "@/components/common/WizardModal";
 import { validateForm } from "@/lib/form";
 import FineTuningBasicFields from "./FineTuningBasicFields";
-import ModelDevParameterFields from "@/components/ai-training/ModelDevParameterFields";
+import ModelDevParameterFields from "@/components/modeldev/ModelDevParameterFields";
 import FineTuningSummary from "./FineTuningSummary";
 import { buildFineTuningParameters } from "./utils";
 import FineTuningReadinessFields from "./FineTuningReadinessFields";

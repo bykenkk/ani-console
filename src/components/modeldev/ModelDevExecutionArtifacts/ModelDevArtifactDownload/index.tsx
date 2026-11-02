@@ -5,9 +5,9 @@ import { downloadModelDevArtifact, type ModelDevArtifact } from "@/api/modeldev"
 import { downloadBlob } from "@/lib/browser";
 import { withId } from "@/lib/id";
 
-type TrainingArtifactDownloadProps = { artifact: ModelDevArtifact };
+type ModelDevArtifactDownloadProps = { artifact: ModelDevArtifact };
 
-export default function TrainingArtifactDownload({ artifact }: TrainingArtifactDownloadProps) {
+export default function ModelDevArtifactDownload({ artifact }: ModelDevArtifactDownloadProps) {
   const controller = useRef<AbortController | null>(null);
   useEffect(
     () => () => {

@@ -17,7 +17,7 @@ const columns: ListColumn<ModelDevExecution>[] = [
     width: 200,
     fixed: "left",
     render: (_, task) => (
-      <ResourceNameId name={task.name} id={task.execution_id} type="training-task" />
+      <ResourceNameId name={task.name} id={task.execution_id} type="finetuning-task" />
     ),
   },
   { key: "status", title: "任务状态", dataIndex: "compute_state", width: 120, ellipsis: true },

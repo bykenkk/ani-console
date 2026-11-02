@@ -4,9 +4,9 @@ import type { EChartsOption } from "echarts";
 import type { ModelDevTrainingMetric } from "@/api/modeldev";
 import { CoreLineBarChart } from "@/components/common";
 
-type TrainingTaskMetricsProps = { metrics: ModelDevTrainingMetric[] };
+type ModelDevTrainingMetricsProps = { metrics: ModelDevTrainingMetric[] };
 
-export default function TrainingTaskMetrics({ metrics }: TrainingTaskMetricsProps) {
+export default function ModelDevTrainingMetrics({ metrics }: ModelDevTrainingMetricsProps) {
   const charts = useMemo(() => {
     const series = new Map<string, [number, number][]>();
     for (const metric of metrics) {

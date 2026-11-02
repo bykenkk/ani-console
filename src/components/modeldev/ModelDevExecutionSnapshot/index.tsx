@@ -2,11 +2,11 @@ import { Card, Descriptions, Table } from "@arco-design/web-react";
 import type { ModelDevExecutionDetail } from "@/api/modeldev";
 import { ResourceId } from "@/components/common";
 import { formatDateTime } from "@/lib/date";
-import TrainingFineTuningConfiguration from "../TrainingFineTuningConfiguration";
+import ModelDevFineTuningConfiguration from "../ModelDevFineTuningConfiguration";
 
-type TrainingExecutionSnapshotProps = { task: ModelDevExecutionDetail };
+type ModelDevExecutionSnapshotProps = { task: ModelDevExecutionDetail };
 
-export default function TrainingExecutionSnapshot({ task }: TrainingExecutionSnapshotProps) {
+export default function ModelDevExecutionSnapshot({ task }: ModelDevExecutionSnapshotProps) {
   const registration = task.model_registration;
   const history = task.history;
   const explicit = task.explicit_parameters;
@@ -62,7 +62,7 @@ export default function TrainingExecutionSnapshot({ task }: TrainingExecutionSna
         />
       </Card>
       {task.kind === "FINETUNING" && (
-        <TrainingFineTuningConfiguration
+        <ModelDevFineTuningConfiguration
           baseModel={task.base_model}
           managedSettings={task.managed_settings}
         />

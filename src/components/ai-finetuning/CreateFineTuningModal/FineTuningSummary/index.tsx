@@ -6,7 +6,7 @@ import type {
 } from "@/api/modeldev";
 import type { InstancePreset } from "@/api/instances";
 import type { Model, ModelVersion } from "@/api/models";
-import ModelDevSummary from "@/components/ai-training/ModelDevSummary";
+import ModelDevSummary from "@/components/modeldev/ModelDevSummary";
 import { formatModelDevComputeResources, formatModelDevInputVersion } from "@/lib/modeldev";
 import { formatDateTime } from "@/lib/format";
 import { REGISTRATION_OPTIONS } from "../constants";
