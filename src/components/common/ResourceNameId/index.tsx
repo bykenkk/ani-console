@@ -20,7 +20,6 @@ export default function ResourceNameId(props: ResourceNameIdProps) {
     Boolean(props.type && id && id !== "-") &&
     props.type !== "filesystem" &&
     props.type !== "vector-store" &&
-    props.type !== "security-group" &&
     props.type !== "knowledge-base";
 
   const handleOpen = () => {

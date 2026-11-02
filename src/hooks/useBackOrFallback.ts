@@ -18,9 +18,7 @@ const resourceListRoutes = {
   "knowledge-base": "/",
   vpc: "/vpcs",
   subnet: "/subnets",
-  // TODO(feature-visibility): 待安全组支持后恢复列表返回目标。
-  // "security-group": "/security-groups",
-  "security-group": "/",
+  "security-group": "/security-groups",
   "load-balancer": "/load-balancers",
   volume: "/volumes",
   // TODO(feature-visibility): 待文件存储支持后恢复列表返回目标。

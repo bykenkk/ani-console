@@ -78,11 +78,10 @@ export function navigateToResourceDetail(
       navigate({ to: "/subnets/$subnetId", params: { subnetId: resource.id } });
       return;
     case "security-group":
-      // TODO(feature-visibility): 待安全组支持后恢复详情跳转。
-      // navigate({
-      //   to: "/security-groups/$securityGroupId",
-      //   params: { securityGroupId: resource.id },
-      // });
+      navigate({
+        to: "/security-groups/$securityGroupId",
+        params: { securityGroupId: resource.id },
+      });
       return;
     case "load-balancer":
       navigate({
