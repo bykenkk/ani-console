@@ -5,8 +5,9 @@
 
 /* Keep the body scrollable within the available page height. */
 .listDataTable,
-.listDataTable > :global(.arco-spin),
-.listDataTable > :global(.arco-spin) > :global(.arco-spin-children),
+.listDataTable > :global(.arco-table),
+.listDataTable > :global(.arco-table) > :global(.arco-spin),
+.listDataTable > :global(.arco-table) > :global(.arco-spin) > :global(.arco-spin-children),
 .listDataTable :global(.arco-table-container),
 .listDataTable :global(.arco-table-content-scroll),
 .listDataTable :global(.arco-table-content-inner) {

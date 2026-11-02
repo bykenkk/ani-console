@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import clsx from "clsx";
 import { Empty, Table, type TableColumnProps, type TableProps } from "@arco-design/web-react";
 import DataTableSectionHeader, { type DataTableSectionHeaderProps } from "./DataTableSectionHeader";
 
@@ -105,10 +106,9 @@ export function DataTable<T>({
         };
 
   return (
-    <>
+    <div className={clsx("flex min-h-0 min-w-0 flex-col", scroll?.y && "flex-1", className)}>
       {header ? <DataTableSectionHeader {...header} /> : null}
       <Table<T>
-        className={className}
         aria-label={tableLabel}
         rowKey={rowKey}
         columns={resolvedColumns}
@@ -139,6 +139,6 @@ export function DataTable<T>({
       {pagination !== false && pagination.mode === "legacy-cursor" && (
         <LegacyCursorPagination pagination={pagination} tableLabel={tableLabel} />
       )}
-    </>
+    </div>
   );
 }
