@@ -42,7 +42,6 @@ export function ipInRanges(ranges: IpInterval[], address: string): boolean {
 export function subnetIpUnavailableReason(subnet?: NetworkSubnet): string | undefined {
   if (!subnet) return "请先选择子网";
   if (subnet.state !== "available") return "子网当前不可用";
-  if (subnet.observation_stale) return "地址观测已过期，请刷新后重试";
   const ranges = parseIpRanges(subnet.available_ip_range);
   if (!ranges) return "尚无有效的可用地址范围";
   if (!ranges.length) return "当前子网没有可用地址";

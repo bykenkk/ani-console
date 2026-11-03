@@ -1,3 +1,4 @@
+import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import CreateSubnetModal from "@/components/subnets/CreateSubnetModal";
 import { useSubnetActions } from "@/hooks/useSubnetActions";
 
@@ -12,13 +13,7 @@ import {
   type NetworkVPC,
 } from "@/api/network";
 
-import {
-  ResourceNameId,
-  ListPageFrame,
-  type ListColumn,
-  StatusBadge,
-  ListDataTable,
-} from "@/components/common";
+import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { navigateToResourceDetail } from "@/lib/resources";
@@ -91,7 +86,7 @@ export default function SubnetsPage() {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, subnet) => <StatusBadge status={subnet.state} />,
+      render: (_, subnet) => <NetworkResourceStatus resource={subnet} />,
     },
     {
       key: "vpc",

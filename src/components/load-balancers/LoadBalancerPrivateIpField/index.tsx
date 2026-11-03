@@ -62,6 +62,11 @@ export default function LoadBalancerPrivateIpField({
     <Form.Item
       label="指定 IP"
       field="vip"
+      extra={
+        subnet.data?.observation_stale
+          ? "地址信息待确认，提交时将核验当前状态和地址占用。"
+          : undefined
+      }
       rules={[
         { required: true, message: "请选择指定 IP" },
         {

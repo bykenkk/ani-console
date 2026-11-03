@@ -1,3 +1,4 @@
+import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useSubnetActions } from "@/hooks/useSubnetActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
@@ -7,13 +8,7 @@ import {
   type NetworkSubnet,
   type NetworkVPC,
 } from "@/api/network";
-import {
-  AliIcon,
-  DetailPageFrame,
-  DetailPagePlaceholder,
-  ResourceId,
-  StatusBadge,
-} from "@/components/common";
+import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
 import { withId } from "@/lib/id";
 
 import { useQuery } from "@tanstack/react-query";
@@ -68,7 +63,7 @@ export default function SubnetDetailPage({ subnetId, tab, onTabChange }: SubnetD
     <DetailPageFrame
       breadcrumbs={[...navigationBreadcrumbsForPath("/subnets"), { label: subnet.name }]}
       title={subnet.name}
-      status={<StatusBadge status={subnet.state} />}
+      status={<NetworkResourceStatus resource={subnet} />}
       icon={<AliIcon name="VPCwangluo" size={28} />}
       headerItems={[{ label: "CIDR", value: subnet.cidr }]}
       actions={<ResourceActionMenu record={subnet} actions={actions} />}

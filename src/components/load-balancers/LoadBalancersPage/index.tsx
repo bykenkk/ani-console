@@ -1,3 +1,4 @@
+import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useLoadBalancerActions } from "@/hooks/useLoadBalancerActions";
 
 import { useQuery } from "@tanstack/react-query";
@@ -11,13 +12,7 @@ import {
 } from "@/api/network";
 
 import CreateLoadBalancerModal from "@/components/load-balancers/CreateLoadBalancerModal";
-import {
-  ResourceNameId,
-  ListPageFrame,
-  type ListColumn,
-  StatusBadge,
-  ListDataTable,
-} from "@/components/common";
+import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
 import { loadBalancerListeners } from "@/lib/load-balancers";
 import { formatDateTime } from "@/lib/format";
 import { withFirst100 } from "@/api/pagination";
@@ -113,9 +108,7 @@ export default function LoadBalancersPage() {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, item) => (
-        <StatusBadge status={item.state} reason={item.reason} message={item.reason_message} />
-      ),
+      render: (_, item) => <NetworkResourceStatus resource={item} />,
     },
     {
       key: "vip",

@@ -1,14 +1,9 @@
+import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useLoadBalancerActions } from "@/hooks/useLoadBalancerActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { withId } from "@/lib/id";
-import {
-  DetailPageFrame,
-  DetailPagePlaceholder,
-  AliIcon,
-  ResourceId,
-  StatusBadge,
-} from "@/components/common";
+import { DetailPageFrame, DetailPagePlaceholder, AliIcon, ResourceId } from "@/components/common";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { useQuery } from "@tanstack/react-query";
 
@@ -114,9 +109,7 @@ export default function LoadBalancerDetailPage({
     <DetailPageFrame
       breadcrumbs={[...navigationBreadcrumbsForPath("/load-balancers"), { label: item.name }]}
       title={item.name}
-      status={
-        <StatusBadge status={item.state} reason={item.reason} message={item.reason_message} />
-      }
+      status={<NetworkResourceStatus resource={item} />}
       icon={<AliIcon name="fuzaijunhengqi" size={28} />}
       headerItems={[{ label: "私网 IP", value: item.private_ip || "-" }]}
       actions={<ResourceActionMenu record={item} actions={actions} />}
