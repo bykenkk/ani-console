@@ -6,12 +6,16 @@ import { validateForm } from "@/lib/form";
 
 type AddLoadBalancerListenerModalProps = {
   usedPorts: number[];
+  vpcId: string;
+  pending?: boolean;
   onCancel: () => void;
-  onAdd: (listener: LoadBalancerListenerFormValues) => void;
+  onAdd: (listener: LoadBalancerListenerFormValues) => void | Promise<void>;
 };
 
 export default function AddLoadBalancerListenerModal({
   usedPorts,
+  vpcId,
+  pending,
   onCancel,
   onAdd,
 }: AddLoadBalancerListenerModalProps) {
@@ -19,16 +23,25 @@ export default function AddLoadBalancerListenerModal({
   return (
     <Modal
       visible
+      confirmLoading={pending}
+      closable={!pending}
+      maskClosable={!pending}
+      cancelButtonProps={{ disabled: pending }}
       style={{ width: 760 }}
       title="添加监听器"
       okText="添加"
       onCancel={onCancel}
       onOk={async () => {
         const values = await validateForm<LoadBalancerListenerFormValues>(form);
-        onAdd(listenerInput({ ...values, backends: [] }));
+        await onAdd(listenerInput(values));
       }}
     >
-      <LoadBalancerListenerForm form={form} usedPorts={usedPorts} />
+      <LoadBalancerListenerForm
+        form={form}
+        disabled={pending}
+        vpcId={vpcId}
+        usedPorts={usedPorts}
+      />
     </Modal>
   );
 }

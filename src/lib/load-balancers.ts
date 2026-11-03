@@ -5,6 +5,12 @@ import type {
 } from "@/api/network";
 
 const labels: Record<string, string> = {
+  waiting_for_backends: "等待后端成员",
+  applying: "应用中",
+  configured: "已配置",
+  removing: "移除中",
+  degraded: "配置异常",
+  unknown: "未知",
   LOAD_BALANCER_EXPOSURE_PRIVATE: "私网",
   LOAD_BALANCER_EXPOSURE_PUBLIC: "公网",
   LOAD_BALANCER_EXPOSURE_PUBLIC_PRIVATE: "公网+私网",
@@ -86,7 +92,11 @@ export function listenerInput(
       ? undefined
       : listener.health_check
         ? {
-            ...listener.health_check,
+            interval_seconds: listener.health_check.interval_seconds,
+            timeout_seconds: listener.health_check.timeout_seconds,
+            unhealthy_threshold: listener.health_check.unhealthy_threshold,
+            healthy_threshold: listener.health_check.healthy_threshold,
+            port: listener.health_check.port,
             protocol:
               listener.protocol === "LOAD_BALANCER_LISTENER_PROTOCOL_UDP"
                 ? "LOAD_BALANCER_HEALTH_CHECK_PROTOCOL_TCP"
@@ -103,7 +113,13 @@ export function listenerInput(
                 : undefined,
           }
         : undefined,
-    certificate_ref: tls ? listener.certificate_ref : undefined,
+    certificate_ref:
+      tls && listener.certificate_ref
+        ? {
+            name: listener.certificate_ref.name.trim(),
+            namespace: listener.certificate_ref.namespace?.trim() || undefined,
+          }
+        : undefined,
     algorithm: listener.algorithm,
     session_persistence: http
       ? {

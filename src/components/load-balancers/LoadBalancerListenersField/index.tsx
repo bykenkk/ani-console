@@ -1,4 +1,4 @@
-import { Button, Modal, Space } from "@arco-design/web-react";
+import { Button, Modal } from "@arco-design/web-react";
 import { IconPlus } from "@arco-design/web-react/icon";
 import { useState } from "react";
 import type { LoadBalancerListenerFormValues } from "@/components/load-balancers/LoadBalancerListenerForm";
@@ -11,18 +11,20 @@ type LoadBalancerListenersFieldProps = {
   value?: LoadBalancerListenerFormValues[];
   onChange?: (value: LoadBalancerListenerFormValues[]) => void;
   disabled?: boolean;
+  vpcId: string;
 };
 
 export default function LoadBalancerListenersField({
   value = [],
   onChange,
   disabled,
+  vpcId,
 }: LoadBalancerListenersFieldProps) {
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<LoadBalancerListenerFormValues>();
   return (
     <>
-      <Space direction="vertical" className="w-full">
+      <div className="flex w-full flex-col gap-3">
         {value.length > 0 && (
           <DataTable<LoadBalancerListenerFormValues>
             pagination={false}
@@ -75,9 +77,10 @@ export default function LoadBalancerListenersField({
         >
           添加监听器
         </Button>
-      </Space>
+      </div>
       {adding && (
         <AddLoadBalancerListenerModal
+          vpcId={vpcId}
           usedPorts={value.map((item) => item.port)}
           onCancel={() => setAdding(false)}
           onAdd={(listener) => {
@@ -89,6 +92,7 @@ export default function LoadBalancerListenersField({
       {editing && (
         <EditLoadBalancerListenerModal
           listener={editing}
+          vpcId={vpcId}
           usedPorts={value.filter((item) => item.port !== editing.port).map((item) => item.port)}
           onCancel={() => setEditing(undefined)}
           onSave={(listener) => {

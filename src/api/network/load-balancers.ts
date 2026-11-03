@@ -7,8 +7,11 @@ import type {
   NetworkLoadBalancer,
   NetworkLoadBalancerListParams,
   NetworkLoadBalancerListResponse,
+  UpdateNetworkLoadBalancerInput,
+  UpdateNetworkLoadBalancerRequest,
 } from "./types";
 
+const updateScope = createIdempotencyScope("network-load-balancer-update", ["PATCH"]);
 const createScope = createIdempotencyScope("network-load-balancer-create", ["POST"]);
 const loadBalancerPath = (loadBalancerId: string) =>
   `/networks/load-balancers/${encodeURIComponent(loadBalancerId)}`;
@@ -49,4 +52,21 @@ export async function deleteNetworkLoadBalancer(loadBalancerId: string): Promise
   await coreRequest<void>(loadBalancerPath(loadBalancerId), {
     method: "DELETE",
   });
+}
+
+export function updateNetworkLoadBalancer(
+  loadBalancerId: string,
+  submitData: UpdateNetworkLoadBalancerInput,
+): Promise<void> {
+  return runIdempotentRequest(
+    updateScope,
+    submitData,
+    async (body) => {
+      await coreRequest<void, UpdateNetworkLoadBalancerRequest>(loadBalancerPath(loadBalancerId), {
+        method: "PATCH",
+        data: body,
+      });
+    },
+    [loadBalancerId],
+  );
 }
