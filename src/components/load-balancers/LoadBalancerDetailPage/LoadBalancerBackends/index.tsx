@@ -1,20 +1,30 @@
 import { Button, Modal } from "@arco-design/web-react";
 import { useState } from "react";
 import SaveLoadBalancerBackendModal from "../../SaveLoadBalancerBackendModal";
-import { useLoadBalancerConfiguration } from "@/hooks/useLoadBalancerConfiguration";
 import { loadBalancerListeners } from "@/lib/load-balancers";
-import type { NetworkLoadBalancer, NetworkLoadBalancerBackend } from "@/api/network";
+import type {
+  NetworkLoadBalancer,
+  NetworkLoadBalancerBackend,
+  NetworkLoadBalancerBackendInput,
+} from "@/api/network";
 import { DataTable, StatusBadge } from "@/components/common";
 
-type LoadBalancerBackendsProps = { item: NetworkLoadBalancer };
+type LoadBalancerBackendsProps = {
+  item: NetworkLoadBalancer;
+  pending: boolean;
+  onSave: (
+    listenerId: string,
+    backends: NetworkLoadBalancerBackendInput[],
+    channel?: "message" | "notification",
+  ) => Promise<void>;
+};
 
-export default function LoadBalancerBackends({ item }: LoadBalancerBackendsProps) {
+export default function LoadBalancerBackends({ item, pending, onSave }: LoadBalancerBackendsProps) {
   const listeners = loadBalancerListeners(item);
-  const update = useLoadBalancerConfiguration(item);
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<NetworkLoadBalancerBackend & { listenerId: string }>();
   const disabled =
-    update.pending || !item.version || item.state === "deleting" || item.state === "deleted";
+    pending || !item.version || item.state === "deleting" || item.state === "deleted";
   const backends = listeners.flatMap((listener) =>
     (listener.backends ?? []).map((backend) => ({
       ...backend,
@@ -62,7 +72,7 @@ export default function LoadBalancerBackends({ item }: LoadBalancerBackendsProps
                 okText: "移除",
                 okButtonProps: { status: "danger" },
                 onOk: () =>
-                  update.saveBackends(
+                  onSave(
                     backend.listenerId,
                     backends.filter(
                       (current) =>
@@ -82,13 +92,13 @@ export default function LoadBalancerBackends({ item }: LoadBalancerBackendsProps
         <SaveLoadBalancerBackendModal
           vpcId={item.vpc_id}
           listeners={listeners}
-          pending={update.pending}
+          pending={pending}
           onCancel={() => setAdding(false)}
           onSave={async (backend, listenerId) => {
             if (!listenerId) return;
             const listener = listeners.find((current) => current.id === listenerId);
             if (!listener) throw new Error("监听器已变化，请刷新后重试");
-            await update.saveBackends(listenerId, [...(listener.backends ?? []), backend]);
+            await onSave(listenerId, [...(listener.backends ?? []), backend]);
             setAdding(false);
           }}
         />
@@ -97,12 +107,12 @@ export default function LoadBalancerBackends({ item }: LoadBalancerBackendsProps
         <SaveLoadBalancerBackendModal
           vpcId={item.vpc_id}
           backend={editing}
-          pending={update.pending}
+          pending={pending}
           onCancel={() => setEditing(undefined)}
           onSave={async (backend) => {
             const listener = listeners.find((current) => current.id === editing.listenerId);
             if (!listener) throw new Error("监听器已变化，请刷新后重试");
-            await update.saveBackends(
+            await onSave(
               editing.listenerId,
               (listener.backends ?? []).map((current) =>
                 current.id === editing.id ? backend : current,

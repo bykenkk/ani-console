@@ -2,21 +2,34 @@ import { Button, Modal } from "@arco-design/web-react";
 import { useState } from "react";
 import AddLoadBalancerListenerModal from "../../AddLoadBalancerListenerModal";
 import EditLoadBalancerListenerModal from "../../EditLoadBalancerListenerModal";
-import { useLoadBalancerConfiguration } from "@/hooks/useLoadBalancerConfiguration";
-import type { NetworkLoadBalancer, NetworkLoadBalancerListenerResource } from "@/api/network";
+import type {
+  NetworkLoadBalancer,
+  NetworkLoadBalancerListener,
+  NetworkLoadBalancerListenerResource,
+} from "@/api/network";
 import { DataTable, ResourceNameId, StatusBadge } from "@/components/common";
 import { listenerInput, loadBalancerLabel } from "@/lib/load-balancers";
 import { loadBalancerListeners } from "@/lib/load-balancers";
 
-type LoadBalancerListenersProps = { item: NetworkLoadBalancer };
+type LoadBalancerListenersProps = {
+  item: NetworkLoadBalancer;
+  pending: boolean;
+  onSave: (
+    listeners: NetworkLoadBalancerListener[],
+    channel?: "message" | "notification",
+  ) => Promise<void>;
+};
 
-export default function LoadBalancerListeners({ item }: LoadBalancerListenersProps) {
+export default function LoadBalancerListeners({
+  item,
+  pending,
+  onSave,
+}: LoadBalancerListenersProps) {
   const listeners = loadBalancerListeners(item);
   const [adding, setAdding] = useState(false);
   const [editing, setEditing] = useState<NetworkLoadBalancerListenerResource>();
-  const update = useLoadBalancerConfiguration(item);
   const disabled =
-    update.pending || !item.version || item.state === "deleting" || item.state === "deleted";
+    pending || !item.version || item.state === "deleting" || item.state === "deleted";
   return (
     <div className="flex flex-col gap-3">
       <Button type="primary" disabled={disabled} onClick={() => setAdding(true)}>
@@ -108,7 +121,7 @@ export default function LoadBalancerListeners({ item }: LoadBalancerListenersPro
                 okText: "删除",
                 okButtonProps: { status: "danger" },
                 onOk: () =>
-                  update.save(
+                  onSave(
                     listeners.filter((current) => current.id !== listener.id).map(listenerInput),
                     "notification",
                   ),
@@ -124,11 +137,11 @@ export default function LoadBalancerListeners({ item }: LoadBalancerListenersPro
       {adding && (
         <AddLoadBalancerListenerModal
           vpcId={item.vpc_id}
-          pending={update.pending}
+          pending={pending}
           usedPorts={listeners.map((listener) => listener.port)}
           onCancel={() => setAdding(false)}
           onAdd={async (listener) => {
-            await update.save([...listeners.map(listenerInput), listener]);
+            await onSave([...listeners.map(listenerInput), listener]);
             setAdding(false);
           }}
         />
@@ -136,14 +149,14 @@ export default function LoadBalancerListeners({ item }: LoadBalancerListenersPro
       {editing && (
         <EditLoadBalancerListenerModal
           vpcId={item.vpc_id}
-          pending={update.pending}
+          pending={pending}
           listener={listenerInput(editing)}
           usedPorts={listeners
             .filter((listener) => listener.id !== editing.id)
             .map((listener) => listener.port)}
           onCancel={() => setEditing(undefined)}
           onSave={async (listener) => {
-            await update.save(
+            await onSave(
               listeners.map((current) =>
                 current.id === editing.id ? listener : listenerInput(current),
               ),
