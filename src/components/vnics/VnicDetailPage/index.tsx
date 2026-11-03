@@ -37,8 +37,8 @@ export default function VnicDetailPage({ vnicId }: VnicDetailPageProps) {
         icon={<AliIcon name="wangluo" size={28} />}
         status={<StatusBadge status={vnic.state} reason={vnic.reason} />}
         headerItems={[
-          { label: "MAC", value: vnic.mac_address || "-" },
-          { label: "IP", value: vnic.ips?.join(" · ") || vnic.primary_ip || "-" },
+          { label: "实际 MAC", value: vnic.mac_address || "-" },
+          { label: "实际 IP", value: vnic.ips?.join(" · ") || vnic.primary_ip || "-" },
         ]}
         actions={
           <ResourceActionMenu
@@ -86,8 +86,10 @@ export default function VnicDetailPage({ vnicId }: VnicDetailPageProps) {
             key: "observation",
             title: "分配与观察",
             fields: [
-              { label: "MAC", value: vnic.mac_address || "-" },
-              { label: "IP 地址", value: vnic.ips?.join(" · ") || vnic.primary_ip || "-" },
+              { label: "申请 IP 地址", value: vnic.requested_ip || "自动分配" },
+              { label: "申请 MAC 地址", value: vnic.requested_mac || "自动分配" },
+              { label: "实际 IP 地址", value: vnic.ips?.join(" · ") || vnic.primary_ip || "-" },
+              { label: "实际 MAC 地址", value: vnic.mac_address || "-" },
               {
                 label: "使用状态",
                 value: vnic.bindings?.length
@@ -100,6 +102,7 @@ export default function VnicDetailPage({ vnicId }: VnicDetailPageProps) {
                 label: "观察状态",
                 value: vnic.observation_stale ? "观察待确认" : vnic.reason || "-",
               },
+              { label: "原因", value: vnic.reason || "-" },
               { label: "最近确认", value: formatDateTime(vnic.observed_at) },
             ],
           },

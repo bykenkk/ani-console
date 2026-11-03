@@ -24,6 +24,8 @@ export interface NetworkVnic {
   state: string;
   binding_state: string;
   version: string;
+  requested_ip?: string;
+  requested_mac?: string;
   mac_address?: string;
   primary_ip?: string;
   ips: string[];
@@ -53,6 +55,8 @@ export interface CreateNetworkVnicInput {
   name: string;
   description?: string;
   subnet_id: string;
+  requested_ip?: string;
+  requested_mac?: string;
 }
 export interface CreateNetworkVnicRequest {
   data: CreateNetworkVnicInput & { idempotency_key: string };
