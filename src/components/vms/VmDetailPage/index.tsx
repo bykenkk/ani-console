@@ -195,7 +195,10 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
             content: (
               <VmNetwork
                 vm={vm}
-                busy={!["Running", "Stopped"].includes(vm.observedState)}
+                busy={
+                  vm.closing ||
+                  ["Starting", "Stopping", "Deleting", "Provisioning"].includes(vm.observedState)
+                }
                 onRestart={() => actions.find((action) => action.key === "restart")?.onClick(vm)}
               />
             ),
