@@ -6,15 +6,15 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   ipv4CidrWithinError,
-  optionalIpv4Error,
   optionalIpv4WithinCidr,
-  optionalIpv4WithinCidrError,
   requireIpv4CidrWithin,
   subnetFixedOctets,
   suggestGatewayIp,
   suggestSubnetCidr,
 } from "@/lib/validators";
 import { withFirst100 } from "@/api/pagination";
+import SubnetAddressOptions, { type SubnetAddressOptionsFormValues } from "../SubnetAddressOptions";
+import { parseSubnetDnsServers, parseSubnetExcludedIps } from "../SubnetAddressOptions/utils";
 
 type CreateSubnetModalProps = {
   onCancel: () => void;
@@ -30,7 +30,12 @@ export default function CreateSubnetModal({ onCancel, onCreated }: CreateSubnetM
   const [name, setName] = useState("");
   const [vpcId, setVpcId] = useState("");
   const [cidr, setCidr] = useState("10.0.1.0/24");
-  const [gateway, setGateway] = useState("");
+  const [addressOptions, setAddressOptions] = useState<SubnetAddressOptionsFormValues>({
+    gateway: "",
+    excludeIps: "",
+    enableDhcp: false,
+    dnsServers: "",
+  });
   const vpcs = useQuery({
     meta: {
       errorNotification: {
@@ -47,16 +52,14 @@ export default function CreateSubnetModal({ onCancel, onCreated }: CreateSubnetM
   const cidrError = selectedVpcCidr
     ? ipv4CidrWithinError(cidr, selectedVpcCidr, "CIDR", "VPC CIDR")
     : undefined;
-  const gatewayError = cidr
-    ? optionalIpv4WithinCidrError(gateway, cidr, "网关", "CIDR")
-    : optionalIpv4Error(gateway, "网关");
   const fixedOctets = selectedVpcCidr ? subnetFixedOctets(selectedVpcCidr) : [];
   const selectedVpcPrefix = selectedVpcCidr ? Number(selectedVpcCidr.split("/")[1]) : 0;
 
   const setSubnetCidr = (nextCidr: string) => {
     setCidr(nextCidr);
     try {
-      setGateway(suggestGatewayIp(nextCidr));
+      const gateway = suggestGatewayIp(nextCidr);
+      setAddressOptions((current) => ({ ...current, gateway }));
     } catch {
       /* Keep the last valid gateway while editing. */
     }
@@ -78,7 +81,10 @@ export default function CreateSubnetModal({ onCancel, onCreated }: CreateSubnetM
         name: trimmedName,
         vpc_id: vpcId,
         cidr: requireIpv4CidrWithin(cidr, selectedVpcCidr, "CIDR", "VPC CIDR"),
-        gateway: optionalIpv4WithinCidr(gateway, cidr, "网关", "CIDR"),
+        gateway: optionalIpv4WithinCidr(addressOptions.gateway, cidr, "网关", "CIDR"),
+        exclude_ips: parseSubnetExcludedIps(addressOptions.excludeIps, cidr),
+        enable_dhcp: addressOptions.enableDhcp,
+        dns_servers: parseSubnetDnsServers(addressOptions.dnsServers),
       };
       return createNetworkSubnet(submitData);
     },
@@ -146,13 +152,7 @@ export default function CreateSubnetModal({ onCancel, onCreated }: CreateSubnetM
             minPrefix={selectedVpcPrefix}
           />
         </Form.Item>
-        <Form.Item
-          label="网关"
-          validateStatus={gatewayError ? "error" : undefined}
-          help={gatewayError}
-        >
-          <Ipv4CidrInput value={gateway} onChange={setGateway} placeholder="10.0.1.1" />
-        </Form.Item>
+        <SubnetAddressOptions cidr={cidr} value={addressOptions} onChange={setAddressOptions} />
       </Form>
     </Modal>
   );

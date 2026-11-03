@@ -188,6 +188,9 @@ export interface NetworkSubnet {
   name: string;
   cidr: string;
   gateway?: string | null;
+  exclude_ips?: string[];
+  enable_dhcp?: boolean;
+  dns_servers?: string[];
   state: NetworkResourceState;
   reason?: string | null;
   dev_profile?: CoreDevProfileInfo;
@@ -240,6 +243,9 @@ export interface CreateNetworkSubnetInput {
   name: string;
   cidr: string;
   gateway?: string | null;
+  exclude_ips?: string[];
+  enable_dhcp?: boolean;
+  dns_servers?: string[];
 }
 export type CreateNetworkSubnetRequest = CreateNetworkSubnetInput & { idempotency_key: string };
 
