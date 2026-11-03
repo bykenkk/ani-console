@@ -189,7 +189,17 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
             label: "存储挂载",
             content: <InstanceStorage diskContent={<VmDisks vm={vm} />} />,
           },
-          { key: "network", label: "网络", content: <VmNetwork vm={vm} /> },
+          {
+            key: "network",
+            label: "网络",
+            content: (
+              <VmNetwork
+                vm={vm}
+                busy={!["Running", "Stopped"].includes(vm.observedState)}
+                onRestart={() => actions.find((action) => action.key === "restart")?.onClick(vm)}
+              />
+            ),
+          },
           { key: "configuration", label: "创建配置", content: <VmConfiguration vm={vm} /> },
           { key: "guest", label: "来宾信息", content: <VmGuestInfo vm={vm} /> },
           { key: "media", label: "光盘与启动", content: <VmMediaDevices vm={vm} /> },

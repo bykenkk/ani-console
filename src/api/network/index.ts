@@ -5,3 +5,4 @@ export * from "./snat";
 export * from "./subnets";
 export * from "./types";
 export * from "./vpcs";
+export * from "./vnics";

@@ -165,6 +165,11 @@ export default function ContainerDetailPage({
             label: "网络",
             content: (
               <InstanceNetwork
+                instance={record}
+                onRestart={() =>
+                  actions.find((action) => action.key === "restart")?.onClick(record)
+                }
+                busy={Boolean(record.activeOperationId) || record.desiredState === "deleted"}
                 configuration={configuration.data}
                 loading={configuration.isFetching}
               />
