@@ -75,6 +75,8 @@ export function DataTable<T>({
           {
             key: "__actions",
             title: null,
+            // 空操作列表头不叠加 Arco 内层 padding，避免撑宽窄列并产生额外滚动。
+            className: "[&>.arco-table-th-item]:px-0!",
             fixed: scroll?.x === false ? undefined : "right",
             width: getRowActionsColumnWidth(),
             headerCellStyle: { paddingInline: CELL_HORIZONTAL_PADDING / 2 },
@@ -110,6 +112,7 @@ export function DataTable<T>({
     <div className={clsx("flex min-h-0 min-w-0 flex-col", scroll?.y && "flex-1", className)}>
       {header ? <SectionHeader {...header} /> : null}
       <Table<T>
+        className="[&_.arco-table-container]:overflow-hidden"
         aria-label={tableLabel}
         rowKey={rowKey}
         columns={resolvedColumns}
