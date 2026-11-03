@@ -1,17 +1,17 @@
-// TODO(pagination-migration): 仅供后端 cursor/limit 或 page_token 过渡期使用；接口全部迁至 page/pageSize 后移除此兼容组件和 legacy-cursor 配置。
 import { Button, Select } from "@arco-design/web-react";
 import { IconLeft, IconRight } from "@arco-design/web-react/icon";
 import type { ListPagination } from "..";
 
-type LegacyCursorPaginationProps = {
+type CursorPaginationProps = {
   pagination: Extract<ListPagination, { mode: "legacy-cursor" }>;
   tableLabel: string;
 };
 
-export default function LegacyCursorPagination({
-  pagination,
-  tableLabel,
-}: LegacyCursorPaginationProps) {
+/**
+ * @deprecated 仅兼容后端 cursor/limit 或 page_token 分页，新接口使用 page/pageSize。
+ * TODO(pagination-migration): 接口全部迁移后移除此组件和 legacy-cursor 配置。
+ */
+export default function CursorPagination({ pagination, tableLabel }: CursorPaginationProps) {
   const { page, pageSize, disabled, hasNextPage, onPageChange, onPageSizeChange } = pagination;
   return (
     <nav

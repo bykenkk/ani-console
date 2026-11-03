@@ -1,7 +1,7 @@
 import { Modal } from "@arco-design/web-react";
 import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
 import { pauseSandbox, resumeSandbox, deleteSandbox, type Sandbox } from "@/api/sandboxes";
-import { unavailableAction, type RowAction } from "@/components/common/DataTable/RowActions";
+import { unavailableAction, type RowAction } from "@/components/common/DataTable";
 import { withId } from "@/lib/id";
 
 type SandboxAction = "pause" | "resume" | "delete";
@@ -69,7 +69,6 @@ export function useSandboxActions(onDeleted?: () => void) {
     {
       key: "lifecycle",
       label: (sandbox) => (sandbox.desired_state === "paused" ? "恢复" : "暂停"),
-      widthLabel: "暂停",
       disabled: unavailable,
       onClick: (sandbox) =>
         confirm(sandbox, sandbox.desired_state === "paused" ? "resume" : "pause"),

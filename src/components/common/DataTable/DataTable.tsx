@@ -1,18 +1,17 @@
 import type { ReactNode } from "react";
 import clsx from "clsx";
 import { Empty, Table, type TableColumnProps, type TableProps } from "@arco-design/web-react";
-import DataTableSectionHeader, { type DataTableSectionHeaderProps } from "./DataTableSectionHeader";
+import SectionHeader, { type SectionHeaderProps } from "./SectionHeader";
+import { CELL_HORIZONTAL_PADDING } from "./constants";
 
 import {
   getRowActionsColumnWidth,
   normalizeDataTableColumns,
   resolveDataTableScroll,
-} from "./layout";
+} from "./utils";
 import { ConfiguredDataTableRowActions, type RowAction } from "./RowActions";
 
-import LegacyCursorPagination from "./LegacyCursorPagination";
-
-export type { RowAction } from "./RowActions";
+import CursorPagination from "./CursorPagination";
 
 export type ListColumn<T> = TableColumnProps<T>;
 
@@ -31,7 +30,7 @@ export type ListPagination = {
 
 export type DataTableProps<T> = {
   className?: string;
-  header?: DataTableSectionHeaderProps;
+  header?: SectionHeaderProps;
   data: T[];
   rowKey?: string | ((row: T) => string);
   columns: Array<TableColumnProps<T>>;
@@ -78,6 +77,8 @@ export function DataTable<T>({
             title: null,
             fixed: scroll?.x === false ? undefined : "right",
             width: getRowActionsColumnWidth(),
+            headerCellStyle: { paddingInline: CELL_HORIZONTAL_PADDING / 2 },
+            bodyCellStyle: { paddingInline: CELL_HORIZONTAL_PADDING / 2 },
             render: (_value, record) => (
               <ConfiguredDataTableRowActions actions={rowActions} record={record} />
             ),
@@ -107,7 +108,7 @@ export function DataTable<T>({
 
   return (
     <div className={clsx("flex min-h-0 min-w-0 flex-col", scroll?.y && "flex-1", className)}>
-      {header ? <DataTableSectionHeader {...header} /> : null}
+      {header ? <SectionHeader {...header} /> : null}
       <Table<T>
         aria-label={tableLabel}
         rowKey={rowKey}
@@ -137,7 +138,7 @@ export function DataTable<T>({
         rowSelection={rowSelection}
       />
       {pagination !== false && pagination.mode === "legacy-cursor" && (
-        <LegacyCursorPagination pagination={pagination} tableLabel={tableLabel} />
+        <CursorPagination pagination={pagination} tableLabel={tableLabel} />
       )}
     </div>
   );

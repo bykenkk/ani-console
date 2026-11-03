@@ -2,7 +2,7 @@ import { Modal } from "@arco-design/web-react";
 import { useState } from "react";
 import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
 import { startVm, restartVm, deleteVm, type VirtualMachine } from "@/api/vms";
-import { unavailableAction, type RowAction } from "@/components/common/DataTable/RowActions";
+import { unavailableAction, type RowAction } from "@/components/common/DataTable";
 import VmCreateSnapshotModal from "@/components/vms/VmCreateSnapshotModal";
 import VmShutdownModal from "@/components/vms/VmShutdownModal";
 import VmChangeSecurityGroupsModal from "@/components/vms/VmChangeSecurityGroupsModal";
@@ -74,7 +74,6 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
     {
       key: "lifecycle",
       label: (vm) => (vm.observedState === "Running" ? "关机" : "开机"),
-      widthLabel: "关机",
       disabled: unavailable,
       onClick: (vm) => {
         if (vm.observedState === "Running") setDialog({ action: "stop", vm });

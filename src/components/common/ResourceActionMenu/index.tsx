@@ -1,6 +1,6 @@
 import { Button, Dropdown, Menu, Tooltip } from "@arco-design/web-react";
 import { IconMoreVertical } from "@arco-design/web-react/icon";
-import type { RowAction } from "@/components/common/DataTable/RowActions";
+import type { RowAction } from "@/components/common/DataTable";
 
 type ResourceActionMenuProps<T> = {
   record: T;

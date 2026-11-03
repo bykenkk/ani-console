@@ -2,17 +2,13 @@ import { Typography } from "@arco-design/web-react";
 import clsx from "clsx";
 import type { ReactNode } from "react";
 
-export type DataTableSectionHeaderProps = {
+export type SectionHeaderProps = {
   title: ReactNode;
   extra?: ReactNode;
   className?: string;
 };
 
-export default function DataTableSectionHeader({
-  title,
-  extra,
-  className = "mb-3",
-}: DataTableSectionHeaderProps) {
+export default function SectionHeader({ title, extra, className = "mb-3" }: SectionHeaderProps) {
   return (
     <div className={clsx("flex min-w-0 items-center justify-between gap-3", className)}>
       <Typography.Title heading={6} className="m-0!">

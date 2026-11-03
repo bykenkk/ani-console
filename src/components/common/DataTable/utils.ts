@@ -1,9 +1,22 @@
 import type { TableColumnProps, TableProps } from "@arco-design/web-react";
+import {
+  ACTION_BUTTON_BORDER_WIDTH,
+  ACTION_BUTTON_HORIZONTAL_PADDING,
+  CELL_HORIZONTAL_PADDING,
+  DEFAULT_COLUMN_WIDTH,
+  MORE_ICON_WIDTH,
+} from "./constants";
+import type { RowAction } from "./RowActions";
 
-const DEFAULT_COLUMN_WIDTH = 200;
-const CELL_HORIZONTAL_PADDING = 32;
-const ACTION_BUTTON_HORIZONTAL_PADDING = 8;
-const MORE_ICON_WIDTH = 16;
+export function unavailableAction<T>(key: string, label: string): RowAction<T> {
+  return {
+    key,
+    label,
+    disabled: () => true,
+    title: "该操作暂未开放",
+    onClick: () => undefined,
+  };
+}
 
 function getTextWidth(text: string) {
   return Array.from(text).reduce(
@@ -18,7 +31,12 @@ function getColumnWidth<T>(column: TableColumnProps<T>) {
 }
 
 export function getRowActionsColumnWidth() {
-  return MORE_ICON_WIDTH + ACTION_BUTTON_HORIZONTAL_PADDING + CELL_HORIZONTAL_PADDING;
+  return (
+    MORE_ICON_WIDTH +
+    ACTION_BUTTON_HORIZONTAL_PADDING +
+    ACTION_BUTTON_BORDER_WIDTH * 2 +
+    CELL_HORIZONTAL_PADDING
+  );
 }
 
 export function normalizeDataTableColumns<T>(columns: Array<TableColumnProps<T>>) {

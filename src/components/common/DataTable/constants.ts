@@ -1,0 +1,5 @@
+export const DEFAULT_COLUMN_WIDTH = 200;
+export const CELL_HORIZONTAL_PADDING = 2;
+export const ACTION_BUTTON_HORIZONTAL_PADDING = 12;
+export const ACTION_BUTTON_BORDER_WIDTH = 1;
+export const MORE_ICON_WIDTH = 16;

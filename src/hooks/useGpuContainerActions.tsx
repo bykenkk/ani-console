@@ -5,7 +5,7 @@ import InstanceDetachPvcModal from "@/components/instances/InstanceDetachPvcModa
 import ContainerChangeSecurityGroupsModal from "@/components/instances/ContainerChangeSecurityGroupsModal";
 import { useState } from "react";
 import { startInstance, type InstanceRecord } from "@/api/instances";
-import { unavailableAction, type RowAction } from "@/components/common/DataTable/RowActions";
+import { unavailableAction, type RowAction } from "@/components/common/DataTable";
 import { instanceIntentUnavailable, openInstanceTerminalWindow } from "@/lib/instances";
 import GpuContainerStopModal from "@/components/gpu-containers/GpuContainerStopModal";
 import GpuContainerDeleteModal from "@/components/gpu-containers/GpuContainerDeleteModal";
@@ -66,7 +66,6 @@ export function useGpuContainerActions(onDeleted?: () => void) {
     {
       key: "lifecycle",
       label: (instance) => (instance.observedState === "stopped" ? "启动" : "停止"),
-      widthLabel: "启动",
       disabled: (instance) =>
         unavailable(instance) ||
         !["running", "stopped"].includes(instance.observedState) ||

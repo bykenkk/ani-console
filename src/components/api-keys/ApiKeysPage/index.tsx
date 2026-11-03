@@ -252,7 +252,6 @@ export function ApiKeysPage() {
             {
               key: "status",
               label: (item) => (item.is_active ? "禁用" : "启用"),
-              widthLabel: "启用",
               intent: "warning",
               disabled: (item) => isExpired(item),
               tooltip: (item) => (isExpired(item) ? "已过期的 API Key 无法重新启用" : undefined),
