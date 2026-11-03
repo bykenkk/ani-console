@@ -73,6 +73,9 @@ export interface InstanceNetworkInterface {
   applied_revision: string;
   pending_restart: boolean;
   effective_now: boolean;
+  configuration_state: "configuring" | "ready" | "failed";
+  operation_id: string;
+  operation_reason: string;
   current_vnic_name?: string;
   current_mac_address?: string;
   current_ips: string[];

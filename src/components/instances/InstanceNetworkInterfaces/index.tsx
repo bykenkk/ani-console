@@ -49,7 +49,15 @@ export default function InstanceNetworkInterfaces({
   const ownerMutations = useIsMutating({
     mutationKey: [consumerKind === "vm" ? "vm-write" : "instance-command"],
   });
-  const disabled = busy || Boolean(ownerMutations) || save.isPending || !network.data?.supported;
+  const configurationInProgress = network.data?.items.some(
+    (item) => item.configuration_state === "configuring",
+  );
+  const disabled =
+    busy ||
+    Boolean(ownerMutations) ||
+    configurationInProgress ||
+    save.isPending ||
+    !network.data?.supported;
   const confirmAutomatic = () =>
     Modal.confirm({
       title: "恢复自动分配",
@@ -147,11 +155,14 @@ export default function InstanceNetworkInterfaces({
             render: (_, item) => (item.desired.mode === "manual" ? "手动网卡" : "自动分配"),
           },
           {
-            title: "生效状态",
-            width: 180,
-            render: (_, item) => (
-              <Tag>
-                {stopped
+            title: "配置与生效状态",
+            width: 210,
+            render: (_, item) => {
+              let state = "配置状态待确认";
+              if (item.configuration_state === "configuring") state = "配置处理中";
+              else if (item.configuration_state === "failed") state = "配置失败";
+              else if (item.configuration_state === "ready") {
+                state = stopped
                   ? "下次启动使用"
                   : busy
                     ? "处理中"
@@ -159,9 +170,27 @@ export default function InstanceNetworkInterfaces({
                       ? "待重启生效"
                       : item.effective_now
                         ? "已生效"
-                        : "观察待确认"}
-              </Tag>
-            ),
+                        : "观察待确认";
+              }
+              return (
+                <div>
+                  <Tag
+                    color={
+                      item.configuration_state === "failed"
+                        ? "red"
+                        : item.configuration_state === "configuring"
+                          ? "orange"
+                          : undefined
+                    }
+                  >
+                    {state}
+                  </Tag>
+                  {item.operation_reason && (
+                    <div className="mt-1 break-words text-[12px]">{item.operation_reason}</div>
+                  )}
+                </div>
+              );
+            },
           },
           {
             title: "配置版本",
