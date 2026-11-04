@@ -15,16 +15,17 @@ export default function VnicNetworkFields({ form, onSubnetChange }: VnicNetworkF
   const [vpcName, setVpcName] = useState("");
   const [subnetName, setSubnetName] = useState("");
   const vpcs = useQuery({
-    queryKey: ["network-vpcs", "vnic", "options", vpcName],
-    queryFn: ({ signal }) => listVpcOptions({ name: vpcName.trim() || undefined }, signal),
+    queryKey: ["network-vpcs", "vnic", "options", vpcName, { can_use: true }],
+    queryFn: ({ signal }) =>
+      listVpcOptions({ name: vpcName.trim() || undefined, can_use: true }, signal),
     meta: { errorNotification: { id: "vpcs", action: "VPC 选项加载" } },
   });
   const subnets = useQuery({
-    queryKey: ["network-subnets", "vnic", "options", vpcId, subnetName],
+    queryKey: ["network-subnets", "vnic", "options", vpcId, subnetName, { can_use: true }],
     // TODO(subnet-pagination): 沿用现有正式子网目录的首批选项；后端迁为页码分页后改用 withFirst100，不遍历游标。
     queryFn: ({ signal }) =>
       listNetworkSubnets(
-        { vpc_id: vpcId, name: subnetName.trim() || undefined, limit: 100 },
+        { vpc_id: vpcId, name: subnetName.trim() || undefined, limit: 100, can_use: true },
         signal,
       ),
     enabled: Boolean(vpcId),
@@ -46,7 +47,7 @@ export default function VnicNetworkFields({ form, onSubnetChange }: VnicNetworkF
           loading={vpcs.isFetching}
           options={(vpcs.data?.items ?? []).map((vpc) => ({
             value: vpc.id,
-            label: `${vpc.name} · ${vpc.cidr}`,
+            label: `${vpc.name}${vpc.owner_scope === "platform" ? " · 平台基础网络" : ""} · ${vpc.cidr || "-"}`,
           }))}
         />
       </Form.Item>
@@ -60,7 +61,7 @@ export default function VnicNetworkFields({ form, onSubnetChange }: VnicNetworkF
           loading={subnets.isFetching}
           options={(subnets.data?.items ?? []).map((subnet) => ({
             value: subnet.id,
-            label: `${subnet.name} · ${subnet.cidr}`,
+            label: `${subnet.name}${subnet.owner_scope === "platform" ? " · 平台基础网络" : ""} · ${subnet.cidr || "-"}`,
           }))}
         />
       </Form.Item>

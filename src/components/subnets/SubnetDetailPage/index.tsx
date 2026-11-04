@@ -1,3 +1,4 @@
+import { Tag } from "@arco-design/web-react";
 import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useSubnetActions } from "@/hooks/useSubnetActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
@@ -63,9 +64,14 @@ export default function SubnetDetailPage({ subnetId, tab, onTabChange }: SubnetD
     <DetailPageFrame
       breadcrumbs={[...navigationBreadcrumbsForPath("/subnets"), { label: subnet.name }]}
       title={subnet.name}
-      status={<NetworkResourceStatus resource={subnet} />}
+      status={
+        <div className="flex items-center gap-2">
+          <NetworkResourceStatus resource={subnet} />
+          {subnet.owner_scope === "platform" && <Tag color="arcoblue">平台基础网络</Tag>}
+        </div>
+      }
       icon={<AliIcon name="VPCwangluo" size={28} />}
-      headerItems={[{ label: "CIDR", value: subnet.cidr }]}
+      headerItems={[{ label: "CIDR", value: subnet.cidr || "-" }]}
       actions={<ResourceActionMenu record={subnet} actions={actions} />}
       cards={[
         {
@@ -79,7 +85,7 @@ export default function SubnetDetailPage({ subnetId, tab, onTabChange }: SubnetD
                 parentVpc?.name ??
                 (vpc.isLoading ? "加载中…" : <ResourceId value={subnet.vpc_id} />),
             },
-            { label: "CIDR", value: subnet.cidr },
+            { label: "CIDR", value: subnet.cidr || "-" },
             { label: "网关", value: subnet.gateway || "-" },
             { label: "排除 IP", value: subnet.exclude_ips?.join(" · ") || "-" },
             { label: "DHCP", value: subnet.enable_dhcp ? "已开启" : "已关闭" },

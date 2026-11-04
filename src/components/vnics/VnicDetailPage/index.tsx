@@ -48,8 +48,7 @@ export default function VnicDetailPage({ vnicId }: VnicDetailPageProps) {
               {
                 key: "bind",
                 label: "绑定实例",
-                disabled: (item) =>
-                  item.state !== "available" || !(item.primary_ip || item.ips?.length),
+                disabled: (item) => item.state === "deleting" || item.state === "deleted",
                 onClick: () => setBinding(true),
               },
               ...actions,

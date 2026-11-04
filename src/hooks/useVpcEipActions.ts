@@ -32,14 +32,14 @@ export function useVpcEipActions(onBind?: (vpc: NetworkVPC) => void) {
     {
       key: "bind-eip",
       label: "绑定公网 IP",
-      visible: (vpc) => Boolean(onBind) && !vpc.public_egress,
+      visible: (vpc) => vpc.can_manage === true && Boolean(onBind) && !vpc.public_egress,
       disabled: (vpc) => ["deleting", "deleted", "failed"].includes(vpc.state),
       onClick: (vpc) => onBind?.(vpc),
     },
     {
       key: "unbind-eip",
       label: "解绑公网 IP",
-      visible: (vpc) => Boolean(vpc.public_egress),
+      visible: (vpc) => vpc.can_manage === true && Boolean(vpc.public_egress),
       disabled: (vpc) =>
         vpc.state === "deleting" ||
         vpc.state === "deleted" ||

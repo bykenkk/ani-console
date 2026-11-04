@@ -1,3 +1,4 @@
+import { Tag } from "@arco-design/web-react";
 import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useListPagination } from "@/hooks/useListPagination";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -48,7 +49,12 @@ export default function VpcsPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, vpc) => <ResourceNameId name={vpc.name} id={vpc.id} type="vpc" />,
+      render: (_, vpc) => (
+        <div className="flex flex-col items-start gap-1">
+          <ResourceNameId name={vpc.name} id={vpc.id} type="vpc" />
+          {vpc.owner_scope === "platform" && <Tag color="arcoblue">平台基础网络</Tag>}
+        </div>
+      ),
     },
     {
       key: "state",
@@ -67,16 +73,20 @@ export default function VpcsPage() {
       key: "base-connectivity",
       title: "基础网络",
       width: 120,
-      render: (_, vpc) => (
-        <VpcBaseConnectivityStatus connectivity={vpc.base_connectivity} compact />
-      ),
+      render: (_, vpc) =>
+        vpc.owner_scope === "platform" ? (
+          "平台托管"
+        ) : (
+          <VpcBaseConnectivityStatus connectivity={vpc.base_connectivity} compact />
+        ),
     },
     {
       key: "public-egress",
       title: "公网 IP",
       width: 240,
       ellipsis: true,
-      dataIndex: "public_egress.eip_address",
+      render: (_, vpc) =>
+        vpc.owner_scope === "platform" ? "平台托管" : vpc.public_egress?.eip_address || "-",
     },
     {
       key: "subnets",

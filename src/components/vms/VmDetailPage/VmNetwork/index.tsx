@@ -2,6 +2,7 @@ import { Descriptions } from "@arco-design/web-react";
 import type { VirtualMachine, VmResourceReference } from "@/api/vms";
 import VmIpAddresses from "./VmIpAddresses";
 import VmNetworkInterfaces from "@/components/vms/VmNetworkInterfaces";
+import NetworkReferenceName from "@/components/network/NetworkReferenceName";
 
 type VmNetworkProps = { vm: VirtualMachine };
 
@@ -20,11 +21,27 @@ export default function VmNetwork({ vm }: VmNetworkProps) {
         data={[
           {
             label: "VPC",
-            value: vm.relations?.vpc ? referenceName(vm.relations.vpc) : "-",
+            value: vm.relations?.vpc?.id ? (
+              <NetworkReferenceName
+                kind="vpc"
+                id={vm.relations.vpc.id}
+                name={vm.relations.vpc.name}
+              />
+            ) : (
+              "-"
+            ),
           },
           {
             label: "子网",
-            value: vm.relations?.subnet ? referenceName(vm.relations.subnet) : "-",
+            value: vm.relations?.subnet?.id ? (
+              <NetworkReferenceName
+                kind="subnet"
+                id={vm.relations.subnet.id}
+                name={vm.relations.subnet.name}
+              />
+            ) : (
+              "-"
+            ),
           },
           {
             label: "IP 地址",

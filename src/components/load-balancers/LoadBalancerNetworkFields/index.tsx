@@ -34,15 +34,16 @@ export default function LoadBalancerNetworkFields({
     }
   }, [scheme, form, onAvailabilityChange]);
   const vpcs = useQuery({
-    queryKey: ["network-vpcs", "load-balancer-create", "options"],
-    queryFn: () => listVpcOptions({}),
+    queryKey: ["network-vpcs", "load-balancer-create", "options", { can_manage: true }],
+    queryFn: () => listVpcOptions({ can_manage: true }),
     meta: {
       errorNotification: { id: "vpcs", action: "VPC 列表加载", fallback: "请求失败，请稍后重试" },
     },
   });
+  // TODO(pagination-migration): 子网仍使用 limit/cursor，保留首批选项；后端改造后使用 withFirst100。
   const subnets = useQuery({
-    queryKey: ["network-subnets", "load-balancer-create", vpcId],
-    queryFn: () => listNetworkSubnets({ vpc_id: vpcId }),
+    queryKey: ["network-subnets", "load-balancer-create", vpcId, { can_manage: true }],
+    queryFn: () => listNetworkSubnets({ vpc_id: vpcId, limit: 100, can_manage: true }),
     enabled: !!vpcId,
     meta: {
       errorNotification: {

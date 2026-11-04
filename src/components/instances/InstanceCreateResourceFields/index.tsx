@@ -32,16 +32,17 @@ export default function InstanceCreateResourceFields({
   onVpcChange,
 }: InstanceCreateResourceFieldsProps) {
   const vpcs = useQuery({
-    queryKey: ["network-vpcs", "instance-create", "options"],
-    queryFn: ({ signal }) => listVpcOptions({ state: "RESOURCE_STATE_AVAILABLE" }, signal),
+    queryKey: ["network-vpcs", "instance-create", "options", { can_use: true }],
+    queryFn: ({ signal }) => listVpcOptions({ can_use: true }, signal),
     meta: { errorNotification: { id: "instance-vpc-options", action: "VPC 加载" } },
   });
   const subnets = useQuery({
-    queryKey: ["network-subnets", "instance-create", values.vpc_id, "options"],
+    queryKey: ["network-subnets", "instance-create", values.vpc_id, "options", { can_use: true }],
     enabled: Boolean(values.vpc_id),
     // FIXME(instance-subnet-options): 子网尚无 page/pageSize，当前沿用旧分页契约，仅取首批 100 项。
     // TODO(instance-subnet-options): 后端完成分页改造后使用 withFirst100；不自动遍历后续游标。
-    queryFn: ({ signal }) => listNetworkSubnets({ vpc_id: values.vpc_id, limit: 100 }, signal),
+    queryFn: ({ signal }) =>
+      listNetworkSubnets({ vpc_id: values.vpc_id, limit: 100, can_use: true }, signal),
     meta: {
       errorNotification: {
         id: withId("instance-subnet-options", values.vpc_id),
@@ -68,7 +69,7 @@ export default function InstanceCreateResourceFields({
             loading={vpcs.isFetching}
             options={(vpcs.data?.items ?? []).map((vpc) => ({
               value: vpc.id,
-              label: `${vpc.name} · ${vpc.cidr}`,
+              label: `${vpc.name}${vpc.owner_scope === "platform" ? " · 平台基础网络" : ""} · ${vpc.cidr || "-"}`,
             }))}
             onChange={(id) => onVpcChange(id ?? "")}
           />
@@ -86,7 +87,7 @@ export default function InstanceCreateResourceFields({
             placeholder={values.vpc_id ? "请选择子网" : "请先选择 VPC"}
             options={(subnets.data?.items ?? []).map((subnet) => ({
               value: subnet.id,
-              label: `${subnet.name} · ${subnet.cidr}`,
+              label: `${subnet.name}${subnet.owner_scope === "platform" ? " · 平台基础网络" : ""} · ${subnet.cidr || "-"}`,
             }))}
           />
         </Form.Item>

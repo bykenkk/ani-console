@@ -44,8 +44,8 @@ export default function CreateSubnetModal({ onCancel, onCreated }: CreateSubnetM
         fallback: "请求失败，请稍后重试",
       },
     },
-    queryKey: ["network-vpcs", "subnet-page", "options"],
-    queryFn: () => listVpcOptions({}),
+    queryKey: ["network-vpcs", "subnet-create", "options", { can_manage: true }],
+    queryFn: () => listVpcOptions({ can_manage: true }),
   });
   const selectedVpc = ((vpcs.data?.items ?? []) as Vpc[]).find((vpc) => vpc.id === vpcId);
   const selectedVpcCidr = selectedVpc?.cidr ?? "";

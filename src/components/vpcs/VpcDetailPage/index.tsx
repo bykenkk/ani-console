@@ -1,3 +1,4 @@
+import { Tag } from "@arco-design/web-react";
 import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useVpcActions } from "@/hooks/useVpcActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
@@ -51,9 +52,14 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
       <DetailPageFrame
         breadcrumbs={[...navigationBreadcrumbsForPath("/vpcs"), { label: vpc.name }]}
         title={vpc.name}
-        status={<NetworkResourceStatus resource={vpc} />}
+        status={
+          <div className="flex items-center gap-2">
+            <NetworkResourceStatus resource={vpc} />
+            {vpc.owner_scope === "platform" && <Tag color="arcoblue">平台基础网络</Tag>}
+          </div>
+        }
         icon={<AliIcon name="VPCwangluo" size={28} />}
-        headerItems={[{ label: "CIDR", value: vpc.cidr }]}
+        headerItems={[{ label: "CIDR", value: vpc.cidr || "-" }]}
         actions={<ResourceActionMenu record={vpc} actions={actions} />}
         cards={[
           {
@@ -61,13 +67,26 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
             title: "基本信息",
             fields: [
               { label: "ID", value: <ResourceId value={vpc.id} /> },
-              { label: "CIDR", value: vpc.cidr },
+              { label: "CIDR", value: vpc.cidr || "-" },
               {
                 label: "基础网络",
-                value: <VpcBaseConnectivityStatus connectivity={vpc.base_connectivity} />,
+                value:
+                  vpc.owner_scope === "platform" ? (
+                    "平台托管"
+                  ) : (
+                    <VpcBaseConnectivityStatus connectivity={vpc.base_connectivity} />
+                  ),
               },
-              { label: "公网 IP", value: <VpcPublicEgressStatus binding={vpc.public_egress} /> },
-              ...(vpc.public_egress
+              {
+                label: "公网 IP",
+                value:
+                  vpc.owner_scope === "platform" ? (
+                    "平台托管"
+                  ) : (
+                    <VpcPublicEgressStatus binding={vpc.public_egress} />
+                  ),
+              },
+              ...(vpc.owner_scope === "tenant" && vpc.public_egress
                 ? [
                     { label: "EIP ID", value: <ResourceId value={vpc.public_egress.eip_id} /> },
                     {
@@ -94,7 +113,7 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
           {
             key: "related",
             label: "关联资源",
-            content: <VpcRelatedResources vpcId={vpcId} />,
+            content: <VpcRelatedResources vpcId={vpcId} ownerScope={vpc.owner_scope} />,
           },
         ]}
         activeTabKey={tab}

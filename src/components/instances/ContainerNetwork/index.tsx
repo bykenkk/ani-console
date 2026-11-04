@@ -1,5 +1,5 @@
 import { Descriptions } from "@arco-design/web-react";
-import { ResourceId } from "@/components/common";
+import NetworkReferenceName from "@/components/network/NetworkReferenceName";
 import type { InstanceConfigurationData, InstanceRecord } from "@/api/instances";
 import ContainerNetworkInterfaces from "../ContainerNetworkInterfaces";
 
@@ -21,7 +21,7 @@ export default function ContainerNetwork({ configuration, instance }: ContainerN
           {
             label: "VPC",
             value: configuration?.network?.vpc_id ? (
-              <ResourceId value={configuration.network.vpc_id} />
+              <NetworkReferenceName kind="vpc" id={configuration.network.vpc_id} />
             ) : (
               "-"
             ),
@@ -29,7 +29,7 @@ export default function ContainerNetwork({ configuration, instance }: ContainerN
           {
             label: "子网",
             value: configuration?.network?.subnet_id ? (
-              <ResourceId value={configuration.network.subnet_id} />
+              <NetworkReferenceName kind="subnet" id={configuration.network.subnet_id} />
             ) : (
               "-"
             ),
