@@ -1,13 +1,8 @@
+import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import EipChangeSecurityGroupsModal from "@/components/network/EipChangeSecurityGroupsModal";
 import { useState } from "react";
 import { listNetworkEips, type NetworkEip, type NetworkResourceStateFilter } from "@/api/network";
-import {
-  ListPageFrame,
-  ListDataTable,
-  ResourceNameId,
-  StatusBadge,
-  type ListColumn,
-} from "@/components/common";
+import { ListPageFrame, ListDataTable, ResourceNameId, type ListColumn } from "@/components/common";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import CreateEipModal from "../CreateEipModal";
@@ -50,7 +45,7 @@ export default function EipsPage() {
       key: "state",
       title: "资源状态",
       width: 120,
-      render: (_, item) => <StatusBadge status={item.state} reason={item.reason} />,
+      render: (_, item) => <NetworkResourceStatus resource={item} />,
     },
     {
       key: "binding-state",

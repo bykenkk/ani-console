@@ -1,14 +1,9 @@
+import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useVpcActions } from "@/hooks/useVpcActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { withId } from "@/lib/id";
-import {
-  DetailPageFrame,
-  DetailPagePlaceholder,
-  AliIcon,
-  ResourceId,
-  StatusBadge,
-} from "@/components/common";
+import { DetailPageFrame, DetailPagePlaceholder, AliIcon, ResourceId } from "@/components/common";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -56,7 +51,7 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
       <DetailPageFrame
         breadcrumbs={[...navigationBreadcrumbsForPath("/vpcs"), { label: vpc.name }]}
         title={vpc.name}
-        status={<StatusBadge status={vpc.state} reason={vpc.reason} />}
+        status={<NetworkResourceStatus resource={vpc} />}
         icon={<AliIcon name="VPCwangluo" size={28} />}
         headerItems={[{ label: "CIDR", value: vpc.cidr }]}
         actions={<ResourceActionMenu record={vpc} actions={actions} />}

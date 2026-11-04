@@ -1,15 +1,10 @@
+import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useListPagination } from "@/hooks/useListPagination";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVpcActions } from "@/hooks/useVpcActions";
 import { useState } from "react";
 import { listNetworkVpcs, type NetworkVPC, type NetworkResourceStateFilter } from "@/api/network";
-import {
-  ResourceNameId,
-  ListPageFrame,
-  type ListColumn,
-  StatusBadge,
-  ListDataTable,
-} from "@/components/common";
+import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import CreateVpcModal from "../CreateVpcModal";
 import BindVpcEipModal from "../BindVpcEipModal";
@@ -59,7 +54,7 @@ export default function VpcsPage() {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, vpc) => <StatusBadge status={vpc.state} reason={vpc.reason} />,
+      render: (_, vpc) => <NetworkResourceStatus resource={vpc} />,
     },
     {
       key: "cidr",

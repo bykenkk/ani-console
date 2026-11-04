@@ -1,6 +1,7 @@
+import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
 import { listNetworkSubnets, type NetworkSubnet } from "@/api/network";
-import { DataTable, StatusBadge } from "@/components/common";
+import { DataTable } from "@/components/common";
 import { withId } from "@/lib/id";
 
 type VpcSubnetsProps = { vpcId: string };
@@ -29,7 +30,7 @@ export default function VpcSubnets({ vpcId }: VpcSubnetsProps) {
         {
           title: "状态",
           width: 120,
-          render: (_, item) => <StatusBadge status={item.state} />,
+          render: (_, item) => <NetworkResourceStatus resource={item} />,
         },
       ]}
       data={pageItems}
