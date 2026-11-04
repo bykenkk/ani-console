@@ -5,6 +5,7 @@ import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { DataTable, StatusBadge, type ListColumn } from "@/components/common";
 import { withId } from "@/lib/id";
 import { Tag } from "@arco-design/web-react";
+import SubnetVnics from "./SubnetVnics";
 
 type SubnetRelatedResourcesProps = { subnetId: string };
 
@@ -38,7 +39,8 @@ export default function SubnetRelatedResources({ subnetId }: SubnetRelatedResour
   ];
 
   return (
-    <section>
+    <section className="flex flex-col gap-6">
+      <SubnetVnics subnetId={subnetId} />
       <DataTable<RelatedResource>
         header={{
           title: "关联资源",

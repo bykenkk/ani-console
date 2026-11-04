@@ -166,7 +166,19 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
             label: "存储挂载",
             content: <VmDisks vm={vm} />,
           },
-          { key: "network", label: "网络", content: <VmNetwork vm={vm} /> },
+          {
+            key: "network",
+            label: "网络",
+            content: (
+              <VmNetwork
+                vm={vm}
+                busy={
+                  vm.closing ||
+                  ["Starting", "Stopping", "Deleting", "Provisioning"].includes(vm.observedState)
+                }
+              />
+            ),
+          },
           { key: "snapshots", label: "快照", content: <VmSnapshots vm={vm} /> },
           {
             key: "monitoring",

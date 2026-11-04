@@ -12,7 +12,7 @@ import { withId } from "@/lib/id";
 import { formatDateTime } from "@/lib/format";
 
 type SecurityGroupRelatedResourcesProps = { securityGroupId: string };
-const TYPES = { container: "容器", vm: "云主机", eip: "公网 IP" };
+const TYPES = { container: "容器", vm: "云主机", eip: "公网 IP", vnic: "虚拟网卡" };
 export default function SecurityGroupRelatedResources({
   securityGroupId,
 }: SecurityGroupRelatedResourcesProps) {
@@ -56,7 +56,7 @@ export default function SecurityGroupRelatedResources({
         data={bindings.data?.items ?? []}
         columns={[
           { title: "类型", width: 110, render: (_, item) => TYPES[item.target_type] },
-          { title: "资源 ID", dataIndex: "target_id", width: 240 },
+          { title: "资源 ID", width: 240, dataIndex: "target_id" },
           {
             title: "绑定状态",
             width: 140,

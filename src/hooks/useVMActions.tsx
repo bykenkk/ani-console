@@ -1,7 +1,7 @@
 import { Modal } from "@arco-design/web-react";
 import { useState } from "react";
 import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
-import { startVm, restartVm, deleteVm, type VirtualMachine } from "@/api/vms";
+import { getVm, startVm, restartVm, deleteVm, type VirtualMachine } from "@/api/vms";
 import { unavailableAction, type RowAction } from "@/components/common/DataTable";
 import VmCreateSnapshotModal from "@/components/vms/VmCreateSnapshotModal";
 import VmShutdownModal from "@/components/vms/VmShutdownModal";
@@ -27,7 +27,9 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
     mutationKey: ["vm-write", "power"],
     retry: false,
     mutationFn: async ({ action, vm }: { action: VmPowerAction; vm: VirtualMachine }) => {
-      const input = { expected_version: vm.version };
+      const input = {
+        expected_version: action === "restart" ? (await getVm(vm.id)).version : vm.version,
+      };
       await { start: startVm, restart: restartVm, delete: deleteVm }[action](vm.id, input);
     },
     meta: {
@@ -51,6 +53,9 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
         await Promise.all([
           qc.invalidateQueries({ queryKey: ["vms", "list"] }),
           qc.invalidateQueries({ queryKey: ["vms", vm.id], exact: true }),
+          qc.invalidateQueries({ queryKey: ["network-interfaces", "vm", vm.id] }),
+          qc.invalidateQueries({ queryKey: ["network-vnics"] }),
+          qc.invalidateQueries({ queryKey: ["network-vnic"] }),
         ]);
       }
     },
@@ -61,7 +66,9 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
       content:
         action === "delete"
           ? "将删除该云主机及其自有磁盘、介质副本和快照。此操作不可撤销。"
-          : `确认${LABELS[action]}该云主机？`,
+          : action === "restart"
+            ? "确认重启该云主机？重启将中断业务连接，并应用待生效的主网卡配置。"
+            : `确认${LABELS[action]}该云主机？`,
       okButtonProps: {
         status: action === "delete" ? "danger" : "default",
       },

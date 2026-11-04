@@ -203,6 +203,8 @@ export default function GpuContainerDetailPage({
             label: "网络",
             content: (
               <InstanceNetwork
+                instance={record}
+                busy={Boolean(record.activeOperationId) || record.desiredState === "deleted"}
                 configuration={configuration.data}
                 loading={configuration.isFetching}
               />

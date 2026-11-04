@@ -58,6 +58,8 @@ import { Route as AuthenticatedAppVectorStoresIndexRouteImport } from './routes/
 import { Route as AuthenticatedAppVectorStoresVectorStoreIdRouteImport } from './routes/_authenticated/_app/vector-stores/$vectorStoreId'
 import { Route as AuthenticatedAppVmsIndexRouteImport } from './routes/_authenticated/_app/vms/index'
 import { Route as AuthenticatedAppVmsInstanceIdRouteImport } from './routes/_authenticated/_app/vms/$instanceId'
+import { Route as AuthenticatedAppVnicsIndexRouteImport } from './routes/_authenticated/_app/vnics/index'
+import { Route as AuthenticatedAppVnicsVnicIdRouteImport } from './routes/_authenticated/_app/vnics/$vnicId'
 import { Route as AuthenticatedAppVolumesIndexRouteImport } from './routes/_authenticated/_app/volumes/index'
 import { Route as AuthenticatedAppVolumesVolumeIdRouteImport } from './routes/_authenticated/_app/volumes/$volumeId'
 import { Route as AuthenticatedAppVpcsIndexRouteImport } from './routes/_authenticated/_app/vpcs/index'
@@ -347,6 +349,18 @@ const AuthenticatedAppVmsInstanceIdRoute =
     path: '/vms/$instanceId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppVnicsIndexRoute =
+  AuthenticatedAppVnicsIndexRouteImport.update({
+    id: '/vnics/',
+    path: '/vnics/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppVnicsVnicIdRoute =
+  AuthenticatedAppVnicsVnicIdRouteImport.update({
+    id: '/vnics/$vnicId',
+    path: '/vnics/$vnicId',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppVolumesIndexRoute =
   AuthenticatedAppVolumesIndexRouteImport.update({
     id: '/volumes/',
@@ -402,6 +416,7 @@ export interface FileRoutesByFullPath {
   '/subnets/$subnetId': typeof AuthenticatedAppSubnetsSubnetIdRoute
   '/vector-stores/$vectorStoreId': typeof AuthenticatedAppVectorStoresVectorStoreIdRoute
   '/vms/$instanceId': typeof AuthenticatedAppVmsInstanceIdRoute
+  '/vnics/$vnicId': typeof AuthenticatedAppVnicsVnicIdRoute
   '/volumes/$volumeId': typeof AuthenticatedAppVolumesVolumeIdRoute
   '/vpcs/$vpcId': typeof AuthenticatedAppVpcsVpcIdRoute
   '/ai-api-keys/': typeof AuthenticatedAppAiApiKeysIndexRoute
@@ -428,6 +443,7 @@ export interface FileRoutesByFullPath {
   '/subnets/': typeof AuthenticatedAppSubnetsIndexRoute
   '/vector-stores/': typeof AuthenticatedAppVectorStoresIndexRoute
   '/vms/': typeof AuthenticatedAppVmsIndexRoute
+  '/vnics/': typeof AuthenticatedAppVnicsIndexRoute
   '/volumes/': typeof AuthenticatedAppVolumesIndexRoute
   '/vpcs/': typeof AuthenticatedAppVpcsIndexRoute
   '/objects/$bucketId/': typeof AuthenticatedAppObjectsBucketIdIndexRoute
@@ -454,6 +470,7 @@ export interface FileRoutesByTo {
   '/subnets/$subnetId': typeof AuthenticatedAppSubnetsSubnetIdRoute
   '/vector-stores/$vectorStoreId': typeof AuthenticatedAppVectorStoresVectorStoreIdRoute
   '/vms/$instanceId': typeof AuthenticatedAppVmsInstanceIdRoute
+  '/vnics/$vnicId': typeof AuthenticatedAppVnicsVnicIdRoute
   '/volumes/$volumeId': typeof AuthenticatedAppVolumesVolumeIdRoute
   '/vpcs/$vpcId': typeof AuthenticatedAppVpcsVpcIdRoute
   '/ai-api-keys': typeof AuthenticatedAppAiApiKeysIndexRoute
@@ -480,6 +497,7 @@ export interface FileRoutesByTo {
   '/subnets': typeof AuthenticatedAppSubnetsIndexRoute
   '/vector-stores': typeof AuthenticatedAppVectorStoresIndexRoute
   '/vms': typeof AuthenticatedAppVmsIndexRoute
+  '/vnics': typeof AuthenticatedAppVnicsIndexRoute
   '/volumes': typeof AuthenticatedAppVolumesIndexRoute
   '/vpcs': typeof AuthenticatedAppVpcsIndexRoute
   '/objects/$bucketId': typeof AuthenticatedAppObjectsBucketIdIndexRoute
@@ -511,6 +529,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/subnets/$subnetId': typeof AuthenticatedAppSubnetsSubnetIdRoute
   '/_authenticated/_app/vector-stores/$vectorStoreId': typeof AuthenticatedAppVectorStoresVectorStoreIdRoute
   '/_authenticated/_app/vms/$instanceId': typeof AuthenticatedAppVmsInstanceIdRoute
+  '/_authenticated/_app/vnics/$vnicId': typeof AuthenticatedAppVnicsVnicIdRoute
   '/_authenticated/_app/volumes/$volumeId': typeof AuthenticatedAppVolumesVolumeIdRoute
   '/_authenticated/_app/vpcs/$vpcId': typeof AuthenticatedAppVpcsVpcIdRoute
   '/_authenticated/_app/ai-api-keys/': typeof AuthenticatedAppAiApiKeysIndexRoute
@@ -537,6 +556,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/subnets/': typeof AuthenticatedAppSubnetsIndexRoute
   '/_authenticated/_app/vector-stores/': typeof AuthenticatedAppVectorStoresIndexRoute
   '/_authenticated/_app/vms/': typeof AuthenticatedAppVmsIndexRoute
+  '/_authenticated/_app/vnics/': typeof AuthenticatedAppVnicsIndexRoute
   '/_authenticated/_app/volumes/': typeof AuthenticatedAppVolumesIndexRoute
   '/_authenticated/_app/vpcs/': typeof AuthenticatedAppVpcsIndexRoute
   '/_authenticated/_app/objects/$bucketId/': typeof AuthenticatedAppObjectsBucketIdIndexRoute
@@ -567,6 +587,7 @@ export interface FileRouteTypes {
     | '/subnets/$subnetId'
     | '/vector-stores/$vectorStoreId'
     | '/vms/$instanceId'
+    | '/vnics/$vnicId'
     | '/volumes/$volumeId'
     | '/vpcs/$vpcId'
     | '/ai-api-keys/'
@@ -593,6 +614,7 @@ export interface FileRouteTypes {
     | '/subnets/'
     | '/vector-stores/'
     | '/vms/'
+    | '/vnics/'
     | '/volumes/'
     | '/vpcs/'
     | '/objects/$bucketId/'
@@ -619,6 +641,7 @@ export interface FileRouteTypes {
     | '/subnets/$subnetId'
     | '/vector-stores/$vectorStoreId'
     | '/vms/$instanceId'
+    | '/vnics/$vnicId'
     | '/volumes/$volumeId'
     | '/vpcs/$vpcId'
     | '/ai-api-keys'
@@ -645,6 +668,7 @@ export interface FileRouteTypes {
     | '/subnets'
     | '/vector-stores'
     | '/vms'
+    | '/vnics'
     | '/volumes'
     | '/vpcs'
     | '/objects/$bucketId'
@@ -675,6 +699,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/subnets/$subnetId'
     | '/_authenticated/_app/vector-stores/$vectorStoreId'
     | '/_authenticated/_app/vms/$instanceId'
+    | '/_authenticated/_app/vnics/$vnicId'
     | '/_authenticated/_app/volumes/$volumeId'
     | '/_authenticated/_app/vpcs/$vpcId'
     | '/_authenticated/_app/ai-api-keys/'
@@ -701,6 +726,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/subnets/'
     | '/_authenticated/_app/vector-stores/'
     | '/_authenticated/_app/vms/'
+    | '/_authenticated/_app/vnics/'
     | '/_authenticated/_app/volumes/'
     | '/_authenticated/_app/vpcs/'
     | '/_authenticated/_app/objects/$bucketId/'
@@ -1056,6 +1082,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppVmsInstanceIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/vnics/': {
+      id: '/_authenticated/_app/vnics/'
+      path: '/vnics'
+      fullPath: '/vnics/'
+      preLoaderRoute: typeof AuthenticatedAppVnicsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/vnics/$vnicId': {
+      id: '/_authenticated/_app/vnics/$vnicId'
+      path: '/vnics/$vnicId'
+      fullPath: '/vnics/$vnicId'
+      preLoaderRoute: typeof AuthenticatedAppVnicsVnicIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/volumes/': {
       id: '/_authenticated/_app/volumes/'
       path: '/volumes'
@@ -1129,6 +1169,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSubnetsSubnetIdRoute: typeof AuthenticatedAppSubnetsSubnetIdRoute
   AuthenticatedAppVectorStoresVectorStoreIdRoute: typeof AuthenticatedAppVectorStoresVectorStoreIdRoute
   AuthenticatedAppVmsInstanceIdRoute: typeof AuthenticatedAppVmsInstanceIdRoute
+  AuthenticatedAppVnicsVnicIdRoute: typeof AuthenticatedAppVnicsVnicIdRoute
   AuthenticatedAppVolumesVolumeIdRoute: typeof AuthenticatedAppVolumesVolumeIdRoute
   AuthenticatedAppVpcsVpcIdRoute: typeof AuthenticatedAppVpcsVpcIdRoute
   AuthenticatedAppAiApiKeysIndexRoute: typeof AuthenticatedAppAiApiKeysIndexRoute
@@ -1155,6 +1196,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSubnetsIndexRoute: typeof AuthenticatedAppSubnetsIndexRoute
   AuthenticatedAppVectorStoresIndexRoute: typeof AuthenticatedAppVectorStoresIndexRoute
   AuthenticatedAppVmsIndexRoute: typeof AuthenticatedAppVmsIndexRoute
+  AuthenticatedAppVnicsIndexRoute: typeof AuthenticatedAppVnicsIndexRoute
   AuthenticatedAppVolumesIndexRoute: typeof AuthenticatedAppVolumesIndexRoute
   AuthenticatedAppVpcsIndexRoute: typeof AuthenticatedAppVpcsIndexRoute
 }
@@ -1192,6 +1234,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppVectorStoresVectorStoreIdRoute:
     AuthenticatedAppVectorStoresVectorStoreIdRoute,
   AuthenticatedAppVmsInstanceIdRoute: AuthenticatedAppVmsInstanceIdRoute,
+  AuthenticatedAppVnicsVnicIdRoute: AuthenticatedAppVnicsVnicIdRoute,
   AuthenticatedAppVolumesVolumeIdRoute: AuthenticatedAppVolumesVolumeIdRoute,
   AuthenticatedAppVpcsVpcIdRoute: AuthenticatedAppVpcsVpcIdRoute,
   AuthenticatedAppAiApiKeysIndexRoute: AuthenticatedAppAiApiKeysIndexRoute,
@@ -1226,6 +1269,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppVectorStoresIndexRoute:
     AuthenticatedAppVectorStoresIndexRoute,
   AuthenticatedAppVmsIndexRoute: AuthenticatedAppVmsIndexRoute,
+  AuthenticatedAppVnicsIndexRoute: AuthenticatedAppVnicsIndexRoute,
   AuthenticatedAppVolumesIndexRoute: AuthenticatedAppVolumesIndexRoute,
   AuthenticatedAppVpcsIndexRoute: AuthenticatedAppVpcsIndexRoute,
 }

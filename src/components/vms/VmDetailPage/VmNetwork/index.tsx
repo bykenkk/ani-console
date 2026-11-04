@@ -2,14 +2,23 @@ import { Descriptions } from "@arco-design/web-react";
 import type { VirtualMachine, VmResourceReference } from "@/api/vms";
 import { DataTable } from "@/components/common";
 import VmIpAddresses from "./VmIpAddresses";
+import InstanceNetworkInterfaces from "@/components/instances/InstanceNetworkInterfaces";
 
-type VmNetworkProps = { vm: VirtualMachine };
+type VmNetworkProps = { vm: VirtualMachine; busy: boolean };
 
-export default function VmNetwork({ vm }: VmNetworkProps) {
+export default function VmNetwork({ vm, busy }: VmNetworkProps) {
   const referenceName = (reference?: VmResourceReference) =>
     reference?.name || (reference?.state === "NOT_FOUND" ? "资源不可用" : "名称暂不可用");
   return (
     <div className="flex flex-col gap-4">
+      <InstanceNetworkInterfaces
+        consumerKind="vm"
+        consumerId={vm.id}
+        resourceVersion={vm.version}
+        running={vm.observedState === "Running"}
+        stopped={vm.observedState === "Stopped"}
+        busy={busy}
+      />
       <Descriptions
         title="网络配置"
         size="medium"

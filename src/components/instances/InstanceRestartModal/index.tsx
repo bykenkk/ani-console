@@ -38,6 +38,9 @@ export default function InstanceRestartModal({
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["instances", instance.compute_type] }),
         qc.invalidateQueries({ queryKey: ["instance", instance.id] }),
+        qc.invalidateQueries({ queryKey: ["network-interfaces", "container", instance.id] }),
+        qc.invalidateQueries({ queryKey: ["network-vnics"] }),
+        qc.invalidateQueries({ queryKey: ["network-vnic"] }),
       ]);
       onSubmitted();
     },
@@ -53,7 +56,7 @@ export default function InstanceRestartModal({
       }}
     >
       确认重启“{instance.name}”？重启会中断容器进程、终端会话，内存及临时数据可能丢失。工作目录和
-      PVC 中已保存的数据保留。
+      PVC 中已保存的数据保留。 待生效的主网卡配置将在本次重启应用。
     </Modal>
   );
 }

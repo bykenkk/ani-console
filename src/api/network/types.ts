@@ -1,5 +1,123 @@
 import type { CoreDevProfileInfo, CursorPageParams, PageParams } from "@/api/types";
 
+export type VnicConsumerKind = "vm" | "container";
+export interface NetworkVnicBinding {
+  binding_id: string;
+  consumer_kind: VnicConsumerKind;
+  consumer_id: string;
+  consumer_name?: string;
+  compute_type?: "cpu" | "gpu";
+  slot: string;
+  requested_revision: string;
+  applied_revision: string;
+  current: boolean;
+  target: boolean;
+}
+export interface NetworkVnic {
+  id: string;
+  name: string;
+  description?: string;
+  vpc_id: string;
+  subnet_id: string;
+  vpc_name?: string;
+  subnet_name?: string;
+  state: string;
+  binding_state: string;
+  version: string;
+  requested_ip?: string;
+  requested_mac?: string;
+  mac_address?: string;
+  primary_ip?: string;
+  ips: string[];
+  bindings: NetworkVnicBinding[];
+  security_group_ids: string[];
+  security_group_names?: string[];
+  observed_at?: string;
+  observation_stale?: boolean;
+  reason?: string;
+  last_operation_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+export interface NetworkVnicListParams extends PageParams {
+  name?: string;
+  subnet_id?: string;
+  binding_state?: string;
+  state?: string;
+  bindable_to_kind?: VnicConsumerKind;
+  bindable_to_id?: string;
+}
+export interface NetworkVnicListResponse {
+  items: NetworkVnic[];
+  total: string;
+}
+export interface CreateNetworkVnicInput {
+  name: string;
+  description?: string;
+  subnet_id: string;
+  requested_ip?: string;
+  requested_mac?: string;
+}
+export interface CreateNetworkVnicRequest {
+  data: CreateNetworkVnicInput & { idempotency_key: string };
+}
+export interface NetworkInterfaceChoice {
+  mode: "automatic" | "manual";
+  vnic_id?: string;
+  vnic_name?: string;
+  provider_uid?: string;
+  mac_address?: string;
+  ips?: string[];
+}
+export interface InstanceNetworkInterface {
+  slot: string;
+  desired: NetworkInterfaceChoice;
+  applied: NetworkInterfaceChoice;
+  requested_revision: string;
+  applied_revision: string;
+  pending_restart: boolean;
+  effective_now: boolean;
+  configuration_state: "configuring" | "ready" | "failed";
+  operation_id: string;
+  operation_reason: string;
+  current_vnic_name?: string;
+  current_mac_address?: string;
+  current_ips: string[];
+  observed_at?: string;
+  observation_reason?: string;
+}
+export interface InstanceNetworkInterfaces {
+  items: InstanceNetworkInterface[];
+  version: string;
+  supported: boolean;
+  unsupported_reason?: string;
+}
+export interface SetNetworkInterfaceInput {
+  mode: NetworkInterfaceChoice["mode"];
+  vnic_id?: string;
+  expected_version: string;
+}
+export interface SetNetworkInterfaceRequest {
+  data: SetNetworkInterfaceInput & { idempotency_key: string };
+}
+export interface VnicBindingTarget {
+  consumer_kind: VnicConsumerKind;
+  consumer_id: string;
+  name: string;
+  version: string;
+  state: string;
+  compute_type?: "cpu" | "gpu";
+  security_group_ids: string[];
+}
+export interface VnicBindingTargetListParams extends PageParams {
+  consumer_kind: VnicConsumerKind;
+  name?: string;
+}
+export interface VnicBindingTargetListResponse {
+  items: VnicBindingTarget[];
+  total: string;
+}
+
 export type NetworkResourceState =
   | "pending"
   | "provisioning"
@@ -70,6 +188,9 @@ export interface NetworkSubnet {
   name: string;
   cidr: string;
   gateway?: string | null;
+  exclude_ips?: string[];
+  enable_dhcp?: boolean;
+  dns_servers?: string[];
   state: NetworkResourceState;
   reason?: string | null;
   dev_profile?: CoreDevProfileInfo;
@@ -122,6 +243,9 @@ export interface CreateNetworkSubnetInput {
   name: string;
   cidr: string;
   gateway?: string | null;
+  exclude_ips?: string[];
+  enable_dhcp?: boolean;
+  dns_servers?: string[];
 }
 export type CreateNetworkSubnetRequest = CreateNetworkSubnetInput & { idempotency_key: string };
 
@@ -171,7 +295,7 @@ export type CreateNetworkSecurityGroupRequest = {
     idempotency_key: string;
   };
 };
-export type NetworkSecurityGroupBindingTargetType = "eip" | "container" | "vm";
+export type NetworkSecurityGroupBindingTargetType = "eip" | "container" | "vm" | "vnic";
 export interface NetworkSecurityGroupBinding {
   target_type: NetworkSecurityGroupBindingTargetType;
   target_id: string;

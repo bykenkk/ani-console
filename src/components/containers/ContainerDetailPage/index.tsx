@@ -177,6 +177,8 @@ export default function ContainerDetailPage({
             label: "网络",
             content: (
               <InstanceNetwork
+                instance={record}
+                busy={Boolean(record.activeOperationId) || record.desiredState === "deleted"}
                 configuration={configuration.data}
                 loading={configuration.isFetching}
               />
