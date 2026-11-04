@@ -175,7 +175,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
           {
             key: "monitoring",
             label: "资源监控",
-            content: <InstanceMetrics instanceId={vm.id} instanceType="vm" />,
+            content: <InstanceMetrics instanceId={vm.id} />,
           },
           {
             key: "logs",

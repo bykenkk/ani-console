@@ -19,6 +19,7 @@ import InstanceVersions from "@/components/instances/InstanceVersions";
 import InstanceConfiguration from "@/components/instances/InstanceConfiguration";
 import InstanceEvents from "@/components/instances/InstanceEvents";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
+import InstanceGpuMetrics from "@/components/instances/InstanceGpuMetrics";
 import ContainerNetwork from "@/components/instances/ContainerNetwork";
 import InstanceOperations from "@/components/instances/InstanceOperations";
 import ContainerStorage from "@/components/containers/ContainerStorage";
@@ -200,16 +201,14 @@ export default function GpuContainerDetailPage({
           {
             key: "monitoring",
             label: "资源监控",
-            content: <InstanceMetrics instanceId={instanceId} instanceType="gpu_container" />,
+            content: <InstanceMetrics instanceId={instanceId} />,
           },
           {
             key: "gpu-metrics",
             label: "GPU 指标",
             content: (
-              <InstanceMetrics
-                gpuOnly
+              <InstanceGpuMetrics
                 instanceId={instanceId}
-                instanceType="gpu_container"
                 gpuModel={record.gpu_summary?.model_key}
                 gpuCount={record.gpu_summary?.devices_per_instance}
               />

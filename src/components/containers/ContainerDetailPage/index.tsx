@@ -174,7 +174,7 @@ export default function ContainerDetailPage({
           {
             key: "monitoring",
             label: "资源监控",
-            content: <InstanceMetrics instanceId={instanceId} instanceType="container" />,
+            content: <InstanceMetrics instanceId={instanceId} />,
           },
           {
             key: "logs",
