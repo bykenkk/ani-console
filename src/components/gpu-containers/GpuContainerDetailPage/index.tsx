@@ -19,7 +19,7 @@ import InstanceVersions from "@/components/instances/InstanceVersions";
 import InstanceConfiguration from "@/components/instances/InstanceConfiguration";
 import InstanceEvents from "@/components/instances/InstanceEvents";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
-import InstanceNetwork from "@/components/instances/InstanceNetwork";
+import ContainerNetwork from "@/components/instances/ContainerNetwork";
 import InstanceOperations from "@/components/instances/InstanceOperations";
 import ContainerStorage from "@/components/containers/ContainerStorage";
 
@@ -179,12 +179,7 @@ export default function GpuContainerDetailPage({
           {
             key: "configuration",
             label: "配置",
-            content: (
-              <InstanceConfiguration
-                configuration={configuration.data}
-                loading={configuration.isFetching}
-              />
-            ),
+            content: <InstanceConfiguration configuration={configuration.data} />,
           },
           {
             key: "storage",
@@ -193,7 +188,6 @@ export default function GpuContainerDetailPage({
               <ContainerStorage
                 instance={record}
                 configuration={configuration.data}
-                loading={current.isFetching || configuration.isFetching}
                 onRefresh={() => Promise.all([current.refetch(), configuration.refetch()])}
               />
             ),
@@ -201,19 +195,12 @@ export default function GpuContainerDetailPage({
           {
             key: "network",
             label: "网络",
-            content: (
-              <InstanceNetwork
-                instance={record}
-                busy={Boolean(record.activeOperationId) || record.desiredState === "deleted"}
-                configuration={configuration.data}
-                loading={configuration.isFetching}
-              />
-            ),
+            content: <ContainerNetwork instance={record} configuration={configuration.data} />,
           },
           {
             key: "monitoring",
             label: "资源监控",
-            content: <InstanceMetrics instanceId={instanceId} computeType={record.compute_type} />,
+            content: <InstanceMetrics instanceId={instanceId} instanceType="gpu_container" />,
           },
           {
             key: "gpu-metrics",
@@ -222,7 +209,7 @@ export default function GpuContainerDetailPage({
               <InstanceMetrics
                 gpuOnly
                 instanceId={instanceId}
-                computeType={record.compute_type}
+                instanceType="gpu_container"
                 gpuModel={record.gpu_summary?.model_key}
                 gpuCount={record.gpu_summary?.devices_per_instance}
               />

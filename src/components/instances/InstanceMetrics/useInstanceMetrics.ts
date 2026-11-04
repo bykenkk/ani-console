@@ -110,7 +110,7 @@ function metricChart(
   };
 }
 
-export function useGovernanceMetrics(instanceId?: string, hasGpuMetrics = false) {
+export function useInstanceMetrics(instanceId?: string, hasGpuMetrics = false) {
   // 缺失点保留 null，不补零。
   const latest = useQuery({
     queryKey: ["instance-metrics-latest", instanceId],

@@ -10,7 +10,6 @@ import { useState } from "react";
 type ContainerStorageProps = {
   instance: InstanceRecord;
   configuration?: InstanceConfigurationData;
-  loading?: boolean;
   onRefresh: () => Promise<unknown>;
 };
 // TODO(feature-visibility): 待文件存储支持后随 NFS 区域恢复行类型。
@@ -25,7 +24,6 @@ type ContainerStorageProps = {
 export default function ContainerStorage({
   instance,
   configuration,
-  loading = false,
   onRefresh,
 }: ContainerStorageProps) {
   const [dialog, setDialog] = useState<
@@ -35,7 +33,6 @@ export default function ContainerStorage({
   const submitting = useIsMutating({ mutationKey: ["instance-command"] }) > 0;
   const unavailable =
     !configuration ||
-    loading ||
     Boolean(dialog) ||
     submitting ||
     Boolean(configuration.pending_change) ||
@@ -55,14 +52,11 @@ export default function ContainerStorage({
               >
                 挂载云盘
               </Button>
-              <Button loading={loading} onClick={onRefresh}>
-                刷新
-              </Button>
+              <Button onClick={onRefresh}>刷新</Button>
             </div>
           ),
         }}
         data={configuration?.volume_mounts ?? []}
-        loading={loading}
         rowKey={(volume) => `${volume.pvc_name}:${volume.mount_path}`}
         pagination={false}
         rowActions={[

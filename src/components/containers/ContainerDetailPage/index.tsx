@@ -19,7 +19,7 @@ import InstanceVersions from "@/components/instances/InstanceVersions";
 import InstanceEvents from "@/components/instances/InstanceEvents";
 import InstanceConfiguration from "@/components/instances/InstanceConfiguration";
 import ContainerStorage from "@/components/containers/ContainerStorage";
-import InstanceNetwork from "@/components/instances/InstanceNetwork";
+import ContainerNetwork from "@/components/instances/ContainerNetwork";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceOperations from "@/components/instances/InstanceOperations";
 
@@ -153,12 +153,7 @@ export default function ContainerDetailPage({
           {
             key: "configuration",
             label: "配置",
-            content: (
-              <InstanceConfiguration
-                configuration={configuration.data}
-                loading={configuration.isFetching}
-              />
-            ),
+            content: <InstanceConfiguration configuration={configuration.data} />,
           },
           {
             key: "storage",
@@ -167,7 +162,6 @@ export default function ContainerDetailPage({
               <ContainerStorage
                 instance={record}
                 configuration={configuration.data}
-                loading={current.isFetching || configuration.isFetching}
                 onRefresh={() => Promise.all([current.refetch(), configuration.refetch()])}
               />
             ),
@@ -175,19 +169,12 @@ export default function ContainerDetailPage({
           {
             key: "network",
             label: "网络",
-            content: (
-              <InstanceNetwork
-                instance={record}
-                busy={Boolean(record.activeOperationId) || record.desiredState === "deleted"}
-                configuration={configuration.data}
-                loading={configuration.isFetching}
-              />
-            ),
+            content: <ContainerNetwork instance={record} configuration={configuration.data} />,
           },
           {
             key: "monitoring",
             label: "资源监控",
-            content: <InstanceMetrics instanceId={instanceId} computeType={record.compute_type} />,
+            content: <InstanceMetrics instanceId={instanceId} instanceType="container" />,
           },
           {
             key: "logs",

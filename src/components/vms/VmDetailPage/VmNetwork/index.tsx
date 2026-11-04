@@ -1,24 +1,15 @@
 import { Descriptions } from "@arco-design/web-react";
 import type { VirtualMachine, VmResourceReference } from "@/api/vms";
-import { DataTable } from "@/components/common";
 import VmIpAddresses from "./VmIpAddresses";
-import InstanceNetworkInterfaces from "@/components/instances/InstanceNetworkInterfaces";
+import VmNetworkInterfaces from "@/components/vms/VmNetworkInterfaces";
 
-type VmNetworkProps = { vm: VirtualMachine; busy: boolean };
+type VmNetworkProps = { vm: VirtualMachine };
 
-export default function VmNetwork({ vm, busy }: VmNetworkProps) {
+export default function VmNetwork({ vm }: VmNetworkProps) {
   const referenceName = (reference?: VmResourceReference) =>
     reference?.name || (reference?.state === "NOT_FOUND" ? "资源不可用" : "名称暂不可用");
   return (
     <div className="flex flex-col gap-4">
-      <InstanceNetworkInterfaces
-        consumerKind="vm"
-        consumerId={vm.id}
-        resourceVersion={vm.version}
-        running={vm.observedState === "Running"}
-        stopped={vm.observedState === "Stopped"}
-        busy={busy}
-      />
       <Descriptions
         title="网络配置"
         size="medium"
@@ -63,22 +54,7 @@ export default function VmNetwork({ vm, busy }: VmNetworkProps) {
           },
         ]}
       />
-      <DataTable
-        header={{ title: "网卡信息" }}
-        data={vm.runtime?.interfaces ?? []}
-        rowKey={(nic) => `${nic.name}:${nic.mac}`}
-        pagination={false}
-        tableLabel="云主机网卡信息"
-        columns={[
-          { title: "网卡名称", dataIndex: "guestName", width: 140 },
-          { title: "MAC 地址", dataIndex: "mac", width: 180 },
-          {
-            title: "IP 地址",
-            width: 230,
-            render: (_, nic) => <VmIpAddresses addresses={nic.addresses ?? []} />,
-          },
-        ]}
-      />
+      <VmNetworkInterfaces vm={vm} />
     </div>
   );
 }

@@ -169,21 +169,13 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
           {
             key: "network",
             label: "网络",
-            content: (
-              <VmNetwork
-                vm={vm}
-                busy={
-                  vm.closing ||
-                  ["Starting", "Stopping", "Deleting", "Provisioning"].includes(vm.observedState)
-                }
-              />
-            ),
+            content: <VmNetwork vm={vm} />,
           },
           { key: "snapshots", label: "快照", content: <VmSnapshots vm={vm} /> },
           {
             key: "monitoring",
             label: "资源监控",
-            content: <InstanceMetrics instanceId={vm.id} />,
+            content: <InstanceMetrics instanceId={vm.id} instanceType="vm" />,
           },
           {
             key: "logs",

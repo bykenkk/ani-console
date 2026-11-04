@@ -3,19 +3,14 @@ import type { InstanceConfigurationData } from "@/api/instances";
 
 type InstanceConfigurationProps = {
   configuration?: InstanceConfigurationData;
-  loading?: boolean;
 };
 
-export default function InstanceConfiguration({
-  configuration,
-  loading = false,
-}: InstanceConfigurationProps) {
+export default function InstanceConfiguration({ configuration }: InstanceConfigurationProps) {
   return (
     <div className="flex w-full flex-col gap-4">
       <DataTable
         header={{ title: "环境变量" }}
         data={configuration?.env ?? []}
-        loading={loading}
         rowKey="name"
         pagination={false}
         columns={[

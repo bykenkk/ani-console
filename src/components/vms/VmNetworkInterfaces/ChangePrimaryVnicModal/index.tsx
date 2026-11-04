@@ -1,38 +1,33 @@
 import { useState } from "react";
 import { Alert, Form, Modal, Radio } from "@arco-design/web-react";
-import type {
-  InstanceNetworkInterface,
-  NetworkInterfaceChoice,
-  VnicConsumerKind,
-} from "@/api/network";
+import type { InstanceNetworkInterface, NetworkInterfaceChoice } from "@/api/network";
 import { useInstanceNetworkActions } from "@/hooks/useInstanceNetworkActions";
 import { validateForm } from "@/lib/form";
 import VnicSelect from "@/components/vnics/VnicSelect";
 
-type InstanceNetworkInterfaceModalProps = {
-  consumerKind: VnicConsumerKind;
+type ChangePrimaryVnicModalProps = {
   consumerId: string;
   version: string;
   current?: InstanceNetworkInterface;
   onCancel: () => void;
 };
-export default function InstanceNetworkInterfaceModal({
-  consumerKind,
+export default function ChangePrimaryVnicModal({
   consumerId,
   version,
   current,
   onCancel,
-}: InstanceNetworkInterfaceModalProps) {
+}: ChangePrimaryVnicModalProps) {
   const [form] = Form.useForm();
   const [mode, setMode] = useState<NetworkInterfaceChoice["mode"]>(
     current?.desired.mode ?? "automatic",
   );
   const [vnicId, setVnicId] = useState(current?.desired.vnic_id);
-  const save = useInstanceNetworkActions(consumerKind, consumerId, onCancel);
+  const save = useInstanceNetworkActions("vm", consumerId, onCancel);
   return (
     <Modal
       visible
-      title="切换主网卡"
+      title="修改主网卡配置"
+      okText="保存配置"
       onCancel={onCancel}
       confirmLoading={save.isPending}
       onOk={async () => {
@@ -45,21 +40,21 @@ export default function InstanceNetworkInterfaceModal({
       }}
     >
       <Form form={form} layout="vertical">
-        <Form.Item label="使用模式">
+        <Form.Item label="网卡分配方式">
           <Radio.Group value={mode} onChange={setMode}>
             <Radio value="automatic">自动分配</Radio>
-            <Radio value="manual">使用手动网卡</Radio>
+            <Radio value="manual">选择已有网卡</Radio>
           </Radio.Group>
         </Form.Item>
         {mode === "manual" && (
           <Form.Item
             field="vnic"
-            label="目标网卡"
+            label="选择网卡"
             initialValue={vnicId}
-            rules={[{ required: true, message: "请选择目标网卡" }]}
+            rules={[{ required: true, message: "请选择已有网卡" }]}
           >
             <VnicSelect
-              consumerKind={consumerKind}
+              consumerKind="vm"
               consumerId={consumerId}
               value={vnicId}
               onChange={setVnicId}
@@ -67,16 +62,16 @@ export default function InstanceNetworkInterfaceModal({
           </Form.Item>
         )}
         <div className="mb-4">
-          当前网卡：{current?.current_vnic_name || "无已确认在线端点"}
+          当前网卡：{current?.current_vnic_name || "暂未获取"}
           <br />
-          当前地址：{current?.current_ips?.join(" · ") || "-"}
+          当前 IP 地址：{current?.current_ips?.join(" · ") || "-"}
         </div>
         <Alert
           type="info"
           content={
             mode === "automatic"
-              ? "保存后恢复子网自动分配，IP 可能变化。运行实例需重启生效，停止实例在下次启动使用。原手动网卡及地址仍保留。"
-              : "保存配置不会重启实例。运行实例需重启生效，停止实例在下次启动使用。目标网卡继承实例安全组。"
+              ? "自动分配时，IP 地址可能变化，原网卡及其 IP 地址将保留。配置将在实例重启或下次启动时生效。保存配置不会自动重启实例。"
+              : "配置将在实例重启后生效；已停止的实例将在下次启动时生效。保存配置不会自动重启实例。所选网卡将继承实例的安全组配置。"
           }
         />
       </Form>

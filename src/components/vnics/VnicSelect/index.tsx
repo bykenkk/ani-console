@@ -29,7 +29,7 @@ export default function VnicSelect({ consumerKind, consumerId, value, onChange }
   });
   return (
     <Select
-      placeholder="选择手动网卡"
+      placeholder="请选择已有网卡"
       showSearch
       filterOption={false}
       onSearch={setName}

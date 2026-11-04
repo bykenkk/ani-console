@@ -18,13 +18,13 @@ import type {
   UpdateInferenceRequest,
 } from "./types";
 
-const createScope = createIdempotencyScope("governance-inference-create", ["POST"]);
-const deleteScope = createIdempotencyScope("governance-inference-delete", ["POST"]);
-const updateScope = createIdempotencyScope("governance-inference-update", ["POST"]);
+const createScope = createIdempotencyScope("inference-create", ["POST"]);
+const deleteScope = createIdempotencyScope("inference-delete", ["POST"]);
+const updateScope = createIdempotencyScope("inference-update", ["POST"]);
 const commandScopes = {
-  start: createIdempotencyScope("governance-inference-start", ["POST"]),
-  stop: createIdempotencyScope("governance-inference-stop", ["POST"]),
-  restart: createIdempotencyScope("governance-inference-restart", ["POST"]),
+  start: createIdempotencyScope("inference-start", ["POST"]),
+  stop: createIdempotencyScope("inference-stop", ["POST"]),
+  restart: createIdempotencyScope("inference-restart", ["POST"]),
 };
 const servicePath = (id: string) => `/inference/services/${encodeURIComponent(id)}`;
 

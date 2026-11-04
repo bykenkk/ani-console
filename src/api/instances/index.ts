@@ -34,15 +34,15 @@ import type {
   InstanceMetricsLatestResponse,
 } from "./types";
 
-const createScope = createIdempotencyScope("governance-instance-create", ["POST"]);
-const startScope = createIdempotencyScope("governance-instance-start", ["POST"]);
-const stopScope = createIdempotencyScope("governance-instance-stop", ["POST"]);
+const createScope = createIdempotencyScope("instance-create", ["POST"]);
+const startScope = createIdempotencyScope("instance-start", ["POST"]);
+const stopScope = createIdempotencyScope("instance-stop", ["POST"]);
 const restartScope = createIdempotencyScope("instance-restart", ["POST"]);
 const attachScope = createIdempotencyScope("instance-attach-pvc", ["POST"]);
 const detachScope = createIdempotencyScope("instance-detach-pvc", ["POST"]);
-const deleteScope = createIdempotencyScope("governance-instance-delete", ["DELETE"]);
+const deleteScope = createIdempotencyScope("instance-delete", ["DELETE"]);
 const securityGroupsScope = createIdempotencyScope("instance-security-groups", ["PUT"]);
-const execScope = createIdempotencyScope("governance-instance-exec", ["POST"]);
+const execScope = createIdempotencyScope("instance-exec", ["POST"]);
 const instancePath = (id: string) => `/instances/${encodeURIComponent(id)}`;
 export function listInstances(params: InstanceListParams = {}, signal?: AbortSignal) {
   // 不传 observedState 时由服务端排除已删除实例，筛选与 total 均由服务端计算。

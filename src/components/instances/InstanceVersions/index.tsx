@@ -18,7 +18,7 @@ export default function InstanceVersions({ currentImage }: InstanceVersionsProps
         header={{
           title: "当前镜像",
           extra: (
-            <Button disabled title="更新镜像暂未开放">
+            <Button type="primary" disabled title="更新镜像暂未开放">
               更新镜像
             </Button>
           ),

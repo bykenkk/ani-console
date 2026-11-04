@@ -1,12 +1,11 @@
 import { Card, Empty, Grid, Statistic } from "@arco-design/web-react";
-import type { ComputeType } from "@/api/instances";
 import { CoreLineBarChart } from "@/components/common";
 import InstanceGpuMetrics from "./InstanceGpuMetrics";
-import { useGovernanceMetrics } from "./useGovernanceMetrics";
+import { useInstanceMetrics } from "./useInstanceMetrics";
 
 type InstanceMetricsProps = {
   instanceId?: string;
-  computeType?: ComputeType;
+  instanceType: "vm" | "container" | "gpu_container";
   gpuOnly?: boolean;
   gpuModel?: string;
   gpuCount?: number;
@@ -14,15 +13,15 @@ type InstanceMetricsProps = {
 
 export default function InstanceMetrics({
   instanceId,
-  computeType,
+  instanceType,
   gpuOnly = false,
   gpuModel,
   gpuCount,
 }: InstanceMetricsProps) {
   // TODO(instance-metrics): 沙箱监控契约尚未提供，调用方保留模板空态，待补齐后传入正式实例 ID。
-  const metrics = useGovernanceMetrics(instanceId, computeType === "gpu");
+  const metrics = useInstanceMetrics(instanceId, instanceType === "gpu_container");
   const statistics = metrics.statistics;
-  if (gpuOnly && computeType === "gpu") {
+  if (gpuOnly && instanceType === "gpu_container") {
     return (
       <InstanceGpuMetrics
         gpuModel={gpuModel}
