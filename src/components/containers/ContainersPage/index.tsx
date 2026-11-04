@@ -12,7 +12,6 @@ import { useListPagination } from "@/hooks/useListPagination";
 import { useContainerActions } from "@/hooks/useContainerActions";
 import ContainerCreateModal from "@/components/containers/ContainerCreateModal";
 import { formatDateTime } from "@/lib/format";
-import InstanceOperationObserver from "@/components/instances/InstanceOperationObserver";
 
 type StatusFilter = "all" | Exclude<ObservedState, "deleted">;
 export default function ContainersPage() {
@@ -75,17 +74,18 @@ export default function ContainersPage() {
     },
     {
       key: "compute",
-      title: "CPU / 内存",
+      title: "规格",
       width: 160,
-      render: (_, row) => [row.cpu, row.memory].filter(Boolean).join(" / ") || "-",
+      ellipsis: true,
+      render: (_, row) => row.preset_name || row.preset_code || "-",
     },
 
-    { key: "image", title: "镜像 ID", dataIndex: "imageId", width: 220, ellipsis: true },
+    { key: "image", title: "镜像", dataIndex: "imageId", width: 220, ellipsis: true },
     // FIXME(governance-instance-columns): 新列表缺少副本、发布、节点、访问地址和保护字段，原列保留空占位，不补拉旧列表。
     // TODO(governance-instance-columns): 契约补齐后逐列接入，不能用 observedState/Pod IP 等替代旧字段。
     { key: "replicas", title: "副本", width: 80 },
     { key: "rollout", title: "发布", width: 120 },
-    { key: "node", title: "节点", width: 140 },
+    { key: "node", title: "所在节点", width: 140 },
     { key: "endpoint", title: "访问地址", width: 160 },
     { key: "protection", title: "终止保护", width: 120 },
     {
@@ -163,14 +163,6 @@ export default function ContainersPage() {
           }}
         />
       )}
-      {(query.data?.items ?? []).map((instance) => (
-        <InstanceOperationObserver
-          key={instance.id}
-          instanceId={instance.id}
-          computeType={instance.compute_type}
-          operationId={instance.activeOperationId}
-        />
-      ))}
       {dialogNode}
     </>
   );

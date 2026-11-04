@@ -37,14 +37,16 @@ export default function InstanceEvents({ instanceId }: InstanceEventsProps) {
             title: "类型",
             width: 100,
             render: (_, event) => (
-              <Tag color={event.type === "Warning" ? "orangered" : "green"}>{event.type}</Tag>
+              <Tag color={event.type === "Warning" ? "orangered" : "green"}>
+                {event.type === "Normal" ? "正常" : event.type === "Warning" ? "警告" : event.type}
+              </Tag>
             ),
           },
           { title: "原因", dataIndex: "reason", width: 180 },
-          { title: "消息", width: 400, dataIndex: "message", ellipsis: true },
+          { title: "事件内容", width: 400, dataIndex: "message", ellipsis: true },
           { title: "次数", dataIndex: "count", width: 80 },
           {
-            title: "发生时间",
+            title: "最近发生时间",
             width: 180,
             render: (_, event) =>
               event.lastOccurredAt ? formatDateTime(event.lastOccurredAt) : "-",

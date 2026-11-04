@@ -6,7 +6,6 @@ import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ImageNameText,
   ResourceId,
   StatusBadge,
 } from "@/components/common";
@@ -22,8 +21,7 @@ import InstanceEvents from "@/components/instances/InstanceEvents";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceNetwork from "@/components/instances/InstanceNetwork";
 import InstanceOperations from "@/components/instances/InstanceOperations";
-import InstanceStorage from "@/components/instances/InstanceStorage";
-import InstanceOperationObserver from "@/components/instances/InstanceOperationObserver";
+import ContainerStorage from "@/components/containers/ContainerStorage";
 
 type GpuContainerDetailPageProps = {
   instanceId: string;
@@ -118,12 +116,15 @@ export default function GpuContainerDetailPage({
               // FIXME(instance-basic): 当前实例合同未提供保护、Provider、发布、身份、安全组、负载均衡和调用地址，保留字段空态。
               // TODO(instance-basic): 上述正式字段对齐并联调验证后逐项接入，不补查其他系统实例。
               { label: "终止保护", value: "-" },
-              { label: "镜像", value: <ImageNameText image={record.imageId} /> },
-              { label: "Provider", value: "-" },
-              { label: "节点", value: runtime.data?.pod?.nodeName ?? "-" },
               {
-                label: "CPU / 内存",
-                value: [record.cpu, record.memory].filter(Boolean).join(" / ") || "-",
+                label: "镜像",
+                value: record.imageId ? <ResourceId value={record.imageId} /> : "-",
+              },
+              { label: "Provider", value: "-" },
+              { label: "所在节点", value: runtime.data?.pod?.nodeName ?? "-" },
+              {
+                label: "规格",
+                value: record.preset_name || record.preset_code || "-",
               },
               {
                 label: "GPU",
@@ -132,11 +133,15 @@ export default function GpuContainerDetailPage({
                   : "-",
               },
               {
-                label: "副本",
-                value:
-                  String(runtime.data?.statefulSet?.readyReplicas ?? "-") +
-                  " / " +
-                  String(runtime.data?.statefulSet?.desiredReplicas ?? "-"),
+                label: "就绪副本",
+                value: (
+                  <Tooltip content="就绪副本 / 期望副本">
+                    <span>
+                      {runtime.data?.statefulSet?.readyReplicas ?? "-"} /{" "}
+                      {runtime.data?.statefulSet?.desiredReplicas ?? "-"}
+                    </span>
+                  </Tooltip>
+                ),
               },
               { label: "修订 / 发布", value: "-" },
               { label: "Workload Identity", value: "-" },
@@ -185,11 +190,11 @@ export default function GpuContainerDetailPage({
             key: "storage",
             label: "数据卷",
             content: (
-              <InstanceStorage
+              <ContainerStorage
                 instance={record}
                 configuration={configuration.data}
-                runtime={runtime.data}
-                loading={configuration.isFetching}
+                loading={current.isFetching || configuration.isFetching}
+                onRefresh={() => Promise.all([current.refetch(), configuration.refetch()])}
               />
             ),
           },
@@ -246,12 +251,6 @@ export default function GpuContainerDetailPage({
         activeTabKey={tab}
         onTabChange={onTabChange}
         onBack={goBack}
-      />
-      <InstanceOperationObserver
-        key={instanceId}
-        instanceId={instanceId}
-        computeType={record.compute_type}
-        operationId={record.activeOperationId}
       />
       {dialogNode}
     </>

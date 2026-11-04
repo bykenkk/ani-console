@@ -1,4 +1,4 @@
-import { Button, Empty } from "@arco-design/web-react";
+import { Button, Empty, Tooltip } from "@arco-design/web-react";
 import { getInstance, getInstanceConfiguration, getInstanceRuntime } from "@/api/instances";
 import { useQuery } from "@tanstack/react-query";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
@@ -18,11 +18,10 @@ import InstanceLogs from "@/components/instances/InstanceLogs";
 import InstanceVersions from "@/components/instances/InstanceVersions";
 import InstanceEvents from "@/components/instances/InstanceEvents";
 import InstanceConfiguration from "@/components/instances/InstanceConfiguration";
-import InstanceStorage from "@/components/instances/InstanceStorage";
+import ContainerStorage from "@/components/containers/ContainerStorage";
 import InstanceNetwork from "@/components/instances/InstanceNetwork";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceOperations from "@/components/instances/InstanceOperations";
-import InstanceOperationObserver from "@/components/instances/InstanceOperationObserver";
 
 type ContainerDetailPageProps = {
   instanceId: string;
@@ -78,11 +77,11 @@ export default function ContainerDetailPage({
         headerItems={[
           { label: "镜像", value: record.imageId || "-" },
           {
-            label: "CPU / 内存",
-            value: [record.cpu || "-", record.memory || "-"].join(" / "),
+            label: "规格",
+            value: record.preset_name || record.preset_code || "-",
           },
-          // TODO(container-private-ip): 当前契约未返回私网 IP，待正式字段补齐后接入，不以 Pod IP 替代。
-          { label: "私网 IP", value: "-" },
+          // TODO(container-private-ip): 当前契约未返回 IP 地址，待正式字段补齐后接入。
+          { label: "IP 地址", value: "-" },
         ]}
         actions={
           <div className="flex items-center gap-2">
@@ -106,29 +105,42 @@ export default function ContainerDetailPage({
             title: "基本信息",
             fields: [
               { label: "ID", value: <ResourceId value={record.id} /> },
-              { label: "节点", value: runtime.data?.pod?.nodeName ?? "-" },
+              { label: "所在节点", value: runtime.data?.pod?.nodeName ?? "-" },
               { label: "创建时间", value: formatDateTime(record.createdAt) },
               // FIXME(container-basic): 当前详情无更新时间和终止保护，不能从其他实例契约补齐。
               // TODO(container-basic): 后端提供正式字段后接入，保留现有字段位置。
+              {
+                label: "就绪副本",
+                value: (
+                  <Tooltip content="就绪副本 / 期望副本">
+                    <span>
+                      {runtime.data?.statefulSet?.readyReplicas ?? "-"} /{" "}
+                      {runtime.data?.statefulSet?.desiredReplicas ?? "-"}
+                    </span>
+                  </Tooltip>
+                ),
+              },
+              // FIXME(container-release): 当前无访问地址，不能用 Pod IP 替代。
+              // TODO(container-release): 后端提供访问地址契约后补齐。
+              { label: "访问地址", value: "-" },
+              {
+                label: "VPC",
+                value: configuration.data?.network?.vpc_id ? (
+                  <ResourceId value={configuration.data.network.vpc_id} />
+                ) : (
+                  "-"
+                ),
+              },
+              {
+                label: "子网",
+                value: configuration.data?.network?.subnet_id ? (
+                  <ResourceId value={configuration.data.network.subnet_id} />
+                ) : (
+                  "-"
+                ),
+              },
               { label: "更新时间", value: "-" },
               { label: "终止保护", value: "-" },
-            ],
-          },
-          {
-            key: "resource",
-            title: "资源状态",
-            defaultCollapsed: true,
-            fields: [
-              {
-                label: "副本",
-                value: `${runtime.data?.statefulSet?.readyReplicas ?? "-"}/${runtime.data?.statefulSet?.desiredReplicas ?? "-"}`,
-              },
-              // FIXME(container-release): 当前无发布状态和访问地址，不能用 Pod 状态或 IP 替代。
-              // TODO(container-release): 后端提供发布与地址契约后补齐。
-              { label: "发布状态", value: "-" },
-              { label: "访问地址", value: "-" },
-              { label: "VPC", value: configuration.data?.network?.vpc_id ?? "-" },
-              { label: "子网", value: configuration.data?.network?.subnet_id ?? "-" },
             ],
           },
         ]}
@@ -152,11 +164,11 @@ export default function ContainerDetailPage({
             key: "storage",
             label: "数据卷",
             content: (
-              <InstanceStorage
+              <ContainerStorage
                 instance={record}
                 configuration={configuration.data}
-                runtime={runtime.data}
-                loading={configuration.isFetching}
+                loading={current.isFetching || configuration.isFetching}
+                onRefresh={() => Promise.all([current.refetch(), configuration.refetch()])}
               />
             ),
           },
@@ -200,12 +212,6 @@ export default function ContainerDetailPage({
         activeTabKey={tab}
         onTabChange={onTabChange}
         onBack={goBack}
-      />
-      <InstanceOperationObserver
-        key={instanceId}
-        instanceId={instanceId}
-        computeType={record.compute_type}
-        operationId={record.activeOperationId}
       />
       {dialogNode}
     </>

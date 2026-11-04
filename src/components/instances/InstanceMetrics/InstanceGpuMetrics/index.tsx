@@ -22,7 +22,7 @@ export default function InstanceGpuMetrics({
   loading,
   trendLoading,
 }: InstanceGpuMetricsProps) {
-  const gpuModelSummary = gpuModel ? `${gpuModel}×${gpuCount ?? "-"}` : "-";
+  const gpuModelSummary = gpuModel ? `${gpuModel} × ${gpuCount ?? "-"}` : "-";
   return (
     <Grid.Row gutter={[16, 16]}>
       <Grid.Col span={24}>
@@ -35,14 +35,14 @@ export default function InstanceGpuMetrics({
             </Grid.Col>
             <Grid.Col span={8}>
               <div className="px-3 py-2">
-                <Statistic title="显存" value={metrics.memoryUsage} />
+                <Statistic title="显存使用量" value={metrics.memoryUsage} />
               </div>
             </Grid.Col>
             <Grid.Col span={8}>
               <Tooltip content={gpuModelSummary} disabled={!gpuModel}>
                 <div className="min-w-0 overflow-hidden px-3 py-2">
                   <Statistic
-                    title="型号 × 数量"
+                    title="GPU 配置"
                     className="w-full"
                     value={gpuModelSummary}
                     styleValue={{

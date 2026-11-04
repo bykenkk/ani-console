@@ -1,4 +1,4 @@
-import { Checkbox, Form, Input, Modal } from "@arco-design/web-react";
+import { Form, Input, Modal, Switch } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   attachInstancePvc,
@@ -122,15 +122,22 @@ export default function InstanceAttachPvcModal({
             configuration.data?.volume_mounts.length === 8 ? "最多支持 8 个附加挂载" : undefined
           }
         >
-          <Input placeholder="例如 /data" />
+          <Input placeholder="请输入挂载路径" />
         </Form.Item>
-        <Form.Item field="read_only" triggerPropName="checked">
-          <Checkbox>只读挂载</Checkbox>
+        <Form.Item
+          field="read_only"
+          label="只读挂载"
+          triggerPropName="checked"
+          extra="开启后以只读方式挂载云盘。"
+        >
+          <Switch />
         </Form.Item>
         {running && (
           <Form.Item
             field="restart_if_running"
+            label="允许重启"
             triggerPropName="checked"
+            extra="会中断容器进程和终端会话，内存及临时数据可能丢失，PVC 数据保留。"
             rules={[
               {
                 validator: (value, callback) =>
@@ -138,9 +145,7 @@ export default function InstanceAttachPvcModal({
               },
             ]}
           >
-            <Checkbox>
-              允许重启：会中断容器进程和终端会话，内存及临时数据可能丢失，PVC 数据保留
-            </Checkbox>
+            <Switch />
           </Form.Item>
         )}
       </Form>

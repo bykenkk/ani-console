@@ -1,4 +1,3 @@
-import { Space } from "@arco-design/web-react";
 import { DataTable } from "@/components/common";
 import type { InstanceConfigurationData } from "@/api/instances";
 
@@ -12,7 +11,7 @@ export default function InstanceConfiguration({
   loading = false,
 }: InstanceConfigurationProps) {
   return (
-    <Space direction="vertical" size={24} className="w-full">
+    <div className="flex w-full flex-col gap-4">
       <DataTable
         header={{ title: "环境变量" }}
         data={configuration?.env ?? []}
@@ -43,6 +42,6 @@ export default function InstanceConfiguration({
           { title: "用途", width: 140, dataIndex: "purpose" },
         ]}
       />
-    </Space>
+    </div>
   );
 }

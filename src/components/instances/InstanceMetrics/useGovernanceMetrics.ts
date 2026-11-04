@@ -75,7 +75,7 @@ function metricChart(
   return {
     tooltip: { trigger: "axis" },
     legend: { bottom: 0 },
-    grid: { left: 85, right: 30, top: 35, bottom: 48 },
+    grid: { left: 8, right: 16, top: 32, bottom: 40, containLabel: true },
     xAxis: {
       type: "category",
       boundaryGap: false,
@@ -86,8 +86,11 @@ function metricChart(
       min: 0,
       name: METRIC_UNIT_LABELS[unit],
       axisLine: { onZero: false },
-      axisLabel:
-        unit === "cores" ? undefined : { formatter: (value: number) => metricValue(value, unit) },
+      axisLabel: {
+        show: true,
+        formatter: (value: number) =>
+          unit === "cores" ? String(Number(value.toPrecision(3))) : metricValue(value, unit),
+      },
     },
     series: series.map((item) => {
       const points = new Map(item.points.map((point) => [point.timestamp, point.value]));
