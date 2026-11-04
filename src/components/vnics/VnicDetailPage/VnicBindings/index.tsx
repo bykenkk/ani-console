@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { DataTable } from "@/components/common";
 import type { NetworkVnicBinding } from "@/api/network";
 import UnbindVnicButton from "./UnbindVnicButton";
@@ -22,18 +21,7 @@ export default function VnicBindings({ bindings }: VnicBindingsProps) {
           width: 280,
           render: (_, item) => (
             <div>
-              <Link
-                to={
-                  item.consumer_kind === "vm"
-                    ? "/vms/$instanceId"
-                    : item.compute_type === "gpu"
-                      ? "/gpu-containers/$instanceId"
-                      : "/containers/$instanceId"
-                }
-                params={{ instanceId: item.consumer_id }}
-              >
-                {item.consumer_name || item.consumer_id}
-              </Link>
+              <span>{item.consumer_name || item.consumer_id}</span>
               <div>{item.consumer_name ? item.consumer_id : ""}</div>
             </div>
           ),

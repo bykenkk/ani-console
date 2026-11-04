@@ -81,12 +81,8 @@ export default function VnicsPage() {
       width: 260,
       render: (_, item) => (
         <div className="flex min-w-0 flex-col">
-          <Link to="/vpcs/$vpcId" params={{ vpcId: item.vpc_id }} className="truncate">
-            {item.vpc_name || item.vpc_id}
-          </Link>
-          <Link to="/subnets/$subnetId" params={{ subnetId: item.subnet_id }} className="truncate">
-            {item.subnet_name || item.subnet_id}
-          </Link>
+          <span className="truncate">{item.vpc_name || item.vpc_id}</span>
+          <span className="truncate">{item.subnet_name || item.subnet_id}</span>
         </div>
       ),
     },
@@ -103,18 +99,7 @@ export default function VnicsPage() {
         item.bindings?.length
           ? item.bindings.map((binding) => (
               <div key={binding.binding_id}>
-                <Link
-                  to={
-                    binding.consumer_kind === "vm"
-                      ? "/vms/$instanceId"
-                      : binding.compute_type === "gpu"
-                        ? "/gpu-containers/$instanceId"
-                        : "/containers/$instanceId"
-                  }
-                  params={{ instanceId: binding.consumer_id }}
-                >
-                  {binding.consumer_name || binding.consumer_id}
-                </Link>
+                <span>{binding.consumer_name || binding.consumer_id}</span>
               </div>
             ))
           : "-",

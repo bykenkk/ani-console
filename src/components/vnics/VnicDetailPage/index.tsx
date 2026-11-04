@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { getNetworkVnic } from "@/api/network";
 import {
   AliIcon,
@@ -65,19 +65,11 @@ export default function VnicDetailPage({ vnicId }: VnicDetailPageProps) {
               { label: "描述", value: vnic.description || "-" },
               {
                 label: "VPC",
-                value: (
-                  <Link to="/vpcs/$vpcId" params={{ vpcId: vnic.vpc_id }}>
-                    {vnic.vpc_name || vnic.vpc_id}
-                  </Link>
-                ),
+                value: vnic.vpc_name || vnic.vpc_id,
               },
               {
                 label: "子网",
-                value: (
-                  <Link to="/subnets/$subnetId" params={{ subnetId: vnic.subnet_id }}>
-                    {vnic.subnet_name || vnic.subnet_id}
-                  </Link>
-                ),
+                value: vnic.subnet_name || vnic.subnet_id,
               },
               { label: "创建时间", value: formatDateTime(vnic.created_at) },
             ],
@@ -114,14 +106,7 @@ export default function VnicDetailPage({ vnicId }: VnicDetailPageProps) {
                 label: vnic.bindings?.length ? "继承实例配置" : "保留上次配置",
                 value: vnic.security_group_ids?.length
                   ? vnic.security_group_ids.map((id, index) => (
-                      <div key={id}>
-                        <Link
-                          to="/security-groups/$securityGroupId"
-                          params={{ securityGroupId: id }}
-                        >
-                          {vnic.security_group_names?.[index] || id}
-                        </Link>
-                      </div>
+                      <div key={id}>{vnic.security_group_names?.[index] || id}</div>
                     ))
                   : "-",
               },

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Alert, Button, Modal, Tag } from "@arco-design/web-react";
 import { useIsMutating, useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
 import { getVmNetworkInterfaces } from "@/api/vms";
 import { getInstanceNetworkInterfaces } from "@/api/instances";
 import type { InstanceNetworkInterface, VnicConsumerKind } from "@/api/network";
@@ -148,9 +147,7 @@ export default function InstanceNetworkInterfaces({
             render: (_, item) => (
               <div>
                 {item.desired.mode === "manual" && item.desired.vnic_id ? (
-                  <Link to="/vnics/$vnicId" params={{ vnicId: item.desired.vnic_id }}>
-                    {item.desired.vnic_name || item.desired.vnic_id}
-                  </Link>
+                  <span>{item.desired.vnic_name || item.desired.vnic_id}</span>
                 ) : (
                   "子网自动分配"
                 )}
