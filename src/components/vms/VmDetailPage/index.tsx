@@ -199,7 +199,6 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
                   vm.closing ||
                   ["Starting", "Stopping", "Deleting", "Provisioning"].includes(vm.observedState)
                 }
-                onRestart={() => actions.find((action) => action.key === "restart")?.onClick(vm)}
               />
             ),
           },

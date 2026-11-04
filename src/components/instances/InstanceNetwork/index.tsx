@@ -7,7 +7,6 @@ type InstanceNetworkProps = {
   configuration?: InstanceConfigurationData;
   loading?: boolean;
   instance?: InstanceRecord;
-  onRestart?: () => void;
   busy?: boolean;
 };
 
@@ -15,7 +14,6 @@ export default function InstanceNetwork({
   configuration,
   loading = false,
   instance,
-  onRestart,
   busy = false,
 }: InstanceNetworkProps) {
   const rows: Array<{ name: string; value: ReactNode }> = [
@@ -28,7 +26,7 @@ export default function InstanceNetwork({
   ];
   return (
     <div className="flex flex-col gap-6">
-      {instance && onRestart && (
+      {instance && (
         <InstanceNetworkInterfaces
           consumerKind="container"
           consumerId={instance.id}
@@ -36,7 +34,6 @@ export default function InstanceNetwork({
           running={instance.observedState === "running"}
           stopped={instance.observedState === "stopped"}
           busy={busy}
-          onRestart={onRestart}
         />
       )}
       <DataTable

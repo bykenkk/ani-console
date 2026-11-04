@@ -6,7 +6,10 @@ import { getVmNetworkInterfaces } from "@/api/vms";
 import { getInstanceNetworkInterfaces } from "@/api/instances";
 import type { InstanceNetworkInterface, VnicConsumerKind } from "@/api/network";
 import { DataTable } from "@/components/common";
-import { useInstanceNetworkActions } from "@/hooks/useInstanceNetworkActions";
+import {
+  useInstanceNetworkActions,
+  useRestartInstanceNetwork,
+} from "@/hooks/useInstanceNetworkActions";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 import InstanceNetworkInterfaceModal from "../InstanceNetworkInterfaceModal";
@@ -18,7 +21,6 @@ type InstanceNetworkInterfacesProps = {
   running: boolean;
   stopped: boolean;
   busy: boolean;
-  onRestart: () => void;
 };
 
 export default function InstanceNetworkInterfaces({
@@ -28,7 +30,6 @@ export default function InstanceNetworkInterfaces({
   running,
   stopped,
   busy,
-  onRestart,
 }: InstanceNetworkInterfacesProps) {
   const [editing, setEditing] = useState(false);
   const network = useQuery({
@@ -46,6 +47,7 @@ export default function InstanceNetworkInterfaces({
   });
   const current = network.data?.items.find((item) => item.slot === "primary");
   const save = useInstanceNetworkActions(consumerKind, consumerId);
+  const restart = useRestartInstanceNetwork(consumerKind, consumerId);
   const ownerMutations = useIsMutating({
     mutationKey: [consumerKind === "vm" ? "vm-write" : "instance-command"],
   });
@@ -57,6 +59,7 @@ export default function InstanceNetworkInterfaces({
     Boolean(ownerMutations) ||
     configurationInProgress ||
     save.isPending ||
+    restart.isPending ||
     !network.data?.supported;
   const confirmAutomatic = () =>
     Modal.confirm({
@@ -77,6 +80,12 @@ export default function InstanceNetworkInterfaces({
         }),
     });
   };
+  const confirmRestart = () =>
+    Modal.confirm({
+      title: "重启并应用网卡",
+      content: `确认重启${consumerKind === "vm" ? "云主机" : "容器"} ${consumerId} 并应用待生效的主网卡配置？重启将中断业务连接和终端会话，内存及临时数据可能丢失。`,
+      onOk: () => restart.mutateAsync(),
+    });
   return (
     <div className="flex flex-col gap-3">
       {network.data && !network.data.supported && (
@@ -107,7 +116,8 @@ export default function InstanceNetworkInterfaces({
               </Button>
               <Button
                 disabled={disabled || !running || !current?.pending_restart}
-                onClick={onRestart}
+                loading={restart.isPending}
+                onClick={confirmRestart}
               >
                 重启并应用
               </Button>
