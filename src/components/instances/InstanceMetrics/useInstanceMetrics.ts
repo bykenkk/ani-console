@@ -9,6 +9,7 @@ import {
 import { getPreviousHoursDateTimeRange, formatTime } from "@/lib/date";
 import { formatBytes } from "@/lib/format";
 import { withId } from "@/lib/id";
+import { useInstanceGpuMemory } from "./useInstanceGpuMemory";
 
 const BASE_METRIC_CODES: InstanceMetricCode[] = ["cpu.usage_cores", "memory.working_set_bytes"];
 const METRIC_CODES: InstanceMetricCode[] = [
@@ -16,10 +17,7 @@ const METRIC_CODES: InstanceMetricCode[] = [
   "network.receive_bytes_per_second",
   "network.transmit_bytes_per_second",
 ];
-const GPU_METRIC_CODES: InstanceMetricCode[] = [
-  "gpu.utilization_percent",
-  "gpu.memory_usage_bytes",
-];
+const GPU_METRIC_CODES: InstanceMetricCode[] = ["gpu.utilization_percent"];
 const METRIC_LABELS: Record<InstanceMetricCode, string> = {
   "cpu.usage_cores": "CPU 使用量",
   "memory.working_set_bytes": "内存使用量",
@@ -111,6 +109,7 @@ function metricChart(
 }
 
 export function useInstanceMetrics(instanceId?: string, hasGpuMetrics = false) {
+  const gpuMemory = useInstanceGpuMemory(instanceId, hasGpuMetrics);
   // 缺失点保留 null，不补零。
   const latest = useQuery({
     queryKey: ["instance-metrics-latest", instanceId],
@@ -165,7 +164,7 @@ export function useInstanceMetrics(instanceId?: string, hasGpuMetrics = false) {
     return metricValue(series?.points[0]?.value, series?.unit);
   };
   const gpuUtilization = latestValue("gpu.utilization_percent");
-  const gpuMemoryUsage = latestValue("gpu.memory_usage_bytes");
+  const gpuMemoryUsage = gpuMemory.usage;
   const statistics = [
     { title: "CPU 使用量", value: latestValue("cpu.usage_cores") },
     { title: "内存使用量", value: latestValue("memory.working_set_bytes") },
@@ -200,12 +199,16 @@ export function useInstanceMetrics(instanceId?: string, hasGpuMetrics = false) {
   return {
     statistics,
     hasData: Boolean(latest.data),
-    loading: latest.isLoading,
-    trendLoading: range.isLoading,
+    loading: latest.isLoading || (hasGpuMetrics && gpuMemory.loading),
+    trendLoading: range.isLoading || (hasGpuMetrics && gpuMemory.trendLoading),
     charts: hasGpuMetrics ? [...charts, gpuChart] : charts,
     gpuMetrics: {
       utilization: gpuUtilization,
       memoryUsage: gpuMemoryUsage,
+      memoryLimit: gpuMemory.limit,
+      memoryStatus: gpuMemory.status,
+      memoryRangeStatus: gpuMemory.rangeStatus,
+      memoryChart: gpuMemory.chart,
       hasTrend: gpuChart.hasTrend,
       option: gpuChart.option,
     },
