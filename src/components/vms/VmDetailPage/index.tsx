@@ -11,7 +11,6 @@ import {
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import InstanceLogs from "@/components/instances/InstanceLogs";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
-import InstanceStorage from "@/components/instances/InstanceStorage";
 import { useVMActions } from "@/hooks/useVMActions";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
@@ -45,10 +44,6 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
   if (!detail.data) return <DetailPagePlaceholder loading={detail.isLoading} />;
   const vm = detail.data;
   const consoleAction = actions.find((action) => action.key === "console");
-  const compute = [
-    vm.cpuMillis ? `${Number(vm.cpuMillis) / 1000}C` : "-",
-    vm.memoryMib ? `${Number(vm.memoryMib) / 1024} GiB` : "-",
-  ].join(" / ");
   return (
     <>
       <DetailPageFrame
@@ -56,7 +51,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
         title={vm.name}
         status={<StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />}
         icon={<AliIcon name="yunzhuji" size={28} />}
-        headerItems={[{ label: "CPU / 内存", value: compute }]}
+        headerItems={[{ label: "规格", value: vm.presetName || "-" }]}
         actions={
           <div className="flex items-center gap-2">
             <Button
@@ -81,18 +76,19 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
             title: "基本信息",
             fields: [
               { label: "ID", value: <ResourceId value={vm.id} /> },
-              { label: "CPU / 内存", value: compute },
               {
-                label: "创建时规格",
+                label: "规格",
                 value: <span title={vm.presetName}>{vm.presetName || "-"}</span>,
               },
-              { label: "系统盘", value: vm.systemDiskSizeGb ? `${vm.systemDiskSizeGb} GB` : "-" },
               {
-                label: "创建时操作系统",
-                value: [vm.osFamily, vm.osVersion].filter(Boolean).join(" ") || "-",
+                label: "系统盘容量",
+                value: vm.systemDiskSizeGb ? `${vm.systemDiskSizeGb} GB` : "-",
               },
-              { label: "当前节点", value: vm.runtime?.nodeName || "-" },
-              { label: "本次运行开始", value: formatDateTime(vm.runtime?.startedAt) },
+              {
+                label: "操作系统",
+                value: vm.sourceMedia?.name || "-",
+              },
+              { label: "所在节点", value: vm.runtime?.nodeName || "-" },
               {
                 label: "IP 地址",
                 value:
@@ -111,24 +107,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
                       : "-",
               },
               { label: "创建时间", value: formatDateTime(vm.createdAt) },
-              {
-                label: "实际状态",
-                value: <StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />,
-              },
-              {
-                label: "目标状态",
-                value: <StatusBadge status={vm.desiredState} loading={false} />,
-              },
-              { label: "状态更新时间", value: formatDateTime(vm.observedAt) },
-              ...(vm.closing
-                ? [
-                    {
-                      label: "删除状态",
-                      value: <StatusBadge status="deleting">删除中</StatusBadge>,
-                    },
-                  ]
-                : []),
-              { label: "DNS 服务器", value: vm.dns?.nameservers?.join(" · ") || "-" },
+              { label: "启动时间", value: formatDateTime(vm.runtime?.startedAt) },
             ],
           },
           {
@@ -168,11 +147,6 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
                   "-"
                 ),
               },
-              {
-                label: "创建时系统来源",
-                value: <span title={vm.sourceMedia?.name}>{vm.sourceMedia?.name || "-"}</span>,
-              },
-              { label: "密钥", value: "-" },
               { label: "负载均衡", value: "-" },
             ],
           },
@@ -184,15 +158,15 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
           //   label: "远程连接",
           //   content: <VmSshAccess vm={vm} onOpenConsole={() => openInstanceVncWindow(vm.id)} />,
           // },
+          { key: "guest", label: "系统信息", content: <VmGuestInfo vm={vm} /> },
+          { key: "configuration", label: "初始化配置", content: <VmConfiguration vm={vm} /> },
+          { key: "media", label: "启动与介质", content: <VmMediaDevices vm={vm} /> },
           {
             key: "storage",
             label: "存储挂载",
-            content: <InstanceStorage diskContent={<VmDisks vm={vm} />} />,
+            content: <VmDisks vm={vm} />,
           },
           { key: "network", label: "网络", content: <VmNetwork vm={vm} /> },
-          { key: "configuration", label: "创建配置", content: <VmConfiguration vm={vm} /> },
-          { key: "guest", label: "来宾信息", content: <VmGuestInfo vm={vm} /> },
-          { key: "media", label: "光盘与启动", content: <VmMediaDevices vm={vm} /> },
           { key: "snapshots", label: "快照", content: <VmSnapshots vm={vm} /> },
           {
             key: "monitoring",

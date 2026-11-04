@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Modal, Space } from "@arco-design/web-react";
+import { Button, Modal } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import {
   attachVmDisk,
@@ -8,11 +8,10 @@ import {
   type VirtualMachine,
   type VmDisk,
 } from "@/api/vms";
-import { DataTable, ResourceNameId, type RowAction } from "@/components/common";
+import { DataTable, ResourceNameId, StatusBadge, type RowAction } from "@/components/common";
 import VmCreateDiskModal from "@/components/vms/VmCreateDiskModal";
 import VmDetachDiskModal from "@/components/vms/VmDetachDiskModal";
 import { useVMMutation } from "@/hooks/useVMMutation";
-import { formatBytes } from "@/lib/format";
 import { withId } from "@/lib/id";
 import { vmIsClosed } from "@/lib/vms";
 
@@ -83,16 +82,15 @@ export default function VmDisks({ vm }: VmDisksProps) {
     <>
       <DataTable<VmDisk>
         header={{
-          title: "磁盘",
           extra: (
-            <Space>
+            <div className="flex items-center gap-2">
+              <Button type="primary" disabled={disabled} onClick={() => setCreating(true)}>
+                创建数据盘
+              </Button>
               <Button loading={query.isRefetching} onClick={() => query.refetch()}>
                 刷新
               </Button>
-              <Button disabled={disabled} onClick={() => setCreating(true)}>
-                新增数据盘
-              </Button>
-            </Space>
+            </div>
           ),
         }}
         data={query.data?.items ?? []}
@@ -109,29 +107,30 @@ export default function VmDisks({ vm }: VmDisksProps) {
               <ResourceNameId name={disk.name || "-"} id={disk.diskId} openable={false} />
             ),
           },
-          { title: "角色", width: 120, dataIndex: "role" },
-          { title: "容量 (GB)", width: 140, dataIndex: "sizeGb" },
-          {
-            title: "请求容量",
-            width: 140,
-            render: (_, disk) =>
-              disk.requestedBytes ? formatBytes(Number(disk.requestedBytes)) : "-",
-          },
-          {
-            title: "观测容量",
-            width: 140,
-            render: (_, disk) =>
-              disk.observedCapacityBytes ? formatBytes(Number(disk.observedCapacityBytes)) : "-",
-          },
           {
             title: "挂载状态",
             width: 120,
-            render: (_, disk) => (disk.attached ? "已挂载" : "未挂载"),
+            render: (_, disk) => (
+              <StatusBadge tone={disk.attached ? "success" : "neutral"}>
+                {disk.attached ? "已挂载" : "未挂载"}
+              </StatusBadge>
+            ),
           },
-          { title: "准备状态", width: 120, dataIndex: "preparationState" },
-          { title: "原因", width: 220, dataIndex: "reason", ellipsis: true },
-          { title: "卷名", width: 180, dataIndex: "volumeName", ellipsis: true },
-          { title: "序列号", width: 180, dataIndex: "serial", ellipsis: true },
+          {
+            title: "磁盘用途",
+            width: 120,
+            render: (_, disk) =>
+              disk.role === "system"
+                ? "系统盘"
+                : disk.role === "data"
+                  ? "数据盘"
+                  : disk.role || "-",
+          },
+          {
+            title: "磁盘容量",
+            width: 140,
+            render: (_, disk) => (disk.sizeGb ? `${disk.sizeGb} GB` : "-"),
+          },
         ]}
       />
       {creating && (

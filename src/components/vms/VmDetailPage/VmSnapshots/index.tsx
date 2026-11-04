@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, Modal, Space } from "@arco-design/web-react";
+import { Button, Modal } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { deleteVmSnapshot, listVmSnapshots, type VirtualMachine, type VmSnapshot } from "@/api/vms";
 import { DataTable, ResourceNameId, StatusBadge, type RowAction } from "@/components/common";
@@ -62,14 +62,14 @@ export default function VmSnapshots({ vm }: VmSnapshotsProps) {
         header={{
           title: "快照",
           extra: (
-            <Space>
+            <div className="flex items-center gap-2">
+              <Button type="primary" disabled={disabled} onClick={() => setCreating(true)}>
+                创建快照
+              </Button>
               <Button loading={query.isRefetching} onClick={() => query.refetch()}>
                 刷新
               </Button>
-              <Button disabled={disabled} onClick={() => setCreating(true)}>
-                创建快照
-              </Button>
-            </Space>
+            </div>
           ),
         }}
         data={query.data?.items ?? []}

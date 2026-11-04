@@ -40,7 +40,7 @@ export default function VmSetBootDeviceModal({
     >
       <Alert
         type="warning"
-        content="选择下次启动时使用的设备。安装系统时选择系统安装光盘（ISO），安装完成后切回系统盘。请先确认已插入可启动的安装光盘；本操作不会自动重启云主机。"
+        content="选择下次启动时使用的设备。安装系统时选择安装镜像（ISO），安装完成后切换为系统盘。请先确认已加载可启动的安装镜像；本操作不会自动重启云主机。"
       />
       <Form
         form={form}
@@ -56,7 +56,7 @@ export default function VmSetBootDeviceModal({
           <Select
             options={[
               { value: "SYSTEM_DISK", label: "系统盘" },
-              { value: "INSTALL_MEDIA", label: "系统安装光盘（ISO）" },
+              { value: "INSTALL_MEDIA", label: "安装镜像（ISO）" },
             ]}
           />
         </Form.Item>

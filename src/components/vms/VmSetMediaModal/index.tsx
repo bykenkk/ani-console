@@ -18,11 +18,11 @@ export default function VmSetMediaModal({ vm, slot, onCancel, onSubmitted }: VmS
   const media = useQuery({
     queryKey: ["vm-media"],
     queryFn: ({ signal }) => listVmMedia(signal),
-    meta: { errorNotification: { id: "vm-media", action: "虚拟机介质加载" } },
+    meta: { errorNotification: { id: "vm-media", action: "ISO 镜像列表加载" } },
   });
   const mutation = useVMMutation<VmSetMediaFormValues>({
     vmId: vm.id,
-    action: "设置光盘",
+    action: "加载镜像",
     actionId: "vm-media-set",
     onSubmitted,
     mutationFn: (values) =>
@@ -32,7 +32,7 @@ export default function VmSetMediaModal({ vm, slot, onCancel, onSubmitted }: VmS
   return (
     <Modal
       visible
-      title={`${slot === "INSTALL" ? "系统安装光盘" : "驱动光盘"} · ${vm.name}`}
+      title={`加载 / 更换${slot === "INSTALL" ? "安装镜像" : "驱动镜像"} · ${vm.name}`}
       onCancel={onCancel}
       confirmLoading={mutation.isPending}
       okButtonProps={{ disabled: vmIsClosed(vm) || mutation.busy || media.isFetching }}
@@ -43,20 +43,20 @@ export default function VmSetMediaModal({ vm, slot, onCancel, onSubmitted }: VmS
     >
       <Alert
         type="info"
-        content={`${slot === "INSTALL" ? "选择用于安装操作系统的 ISO 光盘。" : "选择用于安装磁盘、网络等驱动的 ISO 光盘。"}保存后不会自动重启云主机；如提示“下次启动生效”，请在适当时间正常关机再启动。`}
+        content={`${slot === "INSTALL" ? "选择用于安装操作系统的 ISO 镜像。" : "选择用于安装设备驱动的 ISO 镜像。"}保存后不会自动重启云主机；如提示“下次启动生效”，请在适当时间正常关机再启动。`}
       />
       <Form form={form} layout="vertical" className="mt-4">
         <Form.Item
           field="mediaKey"
-          label="ISO 光盘"
+          label="ISO 镜像"
           rules={[
-            { required: true, message: "请选择 ISO 光盘" },
+            { required: true, message: "请选择 ISO 镜像" },
             {
               validator: (value, callback) => {
                 if (
                   !media.data?.items.some((item) => item.mediaKey === value && item.kind === kind)
                 )
-                  callback("请选择对应用途的可用 ISO 光盘");
+                  callback("请选择对应用途的可用 ISO 镜像");
               },
             },
           ]}
@@ -64,10 +64,10 @@ export default function VmSetMediaModal({ vm, slot, onCancel, onSubmitted }: VmS
           <Select
             loading={media.isFetching}
             filterOption={false}
-            placeholder="请选择 ISO 光盘"
+            placeholder="请选择 ISO 镜像"
             options={(media.data?.items ?? []).map((item) => ({
               value: item.mediaKey,
-              label: `${item.name} · ${item.kind === "INSTALL_ISO" ? "系统安装光盘" : item.kind === "DRIVER_ISO" ? "驱动光盘" : "系统镜像"} · ${item.mediaKey}`,
+              label: `${item.name} · ${item.kind === "INSTALL_ISO" ? "安装镜像" : item.kind === "DRIVER_ISO" ? "驱动镜像" : "系统镜像"} · ${item.mediaKey}`,
               disabled: item.kind !== kind,
             }))}
           />

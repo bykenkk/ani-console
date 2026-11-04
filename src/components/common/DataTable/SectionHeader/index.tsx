@@ -3,7 +3,7 @@ import clsx from "clsx";
 import type { ReactNode } from "react";
 
 export type SectionHeaderProps = {
-  title: ReactNode;
+  title?: ReactNode;
   extra?: ReactNode;
   className?: string;
 };

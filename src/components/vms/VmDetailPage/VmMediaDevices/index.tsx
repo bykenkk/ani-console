@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Button, Descriptions, Modal } from "@arco-design/web-react";
+import { Alert, Button, Descriptions, Modal, Typography } from "@arco-design/web-react";
 import { ejectVmMedia, type VirtualMachine, type VmMediaSlot, type VmMediaState } from "@/api/vms";
 import { DataTable, StatusBadge, type RowAction } from "@/components/common";
 import VmSetMediaModal from "@/components/vms/VmSetMediaModal";
@@ -16,7 +16,7 @@ export default function VmMediaDevices({ vm }: VmMediaDevicesProps) {
   const [editingBoot, setEditingBoot] = useState(false);
   const eject = useVMMutation<VmMediaSlot>({
     vmId: vm.id,
-    action: "弹出介质",
+    action: "弹出镜像",
     actionId: "vm-media-eject",
     channel: "notification",
     mutationFn: (slot) => ejectVmMedia(vm.id, slot, { expected_version: vm.version }),
@@ -24,42 +24,41 @@ export default function VmMediaDevices({ vm }: VmMediaDevicesProps) {
   const disabled = vmIsClosed(vm) || eject.busy;
   const ejectDisabledReason = (row: MediaSlotRow) => {
     if (vmIsClosed(vm)) {
-      if (vm.observedState === "Deleted") return "云主机已删除，无法弹出介质";
-      if (vm.observedState === "canceled") return "云主机创建已取消，无法弹出介质";
-      if (vm.closing) return "云主机正在删除，暂时无法弹出介质";
+      if (vm.observedState === "Deleted") return "云主机已删除，无法弹出镜像";
+      if (vm.observedState === "canceled") return "云主机创建已取消，无法弹出镜像";
+      if (vm.closing) return "云主机正在删除，暂时无法弹出镜像";
       return "云主机版本尚未就绪，请刷新后重试";
     }
     if (eject.busy) return "有虚拟机操作正在提交，请稍后重试";
-    if (!(row.state?.desiredMedia || row.state?.observedMedia)) return "当前光驱没有可弹出的光盘";
+    if (!(row.state?.desiredMedia || row.state?.observedMedia)) return "当前光驱没有可弹出的镜像";
     return undefined;
   };
   const actions: RowAction<MediaSlotRow>[] = [
     {
       key: "set",
-      label: "插入 / 更换光盘",
+      label: "加载 / 更换镜像",
       disabled: () => disabled,
       onClick: (row) => setEditingSlot(row.slot),
     },
     {
       key: "eject",
-      label: "弹出光盘",
+      label: "弹出镜像",
       disabled: (row) => Boolean(ejectDisabledReason(row)),
       title: ejectDisabledReason,
       onClick: (row) => {
         Modal.confirm({
-          title: "弹出光盘",
-          content: `确认弹出 ${vm.name} 的${row.slot === "INSTALL" ? "系统安装光盘" : "驱动光盘"}？此操作不会删除系统盘或数据盘，也不会自动重启云主机。若当前运行中仍在使用该光盘，将在下次启动时生效。`,
+          title: "弹出镜像",
+          content: `确认弹出 ${vm.name} 的${row.slot === "INSTALL" ? "系统安装镜像" : "驱动镜像"}？此操作不会删除磁盘数据，也不会自动重启云主机。若镜像仍在使用，变更将在下次启动时生效。`,
           onOk: () => eject.mutateAsync(row.slot),
         });
       },
     },
   ];
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-4">
       <Alert
         type="info"
-        title="光盘用于安装系统或驱动"
-        content="系统安装光盘用于安装操作系统，驱动光盘用于安装磁盘、网络等驱动。已保存配置决定下次启动使用哪张光盘；当前使用的光盘以运行状态为准。更换、弹出光盘和切换启动设备都不会自动重启云主机。"
+        content="安装镜像用于安装操作系统，驱动镜像用于安装设备驱动。镜像和启动设备的配置变更不会自动重启云主机，具体生效情况请查看配置状态。"
       />
       <DataTable<MediaSlotRow>
         header={{ title: "虚拟光驱" }}
@@ -70,69 +69,77 @@ export default function VmMediaDevices({ vm }: VmMediaDevicesProps) {
         rowActions={actions}
         columns={[
           {
-            title: "光驱用途",
-            width: 200,
-            render: (_, row) => (row.slot === "INSTALL" ? "系统安装光盘" : "驱动光盘"),
+            title: "用途",
+            width: 150,
+            fixed: "left",
+            render: (_, row) => (row.slot === "INSTALL" ? "系统安装" : "驱动安装"),
           },
           {
-            title: "已保存的光盘标识",
-            width: 240,
-            render: (_, row) => (row.state ? row.state.desiredMedia || "未配置光盘" : "-"),
-            ellipsis: true,
-          },
-          {
-            title: "当前使用的光盘标识",
-            width: 240,
-            dataIndex: "state.observedMedia",
-            ellipsis: true,
-          },
-          {
-            title: "生效状态",
-            width: 180,
+            title: "配置状态",
+            width: 120,
             render: (_, row) => {
-              if (!row.state) return <StatusBadge tone="neutral">尚未观测</StatusBadge>;
+              if (!row.state) return <StatusBadge tone="neutral">待采集</StatusBadge>;
               if (row.state.pendingRestart)
                 return <StatusBadge tone="warning">下次启动生效</StatusBadge>;
-              if (!row.state.effectiveNow)
-                return <StatusBadge tone="neutral">尚未确认生效</StatusBadge>;
+              if (!row.state.effectiveNow) return <StatusBadge tone="neutral">待确认</StatusBadge>;
               return (
-                <StatusBadge tone="success">
-                  {row.state.observedMedia ? "当前已生效" : "当前无光盘"}
+                <StatusBadge tone={row.state.observedMedia ? "success" : "neutral"}>
+                  {row.state.observedMedia ? "已生效" : "无镜像"}
                 </StatusBadge>
               );
             },
           },
-        ]}
-      />
-      <Descriptions
-        title="下次从哪里启动"
-        data={[
           {
-            label: "已保存的启动设备",
-            value: (
-              <div className="flex items-center gap-2">
-                {vm.bootDevice === "SYSTEM_DISK"
-                  ? "系统盘"
-                  : vm.bootDevice === "INSTALL_MEDIA"
-                    ? "系统安装光盘（ISO）"
-                    : "-"}
-                <Button
-                  size="small"
-                  type="text"
-                  disabled={disabled}
-                  onClick={() => setEditingBoot(true)}
-                >
-                  切换启动设备
-                </Button>
-              </div>
-            ),
+            title: "已配置镜像",
+            width: 220,
+            dataIndex: "state.desiredMedia",
+            placeholder: "未加载镜像",
+            ellipsis: true,
+          },
+          {
+            title: "当前镜像",
+            width: 220,
+            dataIndex: "state.observedMedia",
+            ellipsis: true,
           },
         ]}
       />
-      <p className="m-0 text-sm text-app-text-secondary">
-        从 ISO
-        安装系统时选择系统安装光盘；系统安装完成后选择系统盘。驱动光盘不用于启动系统。云主机正在运行时，切换后的配置在下次启动时使用。
-      </p>
+      <section className="flex flex-col gap-2">
+        <Descriptions
+          title={
+            <div className="flex items-center justify-between gap-3">
+              <span>启动设置</span>
+              <Button
+                size="small"
+                type="text"
+                disabled={disabled}
+                onClick={() => setEditingBoot(true)}
+              >
+                切换启动设备
+              </Button>
+            </div>
+          }
+          size="medium"
+          column={1}
+          tableLayout="fixed"
+          labelStyle={{ width: 120, verticalAlign: "top" }}
+          valueStyle={{ overflowWrap: "anywhere", verticalAlign: "top" }}
+          data={[
+            {
+              label: "下次启动设备",
+              value:
+                vm.bootDevice === "SYSTEM_DISK"
+                  ? "系统盘"
+                  : vm.bootDevice === "INSTALL_MEDIA"
+                    ? "安装镜像（ISO）"
+                    : "-",
+            },
+          ]}
+        />
+        <Typography.Text type="secondary">
+          安装系统时选择安装镜像（ISO），安装完成后切换为系统盘。新配置在下次启动时使用。
+        </Typography.Text>
+      </section>
       {editingSlot && (
         <VmSetMediaModal
           vm={vm}
