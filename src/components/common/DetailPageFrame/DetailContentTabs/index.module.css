@@ -70,7 +70,17 @@
   box-sizing: border-box;
   height: 100%;
   overflow: auto;
-  padding: 16px;
+  padding: 16px 16px 0;
+}
+
+.tabs :global(.arco-tabs-content .arco-tabs-pane) {
+  display: flow-root;
+  height: auto;
+  min-height: 100%;
+}
+
+.tabs :global(.arco-tabs-pane) > :last-child {
+  margin-bottom: 16px;
 }
 
 .fill :global(.arco-tabs-content .arco-tabs-content-item.arco-tabs-content-item-active) {
