@@ -29,11 +29,11 @@ export default function VmGuestInfo({ vm }: VmGuestInfoProps) {
       }
       break;
     case "NOT_RUNNING":
-      alertContent = "虚拟机未运行，启动后可查看系统信息";
+      alertContent = "云主机未运行，启动后可查看系统信息";
       break;
     case "AGENT_NOT_CONNECTED":
       alertType = "warning";
-      alertContent = "无法获取系统信息，请确认虚拟机内已安装并启动 QEMU Guest Agent";
+      alertContent = "无法获取系统信息，请确认云主机内已安装并启动 QEMU Guest Agent";
       break;
     case "UNAVAILABLE":
       alertType = "warning";
@@ -41,7 +41,7 @@ export default function VmGuestInfo({ vm }: VmGuestInfoProps) {
       break;
     case "CHANGED":
       alertType = "warning";
-      alertContent = "采集期间虚拟机运行实例发生变化，请刷新后重新获取系统信息";
+      alertContent = "采集期间云主机运行实例发生变化，请刷新后重新获取系统信息";
       break;
   }
   const elapsed =

@@ -16,7 +16,7 @@ type NetworkAssociatedInstancesProps = {
 
 const consumerLabels: Record<NetworkAssociatedInstance["consumer_type"], string> = {
   container_instance: "容器实例",
-  virtual_machine: "虚拟机",
+  virtual_machine: "云主机",
   sandbox: "沙箱",
   unknown: "未知",
 };

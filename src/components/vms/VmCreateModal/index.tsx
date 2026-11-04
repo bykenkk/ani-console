@@ -68,7 +68,7 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
   const media = useQuery({
     queryKey: ["vm-media"],
     queryFn: ({ signal }) => listVmMedia(signal),
-    meta: { errorNotification: { id: "vm-media", action: "虚拟机介质加载" } },
+    meta: { errorNotification: { id: "vm-media", action: "云主机介质加载" } },
   });
   const selected = media.data?.items.find((item) => item.mediaKey === values.media_key);
   const canInitialize =

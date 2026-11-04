@@ -29,7 +29,7 @@ export default function VmMediaDevices({ vm }: VmMediaDevicesProps) {
       if (vm.closing) return "云主机正在删除，暂时无法弹出镜像";
       return "云主机版本尚未就绪，请刷新后重试";
     }
-    if (eject.busy) return "有虚拟机操作正在提交，请稍后重试";
+    if (eject.busy) return "有云主机操作正在提交，请稍后重试";
     if (!(row.state?.desiredMedia || row.state?.observedMedia)) return "当前光驱没有可弹出的镜像";
     return undefined;
   };
