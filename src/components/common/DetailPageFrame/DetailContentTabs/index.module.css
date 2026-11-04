@@ -73,6 +73,24 @@
   padding: 16px;
 }
 
+.fill :global(.arco-tabs-content .arco-tabs-content-item.arco-tabs-content-item-active) {
+  overflow: hidden;
+  padding-bottom: 16px;
+}
+
+.fill :global(.arco-tabs-content .arco-tabs-pane) {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.fill :global(.arco-tabs-pane) > :last-child {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-bottom: 0;
+}
+
 @media (max-width: 1024px) {
   .rightPane {
     min-height: 600px;

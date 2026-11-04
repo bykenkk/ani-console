@@ -176,14 +176,8 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
           {
             key: "logs",
             label: "日志",
-            content: (
-              <InstanceLogs
-                instanceId={vm.id}
-                resourceType="vm"
-                active={tab === "logs"}
-                onNotFound={goBack}
-              />
-            ),
+            fill: true,
+            content: <InstanceLogs instanceId={vm.id} instanceType="vm" />,
           },
         ]}
         activeTabKey={tab}

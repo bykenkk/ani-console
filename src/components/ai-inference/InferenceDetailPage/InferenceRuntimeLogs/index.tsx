@@ -1,9 +1,9 @@
-import { Button, Select } from "@arco-design/web-react";
-import { IconPlayArrowFill, IconRecordStop, IconRefresh } from "@arco-design/web-react/icon";
+import { Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { getInferenceLogs, getInferenceRuntime, type InferenceLogLevel } from "@/api/inference";
 import LogViewer from "@/components/common/LogViewer";
+import LogToolbar from "@/components/common/LogToolbar";
 import { withId } from "@/lib/id";
 import { formatInferenceLogs } from "./log-text";
 import { useInferenceLogStream, INFERENCE_LOG_LIMIT } from "./useInferenceLogStream";
@@ -59,73 +59,63 @@ export default function InferenceRuntimeLogs({ serviceId }: InferenceRuntimeLogs
   );
   return (
     <div className="flex h-full min-h-0 min-w-0 flex-col gap-3 overflow-hidden">
-      <div className="flex shrink-0 items-center justify-between gap-3">
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <Select
-            aria-label="日志级别"
-            placeholder="全部级别"
-            allowClear
-            size="small"
-            value={level}
-            disabled={live}
-            autoWidth={false}
-            style={{ width: 128 }}
-            options={["trace", "debug", "info", "warn", "error", "fatal", "unknown"].map(
-              (value) => ({
-                value,
-                label: value,
-              }),
-            )}
-            onChange={setLevel}
-          />
-          <Select
-            aria-label="日志实例"
-            placeholder="请选择实例"
-            size="small"
-            value={selectedInstance?.name}
-            disabled={live}
-            autoWidth={false}
-            style={{ width: 200 }}
-            loading={runtime.isFetching}
-            options={instances.map((item) => ({ value: item.name, label: item.name }))}
-            onChange={(value: string | undefined) => {
-              setInstance(value ?? "");
-              setContainer("");
-            }}
-          />
-          <Select
-            aria-label="日志容器"
-            placeholder="请选择容器"
-            allowClear
-            size="small"
-            value={selectedContainer}
-            disabled={live || !selectedInstance}
-            autoWidth={false}
-            style={{ width: 200 }}
-            options={containers.map((name) => ({ value: name, label: name }))}
-            onChange={(value: string | undefined) => setContainer(value ?? "")}
-          />
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <Button
-            size="small"
-            icon={live ? <IconRecordStop /> : <IconPlayArrowFill />}
-            aria-label={live ? "停止流式日志" : "开启流式日志"}
-            title={live ? "停止流式日志" : "开启流式日志"}
-            disabled={!live && !canQueryLogs}
-            onClick={() => setLive((current) => !current)}
-          />
-          <Button
-            size="small"
-            icon={<IconRefresh />}
-            aria-label="刷新日志"
-            title="刷新日志"
-            disabled={live || !canQueryLogs}
-            loading={!live && logs.isRefetching}
-            onClick={() => logs.refetch()}
-          />
-        </div>
-      </div>
+      <LogToolbar
+        follow={{
+          active: live,
+          disabled: !live && !canQueryLogs,
+          startLabel: "开启流式日志",
+          stopLabel: "停止流式日志",
+          onChange: setLive,
+        }}
+        refresh={{
+          disabled: !canQueryLogs,
+          loading: !live && logs.isRefetching,
+          onClick: () => logs.refetch(),
+        }}
+      >
+        <Select
+          aria-label="日志级别"
+          placeholder="全部级别"
+          allowClear
+          size="small"
+          value={level}
+          disabled={live}
+          autoWidth={false}
+          style={{ width: 128 }}
+          options={["trace", "debug", "info", "warn", "error", "fatal", "unknown"].map((value) => ({
+            value,
+            label: value,
+          }))}
+          onChange={setLevel}
+        />
+        <Select
+          aria-label="日志实例"
+          placeholder="请选择实例"
+          size="small"
+          value={selectedInstance?.name}
+          disabled={live}
+          autoWidth={false}
+          style={{ width: 200 }}
+          loading={runtime.isFetching}
+          options={instances.map((item) => ({ value: item.name, label: item.name }))}
+          onChange={(value: string | undefined) => {
+            setInstance(value ?? "");
+            setContainer("");
+          }}
+        />
+        <Select
+          aria-label="日志容器"
+          placeholder="请选择容器"
+          allowClear
+          size="small"
+          value={selectedContainer}
+          disabled={live || !selectedInstance}
+          autoWidth={false}
+          style={{ width: 200 }}
+          options={containers.map((name) => ({ value: name, label: name }))}
+          onChange={(value: string | undefined) => setContainer(value ?? "")}
+        />
+      </LogToolbar>
       <LogViewer
         key={JSON.stringify([serviceId, selectedInstance?.name, selectedContainer, level, live])}
         className="flex-1"

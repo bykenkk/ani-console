@@ -121,6 +121,7 @@ export default function InferenceDetailPage({
           {
             key: "logs",
             label: "日志",
+            fill: true,
             content: <InferenceRuntimeLogs key={item.id} serviceId={item.id} />,
           },
           { key: "events", label: "事件", content: <InferenceEvents serviceId={item.id} /> },

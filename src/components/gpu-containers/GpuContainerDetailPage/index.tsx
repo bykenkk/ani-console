@@ -229,7 +229,8 @@ export default function GpuContainerDetailPage({
           {
             key: "logs",
             label: "日志",
-            content: <InstanceLogs instanceId={instanceId} active />,
+            fill: true,
+            content: <InstanceLogs instanceId={instanceId} instanceType="gpu_container" />,
           },
           {
             key: "events",

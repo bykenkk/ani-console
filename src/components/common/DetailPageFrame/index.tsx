@@ -39,6 +39,7 @@ export type DetailTab<TKey extends string = string> = {
   label: ReactNode;
   content: ReactNode;
   extra?: ReactNode;
+  fill?: boolean;
 };
 
 type DetailPageFrameProps<TKey extends string> = {

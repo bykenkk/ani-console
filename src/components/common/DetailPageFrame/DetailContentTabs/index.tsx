@@ -1,4 +1,5 @@
 import { Tabs } from "@arco-design/web-react";
+import clsx from "clsx";
 import styles from "./index.module.css";
 import type { DetailTab } from "..";
 
@@ -18,7 +19,7 @@ export default function DetailContentTabs<TKey extends string>({
   return (
     <section className={styles.rightPane}>
       <Tabs
-        className={styles.tabs}
+        className={clsx(styles.tabs, activeTab?.fill && styles.fill)}
         type="line"
         headerPadding={false}
         inkBarSize={{ width: 16 }}

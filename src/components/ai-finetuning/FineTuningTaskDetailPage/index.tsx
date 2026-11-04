@@ -104,6 +104,7 @@ export default function FineTuningTaskDetailPage({
         {
           key: "logs",
           label: "日志",
+          fill: true,
           content: (
             <ModelDevExecutionLogs
               key={executionId}

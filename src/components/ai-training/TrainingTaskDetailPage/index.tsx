@@ -85,6 +85,7 @@ export default function TrainingTaskDetailPage({
         {
           key: "logs",
           label: "日志",
+          fill: true,
           content: (
             <ModelDevExecutionLogs
               key={executionId}

@@ -190,7 +190,8 @@ export default function ContainerDetailPage({
           {
             key: "logs",
             label: "日志",
-            content: <InstanceLogs instanceId={instanceId} active />,
+            fill: true,
+            content: <InstanceLogs instanceId={instanceId} instanceType="container" />,
           },
           {
             key: "events",
