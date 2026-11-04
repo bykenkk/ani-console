@@ -58,18 +58,14 @@ export default function VmsPage() {
     },
     {
       key: "compute",
-      title: "CPU / 内存",
+      title: "规格",
       width: 180,
       ellipsis: true,
-      render: (_, vm) =>
-        [
-          vm.cpuMillis ? `${Number(vm.cpuMillis) / 1000}C` : "-",
-          vm.memoryMib ? `${Number(vm.memoryMib) / 1024} GiB` : "-",
-        ].join(" / "),
+      dataIndex: "presetName",
     },
     {
       key: "systemDiskSizeGb",
-      title: "系统盘",
+      title: "系统盘容量",
       width: 140,
       render: (_, vm) => (vm.systemDiskSizeGb ? `${vm.systemDiskSizeGb} GB` : "-"),
     },
@@ -86,7 +82,7 @@ export default function VmsPage() {
           .join(" · ") || "-",
     },
     // TODO(vm-list-fields): 新契约缺少节点和终止保护，保留原列默认占位。
-    { key: "node", title: "节点", width: 150 },
+    { key: "node", title: "所在节点", width: 150 },
     { key: "protection", title: "终止保护", width: 120 },
     {
       key: "createdAt",

@@ -233,7 +233,7 @@ export default function LoadBalancerDetailPage({
         <StatusBadge status={item.state} reason={item.reason} message={item.reason_message} />
       }
       icon={<AliIcon name="fuzaijunhengqi" size={28} />}
-      headerItems={[{ label: "私网 IP", value: item.private_ip || "-" }]}
+      headerItems={[{ label: "IP 地址", value: item.private_ip || "-" }]}
       actions={<ResourceActionMenu record={item} actions={actions} />}
       cards={[
         {
@@ -241,12 +241,15 @@ export default function LoadBalancerDetailPage({
           title: "基本信息",
           fields: [
             { label: "ID", value: <ResourceId value={item.id} /> },
-            { label: "私网 IP", value: item.private_ip || "-" },
+            { label: "IP 地址", value: item.private_ip || "-" },
             {
               label: "类型",
               value: loadBalancerLabel(item.exposure),
             },
-            { label: "VPC", value: parentVpc?.name ?? item.vpc_id },
+            {
+              label: "VPC",
+              value: parentVpc?.name ?? (item.vpc_id ? <ResourceId value={item.vpc_id} /> : "-"),
+            },
             {
               label: "基础网络",
               value: parentVpc ? (
@@ -257,12 +260,13 @@ export default function LoadBalancerDetailPage({
             },
             {
               label: "子网",
-              value: parentSubnet?.name ?? item.subnet_id ?? "-",
+              value:
+                parentSubnet?.name ??
+                (item.subnet_id ? <ResourceId value={item.subnet_id} /> : "-"),
             },
             { label: "描述", value: item.description || "-" },
             { label: "公网 IP", value: item.public_address || "-" },
             { label: "规格", value: item.flavor || "-" },
-            { label: "配置状态", value: loadBalancerLabel(item.configuration_state) },
             { label: "流量健康", value: loadBalancerLabel(item.data_plane_state) },
             {
               label: "流量观测时间",

@@ -119,7 +119,7 @@ export default function LoadBalancersPage() {
     },
     {
       key: "vip",
-      title: "私网 IP",
+      title: "IP 地址",
       dataIndex: "private_ip",
       width: 100,
       ellipsis: true,

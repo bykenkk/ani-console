@@ -55,16 +55,21 @@ export default function FineTuningTaskDetailPage({
           title: "基本信息",
           fields: [
             { label: "ID", value: <ResourceId value={task.execution_id} /> },
-            { label: "计算状态", value: task.compute_state || "-" },
-            { label: "发布状态", value: task.delivery_state || "-" },
-            { label: "关闭状态", value: task.close_state || "-" },
-            { label: "资源状态", value: task.resource_state || "-" },
             { label: "训练阶段", value: task.managed_settings?.stage || "-" },
             { label: "微调方法", value: task.managed_settings?.finetuning_type || "-" },
-            { label: "微调实现", value: task.implementation_id || "-" },
+            {
+              label: "微调实现",
+              value: task.implementation_id ? <ResourceId value={task.implementation_id} /> : "-",
+            },
             { label: "算力规格", value: <ResourceId value={task.compute_preset_id} /> },
-            { label: "数据集版本", value: task.input_version_id || "-" },
-            { label: "镜像版本", value: task.image_version_id || "-" },
+            {
+              label: "数据集版本",
+              value: task.input_version_id ? <ResourceId value={task.input_version_id} /> : "-",
+            },
+            {
+              label: "镜像版本",
+              value: task.image_version_id ? <ResourceId value={task.image_version_id} /> : "-",
+            },
             { label: "当前阶段", value: task.current_step || "-" },
             { label: "停止已请求", value: task.stop_requested ? "是" : "否" },
             { label: "受理时间", value: formatDateTime(task.accepted_at) },

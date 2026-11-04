@@ -243,7 +243,7 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
         )}
         {canInitialize && (
           <Collapse>
-            <Collapse.Item name="guest" header="来宾系统初始化">
+            <Collapse.Item name="guest" header="系统初始化">
               <Form.Item field="initialize_guest" triggerPropName="checked">
                 <Checkbox>初始化登录用户</Checkbox>
               </Form.Item>

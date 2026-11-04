@@ -32,10 +32,8 @@ export default function InstanceCreateSummary({ values }: InstanceCreateSummaryP
         },
         { label: "镜像", value: image?.displayName || image?.image_id || "-" },
         {
-          label: "算力规格",
-          value: preset
-            ? `${preset.name} · ${Number(preset.cpu_millis) / 1000} CPU / ${preset.memory_mib} MiB`
-            : "-",
+          label: "规格",
+          value: preset?.name || preset?.code || "-",
         },
         { label: "VPC", value: values.vpc_id || "-" },
         { label: "子网", value: values.subnet_id || "-" },

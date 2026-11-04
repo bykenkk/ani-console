@@ -80,7 +80,9 @@ export default function SubnetDetailPage({ subnetId, tab, onTabChange }: SubnetD
             { label: "ID", value: <ResourceId value={subnet.id} /> },
             {
               label: "VPC",
-              value: parentVpc?.name ?? (vpc.isLoading ? "加载中…" : subnet.vpc_id),
+              value:
+                parentVpc?.name ??
+                (vpc.isLoading ? "加载中…" : <ResourceId value={subnet.vpc_id} />),
             },
             { label: "CIDR", value: subnet.cidr },
             { label: "网关", value: subnet.gateway ?? "-" },
