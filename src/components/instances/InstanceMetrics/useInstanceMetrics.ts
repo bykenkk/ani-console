@@ -172,7 +172,6 @@ export function useInstanceMetrics(instanceId?: string, hasGpuMetrics = false) {
       ? [
           { title: "GPU 利用率", value: gpuUtilization },
           { title: "GPU 显存", value: gpuMemoryUsage },
-          { title: "GPU 显存限制", value: gpuMemory.limit },
         ]
       : []),
     {
@@ -202,7 +201,7 @@ export function useInstanceMetrics(instanceId?: string, hasGpuMetrics = false) {
     hasData: Boolean(latest.data),
     loading: latest.isLoading || (hasGpuMetrics && gpuMemory.loading),
     trendLoading: range.isLoading || (hasGpuMetrics && gpuMemory.trendLoading),
-    charts: hasGpuMetrics ? [...charts, gpuChart, gpuMemory.chart] : charts,
+    charts: hasGpuMetrics ? [...charts, gpuChart] : charts,
     gpuMetrics: {
       utilization: gpuUtilization,
       memoryUsage: gpuMemoryUsage,
