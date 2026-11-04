@@ -1,5 +1,28 @@
 import type { CoreDevProfileInfo, CursorPageParams, PageParams } from "@/api/types";
 
+/** One network attachment, not a deduplicated compute resource. */
+export interface NetworkAssociatedInstance {
+  consumer_type: "container_instance" | "virtual_machine" | "sandbox" | "unknown";
+  consumer_id: string;
+  consumer_name: string;
+  consumer_state: string;
+  subnet_id: string;
+  subnet_name: string;
+  slot: string;
+  attachment_id: string;
+  attachment_state: "reserved" | "attached" | "releasing" | "released";
+  // Reason codes are open-ended and must pass through unchanged.
+  attachment_reason: string;
+  observation_stale: boolean;
+  observed_at: string | null;
+  addresses: Array<{ nic_name: string; address: string }>;
+}
+
+export interface NetworkAssociatedInstanceListResponse {
+  items: NetworkAssociatedInstance[];
+  total: string;
+}
+
 export type VnicConsumerKind = "vm" | "container";
 export interface NetworkVnicBinding {
   binding_id: string;

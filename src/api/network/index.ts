@@ -1,3 +1,4 @@
+export * from "./associated-instances";
 export * from "./eips";
 export * from "./load-balancers";
 export * from "./security-groups";

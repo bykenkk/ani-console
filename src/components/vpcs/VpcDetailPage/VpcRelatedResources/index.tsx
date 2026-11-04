@@ -1,8 +1,6 @@
-// FIXME(governance-instance-associations): VPC 关联实例仍依赖旧 vpc_id 筛选、kind 及列表响应，保留原组件、入口和 legacy 调用。
-// TODO(governance-instance-associations): 等新关联契约齐备后逐项迁移，不影响沙箱、虚拟机等未迁移实例。
-import { listInstances, type InstanceRecord } from "@/api/instances/legacy";
 import { useClientPagination } from "@/hooks/useClientPagination";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
+import NetworkAssociatedInstances from "@/components/network/NetworkAssociatedInstances";
 
 import {
   listNetworkLoadBalancers,
@@ -10,19 +8,18 @@ import {
   type NetworkLoadBalancer,
   type NetworkSubnet,
 } from "@/api/network";
-import { DataTable, StatusBadge, type ListColumn } from "@/components/common";
+import { DataTable, ResourceNameId, StatusBadge, type ListColumn } from "@/components/common";
 import { withId } from "@/lib/id";
-import { Space, Tag, Typography } from "@arco-design/web-react";
+import { Typography } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
 type VpcRelatedResourcesProps = { vpcId: string };
 
 type RelatedResource = {
   id: string;
-  kind: "子网" | "负载均衡" | "实例";
+  kind: "子网" | "负载均衡";
   name: string;
   status: string;
-  group: "网络" | "算力";
 };
 
 export default function VpcRelatedResources({ vpcId }: VpcRelatedResourcesProps) {
@@ -47,51 +44,34 @@ export default function VpcRelatedResources({ vpcId }: VpcRelatedResourcesProps)
       fallback: "请求失败，请稍后重试",
     },
   });
-  // TODO(pagination-migration): legacy 实例列表暂用 limit/cursor；新关联契约支持 page/pageSize 后移除此兼容。
-  const { query: instances, pagination: instancePagination } = useCursorPaginatedQuery({
-    queryKey: ["instances", "vpc", vpcId],
-    queryFn: (params) => listInstances({ ...params, vpc_id: vpcId }),
-    errorNotification: {
-      id: withId("vpc-instances", vpcId),
-      action: "关联实例加载",
-      fallback: "请求失败，请稍后重试",
-    },
-  });
   const resources: RelatedResource[] = [
     ...((subnets.data?.items ?? []) as NetworkSubnet[]).map((item) => ({
       id: item.id,
       kind: "子网" as const,
       name: item.name,
       status: item.state,
-      group: "网络" as const,
     })),
     ...((loadBalancers.data?.items ?? []) as NetworkLoadBalancer[]).map((item) => ({
       id: item.id,
       kind: "负载均衡" as const,
       name: item.name,
       status: item.state,
-      group: "网络" as const,
-    })),
-    ...((instances.data?.items ?? []) as InstanceRecord[]).map((item) => ({
-      id: item.id,
-      kind: "实例" as const,
-      name: item.name,
-      status: item.state,
-      group: "算力" as const,
     })),
   ];
   // 完整集合的旧网络列表保留本地分页，不与负载均衡的服务端当前页混算总数。
-  const networkResources = resources.filter(
-    (resource) => resource.group === "网络" && resource.kind !== "负载均衡",
-  );
+  const networkResources = resources.filter((resource) => resource.kind !== "负载均衡");
   const loadBalancerResources = resources.filter((resource) => resource.kind === "负载均衡");
-  const computeResources = resources.filter((resource) => resource.group === "算力");
   const networkPage = useClientPagination(networkResources, vpcId);
-  const loading = subnets.isFetching || loadBalancers.isFetching || instances.isFetching;
+  const loading = subnets.isFetching || loadBalancers.isFetching;
   const columns: Array<ListColumn<RelatedResource>> = [
-    { title: "类型", width: 120, render: (_, resource) => <Tag>{resource.kind}</Tag> },
-    { title: "名称", width: 200, dataIndex: "name" },
-    { title: "资源 ID", width: 280, dataIndex: "id" },
+    {
+      title: "名称 / ID",
+      width: 200,
+      ellipsis: true,
+      render: (_, resource) => (
+        <ResourceNameId name={resource.name || "-"} id={resource.id} openable={false} />
+      ),
+    },
     {
       title: "状态",
       width: 120,
@@ -100,11 +80,11 @@ export default function VpcRelatedResources({ vpcId }: VpcRelatedResourcesProps)
   ];
 
   return (
-    <Space direction="vertical" size={24} className="w-full">
+    <div className="flex w-full flex-col gap-6">
       <section>
         <DataTable<RelatedResource>
           header={{
-            title: "网络关联",
+            title: "子网",
             extra: <Typography.Text type="secondary">{networkResources.length} 个</Typography.Text>,
           }}
           columns={columns}
@@ -116,7 +96,7 @@ export default function VpcRelatedResources({ vpcId }: VpcRelatedResourcesProps)
       </section>
       <section>
         <DataTable<RelatedResource>
-          header={{ title: "负载均衡关联" }}
+          header={{ title: "负载均衡" }}
           columns={columns}
           data={loadBalancerResources}
           loading={loadBalancers.isFetching}
@@ -125,20 +105,8 @@ export default function VpcRelatedResources({ vpcId }: VpcRelatedResourcesProps)
         />
       </section>
       <section>
-        <DataTable<RelatedResource>
-          header={{
-            title: "算力关联",
-            extra: (
-              <Typography.Text type="secondary">共 {instances.data?.total ?? 0} 个</Typography.Text>
-            ),
-          }}
-          columns={columns}
-          data={computeResources}
-          loading={loading}
-          pagination={instancePagination}
-          tableLabel="VPC 算力关联资源"
-        />
+        <NetworkAssociatedInstances scope="vpc" resourceId={vpcId} />
       </section>
-    </Space>
+    </div>
   );
 }

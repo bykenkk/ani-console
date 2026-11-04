@@ -8,7 +8,6 @@ import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@
 import { formatDateTime } from "@/lib/format";
 import CreateVpcModal from "../CreateVpcModal";
 import BindVpcEipModal from "../BindVpcEipModal";
-import VpcBaseConnectivityStatus from "../VpcBaseConnectivityStatus";
 
 type Vpc = NetworkVPC;
 type VpcStatusFilter = "" | NetworkResourceStateFilter;
@@ -62,14 +61,6 @@ export default function VpcsPage() {
       width: 150,
       ellipsis: true,
       dataIndex: "cidr",
-    },
-    {
-      key: "base-connectivity",
-      title: "基础网络",
-      width: 120,
-      render: (_, vpc) => (
-        <VpcBaseConnectivityStatus connectivity={vpc.base_connectivity} compact />
-      ),
     },
     {
       key: "public-egress",

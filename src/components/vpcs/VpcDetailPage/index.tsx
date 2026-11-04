@@ -15,8 +15,6 @@ import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import VpcRelatedResources from "./VpcRelatedResources";
 import VpcSubnets from "./VpcSubnets";
 import BindVpcEipModal from "../BindVpcEipModal";
-import VpcPublicEgressStatus from "../VpcPublicEgressStatus";
-import VpcBaseConnectivityStatus from "../VpcBaseConnectivityStatus";
 
 type VpcDetailPageProps = {
   vpcId: string;
@@ -62,11 +60,7 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
             fields: [
               { label: "ID", value: <ResourceId value={vpc.id} /> },
               { label: "CIDR", value: vpc.cidr },
-              {
-                label: "基础网络",
-                value: <VpcBaseConnectivityStatus connectivity={vpc.base_connectivity} />,
-              },
-              { label: "公网 IP", value: <VpcPublicEgressStatus binding={vpc.public_egress} /> },
+              { label: "公网 IP", value: vpc.public_egress?.eip_address || "-" },
               ...(vpc.public_egress
                 ? [
                     { label: "EIP ID", value: <ResourceId value={vpc.public_egress.eip_id} /> },
