@@ -36,7 +36,7 @@ export default function VmMediaDevices({ vm }: VmMediaDevicesProps) {
   const actions: RowAction<MediaSlotRow>[] = [
     {
       key: "set",
-      label: "加载 / 更换镜像",
+      label: "加载/更换镜像",
       disabled: () => disabled,
       onClick: (row) => setEditingSlot(row.slot),
     },
@@ -48,7 +48,7 @@ export default function VmMediaDevices({ vm }: VmMediaDevicesProps) {
       onClick: (row) => {
         Modal.confirm({
           title: "弹出镜像",
-          content: `确认弹出 ${vm.name} 的${row.slot === "INSTALL" ? "系统安装镜像" : "驱动镜像"}？此操作不会删除磁盘数据，也不会自动重启云主机。若镜像仍在使用，变更将在下次启动时生效。`,
+          content: `确认弹出 ${vm.name} 的镜像？此操作不会删除磁盘数据，也不会自动重启云主机。若镜像仍在使用，变更将在下次启动时生效。`,
           onOk: () => eject.mutateAsync(row.slot),
         });
       },

@@ -50,7 +50,7 @@ export default function VmGuestInfo({ vm }: VmGuestInfoProps) {
       : undefined;
   return (
     <div className="flex flex-col gap-4">
-      <Alert type={alertType} content={alertContent} />
+      {alertType !== "success" && <Alert type={alertType} content={alertContent} />}
       <Descriptions
         title="系统信息"
         size="medium"

@@ -32,7 +32,7 @@ export default function VmSetMediaModal({ vm, slot, onCancel, onSubmitted }: VmS
   return (
     <Modal
       visible
-      title={`加载 / 更换${slot === "INSTALL" ? "安装镜像" : "驱动镜像"} · ${vm.name}`}
+      title={`加载/更换镜像 · ${vm.name}`}
       onCancel={onCancel}
       confirmLoading={mutation.isPending}
       okButtonProps={{ disabled: vmIsClosed(vm) || mutation.busy || media.isFetching }}

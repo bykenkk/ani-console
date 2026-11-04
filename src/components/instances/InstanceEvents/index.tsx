@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { listInstanceEvents } from "@/api/instances";
-import { Alert, Tag } from "@arco-design/web-react";
+import { Alert } from "@arco-design/web-react";
 import { withId } from "@/lib/id";
-import { DataTable } from "@/components/common";
+import { ListDataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
 type InstanceEventsProps = { instanceId?: string };
@@ -23,9 +23,11 @@ export default function InstanceEvents({ instanceId }: InstanceEventsProps) {
   });
   // TODO(governance-instance-events): 当前仅返回事件快照，待完整历史契约补齐并联调后接入分页。
   return (
-    <div className="flex flex-col gap-3">
-      {current.data?.truncated && <Alert type="info" content="当前事件较多，仅展示部分结果" />}
-      <DataTable
+    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden">
+      {current.data?.truncated && (
+        <Alert className="shrink-0" type="info" content="当前事件较多，仅展示部分结果" />
+      )}
+      <ListDataTable
         data={current.data?.events ?? []}
         rowKey={(event) =>
           [event.type, event.reason, event.message, event.lastOccurredAt].join("/")
@@ -36,11 +38,7 @@ export default function InstanceEvents({ instanceId }: InstanceEventsProps) {
           {
             title: "类型",
             width: 100,
-            render: (_, event) => (
-              <Tag color={event.type === "Warning" ? "orangered" : "green"}>
-                {event.type === "Normal" ? "正常" : event.type === "Warning" ? "警告" : event.type}
-              </Tag>
-            ),
+            dataIndex: "type",
           },
           { title: "原因", dataIndex: "reason", width: 180 },
           { title: "事件内容", width: 400, dataIndex: "message", ellipsis: true },

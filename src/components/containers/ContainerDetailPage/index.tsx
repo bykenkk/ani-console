@@ -185,6 +185,7 @@ export default function ContainerDetailPage({
           {
             key: "events",
             label: "事件",
+            fill: true,
             content: <InstanceEvents instanceId={instanceId} />,
           },
           {

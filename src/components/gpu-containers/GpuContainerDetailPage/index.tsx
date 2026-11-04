@@ -223,6 +223,7 @@ export default function GpuContainerDetailPage({
           {
             key: "events",
             label: "事件",
+            fill: true,
             content: <InstanceEvents instanceId={instanceId} />,
           },
           {
