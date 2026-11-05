@@ -119,7 +119,9 @@ export default function InstanceMetrics({ instanceId }: InstanceMetricsProps) {
               {chart.hasTrend ? (
                 <CoreLineBarChart option={chart.option} style={{ height: 160 }} />
               ) : (
-                <Empty description={`暂无${chart.title}数据`} />
+                <div className="flex h-40 items-center justify-center">
+                  <Empty description={`暂无${chart.title}数据`} />
+                </div>
               )}
             </Skeleton>
           </Card>
