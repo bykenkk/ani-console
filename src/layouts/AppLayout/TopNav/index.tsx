@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Button, Dropdown, Input, Menu, Modal } from "@arco-design/web-react";
+import { Button, Dropdown, Menu, Modal } from "@arco-design/web-react";
+// import { Input } from "@arco-design/web-react";
 import {
   IconApps,
   IconCalendar,
@@ -11,7 +12,7 @@ import {
   IconInfoCircle,
   IconLocation,
   IconRight,
-  IconSearch,
+  // IconSearch,
   IconTag,
   IconUser,
 } from "@arco-design/web-react/icon";
@@ -23,7 +24,7 @@ import { formatDateTime } from "@/lib/format";
 import { useAuthStore } from "@/stores/auth";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import AboutUsModal from "./AboutUsModal";
-import KaiwuEntryButton from "./KaiwuEntryButton";
+// import KaiwuEntryButton from "./KaiwuEntryButton";
 
 const MOCK_REGION = { value: "guangzhou-a", label: "广州-A" };
 
@@ -202,14 +203,16 @@ export default function TopNav({
           </nav>
         </div>
         <div className="topnav-right">
-          <Input
+          {/* TODO(feature-visibility): 后续开放全局搜索时恢复搜索框及相关导入。 */}
+          {/* <Input
             className="topnav-search"
             prefix={<IconSearch />}
             placeholder="请输入内容"
             aria-label="全局搜索"
-          />
-          <KaiwuEntryButton />
-          <span className="topnav-user-divider" aria-hidden="true" />
+          /> */}
+          {/* TODO(feature-visibility): 后续开放开物入口时恢复按钮、分隔线及相关导入。 */}
+          {/* <KaiwuEntryButton />
+          <span className="topnav-user-divider" aria-hidden="true" /> */}
           <Dropdown
             droplist={userMenu}
             trigger="hover"
