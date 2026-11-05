@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Select, Tag } from "@arco-design/web-react";
+import { Select } from "@arco-design/web-react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { listNetworkVnics, type NetworkVnic } from "@/api/network";
@@ -8,18 +8,15 @@ import {
   ListDataTable,
   ResourceId,
   StatusBadge,
+  SubnetSelect,
   type ListColumn,
 } from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { useVnicActions } from "@/hooks/useVnicActions";
-import { formatDateTime } from "@/lib/format";
 import CreateVnicModal from "../CreateVnicModal";
-import BindVnicModal from "../BindVnicModal";
-import VnicSubnetSelect from "../VnicSubnetSelect";
 
 export default function VnicsPage() {
   const [createVisible, setCreateVisible] = useState(false);
-  const [binding, setBinding] = useState<NetworkVnic>();
   const [name, setName] = useState("");
   const [state, setState] = useState<string>();
   const [bindingState, setBindingState] = useState<string>();
@@ -44,7 +41,7 @@ export default function VnicsPage() {
       ),
     meta: { errorNotification: { id: "vnics", action: "虚拟网卡列表加载" } },
   });
-  const { actions } = useVnicActions(paging.resetPagination);
+  const { actions, dialogNode } = useVnicActions(paging.resetPagination);
   const columns: ListColumn<NetworkVnic>[] = [
     {
       title: "名称 / ID",
@@ -60,61 +57,29 @@ export default function VnicsPage() {
       ),
     },
     {
-      title: "分配状态",
+      title: "状态",
       width: 120,
       render: (_, item) => <StatusBadge status={item.state} reason={item.reason} />,
     },
     {
-      title: "使用状态",
-      width: 150,
-      render: (_, item) =>
-        item.bindings?.length ? (
-          <Tag>
-            {item.bindings.some((binding) => binding.current) ? "使用中" : "已预留，待应用"}
-          </Tag>
-        ) : (
-          <Tag>{item.state === "available" ? "空闲" : "未就绪"}</Tag>
-        ),
-    },
-    {
-      title: "VPC / 子网",
-      width: 260,
-      render: (_, item) => (
-        <div className="flex min-w-0 flex-col">
-          <span className="truncate">{item.vpc_name || item.vpc_id}</span>
-          <span className="truncate">{item.subnet_name || item.subnet_id}</span>
-        </div>
-      ),
-    },
-    { title: "MAC", width: 180, render: (_, item) => item.mac_address || "-" },
-    {
-      title: "IP 地址",
+      title: "私网 IP",
       width: 220,
+      ellipsis: true,
       render: (_, item) => item.ips?.join(" · ") || item.primary_ip || "-",
     },
     {
-      title: "绑定实例",
-      width: 250,
-      render: (_, item) =>
-        item.bindings?.length
-          ? item.bindings.map((binding) => (
-              <div key={binding.binding_id}>
-                <span>{binding.consumer_name || binding.consumer_id}</span>
-              </div>
-            ))
-          : "-",
+      title: "关联实例",
+      width: 200,
+      ellipsis: true,
+      // FIXME(api-contract): 后端已确认网卡与实例为一对一关系，bindings 数组为接口设计问题；暂取第一条，待契约修正后调整。
+      dataIndex: "bindings[0].consumer_name",
     },
     {
-      title: "观察",
-      width: 220,
-      render: (_, item) => (
-        <div>
-          {item.observation_stale ? "观察待确认" : item.reason || "-"}
-          <div>{formatDateTime(item.observed_at)}</div>
-        </div>
-      ),
+      title: "子网",
+      width: 200,
+      ellipsis: true,
+      render: (_, item) => item.subnet_name || item.subnet_id,
     },
-    { title: "创建时间", width: 180, render: (_, item) => formatDateTime(item.created_at) },
   ];
   return (
     <>
@@ -143,13 +108,20 @@ export default function VnicsPage() {
           },
           filters: (
             <div className="flex flex-wrap gap-3">
-              <VnicSubnetSelect value={subnetId} onChange={setSubnetId} />
+              <SubnetSelect
+                aria-label="子网筛选"
+                value={subnetId}
+                onChange={setSubnetId}
+                allowClear
+                placeholder="全部子网"
+                style={{ width: 220 }}
+              />
               <Select
-                aria-label="分配状态"
+                aria-label="状态"
                 allowClear
                 value={state}
                 onChange={setState}
-                placeholder="全部分配状态"
+                placeholder="全部状态"
                 style={{ width: 180 }}
                 options={[
                   { value: "provisioning", label: "分配中" },
@@ -158,11 +130,11 @@ export default function VnicsPage() {
                 ]}
               />
               <Select
-                aria-label="使用状态"
+                aria-label="绑定状态"
                 allowClear
                 value={bindingState}
                 onChange={setBindingState}
-                placeholder="全部使用状态"
+                placeholder="全部绑定状态"
                 style={{ width: 180 }}
                 options={[
                   { value: "free", label: "未绑定" },
@@ -178,15 +150,7 @@ export default function VnicsPage() {
         <ListDataTable
           data={list.data?.items ?? []}
           columns={columns}
-          rowActions={[
-            {
-              key: "bind",
-              label: "绑定实例",
-              disabled: (item) => item.state === "deleting" || item.state === "deleted",
-              onClick: setBinding,
-            },
-            ...actions,
-          ]}
+          rowActions={actions}
           loading={list.isFetching}
           tableLabel="虚拟网卡列表"
           pagination={{
@@ -204,7 +168,7 @@ export default function VnicsPage() {
           onCreated={paging.resetPagination}
         />
       )}
-      {binding && <BindVnicModal vnic={binding} onCancel={() => setBinding(undefined)} />}
+      {dialogNode}
     </>
   );
 }

@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { listNetworkVnics } from "@/api/network";
-import { DataTable, StatusBadge } from "@/components/common";
+import { DataTable, ResourceNameId, StatusBadge } from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { withId } from "@/lib/id";
 
@@ -20,13 +20,16 @@ export default function SubnetVnics({ subnetId }: SubnetVnicsProps) {
   });
   return (
     <DataTable
-      header={{ title: "独立虚拟网卡" }}
+      header={{ title: "虚拟网卡" }}
       data={vnics.data?.items ?? []}
       loading={vnics.isFetching}
       tableLabel="子网关联虚拟网卡"
       columns={[
-        { title: "名称", width: 220, dataIndex: "name" },
-        { title: "ID", width: 300, dataIndex: "id" },
+        {
+          title: "名称 / ID",
+          width: 200,
+          render: (_, vnic) => <ResourceNameId name={vnic.name} id={vnic.id} openable={false} />,
+        },
         {
           title: "分配状态",
           width: 120,

@@ -1,7 +1,7 @@
+import { StatusBadge } from "@/components/common";
 import { Tag } from "@arco-design/web-react";
 import { listNetworkSubnets, type NetworkSubnet } from "@/api/network";
 import { DataTable, ResourceNameId, type ListColumn } from "@/components/common";
-import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
 
@@ -24,10 +24,18 @@ export default function VpcRelatedSubnets({ vpcId }: VpcRelatedSubnetsProps) {
       width: 200,
       ellipsis: true,
       render: (_, resource) => (
-        <div className="flex flex-col items-start gap-1">
-          <ResourceNameId name={resource.name || "-"} id={resource.id} openable={false} />
-          {resource?.owner_scope === "platform" && <Tag color="arcoblue">平台基础网络</Tag>}
-        </div>
+        <ResourceNameId
+          name={resource.name || "-"}
+          id={resource.id}
+          openable={false}
+          nameSuffix={
+            resource.owner_scope === "platform" && (
+              <Tag size="small" title="由平台提供并统一管理">
+                平台
+              </Tag>
+            )
+          }
+        />
       ),
     },
     { title: "CIDR", width: 180, ellipsis: true, dataIndex: "cidr" },
@@ -35,7 +43,13 @@ export default function VpcRelatedSubnets({ vpcId }: VpcRelatedSubnetsProps) {
     {
       title: "状态",
       width: 120,
-      render: (_, resource) => <NetworkResourceStatus resource={resource} />,
+      render: (_, resource) => (
+        <StatusBadge
+          status={resource.state}
+          reason={resource.reason}
+          message={resource.reason_message}
+        />
+      ),
     },
   ];
 

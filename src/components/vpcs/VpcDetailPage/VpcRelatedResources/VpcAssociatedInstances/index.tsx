@@ -1,6 +1,5 @@
 import { listNetworkVpcAssociatedInstances, type NetworkAssociatedInstance } from "@/api/network";
 import { DataTable, ResourceNameId, StatusBadge, type ListColumn } from "@/components/common";
-import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useListPagination } from "@/hooks/useListPagination";
 import { withId } from "@/lib/id";
 import { Tag } from "@arco-design/web-react";
@@ -20,6 +19,7 @@ const columns: Array<ListColumn<NetworkAssociatedInstance>> = [
     title: "名称 / ID",
     width: 200,
     ellipsis: true,
+    fixed: "left",
     render: (_, item) => (
       <ResourceNameId name={item.consumer_name || "-"} id={item.consumer_id} openable={false} />
     ),
@@ -35,31 +35,10 @@ const columns: Array<ListColumn<NetworkAssociatedInstance>> = [
     render: (_, item) => <StatusBadge status={item.consumer_state} />,
   },
   {
-    title: "网络占用状态",
-    width: 120,
-    render: (_, item) => (
-      <NetworkResourceStatus
-        resource={{
-          state: item.attachment_state,
-          reason: item.attachment_reason,
-          observation_stale: item.observation_stale,
-          observed_at: item.observed_at,
-        }}
-      />
-    ),
-  },
-  {
-    title: "子网",
-    width: 200,
-    ellipsis: true,
-    render: (_, item) => item.subnet_name || item.subnet_id || "-",
-  },
-  {
-    title: "地址",
+    title: "IP 地址",
     width: 240,
     ellipsis: true,
-    render: (_, item) =>
-      item.addresses.map(({ nic_name, address }) => `${nic_name}: ${address}`).join(" · ") || "-",
+    render: (_, item) => item.addresses.map(({ address }) => address).join(" · ") || "-",
   },
 ];
 

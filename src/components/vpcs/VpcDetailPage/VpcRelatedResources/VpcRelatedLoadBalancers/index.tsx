@@ -1,6 +1,6 @@
+import { StatusBadge } from "@/components/common";
 import { listNetworkLoadBalancers, type NetworkLoadBalancer } from "@/api/network";
 import { DataTable, ResourceNameId, type ListColumn } from "@/components/common";
-import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
 
@@ -29,7 +29,13 @@ export default function VpcRelatedLoadBalancers({ vpcId }: VpcRelatedLoadBalance
     {
       title: "状态",
       width: 120,
-      render: (_, resource) => <NetworkResourceStatus resource={resource} />,
+      render: (_, resource) => (
+        <StatusBadge
+          status={resource.state}
+          reason={resource.reason}
+          message={resource.reason_message}
+        />
+      ),
     },
   ];
 

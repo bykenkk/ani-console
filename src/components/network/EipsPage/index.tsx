@@ -1,8 +1,14 @@
-import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import EipChangeSecurityGroupsModal from "@/components/network/EipChangeSecurityGroupsModal";
 import { useState } from "react";
 import { listNetworkEips, type NetworkEip, type NetworkResourceStateFilter } from "@/api/network";
-import { ListPageFrame, ListDataTable, ResourceNameId, type ListColumn } from "@/components/common";
+import {
+  ListPageFrame,
+  ListDataTable,
+  ResourceNameId,
+  ResourceId,
+  StatusBadge,
+  type ListColumn,
+} from "@/components/common";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { formatDateTime } from "@/lib/format";
 import CreateEipModal from "../CreateEipModal";
@@ -42,10 +48,18 @@ export default function EipsPage() {
       render: (_, item) => <ResourceNameId name={item.name} id={item.id} openable={false} />,
     },
     {
+      key: "address",
+      title: "IP 地址",
+      dataIndex: "address",
+      render: (_, item) => <ResourceId value={item.address} />,
+      ellipsis: true,
+      width: 180,
+    },
+    {
       key: "state",
-      title: "资源状态",
+      title: "状态",
       width: 120,
-      render: (_, item) => <NetworkResourceStatus resource={item} />,
+      render: (_, item) => <StatusBadge status={item.state} reason={item.reason} />,
     },
     {
       key: "binding-state",
@@ -53,20 +67,12 @@ export default function EipsPage() {
       width: 120,
       render: (_, item) => <EipBindingStatus eip={item} />,
     },
-    { key: "address", title: "公网 IP", dataIndex: "address", ellipsis: true, width: 160 },
     {
-      key: "network",
-      title: "VPC",
+      key: "binding-resource",
+      title: "绑定资源",
       width: 220,
       ellipsis: true,
       dataIndex: "binding_target.vpc_id",
-    },
-    {
-      key: "description",
-      title: "简介",
-      dataIndex: "description",
-      ellipsis: true,
-      width: 200,
     },
     {
       key: "createdAt",

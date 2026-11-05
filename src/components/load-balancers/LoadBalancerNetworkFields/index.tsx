@@ -1,13 +1,12 @@
+import { VpcSelect, SubnetSelect } from "@/components/common";
 import LoadBalancerPrivateIpField from "../LoadBalancerPrivateIpField";
-import { Form, Grid, Select } from "@arco-design/web-react";
+import { Form, Grid } from "@arco-design/web-react";
 import type { FormInstance } from "@arco-design/web-react/es/Form";
-import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { listNetworkSubnets, listNetworkVpcs } from "@/api/network";
+import type { NetworkVPC } from "@/api/network";
 
 import type { LoadBalancerConfigurationFormValues } from "@/components/load-balancers/CreateLoadBalancerModal";
 import LoadBalancerPublicIpField from "@/components/load-balancers/LoadBalancerPublicIpField";
-import { withFirst100 } from "@/api/pagination";
 import VpcBaseConnectivityStatus from "@/components/vpcs/VpcBaseConnectivityStatus";
 
 type LoadBalancerNetworkFieldsProps = {
@@ -19,42 +18,19 @@ type LoadBalancerNetworkFieldsProps = {
   onAvailabilityChange: (available: boolean) => void;
 };
 
-const listVpcOptions = withFirst100(listNetworkVpcs);
-
 export default function LoadBalancerNetworkFields({
   form,
   scheme,
   onAvailabilityChange,
 }: LoadBalancerNetworkFieldsProps) {
-  const [vpcId, setVpcId] = useState<string>();
+  const [selectedVpc, setSelectedVpc] = useState<NetworkVPC>();
+  const vpcId = selectedVpc?.id;
   useEffect(() => {
     if (scheme === "public") {
       form.setFieldValue("vip", undefined);
       onAvailabilityChange(true);
     }
   }, [scheme, form, onAvailabilityChange]);
-  const vpcs = useQuery({
-    queryKey: ["network-vpcs", "load-balancer-create", "options", { can_manage: true }],
-    queryFn: () => listVpcOptions({ can_manage: true }),
-    meta: {
-      errorNotification: { id: "vpcs", action: "VPC 列表加载", fallback: "请求失败，请稍后重试" },
-    },
-  });
-  // TODO(pagination-migration): 子网仍使用 limit/cursor，保留首批选项；后端改造后使用 withFirst100。
-  const subnets = useQuery({
-    queryKey: ["network-subnets", "load-balancer-create", vpcId, { can_manage: true }],
-    queryFn: () => listNetworkSubnets({ vpc_id: vpcId, limit: 100, can_manage: true }),
-    enabled: !!vpcId,
-    meta: {
-      errorNotification: {
-        id: "subnets",
-        action: "子网列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-  });
-  const availableSubnets = subnets.data?.items ?? [];
-  const selectedVpc = vpcs.data?.items.find((item) => item.id === vpcId);
   return (
     <>
       <Form.Item noStyle shouldUpdate={(previous, next) => previous.scheme !== next.scheme}>
@@ -65,18 +41,13 @@ export default function LoadBalancerNetworkFields({
       <Grid.Row>
         <Grid.Col span={12} style={{ paddingRight: 8, minWidth: 0 }}>
           <Form.Item label="VPC" field="vpc_id" rules={[{ required: true, message: "请选择 VPC" }]}>
-            <Select
-              placeholder="请选择 VPC"
-              loading={vpcs.isLoading}
-              onChange={(value) => {
-                setVpcId(value);
+            <VpcSelect
+              canManage
+              onChange={(_, vpc) => {
+                setSelectedVpc(vpc);
                 onAvailabilityChange(scheme === "public");
                 form.setFieldsValue({ subnet_id: undefined, vip: "", listeners: [] });
               }}
-              options={(vpcs.data?.items ?? []).map((item) => ({
-                value: item.id,
-                label: `${item.name} · ${item.cidr}`,
-              }))}
             />
           </Form.Item>
         </Grid.Col>
@@ -86,19 +57,17 @@ export default function LoadBalancerNetworkFields({
             field="subnet_id"
             rules={[{ required: true, message: "请选择子网" }]}
           >
-            <Select
+            <SubnetSelect
+              key={vpcId}
+              vpcId={vpcId}
+              canManage
               placeholder={vpcId ? "请选择用于 VIP 的子网" : "请先选择 VPC"}
               disabled={!vpcId}
-              loading={subnets.isLoading}
               allowClear
               onChange={() => {
                 form.setFieldValue("vip", "");
                 onAvailabilityChange(scheme === "public");
               }}
-              options={availableSubnets.map((item) => ({
-                value: item.id,
-                label: `${item.name} · ${item.cidr}`,
-              }))}
             />
           </Form.Item>
         </Grid.Col>

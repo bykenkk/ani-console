@@ -1,5 +1,5 @@
+import { StatusBadge } from "@/components/common";
 import { Tag } from "@arco-design/web-react";
-import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useListPagination } from "@/hooks/useListPagination";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVpcActions } from "@/hooks/useVpcActions";
@@ -49,17 +49,25 @@ export default function VpcsPage() {
       width: 200,
       fixed: "left",
       render: (_, vpc) => (
-        <div className="flex flex-col items-start gap-1">
-          <ResourceNameId name={vpc.name} id={vpc.id} type="vpc" />
-          {vpc.owner_scope === "platform" && <Tag color="arcoblue">平台基础网络</Tag>}
-        </div>
+        <ResourceNameId
+          name={vpc.name}
+          id={vpc.id}
+          type="vpc"
+          nameSuffix={
+            vpc.owner_scope === "platform" && (
+              <Tag size="small" title="由平台提供并统一管理">
+                平台
+              </Tag>
+            )
+          }
+        />
       ),
     },
     {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, vpc) => <NetworkResourceStatus resource={vpc} />,
+      render: (_, vpc) => <StatusBadge status={vpc.state} reason={vpc.reason} />,
     },
     {
       key: "cidr",
@@ -73,8 +81,7 @@ export default function VpcsPage() {
       title: "公网 IP",
       width: 240,
       ellipsis: true,
-      render: (_, vpc) =>
-        vpc.owner_scope === "platform" ? "平台托管" : vpc.public_egress?.eip_address || "-",
+      dataIndex: "public_egress.eip_address",
     },
     {
       key: "subnets",

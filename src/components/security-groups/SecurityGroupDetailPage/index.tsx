@@ -16,7 +16,7 @@ import { getNetworkSecurityGroup, type NetworkSecurityGroup } from "@/api/networ
 
 import { formatDateTime } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
-import SecurityGroupRelatedResources from "./SecurityGroupRelatedResources";
+import RelatedResources from "./RelatedResources";
 import SecurityGroupRules from "./SecurityGroupRules";
 
 type SecurityGroupDetailPageProps = {
@@ -57,7 +57,9 @@ export default function SecurityGroupDetailPage({
           { label: securityGroup.name },
         ]}
         title={securityGroup.name}
-        status={<StatusBadge status={securityGroup.state} />}
+        status={
+          <StatusBadge status={securityGroup.state} title={securityGroup.reason || undefined} />
+        }
         icon={<AliIcon name="anquanzu" size={28} />}
         headerItems={[{ label: "关联资源", value: securityGroup.bound_resource_count }]}
         actions={<ResourceActionMenu record={securityGroup} actions={actions} />}
@@ -68,8 +70,6 @@ export default function SecurityGroupDetailPage({
             fields: [
               { label: "ID", value: <ResourceId value={securityGroup.id} /> },
               { label: "配置版本", value: securityGroup.version },
-              { label: "状态原因", value: securityGroup.reason || "-" },
-              { label: "最近观测", value: formatDateTime(securityGroup.observed_at) },
               { label: "描述", value: securityGroup.description || "-" },
               {
                 label: "创建时间",
@@ -96,7 +96,7 @@ export default function SecurityGroupDetailPage({
           {
             key: "related",
             label: "关联资源",
-            content: <SecurityGroupRelatedResources securityGroupId={securityGroupId} />,
+            content: <RelatedResources securityGroupId={securityGroupId} />,
           },
         ]}
         activeTabKey={tab}

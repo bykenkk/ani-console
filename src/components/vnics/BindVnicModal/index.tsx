@@ -1,35 +1,61 @@
 import { useState } from "react";
 import { Alert, Form, Modal, Radio } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
-import type { NetworkVnic, VnicConsumerKind, VnicBindingTarget } from "@/api/network";
-import { getVmNetworkInterfaces } from "@/api/vms";
-import { getInstanceNetworkInterfaces } from "@/api/instances";
-import { useInstanceNetworkActions } from "@/hooks/useInstanceNetworkActions";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { NetworkVnic, VnicConsumerKind, SetNetworkInterfaceInput } from "@/api/network";
+import { getVmNetworkInterfaces, setVmNetworkInterface } from "@/api/vms";
+import { getInstanceNetworkInterfaces, setInstanceNetworkInterface } from "@/api/instances";
 import { validateForm } from "@/lib/form";
 import { withId } from "@/lib/id";
-import VnicBindingTargetSelect from "../VnicBindingTargetSelect";
+import BindableInstanceSelect from "./BindableInstanceSelect";
 
 type BindVnicModalProps = { vnic: NetworkVnic; onCancel: () => void };
 export default function BindVnicModal({ vnic, onCancel }: BindVnicModalProps) {
   const [form] = Form.useForm();
   const [kind, setKind] = useState<VnicConsumerKind>("vm");
   const [id, setId] = useState("");
-  const [selected, setSelected] = useState<VnicBindingTarget>();
+  const networkQueryKey = [
+    kind === "vm" ? "vm-network-interfaces" : "container-network-interfaces",
+    id,
+  ];
   const network = useQuery({
-    queryKey: ["network-interfaces", kind, id],
+    queryKey: networkQueryKey,
     queryFn: ({ signal }) =>
       kind === "vm" ? getVmNetworkInterfaces(id, signal) : getInstanceNetworkInterfaces(id, signal),
     enabled: Boolean(id),
     meta: {
-      errorNotification: { id: withId("network-interfaces", kind, id), action: "实例网卡配置加载" },
+      errorNotification: { id: withId(networkQueryKey[0], id), action: "实例网卡配置加载" },
     },
   });
-  const current = network.data?.items.find((item) => item.slot === "primary");
-  const save = useInstanceNetworkActions(kind, id, onCancel);
+  const qc = useQueryClient();
+  const save = useMutation({
+    mutationKey: [kind === "vm" ? "vm-write" : "instance-command", "network", id],
+    mutationFn: (input: SetNetworkInterfaceInput) =>
+      kind === "vm"
+        ? setVmNetworkInterface(id, "primary", input)
+        : setInstanceNetworkInterface(id, "primary", input),
+    meta: {
+      feedback: {
+        channel: "message",
+        action: "绑定虚拟网卡",
+        successText: "绑定已提交",
+        errorFallback: "绑定失败，请刷新后重试",
+      },
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        qc.invalidateQueries({ queryKey: networkQueryKey }),
+        qc.invalidateQueries({ queryKey: ["network-vnics"] }),
+        qc.invalidateQueries({ queryKey: ["network-vnic"] }),
+      ]);
+      onCancel();
+    },
+    onError: () => qc.invalidateQueries({ queryKey: networkQueryKey }),
+  });
   return (
     <Modal
       visible
-      title="绑定实例"
+      title={`绑定实例：${vnic.name}`}
+      okText="绑定"
       onCancel={onCancel}
       confirmLoading={save.isPending}
       okButtonProps={{ disabled: !network.data?.supported }}
@@ -44,13 +70,18 @@ export default function BindVnicModal({ vnic, onCancel }: BindVnicModalProps) {
       }}
     >
       <Form form={form} layout="vertical">
+        <Alert
+          className="mb-4"
+          type="info"
+          content="绑定后，网卡将被预留，待实例重启或下次启动时生效。此操作不会自动重启实例。"
+        />
         <Form.Item label="实例类型">
           <Radio.Group
+            type="button"
             value={kind}
             onChange={(value) => {
               setKind(value);
               setId("");
-              setSelected(undefined);
               form.setFieldValue("instance", undefined);
             }}
           >
@@ -63,32 +94,14 @@ export default function BindVnicModal({ vnic, onCancel }: BindVnicModalProps) {
           label="绑定实例"
           rules={[{ required: true, message: "请选择实例" }]}
         >
-          <VnicBindingTargetSelect
+          <BindableInstanceSelect
             key={kind}
             vnicId={vnic.id}
-            consumerKind={kind}
+            instanceKind={kind}
             value={id || undefined}
-            onChange={setId}
-            onSelected={setSelected}
+            onChange={(value) => setId(value ?? "")}
           />
         </Form.Item>
-        <div className="mb-4 flex flex-col gap-2">
-          <div>当前网卡：{current?.current_vnic_name || "无已确认在线端点"}</div>
-          <div>当前地址：{current?.current_ips?.join(" · ") || "-"}</div>
-          <div>
-            目标网卡：{vnic.name} · {vnic.ips?.join(" · ") || vnic.primary_ip || "-"}
-          </div>
-          <div>
-            继承安全组：
-            {selected
-              ? selected.security_group_ids?.join(" · ") || "无安全组，将清空网卡原安全组"
-              : "-"}
-          </div>
-        </div>
-        <Alert
-          type="info"
-          content="保存配置不会重启实例。运行实例需重启生效，停止实例在下次启动使用；目标网卡将被预留。"
-        />
       </Form>
     </Modal>
   );

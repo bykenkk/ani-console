@@ -3,17 +3,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { restartInstance, getInstance, type InstanceRecord } from "@/api/instances";
 import { withId } from "@/lib/id";
 
-type InstanceRestartModalProps = {
+type ContainerRestartModalProps = {
   instance: InstanceRecord;
   onCancel: () => void;
   onSubmitted: () => void;
 };
 
-export default function InstanceRestartModal({
+export default function ContainerRestartModal({
   instance,
   onCancel,
   onSubmitted,
-}: InstanceRestartModalProps) {
+}: ContainerRestartModalProps) {
   const qc = useQueryClient();
   const mutation = useMutation({
     mutationKey: ["instance-command", instance.id, "restart"],
@@ -38,7 +38,7 @@ export default function InstanceRestartModal({
       await Promise.all([
         qc.invalidateQueries({ queryKey: ["instances", instance.compute_type] }),
         qc.invalidateQueries({ queryKey: ["instance", instance.id] }),
-        qc.invalidateQueries({ queryKey: ["network-interfaces", "container", instance.id] }),
+        qc.invalidateQueries({ queryKey: ["container-network-interfaces", instance.id] }),
         qc.invalidateQueries({ queryKey: ["network-vnics"] }),
         qc.invalidateQueries({ queryKey: ["network-vnic"] }),
       ]);

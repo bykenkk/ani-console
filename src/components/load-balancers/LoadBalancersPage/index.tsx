@@ -1,29 +1,20 @@
-import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
+import { StatusBadge, VpcSelect } from "@/components/common";
 import { useLoadBalancerActions } from "@/hooks/useLoadBalancerActions";
 
-import { useQuery } from "@tanstack/react-query";
-import { Select } from "@arco-design/web-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import {
-  listNetworkLoadBalancers,
-  listNetworkVpcs,
-  type NetworkLoadBalancer,
-  type NetworkVPC,
-} from "@/api/network";
+import { listNetworkLoadBalancers, type NetworkLoadBalancer } from "@/api/network";
 
 import CreateLoadBalancerModal from "@/components/load-balancers/CreateLoadBalancerModal";
 import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
 import { loadBalancerListeners } from "@/lib/load-balancers";
 import { formatDateTime } from "@/lib/format";
-import { withFirst100 } from "@/api/pagination";
-
-const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type LoadBalancer = NetworkLoadBalancer;
-type Vpc = NetworkVPC;
 type StatusFilter = "all" | "provisioning" | "available" | "failed";
 
 export default function LoadBalancersPage() {
+  const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<StatusFilter>("all");
 
@@ -83,17 +74,6 @@ export default function LoadBalancersPage() {
     resetPagination();
     if (page === 1) loadBalancers.refetch();
   };
-  const vpcs = useQuery({
-    meta: {
-      errorNotification: {
-        id: "vpcs",
-        action: "VPC 列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-vpcs", "load-balancer-list", "options"],
-    queryFn: () => listVpcOptions({}),
-  });
   const { actions } = useLoadBalancerActions(resetPagination);
 
   const columns: Array<ListColumn<LoadBalancer>> = [
@@ -108,7 +88,9 @@ export default function LoadBalancersPage() {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, item) => <NetworkResourceStatus resource={item} />,
+      render: (_, item) => (
+        <StatusBadge status={item.state} reason={item.reason} message={item.reason_message} />
+      ),
     },
     {
       key: "vip",
@@ -197,34 +179,25 @@ export default function LoadBalancersPage() {
           },
           filters: (
             <div className="flex flex-wrap gap-3">
-              <Select
+              <VpcSelect
                 aria-label="按 VPC 筛选"
                 value={vpcId || undefined}
-                onChange={(value) => {
-                  setVpcId(value);
+                onChange={(id) => {
+                  setVpcId(id ?? "");
                   resetPagination();
                 }}
                 allowClear
                 placeholder="全部 VPC"
-                loading={vpcs.isLoading}
-                style={{
-                  width: 220,
-                }}
-              >
-                {((vpcs.data?.items ?? []) as Vpc[]).map((item) => (
-                  <Select.Option key={item.id} value={item.id}>
-                    {item.name}
-                  </Select.Option>
-                ))}
-              </Select>
+                style={{ width: 220 }}
+              />
             </div>
           ),
           refresh: {
             label: "刷新",
-            spinning: loadBalancers.isRefetching || vpcs.isRefetching,
+            spinning: loadBalancers.isRefetching,
             onClick: () => {
               refresh();
-              vpcs.refetch();
+              qc.invalidateQueries({ queryKey: ["network-vpcs", "options"] });
             },
           },
         }}
@@ -233,7 +206,7 @@ export default function LoadBalancersPage() {
           data={items}
           columns={columns}
           rowActions={actions}
-          loading={loadBalancers.isFetching || vpcs.isFetching}
+          loading={loadBalancers.isFetching}
           tableLabel="负载均衡列表"
           pagination={{ ...pagination, disabled: loadBalancers.isFetching }}
         />

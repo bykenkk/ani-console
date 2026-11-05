@@ -1,24 +1,22 @@
-import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
+import { StatusBadge, VpcSelect } from "@/components/common";
 import CreateSubnetModal from "@/components/subnets/CreateSubnetModal";
 import { useSubnetActions } from "@/hooks/useSubnetActions";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Select, Tag } from "@arco-design/web-react";
-import { useMemo, useState } from "react";
-import {
-  listNetworkSubnets,
-  listNetworkVpcs,
-  type NetworkSubnet,
-  type NetworkVPC,
-} from "@/api/network";
+import { useQueryClient } from "@tanstack/react-query";
+import { Tag } from "@arco-design/web-react";
+import { useState } from "react";
+import { listNetworkSubnets, type NetworkSubnet } from "@/api/network";
 
-import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
+import {
+  ResourceId,
+  ResourceNameId,
+  ListPageFrame,
+  type ListColumn,
+  ListDataTable,
+} from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
-import { withFirst100 } from "@/api/pagination";
 
-const listVpcOptions = withFirst100(listNetworkVpcs);
-type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
 type SubnetStatusFilter = "all" | Subnet["state"];
 
@@ -29,17 +27,6 @@ export default function SubnetsPage() {
   const [searchText, setSearchText] = useState("");
   const [filterVpcId, setFilterVpcId] = useState("");
 
-  const vpcs = useQuery({
-    meta: {
-      errorNotification: {
-        id: "vpcs",
-        action: "数据加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-vpcs", "subnet-page", "options"],
-    queryFn: () => listVpcOptions({}),
-  });
   // TODO(pagination-migration): 子网继续按后端 limit/cursor 查询当前页，待正式页码契约后迁移。
   const {
     query: subnets,
@@ -69,10 +56,6 @@ export default function SubnetsPage() {
   });
   const { actions } = useSubnetActions(resetPagination);
 
-  const vpcNames = useMemo(
-    () => new Map(((vpcs.data?.items ?? []) as Vpc[]).map((vpc) => [vpc.id, vpc.name])),
-    [vpcs.data?.items],
-  );
   const columns: Array<ListColumn<Subnet>> = [
     {
       key: "name",
@@ -80,24 +63,34 @@ export default function SubnetsPage() {
       width: 200,
       fixed: "left",
       render: (_, subnet) => (
-        <div className="flex flex-col items-start gap-1">
-          <ResourceNameId name={subnet.name} id={subnet.id} type="subnet" />
-          {subnet.owner_scope === "platform" && <Tag color="arcoblue">平台基础网络</Tag>}
-        </div>
+        <ResourceNameId
+          name={subnet.name}
+          id={subnet.id}
+          type="subnet"
+          nameSuffix={
+            subnet.owner_scope === "platform" && (
+              <Tag size="small" title="由平台提供并统一管理">
+                平台
+              </Tag>
+            )
+          }
+        />
       ),
     },
     {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, subnet) => <NetworkResourceStatus resource={subnet} />,
+      render: (_, subnet) => (
+        <StatusBadge status={subnet.state} reason={subnet.reason} message={subnet.reason_message} />
+      ),
     },
     {
       key: "vpc",
       title: "VPC",
       width: 200,
       ellipsis: true,
-      render: (_, subnet) => vpcNames.get(subnet.vpc_id) || subnet.vpc_id,
+      render: (_, subnet) => <ResourceId value={subnet.vpc_id} />,
     },
     {
       key: "cidr",
@@ -173,31 +166,22 @@ export default function SubnetsPage() {
           },
           filters: (
             <div className="flex flex-wrap gap-3">
-              <Select
+              <VpcSelect
                 aria-label="按 VPC 筛选"
                 value={filterVpcId || undefined}
-                onChange={setFilterVpcId}
+                onChange={(id) => setFilterVpcId(id ?? "")}
                 allowClear
                 placeholder="全部 VPC"
-                loading={vpcs.isLoading}
-                style={{
-                  width: 220,
-                }}
-              >
-                {((vpcs.data?.items ?? []) as Vpc[]).map((vpc) => (
-                  <Select.Option key={vpc.id} value={vpc.id}>
-                    {vpc.name}
-                  </Select.Option>
-                ))}
-              </Select>
+                style={{ width: 220 }}
+              />
             </div>
           ),
           refresh: {
             label: "刷新",
-            spinning: subnets.isRefetching || vpcs.isRefetching,
+            spinning: subnets.isRefetching,
             onClick: () => {
               refresh();
-              vpcs.refetch();
+              qc.invalidateQueries({ queryKey: ["network-vpcs", "options"] });
             },
           },
         }}
@@ -206,7 +190,7 @@ export default function SubnetsPage() {
           data={items}
           columns={columns}
           rowActions={actions}
-          loading={subnets.isFetching || vpcs.isFetching}
+          loading={subnets.isFetching}
           tableLabel="子网列表"
           pagination={pagination}
         />

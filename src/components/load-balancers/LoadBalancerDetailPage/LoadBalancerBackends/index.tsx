@@ -35,16 +35,23 @@ export default function LoadBalancerBackends({ item, pending, onSave }: LoadBala
   );
   return (
     <div className="flex flex-col gap-3">
-      <Button
-        type="primary"
-        disabled={disabled || !listeners.some((listener) => !listener.https_redirect_status_code)}
-        onClick={() => setAdding(true)}
-      >
-        添加后端成员
-      </Button>
       <DataTable<
         NetworkLoadBalancerBackend & { listenerId: string; listenerName: string; rowId: string }
       >
+        header={{
+          title: "后端组",
+          extra: (
+            <Button
+              type="primary"
+              disabled={
+                disabled || !listeners.some((listener) => !listener.https_redirect_status_code)
+              }
+              onClick={() => setAdding(true)}
+            >
+              添加后端成员
+            </Button>
+          ),
+        }}
         columns={[
           { title: "监听器", width: 200, dataIndex: "listenerName", ellipsis: true },
           { title: "成员 ID", width: 280, dataIndex: "id", ellipsis: true },

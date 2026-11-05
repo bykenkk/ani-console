@@ -1,10 +1,16 @@
 import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { deleteNetworkVnic, type NetworkVnic } from "@/api/network";
 import type { RowAction } from "@/components/common";
+import BindVnicModal from "@/components/vnics/BindVnicModal";
+import UnbindVnicModal from "@/components/vnics/UnbindVnicModal";
+
+type VnicActionDialog = { action: "bind" | "unbind"; vnic: NetworkVnic };
 
 export function useVnicActions(onDeleted?: () => void) {
   const qc = useQueryClient();
+  const [dialog, setDialog] = useState<VnicActionDialog>();
   const remove = useMutation({
     mutationFn: (vnic: NetworkVnic) => deleteNetworkVnic(vnic.id),
     meta: {
@@ -29,6 +35,20 @@ export function useVnicActions(onDeleted?: () => void) {
   });
   const actions: RowAction<NetworkVnic>[] = [
     {
+      key: "bind",
+      label: "绑定",
+      visible: (vnic) => !vnic.bindings?.length,
+      disabled: (vnic) => vnic.state === "deleting" || vnic.state === "deleted",
+      onClick: (vnic) => setDialog({ action: "bind", vnic }),
+    },
+    {
+      key: "unbind",
+      label: "解绑",
+      visible: (vnic) => Boolean(vnic.bindings?.length),
+      disabled: (vnic) => vnic.state === "deleting" || vnic.state === "deleted",
+      onClick: (vnic) => setDialog({ action: "unbind", vnic }),
+    },
+    {
       key: "delete",
       label: "删除",
       intent: "danger",
@@ -37,8 +57,7 @@ export function useVnicActions(onDeleted?: () => void) {
         Boolean(vnic.bindings?.length) ||
         vnic.state === "deleting" ||
         vnic.state === "deleted",
-      tooltip: (vnic) =>
-        vnic.bindings?.length ? "网卡正被使用或预留，请在绑定实例中解除配置" : undefined,
+      title: (vnic) => (vnic.bindings?.length ? "网卡正被使用或预留，请先解绑实例" : undefined),
       loading: (vnic) => remove.isPending && remove.variables?.id === vnic.id,
       onClick: (vnic) => {
         Modal.confirm({
@@ -50,5 +69,13 @@ export function useVnicActions(onDeleted?: () => void) {
       },
     },
   ];
-  return { actions };
+  const closeDialog = () => setDialog(undefined);
+  const dialogNode = dialog ? (
+    dialog.action === "bind" ? (
+      <BindVnicModal vnic={dialog.vnic} onCancel={closeDialog} />
+    ) : (
+      <UnbindVnicModal vnic={dialog.vnic} onCancel={closeDialog} />
+    )
+  ) : null;
+  return { actions, dialogNode };
 }

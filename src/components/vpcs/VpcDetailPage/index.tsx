@@ -1,4 +1,4 @@
-import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
+import { StatusBadge } from "@/components/common";
 import { useVpcActions } from "@/hooks/useVpcActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
@@ -48,7 +48,7 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
       <DetailPageFrame
         breadcrumbs={[...navigationBreadcrumbsForPath("/vpcs"), { label: vpc.name }]}
         title={vpc.name}
-        status={<NetworkResourceStatus resource={vpc} />}
+        status={<StatusBadge status={vpc.state} reason={vpc.reason} />}
         icon={<AliIcon name="VPCwangluo" size={28} />}
         headerItems={[{ label: "CIDR", value: vpc.cidr || "-" }]}
         actions={<ResourceActionMenu record={vpc} actions={actions} />}
@@ -61,10 +61,7 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
               { label: "CIDR", value: vpc.cidr || "-" },
               {
                 label: "公网 IP",
-                value:
-                  vpc.owner_scope === "platform"
-                    ? "平台托管"
-                    : vpc.public_egress?.eip_address || "-",
+                value: vpc.public_egress?.eip_address || "-",
               },
               { label: "创建时间", value: formatDateTime(vpc.created_at) },
               { label: "更新时间", value: formatDateTime(vpc.updated_at) },

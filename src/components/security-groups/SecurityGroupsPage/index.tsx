@@ -40,19 +40,18 @@ export default function SecurityGroupsPage() {
     {
       key: "name",
       title: "名称 / ID",
-      width: 220,
+      width: 200,
       fixed: "left",
       render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="security-group" />,
     },
     {
       key: "state",
       title: "状态",
-      width: 130,
+      width: 120,
       render: (_, item) => <StatusBadge status={item.state} reason={item.reason} />,
     },
     { key: "rules", title: "规则数", width: 100, render: (_, item) => item.rules.length },
     { key: "bindings", title: "关联资源", width: 100, dataIndex: "bound_resource_count" },
-    { key: "description", title: "描述", width: 220, dataIndex: "description", ellipsis: true },
     {
       key: "createdAt",
       title: "创建时间",

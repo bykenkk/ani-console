@@ -95,28 +95,6 @@ export default function SandboxDetailPage({
             { label: "计算类型", value: snapshot?.compute_type || "-" },
           ],
         },
-        {
-          key: "operations",
-          title: "操作标识",
-          fields: [
-            {
-              label: "创建操作 ID",
-              value: sandbox.create_operation_id ? (
-                <ResourceId value={sandbox.create_operation_id} />
-              ) : (
-                "-"
-              ),
-            },
-            {
-              label: "最近操作 ID",
-              value: sandbox.last_operation_id ? (
-                <ResourceId value={sandbox.last_operation_id} />
-              ) : (
-                "-"
-              ),
-            },
-          ],
-        },
       ]}
       tabs={[
         {

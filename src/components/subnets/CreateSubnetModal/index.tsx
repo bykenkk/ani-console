@@ -1,8 +1,8 @@
-import { createNetworkSubnet, listNetworkVpcs, type NetworkVPC } from "@/api/network";
-import { Ipv4CidrInput } from "@/components/common";
+import { createNetworkSubnet, type NetworkVPC } from "@/api/network";
+import { Ipv4CidrInput, VpcSelect } from "@/components/common";
 import { validateForm } from "@/lib/form";
-import { Form, Input, Modal, Select } from "@arco-design/web-react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { Form, Input, Modal } from "@arco-design/web-react";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import {
   ipv4CidrWithinError,
@@ -12,7 +12,6 @@ import {
   suggestGatewayIp,
   suggestSubnetCidr,
 } from "@/lib/validators";
-import { withFirst100 } from "@/api/pagination";
 import SubnetAddressOptions, { type SubnetAddressOptionsFormValues } from "../SubnetAddressOptions";
 import { parseSubnetDnsServers, parseSubnetExcludedIps } from "../SubnetAddressOptions/utils";
 
@@ -21,14 +20,11 @@ type CreateSubnetModalProps = {
   onCreated: () => void;
 };
 
-const listVpcOptions = withFirst100(listNetworkVpcs);
-
-type Vpc = NetworkVPC;
-
 export default function CreateSubnetModal({ onCancel, onCreated }: CreateSubnetModalProps) {
   const [form] = Form.useForm();
   const [name, setName] = useState("");
-  const [vpcId, setVpcId] = useState("");
+  const [selectedVpc, setSelectedVpc] = useState<NetworkVPC>();
+  const vpcId = selectedVpc?.id ?? "";
   const [cidr, setCidr] = useState("10.0.1.0/24");
   const [addressOptions, setAddressOptions] = useState<SubnetAddressOptionsFormValues>({
     gateway: "",
@@ -36,18 +32,6 @@ export default function CreateSubnetModal({ onCancel, onCreated }: CreateSubnetM
     enableDhcp: false,
     dnsServers: "",
   });
-  const vpcs = useQuery({
-    meta: {
-      errorNotification: {
-        id: "vpcs",
-        action: "数据加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-vpcs", "subnet-create", "options", { can_manage: true }],
-    queryFn: () => listVpcOptions({ can_manage: true }),
-  });
-  const selectedVpc = ((vpcs.data?.items ?? []) as Vpc[]).find((vpc) => vpc.id === vpcId);
   const selectedVpcCidr = selectedVpc?.cidr ?? "";
   const cidrError = selectedVpcCidr
     ? ipv4CidrWithinError(cidr, selectedVpcCidr, "CIDR", "VPC CIDR")
@@ -120,22 +104,15 @@ export default function CreateSubnetModal({ onCancel, onCreated }: CreateSubnetM
           />
         </Form.Item>
         <Form.Item field="vpcId" label="VPC" rules={[{ required: true, message: "请选择 VPC" }]}>
-          <Select
+          <VpcSelect
+            canManage
             value={vpcId || undefined}
-            onChange={(nextVpcId) => {
-              setVpcId(nextVpcId);
-              const vpc = ((vpcs.data?.items ?? []) as Vpc[]).find((item) => item.id === nextVpcId);
+            onChange={(_, vpc) => {
+              setSelectedVpc(vpc);
               if (vpc) setSubnetCidr(suggestSubnetCidr(vpc.cidr));
             }}
-            loading={vpcs.isLoading}
             placeholder="选择 VPC"
-          >
-            {((vpcs.data?.items ?? []) as Vpc[]).map((vpc) => (
-              <Select.Option key={vpc.id} value={vpc.id}>
-                {vpc.name} · {vpc.cidr}
-              </Select.Option>
-            ))}
-          </Select>
+          />
         </Form.Item>
         <Form.Item
           label="CIDR"

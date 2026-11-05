@@ -7,29 +7,30 @@ import { withId } from "@/lib/id";
 
 const listOptions = withFirst100(listNetworkVnics);
 type VnicSelectProps = {
-  consumerKind: VnicConsumerKind;
-  consumerId: string;
+  instanceKind: VnicConsumerKind;
+  instanceId: string;
   value?: string;
-  onChange: (value: string) => void;
+  onChange: (value: string | undefined) => void;
 };
-export default function VnicSelect({ consumerKind, consumerId, value, onChange }: VnicSelectProps) {
+export default function VnicSelect({ instanceKind, instanceId, value, onChange }: VnicSelectProps) {
   const [name, setName] = useState("");
   const options = useQuery({
-    queryKey: ["network-vnics", "options", { consumerKind, consumerId, name }],
+    queryKey: ["network-vnics", "options", { instanceKind, instanceId, name }],
     queryFn: ({ signal }) =>
       listOptions(
         {
-          bindable_to_kind: consumerKind,
-          bindable_to_id: consumerId,
+          bindable_to_kind: instanceKind,
+          bindable_to_id: instanceId,
           name: name.trim() || undefined,
         },
         signal,
       ),
-    meta: { errorNotification: { id: withId("vnic-options", consumerId), action: "可用网卡加载" } },
+    meta: { errorNotification: { id: withId("vnic-options", instanceId), action: "可用网卡加载" } },
   });
   return (
     <Select
       placeholder="请选择已有网卡"
+      allowClear
       showSearch
       filterOption={false}
       onSearch={setName}

@@ -1,7 +1,6 @@
+import { SubnetSelect } from "@/components/common";
 import { Form, Input, InputNumber, Modal, Select } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
 import {
-  listNetworkSubnets,
   type NetworkLoadBalancerBackendInput,
   type NetworkLoadBalancerListenerResource,
 } from "@/api/network";
@@ -33,17 +32,6 @@ export default function SaveLoadBalancerBackendModal({
   onSave,
 }: SaveLoadBalancerBackendModalProps) {
   const [form] = Form.useForm<LoadBalancerBackendFormValues>();
-  const subnets = useQuery({
-    queryKey: ["network-subnets", "load-balancer-backend", "options", vpcId],
-    queryFn: ({ signal }) => listNetworkSubnets({ vpc_id: vpcId }, signal),
-    meta: {
-      errorNotification: {
-        id: "subnets",
-        action: "子网列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-  });
   return (
     <Modal
       visible
@@ -103,14 +91,7 @@ export default function SaveLoadBalancerBackendModal({
           field="subnet_id"
           rules={[{ required: true, message: "请选择后端实例所在子网" }]}
         >
-          <Select
-            loading={subnets.isFetching}
-            filterOption={false}
-            options={(subnets.data?.items ?? []).map((item) => ({
-              value: item.id,
-              label: `${item.name} · ${item.cidr}`,
-            }))}
-          />
+          <SubnetSelect vpcId={vpcId} />
         </Form.Item>
         <Form.Item
           label="实例受管 IP"

@@ -1,9 +1,6 @@
-import { Collapse, Form, Input, Select } from "@arco-design/web-react";
-import { useQuery } from "@tanstack/react-query";
-import { listNetworkVpcs, listNetworkSubnets } from "@/api/network";
+import { VpcSelect, SubnetSelect } from "@/components/common";
+import { Collapse, Form, Input } from "@arco-design/web-react";
 import type { InstanceEnvVar } from "@/api/instances";
-import { withFirst100 } from "@/api/pagination";
-import { withId } from "@/lib/id";
 import SecurityGroupSelect from "@/components/security-groups/SecurityGroupSelect";
 import InstanceKeyValueEditor from "@/components/instances/InstanceKeyValueEditor";
 import InstanceVolumeMountEditor from "@/components/instances/InstanceVolumeMountEditor";
@@ -13,8 +10,6 @@ import {
   validateMountPath,
   validateVolumeMounts,
 } from "./utils";
-
-const listVpcOptions = withFirst100(listNetworkVpcs);
 
 type InstanceCreateResourceFieldsProps = {
   values: {
@@ -31,25 +26,6 @@ export default function InstanceCreateResourceFields({
   values,
   onVpcChange,
 }: InstanceCreateResourceFieldsProps) {
-  const vpcs = useQuery({
-    queryKey: ["network-vpcs", "instance-create", "options", { can_use: true }],
-    queryFn: ({ signal }) => listVpcOptions({ can_use: true }, signal),
-    meta: { errorNotification: { id: "instance-vpc-options", action: "VPC 加载" } },
-  });
-  const subnets = useQuery({
-    queryKey: ["network-subnets", "instance-create", values.vpc_id, "options", { can_use: true }],
-    enabled: Boolean(values.vpc_id),
-    // FIXME(instance-subnet-options): 子网尚无 page/pageSize，当前沿用旧分页契约，仅取首批 100 项。
-    // TODO(instance-subnet-options): 后端完成分页改造后使用 withFirst100；不自动遍历后续游标。
-    queryFn: ({ signal }) =>
-      listNetworkSubnets({ vpc_id: values.vpc_id, limit: 100, can_use: true }, signal),
-    meta: {
-      errorNotification: {
-        id: withId("instance-subnet-options", values.vpc_id),
-        action: "子网加载",
-      },
-    },
-  });
   return (
     <>
       <div className="grid grid-cols-2 items-start gap-4">
@@ -62,15 +38,10 @@ export default function InstanceCreateResourceFields({
               : undefined
           }
         >
-          <Select
+          <VpcSelect
             allowClear
-            showSearch
+            canUse
             placeholder="不配置网络"
-            loading={vpcs.isFetching}
-            options={(vpcs.data?.items ?? []).map((vpc) => ({
-              value: vpc.id,
-              label: `${vpc.name}${vpc.owner_scope === "platform" ? " · 平台基础网络" : ""} · ${vpc.cidr || "-"}`,
-            }))}
             onChange={(id) => onVpcChange(id ?? "")}
           />
         </Form.Item>
@@ -79,16 +50,12 @@ export default function InstanceCreateResourceFields({
           label="子网"
           rules={values.vpc_id ? [{ required: true, message: "请选择子网" }] : undefined}
         >
-          <Select
+          <SubnetSelect
+            key={values.vpc_id}
+            vpcId={values.vpc_id}
             allowClear
-            showSearch
+            canUse
             disabled={!values.vpc_id}
-            loading={subnets.isFetching}
-            placeholder={values.vpc_id ? "请选择子网" : "请先选择 VPC"}
-            options={(subnets.data?.items ?? []).map((subnet) => ({
-              value: subnet.id,
-              label: `${subnet.name}${subnet.owner_scope === "platform" ? " · 平台基础网络" : ""} · ${subnet.cidr || "-"}`,
-            }))}
           />
         </Form.Item>
       </div>

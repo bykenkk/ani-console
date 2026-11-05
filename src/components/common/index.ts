@@ -23,3 +23,6 @@ export { default as ResourceId } from "./ResourceId";
 export { default as StatusBadge } from "./StatusBadge";
 export type { StatusBadgeTone } from "./StatusBadge";
 export { default as WizardSteps } from "./WizardSteps";
+export { default as VnicSelect } from "./VnicSelect";
+export { default as VpcSelect } from "./VpcSelect";
+export { default as SubnetSelect } from "./SubnetSelect";

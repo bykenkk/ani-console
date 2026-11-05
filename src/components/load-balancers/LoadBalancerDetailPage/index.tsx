@@ -1,4 +1,4 @@
-import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
+import { StatusBadge } from "@/components/common";
 import { useLoadBalancerActions } from "@/hooks/useLoadBalancerActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
@@ -28,7 +28,6 @@ import {
   loadBalancerListeners,
 } from "@/lib/load-balancers";
 import { ApiError } from "@/api/request";
-import VpcBaseConnectivityStatus from "@/components/vpcs/VpcBaseConnectivityStatus";
 import LoadBalancerBackends from "./LoadBalancerBackends";
 // TODO(feature-visibility): 待负载均衡事件支持后恢复此组件导入。
 // import LoadBalancerEvents from "./LoadBalancerEvents";
@@ -224,7 +223,9 @@ export default function LoadBalancerDetailPage({
     <DetailPageFrame
       breadcrumbs={[...navigationBreadcrumbsForPath("/load-balancers"), { label: item.name }]}
       title={item.name}
-      status={<NetworkResourceStatus resource={item} />}
+      status={
+        <StatusBadge status={item.state} reason={item.reason} message={item.reason_message} />
+      }
       icon={<AliIcon name="fuzaijunhengqi" size={28} />}
       headerItems={[{ label: "IP 地址", value: item.private_ip || "-" }]}
       actions={<ResourceActionMenu record={item} actions={actions} />}
@@ -239,32 +240,10 @@ export default function LoadBalancerDetailPage({
               label: "类型",
               value: loadBalancerLabel(item.exposure),
             },
-            {
-              label: "VPC",
-              value: parentVpc?.name ?? <ResourceId value={item.vpc_id} />,
-            },
-            {
-              label: "基础网络",
-              value: parentVpc ? (
-                <VpcBaseConnectivityStatus connectivity={parentVpc.base_connectivity} />
-              ) : (
-                "-"
-              ),
-            },
-            {
-              label: "子网",
-              value: parentSubnet?.name ?? <ResourceId value={item.subnet_id} />,
-            },
             { label: "描述", value: item.description || "-" },
             { label: "公网 IP", value: item.public_address || "-" },
             { label: "规格", value: item.flavor || "-" },
             { label: "流量健康", value: loadBalancerLabel(item.data_plane_state) },
-            {
-              label: "流量观测时间",
-              value: item.data_plane_observed_at
-                ? formatDateTime(item.data_plane_observed_at)
-                : "-",
-            },
             { label: "创建时间", value: formatDateTime(item.created_at) },
             { label: "更新时间", value: formatDateTime(item.updated_at) },
           ],

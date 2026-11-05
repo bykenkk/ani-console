@@ -1,5 +1,5 @@
 import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
-import InstanceRestartModal from "@/components/instances/InstanceRestartModal";
+import ContainerRestartModal from "@/components/instances/ContainerRestartModal";
 import InstanceAttachPvcModal from "@/components/instances/InstanceAttachPvcModal";
 import InstanceDetachPvcModal from "@/components/instances/InstanceDetachPvcModal";
 import ContainerChangeSecurityGroupsModal from "@/components/instances/ContainerChangeSecurityGroupsModal";
@@ -123,7 +123,7 @@ export function useContainerActions(onDeleted?: () => void) {
   const dialogNode = (
     <>
       {dialog?.action === "restart" && (
-        <InstanceRestartModal
+        <ContainerRestartModal
           instance={dialog.instance}
           onCancel={() => setDialog(undefined)}
           onSubmitted={submitted}

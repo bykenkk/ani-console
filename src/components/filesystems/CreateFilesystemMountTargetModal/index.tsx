@@ -1,24 +1,13 @@
-import {
-  listNetworkSubnets,
-  listNetworkVpcs,
-  type NetworkSubnet,
-  type NetworkVPC,
-} from "@/api/network";
+import { VpcSelect, SubnetSelect } from "@/components/common";
 import { createFilesystemMountTarget } from "@/api/storage/filesystems";
-import { Alert, Form, Modal, Select } from "@arco-design/web-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { withFirst100 } from "@/api/pagination";
+import { Alert, Form, Modal } from "@arco-design/web-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 type CreateFilesystemMountTargetModalProps = {
   filesystemId: string;
   onCancel: () => void;
 };
-
-const listVpcOptions = withFirst100(listNetworkVpcs);
-
-type Vpc = NetworkVPC;
-type Subnet = NetworkSubnet;
 
 export default function CreateFilesystemMountTargetModal({
   filesystemId,
@@ -27,35 +16,6 @@ export default function CreateFilesystemMountTargetModal({
   const qc = useQueryClient();
   const [vpcId, setVpcId] = useState("");
   const [subnetId, setSubnetId] = useState("");
-  const vpcs = useQuery({
-    meta: {
-      errorNotification: {
-        id: "vpcs",
-        action: "VPC 列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-vpcs", "filesystem-mount-target-create", "options"],
-    queryFn: () => listVpcOptions({}),
-  });
-  const subnets = useQuery({
-    meta: {
-      errorNotification: {
-        id: "subnets",
-        action: "子网列表加载",
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-subnets", "filesystem-mount-target-create", vpcId],
-    queryFn: () => listNetworkSubnets({ vpc_id: vpcId || undefined }),
-    enabled: !!vpcId,
-  });
-  const availableSubnets = (subnets.data?.items ?? []) as Subnet[];
-
-  useEffect(() => {
-    if (subnetId && !subnets.data?.items.some((item) => item.id === subnetId)) setSubnetId("");
-  }, [subnets.data?.items, subnetId]);
-
   const create = useMutation({
     meta: {
       feedback: {
@@ -93,33 +53,23 @@ export default function CreateFilesystemMountTargetModal({
       />
       <Form layout="vertical" className="mt-2">
         <Form.Item label="VPC" required>
-          <Select
+          <VpcSelect
             value={vpcId || undefined}
-            onChange={setVpcId}
-            loading={vpcs.isLoading}
-            placeholder="请选择 VPC"
-          >
-            {((vpcs.data?.items ?? []) as Vpc[]).map((item) => (
-              <Select.Option key={item.id} value={item.id}>
-                {item.name} · {item.cidr}
-              </Select.Option>
-            ))}
-          </Select>
+            onChange={(id) => {
+              setVpcId(id ?? "");
+              setSubnetId("");
+            }}
+          />
         </Form.Item>
         <Form.Item label="子网" required>
-          <Select
+          <SubnetSelect
+            key={vpcId}
+            vpcId={vpcId}
             value={subnetId || undefined}
-            onChange={setSubnetId}
-            loading={subnets.isLoading}
+            onChange={(id) => setSubnetId(id ?? "")}
             disabled={!vpcId}
             placeholder={vpcId ? "请选择子网" : "请先选择 VPC"}
-          >
-            {availableSubnets.map((item) => (
-              <Select.Option key={item.id} value={item.id}>
-                {item.name} · {item.cidr}
-              </Select.Option>
-            ))}
-          </Select>
+          />
         </Form.Item>
       </Form>
     </Modal>

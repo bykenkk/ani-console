@@ -199,7 +199,7 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
           vpcId={values.vpc_id}
           onVpcChange={() => form.setFieldValue("subnet_id", "")}
         />
-        <Form.Item field="security_group_ids" label="安全组" extra="可多选；留空表示不绑定安全组。">
+        <Form.Item field="security_group_ids" label="安全组">
           <SecurityGroupSelect />
         </Form.Item>
         <Form.Item field="start_after_create" label="创建后开机" triggerPropName="checked">

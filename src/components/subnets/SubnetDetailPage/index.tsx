@@ -1,14 +1,8 @@
-import { Tag } from "@arco-design/web-react";
-import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
+import { StatusBadge } from "@/components/common";
 import { useSubnetActions } from "@/hooks/useSubnetActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
-import {
-  getNetworkSubnet,
-  getNetworkVpc,
-  type NetworkSubnet,
-  type NetworkVPC,
-} from "@/api/network";
+import { getNetworkSubnet, type NetworkSubnet } from "@/api/network";
 import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
 import { withId } from "@/lib/id";
 
@@ -19,8 +13,7 @@ import { formatDateTime } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 
 type Subnet = NetworkSubnet;
-type Vpc = NetworkVPC;
-import SubnetRelatedResources from "./SubnetRelatedResources";
+import RelatedResources from "./RelatedResources";
 
 type SubnetDetailPageProps = {
   subnetId: string;
@@ -41,34 +34,18 @@ export default function SubnetDetailPage({ subnetId, tab, onTabChange }: SubnetD
     queryKey: ["network-subnet", subnetId],
     queryFn: () => getNetworkSubnet(subnetId),
   });
-  const vpc = useQuery({
-    meta: {
-      errorNotification: {
-        id: withId("subnet-vpc", subnetId),
-        action: `VPC 加载`,
-        fallback: "请求失败，请稍后重试",
-      },
-    },
-    queryKey: ["network-vpc", detail.data?.vpc_id],
-    queryFn: () => getNetworkVpc(detail.data!.vpc_id),
-    enabled: Boolean(detail.data?.vpc_id),
-  });
   const { actions } = useSubnetActions(goBack);
 
   if (!detail.data) return <DetailPagePlaceholder loading={detail.isLoading} />;
 
   const subnet = detail.data as Subnet;
-  const parentVpc = vpc.data as Vpc | undefined;
 
   return (
     <DetailPageFrame
       breadcrumbs={[...navigationBreadcrumbsForPath("/subnets"), { label: subnet.name }]}
       title={subnet.name}
       status={
-        <div className="flex items-center gap-2">
-          <NetworkResourceStatus resource={subnet} />
-          {subnet.owner_scope === "platform" && <Tag color="arcoblue">平台基础网络</Tag>}
-        </div>
+        <StatusBadge status={subnet.state} reason={subnet.reason} message={subnet.reason_message} />
       }
       icon={<AliIcon name="VPCwangluo" size={28} />}
       headerItems={[{ label: "CIDR", value: subnet.cidr || "-" }]}
@@ -81,9 +58,7 @@ export default function SubnetDetailPage({ subnetId, tab, onTabChange }: SubnetD
             { label: "ID", value: <ResourceId value={subnet.id} /> },
             {
               label: "VPC",
-              value:
-                parentVpc?.name ??
-                (vpc.isLoading ? "加载中…" : <ResourceId value={subnet.vpc_id} />),
+              value: <ResourceId value={subnet.vpc_id} />,
             },
             { label: "CIDR", value: subnet.cidr || "-" },
             { label: "网关", value: subnet.gateway || "-" },
@@ -99,7 +74,7 @@ export default function SubnetDetailPage({ subnetId, tab, onTabChange }: SubnetD
         {
           key: "related",
           label: "关联资源",
-          content: <SubnetRelatedResources subnetId={subnetId} />,
+          content: <RelatedResources subnetId={subnetId} />,
         },
       ]}
       activeTabKey={tab}

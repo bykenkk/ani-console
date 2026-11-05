@@ -32,10 +32,15 @@ export default function LoadBalancerListeners({
     pending || !item.version || item.state === "deleting" || item.state === "deleted";
   return (
     <div className="flex flex-col gap-3">
-      <Button type="primary" disabled={disabled} onClick={() => setAdding(true)}>
-        添加监听器
-      </Button>
       <DataTable<NetworkLoadBalancerListenerResource>
+        header={{
+          title: "监听器",
+          extra: (
+            <Button type="primary" disabled={disabled} onClick={() => setAdding(true)}>
+              添加监听器
+            </Button>
+          ),
+        }}
         columns={[
           {
             title: "部署状态",
