@@ -24,16 +24,12 @@ export default function SandboxRuntime({ sandbox }: SandboxRuntimeProps) {
           { label: "状态观测时间", value: formatDateTime(sandbox.observed_at) },
           {
             label: "集群 ID",
-            value: sandbox.snapshot?.cluster_id ? (
-              <ResourceId value={sandbox.snapshot.cluster_id} />
-            ) : (
-              "-"
-            ),
+            value: <ResourceId value={sandbox.snapshot?.cluster_id} />,
           },
           { label: "命名空间", value: sandbox.snapshot?.namespace || "-" },
           { label: "RuntimeClass", value: sandbox.snapshot?.runtime_class || "-" },
           { label: "Pod 名称", value: refs?.pod_name || "-" },
-          { label: "Pod UID", value: refs?.pod_uid ? <ResourceId value={refs.pod_uid} /> : "-" },
+          { label: "Pod UID", value: <ResourceId value={refs?.pod_uid} /> },
           { label: "Pod 资源版本", value: refs?.pod_resource_version || "-" },
         ]}
       />

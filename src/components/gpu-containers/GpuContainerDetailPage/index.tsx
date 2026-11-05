@@ -119,7 +119,7 @@ export default function GpuContainerDetailPage({
               { label: "终止保护", value: "-" },
               {
                 label: "镜像",
-                value: record.imageId ? <ResourceId value={record.imageId} /> : "-",
+                value: <ResourceId value={record.imageId} />,
               },
               { label: "Provider", value: "-" },
               { label: "所在节点", value: runtime.data?.pod?.nodeName ?? "-" },

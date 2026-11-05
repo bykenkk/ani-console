@@ -125,19 +125,11 @@ export default function ContainerDetailPage({
               { label: "访问地址", value: "-" },
               {
                 label: "VPC",
-                value: configuration.data?.network?.vpc_id ? (
-                  <ResourceId value={configuration.data.network.vpc_id} />
-                ) : (
-                  "-"
-                ),
+                value: <ResourceId value={configuration.data?.network?.vpc_id} />,
               },
               {
                 label: "子网",
-                value: configuration.data?.network?.subnet_id ? (
-                  <ResourceId value={configuration.data.network.subnet_id} />
-                ) : (
-                  "-"
-                ),
+                value: <ResourceId value={configuration.data?.network?.subnet_id} />,
               },
               { label: "更新时间", value: "-" },
               { label: "终止保护", value: "-" },

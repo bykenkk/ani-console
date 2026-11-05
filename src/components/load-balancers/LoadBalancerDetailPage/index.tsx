@@ -241,7 +241,7 @@ export default function LoadBalancerDetailPage({
             },
             {
               label: "VPC",
-              value: parentVpc?.name ?? (item.vpc_id ? <ResourceId value={item.vpc_id} /> : "-"),
+              value: parentVpc?.name ?? <ResourceId value={item.vpc_id} />,
             },
             {
               label: "基础网络",
@@ -253,9 +253,7 @@ export default function LoadBalancerDetailPage({
             },
             {
               label: "子网",
-              value:
-                parentSubnet?.name ??
-                (item.subnet_id ? <ResourceId value={item.subnet_id} /> : "-"),
+              value: parentSubnet?.name ?? <ResourceId value={item.subnet_id} />,
             },
             { label: "描述", value: item.description || "-" },
             { label: "公网 IP", value: item.public_address || "-" },

@@ -24,9 +24,9 @@ export default function SandboxWorkspace({ sandbox }: SandboxWorkspaceProps) {
           { label: "存储类", value: workspace?.storage_class || "-" },
           { label: "回收策略", value: workspace?.reclaim_policy || "-" },
           { label: "PVC 名称", value: refs?.pvc_name || "-" },
-          { label: "PVC UID", value: refs?.pvc_uid ? <ResourceId value={refs.pvc_uid} /> : "-" },
+          { label: "PVC UID", value: <ResourceId value={refs?.pvc_uid} /> },
           { label: "PV 名称", value: refs?.pv_name || "-" },
-          { label: "PV UID", value: refs?.pv_uid ? <ResourceId value={refs.pv_uid} /> : "-" },
+          { label: "PV UID", value: <ResourceId value={refs?.pv_uid} /> },
           { label: "PVC 资源版本", value: refs?.pvc_resource_version || "-" },
         ]}
       />

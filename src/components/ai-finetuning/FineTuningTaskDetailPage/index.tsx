@@ -59,16 +59,16 @@ export default function FineTuningTaskDetailPage({
             { label: "微调方法", value: task.managed_settings?.finetuning_type || "-" },
             {
               label: "微调实现",
-              value: task.implementation_id ? <ResourceId value={task.implementation_id} /> : "-",
+              value: <ResourceId value={task.implementation_id} />,
             },
             { label: "算力规格", value: <ResourceId value={task.compute_preset_id} /> },
             {
               label: "数据集版本",
-              value: task.input_version_id ? <ResourceId value={task.input_version_id} /> : "-",
+              value: <ResourceId value={task.input_version_id} />,
             },
             {
               label: "镜像版本",
-              value: task.image_version_id ? <ResourceId value={task.image_version_id} /> : "-",
+              value: <ResourceId value={task.image_version_id} />,
             },
             { label: "当前阶段", value: task.current_step || "-" },
             { label: "停止已请求", value: task.stop_requested ? "是" : "否" },
@@ -84,11 +84,11 @@ export default function FineTuningTaskDetailPage({
           fields: [
             {
               label: "模型 ID",
-              value: task.base_model ? <ResourceId value={task.base_model.model_id} /> : "-",
+              value: <ResourceId value={task.base_model?.model_id} />,
             },
             {
               label: "版本 ID",
-              value: task.base_model ? <ResourceId value={task.base_model.version_id} /> : "-",
+              value: <ResourceId value={task.base_model?.version_id} />,
             },
             { label: "模型族", value: task.base_model?.family || "-" },
             { label: "权重格式", value: task.base_model?.format || "-" },

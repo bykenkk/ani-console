@@ -57,16 +57,16 @@ export default function TrainingTaskDetailPage({
             { label: "任务类型", value: task.kind || "-" },
             {
               label: "训练实现",
-              value: task.implementation_id ? <ResourceId value={task.implementation_id} /> : "-",
+              value: <ResourceId value={task.implementation_id} />,
             },
             { label: "算力规格", value: <ResourceId value={task.compute_preset_id} /> },
             {
               label: "数据集版本",
-              value: task.input_version_id ? <ResourceId value={task.input_version_id} /> : "-",
+              value: <ResourceId value={task.input_version_id} />,
             },
             {
               label: "镜像版本",
-              value: task.image_version_id ? <ResourceId value={task.image_version_id} /> : "-",
+              value: <ResourceId value={task.image_version_id} />,
             },
             { label: "当前阶段", value: task.current_step || "-" },
             { label: "停止已请求", value: task.stop_requested ? "是" : "否" },

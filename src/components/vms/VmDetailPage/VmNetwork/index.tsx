@@ -21,11 +21,11 @@ export default function VmNetwork({ vm }: VmNetworkProps) {
         data={[
           {
             label: "VPC",
-            value: vm.relations?.vpc?.id ? <ResourceId value={vm.relations.vpc.id} /> : "-",
+            value: <ResourceId value={vm.relations?.vpc?.id} />,
           },
           {
             label: "子网",
-            value: vm.relations?.subnet?.id ? <ResourceId value={vm.relations.subnet.id} /> : "-",
+            value: <ResourceId value={vm.relations?.subnet?.id} />,
           },
           {
             label: "IP 地址",

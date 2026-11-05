@@ -74,23 +74,15 @@ export default function ModelDevExecutionSnapshot({ task }: ModelDevExecutionSna
             { label: "登记状态", value: registration?.state || "无登记记录" },
             {
               label: "登记 ID",
-              value: registration?.registration_id ? (
-                <ResourceId value={registration.registration_id} />
-              ) : (
-                "-"
-              ),
+              value: <ResourceId value={registration?.registration_id} />,
             },
             {
               label: "模型 ID",
-              value: registration?.model_id ? <ResourceId value={registration.model_id} /> : "-",
+              value: <ResourceId value={registration?.model_id} />,
             },
             {
               label: "版本 ID",
-              value: registration?.model_version_id ? (
-                <ResourceId value={registration.model_version_id} />
-              ) : (
-                "-"
-              ),
+              value: <ResourceId value={registration?.model_version_id} />,
             },
             { label: "失败原因", value: registration?.failure_code || "-" },
           ]}
