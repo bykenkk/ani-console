@@ -1,0 +1,100 @@
+import {
+  listNetworkSubnetAssociatedInstances,
+  type NetworkAssociatedInstance,
+} from "@/api/network";
+import { DataTable, ResourceNameId, StatusBadge, type ListColumn } from "@/components/common";
+import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
+import { useListPagination } from "@/hooks/useListPagination";
+import { withId } from "@/lib/id";
+import { Tag } from "@arco-design/web-react";
+import { useQuery } from "@tanstack/react-query";
+
+type SubnetAssociatedInstancesProps = { subnetId: string };
+
+const consumerLabels: Record<NetworkAssociatedInstance["consumer_type"], string> = {
+  container_instance: "容器实例",
+  virtual_machine: "云主机",
+  sandbox: "沙箱",
+  unknown: "未知",
+};
+
+const columns: Array<ListColumn<NetworkAssociatedInstance>> = [
+  {
+    title: "名称 / ID",
+    width: 200,
+    ellipsis: true,
+    render: (_, item) => (
+      <ResourceNameId name={item.consumer_name || "-"} id={item.consumer_id} openable={false} />
+    ),
+  },
+  {
+    title: "类型",
+    width: 120,
+    render: (_, item) => <Tag>{consumerLabels[item.consumer_type] ?? item.consumer_type}</Tag>,
+  },
+  {
+    title: "状态",
+    width: 120,
+    render: (_, item) => <StatusBadge status={item.consumer_state} />,
+  },
+  {
+    title: "网络占用状态",
+    width: 120,
+    render: (_, item) => (
+      <NetworkResourceStatus
+        resource={{
+          state: item.attachment_state,
+          reason: item.attachment_reason,
+          observation_stale: item.observation_stale,
+          observed_at: item.observed_at,
+        }}
+      />
+    ),
+  },
+  {
+    title: "子网",
+    width: 200,
+    ellipsis: true,
+    render: (_, item) => item.subnet_name || item.subnet_id || "-",
+  },
+  {
+    title: "地址",
+    width: 240,
+    ellipsis: true,
+    render: (_, item) =>
+      item.addresses.map(({ nic_name, address }) => `${nic_name}: ${address}`).join(" · ") || "-",
+  },
+];
+
+export default function SubnetAssociatedInstances({ subnetId }: SubnetAssociatedInstancesProps) {
+  const paging = useListPagination(withId("subnet-associated-instances", subnetId), 20);
+  const params = { page: paging.page, pageSize: paging.pageSize };
+  const instances = useQuery({
+    queryKey: ["subnet-associated-instances", subnetId, params],
+    queryFn: ({ signal }) => listNetworkSubnetAssociatedInstances(subnetId, params, signal),
+    meta: {
+      errorNotification: {
+        id: withId("subnet-associated-instances", subnetId),
+        action: "关联实例加载",
+        fallback: "请求失败，请稍后重试",
+      },
+    },
+  });
+
+  return (
+    <DataTable<NetworkAssociatedInstance>
+      header={{ title: "实例" }}
+      rowKey="attachment_id"
+      columns={columns}
+      data={instances.data?.items ?? []}
+      loading={instances.isFetching}
+      pagination={{
+        ...params,
+        total: Number(instances.data?.total ?? "0"),
+        onPageChange: paging.setPage,
+        onPageSizeChange: paging.setPageSize,
+      }}
+      tableLabel="子网 关联实例"
+    />
+  );
+}

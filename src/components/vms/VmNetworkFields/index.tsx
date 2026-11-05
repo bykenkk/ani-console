@@ -11,18 +11,18 @@ export default function VmNetworkFields({ vpcId, onVpcChange }: VmNetworkFieldsP
   const [vpcSearch, setVpcSearch] = useState("");
   const [subnetSearch, setSubnetSearch] = useState("");
   const vpcs = useQuery({
-    queryKey: ["network-vpcs", "vm", "options", vpcSearch],
+    queryKey: ["network-vpcs", "vm", "options", vpcSearch, { can_use: true }],
     queryFn: ({ signal }) =>
-      listVpcOptions({ name: vpcSearch || undefined, state: "RESOURCE_STATE_AVAILABLE" }, signal),
+      listVpcOptions({ name: vpcSearch || undefined, can_use: true }, signal),
     meta: { errorNotification: { id: "vm-vpc-options", action: "VPC 加载" } },
   });
   const subnets = useQuery({
-    queryKey: ["network-subnets", "vm", "options", vpcId, subnetSearch],
+    queryKey: ["network-subnets", "vm", "options", vpcId, subnetSearch, { can_use: true }],
     enabled: Boolean(vpcId),
     // FIXME(vm-subnet-options): 后端仍为 cursor/limit。复用现有子网接口首批选项，不遍历分页；待后端迁移后改为 withFirst100。
     queryFn: ({ signal }) =>
       listNetworkSubnets(
-        { vpc_id: vpcId, name: subnetSearch || undefined, state: "RESOURCE_STATE_AVAILABLE" },
+        { vpc_id: vpcId, name: subnetSearch || undefined, limit: 100, can_use: true },
         signal,
       ),
     meta: { errorNotification: { id: withId("vm-subnet-options", vpcId), action: "子网加载" } },
@@ -38,7 +38,7 @@ export default function VmNetworkFields({ vpcId, onVpcChange }: VmNetworkFieldsP
           placeholder="请选择 VPC"
           options={vpcs.data?.items.map((item) => ({
             value: item.id,
-            label: `${item.name} · ${item.cidr}`,
+            label: `${item.name}${item.owner_scope === "platform" ? " · 平台基础网络" : ""} · ${item.cidr || "-"}`,
           }))}
           onChange={() => {
             setSubnetSearch("");
@@ -56,7 +56,7 @@ export default function VmNetworkFields({ vpcId, onVpcChange }: VmNetworkFieldsP
           placeholder="请选择子网"
           options={subnets.data?.items.map((item) => ({
             value: item.id,
-            label: `${item.name} · ${item.cidr}`,
+            label: `${item.name}${item.owner_scope === "platform" ? " · 平台基础网络" : ""} · ${item.cidr || "-"}`,
           }))}
         />
       </Form.Item>

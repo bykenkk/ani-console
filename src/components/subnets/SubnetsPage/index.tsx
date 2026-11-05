@@ -3,7 +3,7 @@ import CreateSubnetModal from "@/components/subnets/CreateSubnetModal";
 import { useSubnetActions } from "@/hooks/useSubnetActions";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Select } from "@arco-design/web-react";
+import { Select, Tag } from "@arco-design/web-react";
 import { useMemo, useState } from "react";
 import {
   listNetworkSubnets,
@@ -14,20 +14,18 @@ import {
 
 import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
-import { useClientPaginatedQuery } from "@/hooks/useClientPaginatedQuery";
+import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withFirst100 } from "@/api/pagination";
 
 const listVpcOptions = withFirst100(listNetworkVpcs);
 type Vpc = NetworkVPC;
 type Subnet = NetworkSubnet;
 type SubnetStatusFilter = "all" | Subnet["state"];
-type SubnetSearchField = "name" | "id";
 
 export default function SubnetsPage() {
   const qc = useQueryClient();
   const [createVisible, setCreateVisible] = useState(false);
   const [status, setStatus] = useState<SubnetStatusFilter>("all");
-  const [searchField, setSearchField] = useState<SubnetSearchField>("name");
   const [searchText, setSearchText] = useState("");
   const [filterVpcId, setFilterVpcId] = useState("");
 
@@ -42,27 +40,31 @@ export default function SubnetsPage() {
     queryKey: ["network-vpcs", "subnet-page", "options"],
     queryFn: () => listVpcOptions({}),
   });
+  // TODO(pagination-migration): 子网继续按后端 limit/cursor 查询当前页，待正式页码契约后迁移。
   const {
     query: subnets,
     resetPagination,
     refresh,
     items,
     pagination,
-  } = useClientPaginatedQuery<Subnet>({
+  } = useCursorPaginatedQuery<Subnet>({
     errorNotification: {
       id: "subnets",
       action: "子网列表加载",
       fallback: "请求失败，请稍后重试",
     },
-    queryKey: ["network-subnets", { status, searchField, searchText, filterVpcId }],
-    queryFn: async () => {
+    queryKey: ["network-subnets", { status, searchText, filterVpcId }],
+    queryFn: async (params, signal) => {
       const keyword = searchText.trim();
-      return listNetworkSubnets({
-        vpc_id: filterVpcId || undefined,
-        state: status === "all" ? undefined : status,
-        search_field: keyword ? searchField : undefined,
-        keyword: keyword || undefined,
-      });
+      return listNetworkSubnets(
+        {
+          ...params,
+          vpc_id: filterVpcId || undefined,
+          state: status === "all" ? undefined : status,
+          name: keyword || undefined,
+        },
+        signal,
+      );
     },
   });
   const { actions } = useSubnetActions(resetPagination);
@@ -77,7 +79,12 @@ export default function SubnetsPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, subnet) => <ResourceNameId name={subnet.name} id={subnet.id} type="subnet" />,
+      render: (_, subnet) => (
+        <div className="flex flex-col items-start gap-1">
+          <ResourceNameId name={subnet.name} id={subnet.id} type="subnet" />
+          {subnet.owner_scope === "platform" && <Tag color="arcoblue">平台基础网络</Tag>}
+        </div>
+      ),
     },
     {
       key: "state",
@@ -142,7 +149,7 @@ export default function SubnetsPage() {
               label: "可用",
             },
             {
-              value: "pending",
+              value: "provisioning",
               label: "创建中",
             },
             {
@@ -158,14 +165,10 @@ export default function SubnetsPage() {
                 value: "name",
                 label: "名称",
               },
-              {
-                value: "id",
-                label: "ID",
-              },
             ],
-            field: searchField,
+            field: "name",
             value: searchText,
-            onFieldChange: setSearchField,
+            onFieldChange: () => {},
             onChange: setSearchText,
           },
           filters: (

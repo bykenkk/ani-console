@@ -1,8 +1,10 @@
 import type { CoreDevProfileInfo, CursorPageParams, PageParams } from "@/api/types";
 
+export type NetworkConsumerType = "container_instance" | "virtual_machine" | "sandbox" | "unknown";
+
 /** One network attachment, not a deduplicated compute resource. */
 export interface NetworkAssociatedInstance {
-  consumer_type: "container_instance" | "virtual_machine" | "sandbox" | "unknown";
+  consumer_type: NetworkConsumerType;
   consumer_id: string;
   consumer_name: string;
   consumer_state: string;
@@ -158,9 +160,13 @@ export type NetworkResourceStateFilter =
   | "RESOURCE_STATE_DELETING"
   | "RESOURCE_STATE_DELETED";
 
+export type NetworkOwnerScope = "tenant" | "platform";
+
 export interface NetworkVPC {
   id: string;
-  tenant_id?: string;
+  owner_scope: NetworkOwnerScope;
+  can_manage: boolean;
+  can_use: boolean;
   name: string;
   description?: string;
   cidr: string;
@@ -206,7 +212,9 @@ export interface NetworkVpcPublicEgress {
 
 export interface NetworkSubnet {
   id: string;
-  tenant_id: string;
+  owner_scope: NetworkOwnerScope;
+  can_manage: boolean;
+  can_use: boolean;
   vpc_id: string;
   name: string;
   cidr: string;
@@ -234,11 +242,13 @@ export interface NetworkSubnetListParams extends CursorPageParams {
   name?: string;
   vpc_id?: string;
   state?: string;
-  search_field?: "name" | "id";
-  keyword?: string;
+  can_use?: boolean;
+  can_manage?: boolean;
 }
 
 export interface NetworkVPCListParams extends PageParams {
+  can_use?: boolean;
+  can_manage?: boolean;
   state?: "" | NetworkResourceStateFilter;
   name?: string;
 }
@@ -250,7 +260,7 @@ export interface NetworkVPCListResponse {
 
 export interface NetworkSubnetListResponse {
   items: NetworkSubnet[];
-  total: number;
+  total: string;
   next_cursor?: string | null;
 }
 

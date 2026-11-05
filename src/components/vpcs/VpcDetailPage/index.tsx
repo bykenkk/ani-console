@@ -13,7 +13,6 @@ import { getNetworkVpc, type NetworkVPC } from "@/api/network";
 import { formatDateTime } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import VpcRelatedResources from "./VpcRelatedResources";
-import VpcSubnets from "./VpcSubnets";
 import BindVpcEipModal from "../BindVpcEipModal";
 
 type VpcDetailPageProps = {
@@ -51,7 +50,7 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
         title={vpc.name}
         status={<NetworkResourceStatus resource={vpc} />}
         icon={<AliIcon name="VPCwangluo" size={28} />}
-        headerItems={[{ label: "CIDR", value: vpc.cidr }]}
+        headerItems={[{ label: "CIDR", value: vpc.cidr || "-" }]}
         actions={<ResourceActionMenu record={vpc} actions={actions} />}
         cards={[
           {
@@ -59,21 +58,14 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
             title: "基本信息",
             fields: [
               { label: "ID", value: <ResourceId value={vpc.id} /> },
-              { label: "CIDR", value: vpc.cidr },
-              { label: "公网 IP", value: vpc.public_egress?.eip_address || "-" },
-              ...(vpc.public_egress
-                ? [
-                    { label: "EIP ID", value: <ResourceId value={vpc.public_egress.eip_id} /> },
-                    {
-                      label: "绑定 ID",
-                      value: <ResourceId value={vpc.public_egress.binding_id} />,
-                    },
-                    {
-                      label: "公网 IP 观测时间",
-                      value: formatDateTime(vpc.public_egress.observed_at),
-                    },
-                  ]
-                : []),
+              { label: "CIDR", value: vpc.cidr || "-" },
+              {
+                label: "公网 IP",
+                value:
+                  vpc.owner_scope === "platform"
+                    ? "平台托管"
+                    : vpc.public_egress?.eip_address || "-",
+              },
               { label: "创建时间", value: formatDateTime(vpc.created_at) },
               { label: "更新时间", value: formatDateTime(vpc.updated_at) },
             ],
@@ -81,14 +73,9 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
         ]}
         tabs={[
           {
-            key: "subnets",
-            label: "子网",
-            content: <VpcSubnets vpcId={vpcId} />,
-          },
-          {
             key: "related",
             label: "关联资源",
-            content: <VpcRelatedResources vpcId={vpcId} />,
+            content: <VpcRelatedResources vpcId={vpcId} ownerScope={vpc.owner_scope} />,
           },
         ]}
         activeTabKey={tab}

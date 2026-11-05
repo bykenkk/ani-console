@@ -1,5 +1,6 @@
 import { runIdempotentRequest } from "@/api/idempotency";
-import { coreRequest } from "@/api/request";
+import { ApiError, coreRequest } from "@/api/request";
+import type { PageParams } from "@/api/types";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
   CreateNetworkSubnetInput,
@@ -7,10 +8,30 @@ import type {
   NetworkSubnet,
   NetworkSubnetListParams,
   NetworkSubnetListResponse,
+  NetworkAssociatedInstanceListResponse,
 } from "./types";
 
 const createScope = createIdempotencyScope("network-subnet-create", ["POST"]);
 const subnetPath = (subnetId: string) => `/networks/subnets/${encodeURIComponent(subnetId)}`;
+
+export async function listNetworkSubnetAssociatedInstances(
+  subnetId: string,
+  params: PageParams = {},
+  signal?: AbortSignal,
+): Promise<NetworkAssociatedInstanceListResponse> {
+  try {
+    return await coreRequest<NetworkAssociatedInstanceListResponse>("/networks/instances", {
+      method: "GET",
+      params: { subnet_id: subnetId, page: params.page, pageSize: params.pageSize },
+      signal,
+    });
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 403) {
+      error.message = "无权查看网络关联实例";
+    }
+    throw error;
+  }
+}
 
 export function listNetworkSubnets(
   params: NetworkSubnetListParams = {},

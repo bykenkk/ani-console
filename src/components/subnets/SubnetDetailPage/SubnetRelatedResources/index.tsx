@@ -1,4 +1,4 @@
-import NetworkAssociatedInstances from "@/components/network/NetworkAssociatedInstances";
+import SubnetAssociatedInstances from "./SubnetAssociatedInstances";
 import SubnetVnics from "./SubnetVnics";
 
 type SubnetRelatedResourcesProps = { subnetId: string };
@@ -7,7 +7,7 @@ export default function SubnetRelatedResources({ subnetId }: SubnetRelatedResour
   return (
     <section className="flex flex-col gap-6">
       <SubnetVnics subnetId={subnetId} />
-      <NetworkAssociatedInstances scope="subnet" resourceId={subnetId} />
+      <SubnetAssociatedInstances subnetId={subnetId} />
     </section>
   );
 }

@@ -6,7 +6,8 @@ type Vpc = NetworkVPC;
 export function useVpcActions(onDeleted?: (item: Vpc) => void, onBind?: (item: Vpc) => void) {
   const eipActions = useVpcEipActions(onBind);
   const deleteVpc = useResourceDelete<Vpc>("vpc", onDeleted, {
-    isDisabled: (item) => item.state === "deleting" || item.state === "deleted",
+    isDisabled: (item) =>
+      item.can_manage !== true || item.state === "deleting" || item.state === "deleted",
   });
 
   const actions: RowAction<Vpc>[] = [

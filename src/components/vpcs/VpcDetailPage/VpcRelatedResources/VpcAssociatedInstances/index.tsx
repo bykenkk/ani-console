@@ -1,18 +1,12 @@
-import {
-  listNetworkSubnetAssociatedInstances,
-  listNetworkVpcAssociatedInstances,
-  type NetworkAssociatedInstance,
-} from "@/api/network";
+import { listNetworkVpcAssociatedInstances, type NetworkAssociatedInstance } from "@/api/network";
 import { DataTable, ResourceNameId, StatusBadge, type ListColumn } from "@/components/common";
+import NetworkResourceStatus from "@/components/network/NetworkResourceStatus";
 import { useListPagination } from "@/hooks/useListPagination";
 import { withId } from "@/lib/id";
 import { Tag } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 
-type NetworkAssociatedInstancesProps = {
-  scope: "vpc" | "subnet";
-  resourceId: string;
-};
+type VpcAssociatedInstancesProps = { vpcId: string };
 
 const consumerLabels: Record<NetworkAssociatedInstance["consumer_type"], string> = {
   container_instance: "容器实例",
@@ -40,23 +34,44 @@ const columns: Array<ListColumn<NetworkAssociatedInstance>> = [
     width: 120,
     render: (_, item) => <StatusBadge status={item.consumer_state} />,
   },
+  {
+    title: "网络占用状态",
+    width: 120,
+    render: (_, item) => (
+      <NetworkResourceStatus
+        resource={{
+          state: item.attachment_state,
+          reason: item.attachment_reason,
+          observation_stale: item.observation_stale,
+          observed_at: item.observed_at,
+        }}
+      />
+    ),
+  },
+  {
+    title: "子网",
+    width: 200,
+    ellipsis: true,
+    render: (_, item) => item.subnet_name || item.subnet_id || "-",
+  },
+  {
+    title: "地址",
+    width: 240,
+    ellipsis: true,
+    render: (_, item) =>
+      item.addresses.map(({ nic_name, address }) => `${nic_name}: ${address}`).join(" · ") || "-",
+  },
 ];
 
-export default function NetworkAssociatedInstances({
-  scope,
-  resourceId,
-}: NetworkAssociatedInstancesProps) {
-  const paging = useListPagination(withId("network-associated-instances", scope, resourceId), 20);
+export default function VpcAssociatedInstances({ vpcId }: VpcAssociatedInstancesProps) {
+  const paging = useListPagination(withId("vpc-associated-instances", vpcId), 20);
   const params = { page: paging.page, pageSize: paging.pageSize };
   const instances = useQuery({
-    queryKey: ["network-associated-instances", scope, resourceId, params],
-    queryFn: ({ signal }) =>
-      scope === "vpc"
-        ? listNetworkVpcAssociatedInstances(resourceId, params, signal)
-        : listNetworkSubnetAssociatedInstances(resourceId, params, signal),
+    queryKey: ["vpc-associated-instances", vpcId, params],
+    queryFn: ({ signal }) => listNetworkVpcAssociatedInstances(vpcId, params, signal),
     meta: {
       errorNotification: {
-        id: withId("network-associated-instances", scope, resourceId),
+        id: withId("vpc-associated-instances", vpcId),
         action: "关联实例加载",
         fallback: "请求失败，请稍后重试",
       },
@@ -76,7 +91,7 @@ export default function NetworkAssociatedInstances({
         onPageChange: paging.setPage,
         onPageSizeChange: paging.setPageSize,
       }}
-      tableLabel={scope === "vpc" ? "VPC 关联实例" : "子网关联实例"}
+      tableLabel="VPC 关联实例"
     />
   );
 }

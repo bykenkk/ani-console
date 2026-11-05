@@ -1,5 +1,6 @@
 import { runIdempotentRequest } from "@/api/idempotency";
-import { coreRequest } from "@/api/request";
+import { ApiError, coreRequest } from "@/api/request";
+import type { PageParams } from "@/api/types";
 import { createIdempotencyScope } from "@/lib/idempotency";
 import type {
   CreateNetworkVPCInput,
@@ -8,10 +9,30 @@ import type {
   NetworkVPCCidrPresetsResponse,
   NetworkVPCListParams,
   NetworkVPCListResponse,
+  NetworkAssociatedInstanceListResponse,
 } from "./types";
 
 const createScope = createIdempotencyScope("network-vpc-create", ["POST"]);
 const vpcPath = (vpcId: string) => `/networks/vpcs/${encodeURIComponent(vpcId)}`;
+
+export async function listNetworkVpcAssociatedInstances(
+  vpcId: string,
+  params: PageParams = {},
+  signal?: AbortSignal,
+): Promise<NetworkAssociatedInstanceListResponse> {
+  try {
+    return await coreRequest<NetworkAssociatedInstanceListResponse>("/networks/instances", {
+      method: "GET",
+      params: { vpc_id: vpcId, page: params.page, pageSize: params.pageSize },
+      signal,
+    });
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 403) {
+      error.message = "无权查看网络关联实例";
+    }
+    throw error;
+  }
+}
 
 export function listNetworkVpcs(
   params: NetworkVPCListParams = {},
