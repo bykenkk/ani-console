@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { copyToClipboard } from "@/lib/clipboard";
 
 type ResourceIdProps = {
-  value: string;
+  value?: string | null;
   className?: string;
   copyable?: boolean;
 };
@@ -12,10 +12,10 @@ type ResourceIdProps = {
 export default function ResourceId({ value, className, copyable = true }: ResourceIdProps) {
   return (
     <span className={clsx("inline-flex max-w-full min-w-0 items-center gap-1", className)}>
-      <span className="min-w-0 truncate font-mono" title={value}>
-        {value}
+      <span className="min-w-0 truncate font-mono" title={value ?? undefined}>
+        {value || "-"}
       </span>
-      {copyable && (
+      {copyable && value && (
         <Button
           title="复制资源 ID"
           className="shrink-0"

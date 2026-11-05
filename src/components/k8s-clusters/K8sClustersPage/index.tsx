@@ -94,7 +94,7 @@ export default function K8sClustersPage() {
       render: (_, cluster) => (
         <ResourceNameId
           name={cluster.name ?? cluster.id ?? "-"}
-          id={cluster.id ?? "-"}
+          id={cluster.id}
           type="k8s-cluster"
         />
       ),

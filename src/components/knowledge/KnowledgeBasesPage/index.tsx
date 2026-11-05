@@ -50,7 +50,10 @@ export default function KnowledgeBasesPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="knowledge-base" />,
+      // TODO(feature-visibility): 待知识库管理支持后移除 openable={false}，恢复资源名称跳转。
+      render: (_, item) => (
+        <ResourceNameId name={item.name} id={item.id} type="knowledge-base" openable={false} />
+      ),
     },
     {
       key: "status",

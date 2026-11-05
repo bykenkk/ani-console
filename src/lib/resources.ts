@@ -65,11 +65,10 @@ export function navigateToResourceDetail(
       navigate({ to: "/k8s-clusters/$clusterId", params: { clusterId: resource.id } });
       return;
     case "knowledge-base":
-      // TODO(feature-visibility): 待知识库管理支持后恢复详情跳转。
-      // navigate({
-      //   to: "/kb/$kbId",
-      //   params: { kbId: resource.id },
-      // });
+      navigate({
+        to: "/kb/$kbId",
+        params: { kbId: resource.id },
+      });
       return;
     case "vpc":
       navigate({ to: "/vpcs/$vpcId", params: { vpcId: resource.id } });
@@ -93,21 +92,19 @@ export function navigateToResourceDetail(
       navigate({ to: "/volumes/$volumeId", params: { volumeId: resource.id } });
       return;
     case "filesystem":
-      // TODO(feature-visibility): 待文件存储支持后恢复详情跳转。
-      // navigate({
-      //   to: "/filesystems/$filesystemId",
-      //   params: { filesystemId: resource.id },
-      // });
+      navigate({
+        to: "/filesystems/$filesystemId",
+        params: { filesystemId: resource.id },
+      });
       return;
     case "bucket":
       navigate({ to: "/objects/$bucketId", params: { bucketId: resource.id } });
       return;
     case "vector-store":
-      // TODO(feature-visibility): 待向量存储支持后恢复详情跳转。
-      // navigate({
-      //   to: "/vector-stores/$vectorStoreId",
-      //   params: { vectorStoreId: resource.id },
-      // });
+      navigate({
+        to: "/vector-stores/$vectorStoreId",
+        params: { vectorStoreId: resource.id },
+      });
       return;
   }
 }

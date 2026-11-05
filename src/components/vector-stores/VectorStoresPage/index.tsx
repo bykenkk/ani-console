@@ -59,7 +59,10 @@ export default function VectorStoresPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="vector-store" />,
+      // TODO(feature-visibility): 待向量存储支持后移除 openable={false}，恢复资源名称跳转。
+      render: (_, item) => (
+        <ResourceNameId name={item.name} id={item.id} type="vector-store" openable={false} />
+      ),
     },
     {
       key: "state",

@@ -55,7 +55,10 @@ export default function FilesystemsPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="filesystem" />,
+      // TODO(feature-visibility): 待文件存储支持后移除 openable={false}，恢复资源名称跳转。
+      render: (_, item) => (
+        <ResourceNameId name={item.name} id={item.id} type="filesystem" openable={false} />
+      ),
     },
     {
       key: "state",
