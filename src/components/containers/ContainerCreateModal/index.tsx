@@ -1,8 +1,8 @@
-// FIXME(governance-instance-create): 副本、密钥等旧创建能力仍无等价契约，不混入当前请求。
-// TODO(governance-instance-create): 待后端补齐后逐项恢复；本次只接入当前配置合同支持的字段。
-import { useRef, useState } from "react";
+// FIXME(governance-instance-create): 副本、密钥及自定义 GPU 执行参数尚无等价创建字段。
+// TODO(governance-instance-create): 正式契约补齐后逐项恢复；GPU 参数仍由所选规格解析。
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button, Form, Modal, Space } from "@arco-design/web-react";
+import { Button, Form } from "@arco-design/web-react";
 import {
   createInstance,
   type InstanceEnvVar,
@@ -10,11 +10,12 @@ import {
   type InstanceVolumeMount,
 } from "@/api/instances";
 import type { ImageRegistration } from "@/api/images";
-import { WizardSteps } from "@/components/common";
+import type { NetworkSecurityGroup, NetworkSubnet, NetworkVPC } from "@/api/network";
+import WizardModal from "@/components/common/WizardModal";
 import { validateForm } from "@/lib/form";
-import { showMessage } from "@/lib/feedback";
 import ContainerBasicFields from "@/components/instances/ContainerBasicFields";
 import ContainerResourceFields from "@/components/instances/ContainerResourceFields";
+import ContainerRuntimeFields from "@/components/instances/ContainerRuntimeFields";
 import ContainerSummary from "@/components/instances/ContainerSummary";
 import { buildContainerCreateInput } from "./utils";
 
@@ -22,157 +23,183 @@ type ContainerCreateModalProps = {
   onCancel: () => void;
   onCreated: () => void;
 };
-
 export type ContainerCreateFormValues = {
   name: string;
   preset?: InstancePreset;
   image?: ImageRegistration;
-  workspace_mount_path: string;
-  volume_mounts: InstanceVolumeMount[];
+  network_enabled: boolean;
   vpc_id: string;
   subnet_id: string;
   security_group_ids: string[];
+  workspace_mount_path: string;
+  volume_mounts: InstanceVolumeMount[];
   env: InstanceEnvVar[];
   labels: InstanceEnvVar[];
   annotations: InstanceEnvVar[];
 };
-
-const STEP_TITLES = ["基础配置", "资源配置", "摘要信息"];
-const INITIAL_VALUES: ContainerCreateFormValues = {
+type ContainerCreateFieldKey =
+  | keyof ContainerCreateFormValues
+  | `volume_mounts[${number}].${keyof InstanceVolumeMount}`
+  | `${"env" | "labels" | "annotations"}[${number}].${keyof InstanceEnvVar}`;
+type ContainerCreateFieldValue = ContainerCreateFormValues[keyof ContainerCreateFormValues];
+const STEPS = ["基础配置", "网络与存储", "运行配置", "确认配置"];
+const INITIAL: ContainerCreateFormValues = {
   name: "",
-  preset: undefined,
-  image: undefined,
-  workspace_mount_path: "/workspace",
-  volume_mounts: [],
+  network_enabled: false,
   vpc_id: "",
   subnet_id: "",
   security_group_ids: [],
+  workspace_mount_path: "/workspace",
+  volume_mounts: [],
   env: [],
   labels: [],
   annotations: [],
 };
-const BASIC_FIELDS: (keyof ContainerCreateFormValues)[] = ["name", "preset", "image"];
-const RESOURCE_FIELDS: (keyof ContainerCreateFormValues)[] = [
-  "workspace_mount_path",
-  "volume_mounts",
-  "vpc_id",
-  "subnet_id",
-  "security_group_ids",
-  "env",
-  "labels",
-  "annotations",
-];
 
 export default function ContainerCreateModal({ onCancel, onCreated }: ContainerCreateModalProps) {
-  const [form] = Form.useForm<ContainerCreateFormValues>();
+  const [form] = Form.useForm<
+    ContainerCreateFormValues,
+    ContainerCreateFieldValue,
+    ContainerCreateFieldKey
+  >();
+  const [values, setValues] = useState(INITIAL);
   const [step, setStep] = useState(0);
-  const [values, setValues] = useState(INITIAL_VALUES);
-  const submitting = useRef(false);
-  const [validating, setValidating] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [errorField, setErrorField] = useState<ContainerCreateFieldKey>();
+  const [metadataExpanded, setMetadataExpanded] = useState(false);
+  const [vpc, setVpc] = useState<NetworkVPC>();
+  const [subnet, setSubnet] = useState<NetworkSubnet>();
+  const [securityGroups, setSecurityGroups] = useState<Pick<NetworkSecurityGroup, "id" | "name">[]>(
+    [],
+  );
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const lock = useRef(false);
   const qc = useQueryClient();
+  const title = "创建容器";
+  const stepFields: ContainerCreateFieldKey[][] = [
+    ["name", "image", "preset"],
+    [
+      "network_enabled",
+      "workspace_mount_path",
+      "volume_mounts",
+      ...(values.network_enabled
+        ? ["vpc_id" as const, "subnet_id" as const, "security_group_ids" as const]
+        : []),
+      ...values.volume_mounts.flatMap((_, i): ContainerCreateFieldKey[] => [
+        `volume_mounts[${i}].pvc_name`,
+        `volume_mounts[${i}].mount_path`,
+        `volume_mounts[${i}].read_only`,
+      ]),
+    ],
+    (["env", "labels", "annotations"] as const).flatMap((field): ContainerCreateFieldKey[] => [
+      field,
+      ...values[field].flatMap((_, i): ContainerCreateFieldKey[] => [
+        `${field}[${i}].name`,
+        `${field}[${i}].value`,
+      ]),
+    ]),
+  ];
+  useEffect(() => {
+    if (!errorField) return;
+    form.scrollToField(errorField, { block: "nearest" });
+    setErrorField(undefined);
+  }, [form, step, errorField, metadataExpanded]);
+  const changeStep = (next: number) => {
+    setStep(next);
+    scrollRef.current?.scrollTo({ top: 0 });
+  };
+  const close = () => {
+    if (!lock.current) onCancel();
+  };
   const create = useMutation({
     mutationFn: createInstance,
     meta: {
       feedback: {
         channel: "message",
-        action: "创建容器",
+        action: title,
         successText: "创建已提交",
         errorFallback: "创建失败，请检查配置后重试",
       },
     },
-    // TODO(container-task): 创建任务跟踪后续统一接入，当前仅提交请求并提示。
+    // TODO(container-task): 创建任务跟踪后续统一接入。
     onSuccess: async () => {
       await qc.invalidateQueries({ queryKey: ["instances", "cpu"] });
       onCreated();
     },
   });
-  const close = () => {
-    if (!submitting.current) onCancel();
-  };
-  const next = async () => {
-    if (submitting.current) return;
-    submitting.current = true;
-    setValidating(true);
+  const advance = async (submit = false) => {
+    if (lock.current) return;
+    lock.current = true;
+    setBusy(true);
     try {
-      await validateForm({
-        validate: () => form.validate(step === 0 ? BASIC_FIELDS : RESOURCE_FIELDS),
+      const current = await validateForm({
+        validate: async () => {
+          await form.validate(submit ? stepFields.flat() : stepFields[step]);
+          return { ...INITIAL, ...form.getFieldsValue() };
+        },
       });
-      setStep((current) => current + 1);
-    } catch {
-      // 统一表单校验负责字段及提交提示。
-    } finally {
-      submitting.current = false;
-      setValidating(false);
-    }
-  };
-  const submit = async () => {
-    if (submitting.current) return;
-    submitting.current = true;
-    try {
-      const currentValues = await validateForm<ContainerCreateFormValues>(form);
-      const { image, preset } = currentValues;
-      if (
-        !preset ||
-        preset.compute_type !== "cpu" ||
-        !preset.enabled ||
-        !preset.selectable ||
-        !image
-      ) {
-        setStep(0);
-        showMessage({ type: "error", content: "镜像或算力规格已变化，请重新选择" });
+      if (!submit) {
+        changeStep(step + 1);
         return;
       }
-      await create.mutateAsync(buildContainerCreateInput(currentValues));
+      await create.mutateAsync(buildContainerCreateInput(current));
     } catch {
       const errors = form.getFieldsError();
-      if (Object.keys(errors).length) setStep(BASIC_FIELDS.some((field) => errors[field]) ? 0 : 1);
+      const errorStep = stepFields.findIndex((fields) => fields.some((field) => errors[field]));
+      if (errorStep >= 0) {
+        const field = stepFields[errorStep].find((key) => errors[key]);
+        if (field?.startsWith("labels") || field?.startsWith("annotations"))
+          setMetadataExpanded(true);
+        changeStep(errorStep);
+        setErrorField(field);
+      }
     } finally {
-      submitting.current = false;
+      lock.current = false;
+      setBusy(false);
     }
   };
   return (
-    <Modal
-      visible
-      title="创建容器"
-      style={{ width: 820 }}
+    <WizardModal
+      title={title}
+      current={step + 1}
+      steps={STEPS}
+      busy={busy}
       onCancel={close}
+      scrollRef={scrollRef}
+      onStepChange={(next) => {
+        if (!lock.current && next - 1 < step) changeStep(next - 1);
+      }}
       footer={
-        <Space>
-          <Button onClick={close} disabled={create.isPending || validating}>
+        <div className="flex justify-end gap-3">
+          <Button onClick={close} disabled={busy}>
             取消
           </Button>
           {step > 0 && (
-            <Button
-              disabled={create.isPending || validating}
-              onClick={() => setStep((current) => current - 1)}
-            >
+            <Button onClick={() => changeStep(step - 1)} disabled={busy}>
               上一步
             </Button>
           )}
-          <Button
-            type="primary"
-            loading={create.isPending || validating}
-            onClick={step === 2 ? submit : next}
-          >
-            {step === 2 ? "提交创建" : "下一步"}
+          <Button type="primary" loading={busy} onClick={() => advance(step === 3)}>
+            {step === 3 ? title : "下一步"}
           </Button>
-        </Space>
+        </div>
       }
     >
-      <WizardSteps
-        current={step + 1}
-        items={STEP_TITLES}
-        size="small"
-        className="mx-auto w-full max-w-160 shrink-0"
-      />
-      <Form<ContainerCreateFormValues>
+      <Form<ContainerCreateFormValues, ContainerCreateFieldValue, ContainerCreateFieldKey>
         form={form}
         layout="vertical"
-        initialValues={INITIAL_VALUES}
-        className="pt-7"
-        disabled={create.isPending}
-        requiredSymbol={{ position: "end" }}
-        onValuesChange={(changed) => setValues((current) => ({ ...current, ...changed }))}
+        initialValues={INITIAL}
+        disabled={busy}
+        wrapper="div"
+        onValuesChange={(changed, next) => {
+          const reset: Partial<ContainerCreateFormValues> = {};
+          if ("vpc_id" in changed) {
+            reset.subnet_id = "";
+            setSubnet(undefined);
+          }
+          form.setFieldsValue(reset);
+          setValues((current) => ({ ...current, ...next, ...reset }));
+        }}
       >
         <div hidden={step !== 0}>
           <ContainerBasicFields computeType="cpu" />
@@ -180,14 +207,26 @@ export default function ContainerCreateModal({ onCancel, onCreated }: ContainerC
         <div hidden={step !== 1}>
           <ContainerResourceFields
             values={values}
-            onVpcChange={(id) => {
-              form.setFieldsValue({ vpc_id: id, subnet_id: "" });
-              setValues((current) => ({ ...current, vpc_id: id, subnet_id: "" }));
-            }}
+            onVpcChange={setVpc}
+            onSubnetChange={setSubnet}
+            onSecurityGroupsChange={setSecurityGroups}
           />
         </div>
-        {step === 2 && <ContainerSummary values={values} />}
+        <div hidden={step !== 2}>
+          <ContainerRuntimeFields
+            metadataExpanded={metadataExpanded}
+            onMetadataExpandedChange={setMetadataExpanded}
+          />
+        </div>
       </Form>
-    </Modal>
+      {step === 3 && (
+        <ContainerSummary
+          values={values}
+          vpcName={vpc?.name}
+          subnetName={subnet?.name}
+          securityGroups={securityGroups}
+        />
+      )}
+    </WizardModal>
   );
 }

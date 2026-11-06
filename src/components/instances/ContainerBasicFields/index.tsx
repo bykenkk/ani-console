@@ -13,7 +13,7 @@ export default function ContainerBasicFields({ computeType }: ContainerBasicFiel
     <>
       <Form.Item
         field="name"
-        label="名称"
+        label="实例名称"
         rules={[
           { required: true, message: "请输入实例名称" },
           {
@@ -22,7 +22,7 @@ export default function ContainerBasicFields({ computeType }: ContainerBasicFiel
           },
         ]}
       >
-        <Input maxLength={80} />
+        <Input maxLength={80} placeholder="请输入实例名称" />
       </Form.Item>
       <Form.Item
         field="image"

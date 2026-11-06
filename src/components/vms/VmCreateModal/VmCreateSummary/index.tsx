@@ -27,9 +27,9 @@ export default function VmCreateSummary({
     initialized && (values.login_method === "SSH_PUBLIC_KEY" || values.additional_credential);
   const sections = [
     {
-      title: "计算与存储",
+      title: "基础配置",
       data: [
-        { label: "实例规格", value: values.preset?.name || "-" },
+        { label: "实例名称", value: values.name.trim() || "-" },
         {
           label: "系统来源",
           value: values.source_kind === "DISK_IMAGE" ? "从镜像创建" : "通过 ISO 安装",
@@ -38,6 +38,7 @@ export default function VmCreateSummary({
           label: values.source_kind === "DISK_IMAGE" ? "系统镜像" : "安装镜像（ISO）",
           value: media?.name || "-",
         },
+        { label: "实例规格", value: values.preset?.name || "-" },
         { label: "系统盘", value: `${values.system_disk_size_gb} GB` },
         {
           label: "数据盘",
@@ -80,7 +81,6 @@ export default function VmCreateSummary({
     {
       title: "系统配置",
       data: [
-        { label: "实例名称", value: values.name.trim() || "-" },
         {
           label: "登录方式",
           value: !canInitialize

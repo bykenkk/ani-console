@@ -35,11 +35,10 @@ export type VmCreateFormValues = {
   additional_credential: boolean;
   username: string;
   password: string;
-  confirm_password: string;
   ssh_public_key: string;
 };
 
-const STEP_TITLES = ["计算与存储", "网络与安全", "系统配置", "确认配置"];
+const STEP_TITLES = ["基础配置", "网络与安全", "系统配置", "确认配置"];
 type VmCreateFieldKey =
   | keyof VmCreateFormValues
   | `nameservers[${number}]`
@@ -61,7 +60,6 @@ const INITIAL: VmCreateFormValues = {
   additional_credential: false,
   username: "",
   password: "",
-  confirm_password: "",
   ssh_public_key: "",
 };
 
@@ -104,9 +102,10 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
     initializeGuest && (values.login_method === "SSH_PUBLIC_KEY" || values.additional_credential);
   const stepFields: VmCreateFieldKey[][] = [
     [
-      "preset",
+      "name",
       "source_kind",
       "media_key",
+      "preset",
       "system_disk_size_gb",
       "data_disks",
       ...values.data_disks.flatMap((_, index): VmCreateFieldKey[] => [
@@ -116,11 +115,10 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
     ],
     ["vpc_id", "subnet_id", "security_group_ids", "dns_mode", ...dnsFields],
     [
-      "name",
       "start_after_create",
       ...(canInitialize ? ["login_method" as const] : []),
       ...(initializeGuest ? ["username" as const, "additional_credential" as const] : []),
-      ...(usePassword ? ["password" as const, "confirm_password" as const] : []),
+      ...(usePassword ? ["password" as const] : []),
       ...(usePublicKey ? ["ssh_public_key" as const] : []),
     ],
   ];
@@ -254,14 +252,12 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
           if ("source_kind" in changed || "media_key" in changed || "login_method" in changed) {
             reset.additional_credential = false;
             reset.password = "";
-            reset.confirm_password = "";
             reset.ssh_public_key = "";
-            clear.push("password", "confirm_password", "ssh_public_key");
+            clear.push("password", "ssh_public_key");
           } else if ("additional_credential" in changed && !next.additional_credential) {
             if (next.login_method === "SSH_PUBLIC_KEY") {
               reset.password = "";
-              reset.confirm_password = "";
-              clear.push("password", "confirm_password");
+              clear.push("password");
             } else {
               reset.ssh_public_key = "";
               clear.push("ssh_public_key");

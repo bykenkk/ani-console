@@ -7,7 +7,6 @@ type VmSystemFieldsProps = {
 };
 
 export default function VmSystemFields({ values, canInitialize }: VmSystemFieldsProps) {
-  const { form } = Form.useFormContext();
   const passwordFields = (
     <>
       <Form.Item
@@ -20,24 +19,6 @@ export default function VmSystemFields({ values, canInitialize }: VmSystemFields
         ]}
       >
         <Input.Password autoComplete="new-password" placeholder="请输入登录密码" />
-      </Form.Item>
-      <Form.Item
-        field="confirm_password"
-        label="确认密码"
-        dependencies={["password"]}
-        rules={[
-          { required: true, message: "请再次输入登录密码" },
-          {
-            validator: (password, cb) =>
-              cb(
-                password && password !== form.getFieldValue("password")
-                  ? "两次输入的密码不一致"
-                  : undefined,
-              ),
-          },
-        ]}
-      >
-        <Input.Password autoComplete="new-password" placeholder="请再次输入登录密码" />
       </Form.Item>
     </>
   );
@@ -59,17 +40,6 @@ export default function VmSystemFields({ values, canInitialize }: VmSystemFields
   );
   return (
     <>
-      <Form.Item
-        field="name"
-        label="实例名称"
-        rules={[
-          { required: true, message: "请输入实例名称" },
-          { validator: (name, cb) => cb(name && !name.trim() ? "请输入实例名称" : undefined) },
-          { maxLength: 128 },
-        ]}
-      >
-        <Input maxLength={128} placeholder="请输入实例名称" />
-      </Form.Item>
       {canInitialize ? (
         <>
           <Form.Item

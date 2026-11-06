@@ -102,9 +102,10 @@ export default function VmNetworkConfiguration({
                   </div>
                 </Form.Item>
               ))}
-              <div className="flex justify-end">
+              <div className="flex justify-start">
                 <Button
-                  type="dashed"
+                  type="text"
+                  style={{ padding: 0 }}
                   icon={<IconPlus />}
                   aria-label="添加 DNS 服务器"
                   disabled={disabled || fields.length >= 3}

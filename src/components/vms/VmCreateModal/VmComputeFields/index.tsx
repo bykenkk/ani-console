@@ -1,4 +1,4 @@
-import { Form, InputNumber, Radio, Select } from "@arco-design/web-react";
+import { Form, Input, InputNumber, Radio, Select } from "@arco-design/web-react";
 import type { VmMedia } from "@/api/vms";
 import { ComputePresetSelect } from "@/components/common";
 import VmInitialDiskEditor from "../../VmInitialDiskEditor";
@@ -15,21 +15,15 @@ export default function VmComputeFields({ values, media, loading }: VmComputeFie
   return (
     <>
       <Form.Item
-        field="preset"
-        label="实例规格"
+        field="name"
+        label="实例名称"
         rules={[
-          { required: true, message: "请选择实例规格" },
-          {
-            validator: (preset, cb) =>
-              cb(
-                preset && (!preset.enabled || !preset.selectable || preset.compute_type !== "cpu")
-                  ? "请选择可用的 CPU 实例规格"
-                  : undefined,
-              ),
-          },
+          { required: true, message: "请输入实例名称" },
+          { validator: (name, cb) => cb(name && !name.trim() ? "请输入实例名称" : undefined) },
+          { maxLength: 128 },
         ]}
       >
-        <ComputePresetSelect usage="VIRTUAL_MACHINE" computeType="cpu" />
+        <Input maxLength={128} placeholder="请输入实例名称" />
       </Form.Item>
       <Form.Item field="source_kind" label="系统来源">
         <Radio.Group
@@ -67,6 +61,23 @@ export default function VmComputeFields({ values, media, loading }: VmComputeFie
             .filter((item) => item.kind === values.source_kind)
             .map((item) => ({ value: item.mediaKey, label: item.name }))}
         />
+      </Form.Item>
+      <Form.Item
+        field="preset"
+        label="实例规格"
+        rules={[
+          { required: true, message: "请选择实例规格" },
+          {
+            validator: (preset, cb) =>
+              cb(
+                preset && (!preset.enabled || !preset.selectable || preset.compute_type !== "cpu")
+                  ? "请选择可用的 CPU 实例规格"
+                  : undefined,
+              ),
+          },
+        ]}
+      >
+        <ComputePresetSelect usage="VIRTUAL_MACHINE" computeType="cpu" />
       </Form.Item>
       <Form.Item
         field="system_disk_size_gb"

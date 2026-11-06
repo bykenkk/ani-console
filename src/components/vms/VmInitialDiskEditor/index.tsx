@@ -80,9 +80,10 @@ export default function VmInitialDiskEditor() {
               />
             </div>
           ))}
-          <div className="flex justify-end">
+          <div className="flex justify-start">
             <Button
-              type="dashed"
+              type="text"
+              style={{ padding: 0 }}
               icon={<IconPlus />}
               aria-label="添加数据盘"
               disabled={disabled}

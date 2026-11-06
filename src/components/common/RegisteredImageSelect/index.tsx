@@ -65,7 +65,7 @@ export default function RegisteredImageSelect({
       <Select
         aria-label="镜像"
         style={{ width: "calc(100% - 120px)" }}
-        value={value?.image_id ?? ""}
+        value={value?.image_id}
         disabled={disabled}
         showSearch
         loading={query.isFetching}
