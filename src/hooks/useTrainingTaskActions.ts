@@ -46,7 +46,7 @@ export function useTrainingTaskActions(): RowAction<ModelDevExecution>[] {
         errorFallback: "停止失败，请稍后重试",
       }),
     },
-    onSettled: (_, __, task) => refresh(task),
+    onSuccess: (_, task) => refresh(task),
   });
   const resume = useMutation({
     mutationFn: (task: ModelDevExecution) => resumeModelDevRegistration(task.execution_id),
@@ -60,8 +60,7 @@ export function useTrainingTaskActions(): RowAction<ModelDevExecution>[] {
         errorFallback: "恢复请求未确认，请查看最新登记状态",
       }),
     },
-    // 未知结果也先读取原执行，不能自动重放写入或将 HTTP 200 当作 READY。
-    onSettled: (_, __, task) => refresh(task),
+    onSuccess: (_, task) => refresh(task),
   });
   return [
     { key: "refresh", label: "刷新状态", onClick: (task) => refresh(task) },
