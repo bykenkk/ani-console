@@ -19,7 +19,7 @@ type HomeRoute =
   | "/ai-models"
   | "/ai-inference"
   | "/kb"
-  | "/registry"
+  | "/container-images"
   | "/vector-stores";
 
 type HomeSummaryStatus = {

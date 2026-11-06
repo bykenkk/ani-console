@@ -153,10 +153,12 @@ export const menuItems: readonly MenuItem[] = [
       //   children: [{ key: "/kb", label: "知识库管理", icon: <AliIcon name="zhishiku" /> }],
       // },
       {
-        key: "registry-management",
-        label: "镜像仓库",
+        key: "image-management",
+        label: "镜像管理",
         icon: <IconFile />,
-        children: [{ key: "/registry", label: "镜像仓库", icon: <AliIcon name="Harbor" /> }],
+        children: [
+          { key: "/container-images", label: "容器镜像", icon: <AliIcon name="Harbor" /> },
+        ],
       },
       {
         key: "security-identity",
@@ -184,7 +186,7 @@ export const productGroupSections = [
       // "knowledge-services",
     ],
   },
-  { label: "公共服务", groupKeys: ["registry-management", "security-identity"] },
+  { label: "公共服务", groupKeys: ["image-management", "security-identity"] },
 ] as const satisfies readonly ProductGroupSection[];
 
 export function isGroupItem(item: MenuItem): item is MenuItem & { children: MenuItem[] } {
@@ -243,7 +245,7 @@ const PATH_SUBMENU: { prefix: string; key: string }[] = [
   { prefix: "/eips", key: "network-management" },
   { prefix: "/security-groups", key: "network-management" },
   { prefix: "/load-balancers", key: "network-management" },
-  { prefix: "/registry", key: "registry-management" },
+  { prefix: "/container-images", key: "image-management" },
   { prefix: "/api-keys", key: "security-identity" },
 ];
 

@@ -4,7 +4,7 @@ import type { ImageSpace } from "@/api/images";
 import { formatDateTime } from "@/lib/format";
 import { IMAGE_SPACE_STATES } from "../options";
 import ImagePublisherCredential from "../ImagePublisherCredential";
-import RegistryPushInstructionsModal from "../RegistryPushInstructionsModal";
+import ContainerImagePushInstructionsModal from "../ContainerImagePushInstructionsModal";
 
 type ManageImageSpaceModalProps = {
   space: ImageSpace | null | undefined;
@@ -68,7 +68,7 @@ export default function ManageImageSpaceModal({
         )}
       </Space>
       {push && space && (
-        <RegistryPushInstructionsModal space={space} onCancel={() => setPush(false)} />
+        <ContainerImagePushInstructionsModal space={space} onCancel={() => setPush(false)} />
       )}
     </Modal>
   );

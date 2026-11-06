@@ -37,7 +37,7 @@ export default function ContainerRegistryImageSelect({
         rules={[{ required: true, message: "请选择容器镜像" }]}
         extra={
           !images.isLoading && !images.isError && !images.data?.length
-            ? "当前租户的镜像仓库中暂无匹配类型的容器镜像。"
+            ? "当前租户暂无匹配类型的容器镜像。"
             : undefined
         }
       >

@@ -28,6 +28,7 @@ import { Route as AuthenticatedAppAiModelsModelIdRouteImport } from './routes/_a
 import { Route as AuthenticatedAppAiTrainingIndexRouteImport } from './routes/_authenticated/_app/ai-training/index'
 import { Route as AuthenticatedAppAiTrainingExecutionIdRouteImport } from './routes/_authenticated/_app/ai-training/$executionId'
 import { Route as AuthenticatedAppApiKeysIndexRouteImport } from './routes/_authenticated/_app/api-keys/index'
+import { Route as AuthenticatedAppContainerImagesIndexRouteImport } from './routes/_authenticated/_app/container-images/index'
 import { Route as AuthenticatedAppContainersIndexRouteImport } from './routes/_authenticated/_app/containers/index'
 import { Route as AuthenticatedAppContainersInstanceIdRouteImport } from './routes/_authenticated/_app/containers/$instanceId'
 import { Route as AuthenticatedAppDevIndexRouteImport } from './routes/_authenticated/_app/dev/index'
@@ -47,7 +48,6 @@ import { Route as AuthenticatedAppLoadBalancersLoadBalancerIdRouteImport } from 
 import { Route as AuthenticatedAppObjectsIndexRouteImport } from './routes/_authenticated/_app/objects/index'
 import { Route as AuthenticatedAppObjectsBucketIdRouteImport } from './routes/_authenticated/_app/objects/$bucketId'
 import { Route as AuthenticatedAppOverviewComputeIndexRouteImport } from './routes/_authenticated/_app/overview-compute/index'
-import { Route as AuthenticatedAppRegistryIndexRouteImport } from './routes/_authenticated/_app/registry/index'
 import { Route as AuthenticatedAppSandboxesIndexRouteImport } from './routes/_authenticated/_app/sandboxes/index'
 import { Route as AuthenticatedAppSandboxesInstanceIdRouteImport } from './routes/_authenticated/_app/sandboxes/$instanceId'
 import { Route as AuthenticatedAppSecurityGroupsIndexRouteImport } from './routes/_authenticated/_app/security-groups/index'
@@ -171,6 +171,12 @@ const AuthenticatedAppApiKeysIndexRoute =
     path: '/api-keys/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppContainerImagesIndexRoute =
+  AuthenticatedAppContainerImagesIndexRouteImport.update({
+    id: '/container-images/',
+    path: '/container-images/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppContainersIndexRoute =
   AuthenticatedAppContainersIndexRouteImport.update({
     id: '/containers/',
@@ -281,12 +287,6 @@ const AuthenticatedAppOverviewComputeIndexRoute =
   AuthenticatedAppOverviewComputeIndexRouteImport.update({
     id: '/overview-compute/',
     path: '/overview-compute/',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppRegistryIndexRoute =
-  AuthenticatedAppRegistryIndexRouteImport.update({
-    id: '/registry/',
-    path: '/registry/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppSandboxesIndexRoute =
@@ -426,6 +426,7 @@ export interface FileRoutesByFullPath {
   '/ai-models/': typeof AuthenticatedAppAiModelsIndexRoute
   '/ai-training/': typeof AuthenticatedAppAiTrainingIndexRoute
   '/api-keys/': typeof AuthenticatedAppApiKeysIndexRoute
+  '/container-images/': typeof AuthenticatedAppContainerImagesIndexRoute
   '/containers/': typeof AuthenticatedAppContainersIndexRoute
   '/dev/': typeof AuthenticatedAppDevIndexRoute
   '/eips/': typeof AuthenticatedAppEipsIndexRoute
@@ -437,7 +438,6 @@ export interface FileRoutesByFullPath {
   '/load-balancers/': typeof AuthenticatedAppLoadBalancersIndexRoute
   '/objects/': typeof AuthenticatedAppObjectsIndexRoute
   '/overview-compute/': typeof AuthenticatedAppOverviewComputeIndexRoute
-  '/registry/': typeof AuthenticatedAppRegistryIndexRoute
   '/sandboxes/': typeof AuthenticatedAppSandboxesIndexRoute
   '/security-groups/': typeof AuthenticatedAppSecurityGroupsIndexRoute
   '/subnets/': typeof AuthenticatedAppSubnetsIndexRoute
@@ -480,6 +480,7 @@ export interface FileRoutesByTo {
   '/ai-models': typeof AuthenticatedAppAiModelsIndexRoute
   '/ai-training': typeof AuthenticatedAppAiTrainingIndexRoute
   '/api-keys': typeof AuthenticatedAppApiKeysIndexRoute
+  '/container-images': typeof AuthenticatedAppContainerImagesIndexRoute
   '/containers': typeof AuthenticatedAppContainersIndexRoute
   '/dev': typeof AuthenticatedAppDevIndexRoute
   '/eips': typeof AuthenticatedAppEipsIndexRoute
@@ -491,7 +492,6 @@ export interface FileRoutesByTo {
   '/load-balancers': typeof AuthenticatedAppLoadBalancersIndexRoute
   '/objects': typeof AuthenticatedAppObjectsIndexRoute
   '/overview-compute': typeof AuthenticatedAppOverviewComputeIndexRoute
-  '/registry': typeof AuthenticatedAppRegistryIndexRoute
   '/sandboxes': typeof AuthenticatedAppSandboxesIndexRoute
   '/security-groups': typeof AuthenticatedAppSecurityGroupsIndexRoute
   '/subnets': typeof AuthenticatedAppSubnetsIndexRoute
@@ -539,6 +539,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/ai-models/': typeof AuthenticatedAppAiModelsIndexRoute
   '/_authenticated/_app/ai-training/': typeof AuthenticatedAppAiTrainingIndexRoute
   '/_authenticated/_app/api-keys/': typeof AuthenticatedAppApiKeysIndexRoute
+  '/_authenticated/_app/container-images/': typeof AuthenticatedAppContainerImagesIndexRoute
   '/_authenticated/_app/containers/': typeof AuthenticatedAppContainersIndexRoute
   '/_authenticated/_app/dev/': typeof AuthenticatedAppDevIndexRoute
   '/_authenticated/_app/eips/': typeof AuthenticatedAppEipsIndexRoute
@@ -550,7 +551,6 @@ export interface FileRoutesById {
   '/_authenticated/_app/load-balancers/': typeof AuthenticatedAppLoadBalancersIndexRoute
   '/_authenticated/_app/objects/': typeof AuthenticatedAppObjectsIndexRoute
   '/_authenticated/_app/overview-compute/': typeof AuthenticatedAppOverviewComputeIndexRoute
-  '/_authenticated/_app/registry/': typeof AuthenticatedAppRegistryIndexRoute
   '/_authenticated/_app/sandboxes/': typeof AuthenticatedAppSandboxesIndexRoute
   '/_authenticated/_app/security-groups/': typeof AuthenticatedAppSecurityGroupsIndexRoute
   '/_authenticated/_app/subnets/': typeof AuthenticatedAppSubnetsIndexRoute
@@ -597,6 +597,7 @@ export interface FileRouteTypes {
     | '/ai-models/'
     | '/ai-training/'
     | '/api-keys/'
+    | '/container-images/'
     | '/containers/'
     | '/dev/'
     | '/eips/'
@@ -608,7 +609,6 @@ export interface FileRouteTypes {
     | '/load-balancers/'
     | '/objects/'
     | '/overview-compute/'
-    | '/registry/'
     | '/sandboxes/'
     | '/security-groups/'
     | '/subnets/'
@@ -651,6 +651,7 @@ export interface FileRouteTypes {
     | '/ai-models'
     | '/ai-training'
     | '/api-keys'
+    | '/container-images'
     | '/containers'
     | '/dev'
     | '/eips'
@@ -662,7 +663,6 @@ export interface FileRouteTypes {
     | '/load-balancers'
     | '/objects'
     | '/overview-compute'
-    | '/registry'
     | '/sandboxes'
     | '/security-groups'
     | '/subnets'
@@ -709,6 +709,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/ai-models/'
     | '/_authenticated/_app/ai-training/'
     | '/_authenticated/_app/api-keys/'
+    | '/_authenticated/_app/container-images/'
     | '/_authenticated/_app/containers/'
     | '/_authenticated/_app/dev/'
     | '/_authenticated/_app/eips/'
@@ -720,7 +721,6 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/load-balancers/'
     | '/_authenticated/_app/objects/'
     | '/_authenticated/_app/overview-compute/'
-    | '/_authenticated/_app/registry/'
     | '/_authenticated/_app/sandboxes/'
     | '/_authenticated/_app/security-groups/'
     | '/_authenticated/_app/subnets/'
@@ -872,6 +872,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppApiKeysIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/container-images/': {
+      id: '/_authenticated/_app/container-images/'
+      path: '/container-images'
+      fullPath: '/container-images/'
+      preLoaderRoute: typeof AuthenticatedAppContainerImagesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/containers/': {
       id: '/_authenticated/_app/containers/'
       path: '/containers'
@@ -1003,13 +1010,6 @@ declare module '@tanstack/react-router' {
       path: '/overview-compute'
       fullPath: '/overview-compute/'
       preLoaderRoute: typeof AuthenticatedAppOverviewComputeIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/_app/registry/': {
-      id: '/_authenticated/_app/registry/'
-      path: '/registry'
-      fullPath: '/registry/'
-      preLoaderRoute: typeof AuthenticatedAppRegistryIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/sandboxes/': {
@@ -1179,6 +1179,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppAiModelsIndexRoute: typeof AuthenticatedAppAiModelsIndexRoute
   AuthenticatedAppAiTrainingIndexRoute: typeof AuthenticatedAppAiTrainingIndexRoute
   AuthenticatedAppApiKeysIndexRoute: typeof AuthenticatedAppApiKeysIndexRoute
+  AuthenticatedAppContainerImagesIndexRoute: typeof AuthenticatedAppContainerImagesIndexRoute
   AuthenticatedAppContainersIndexRoute: typeof AuthenticatedAppContainersIndexRoute
   AuthenticatedAppDevIndexRoute: typeof AuthenticatedAppDevIndexRoute
   AuthenticatedAppEipsIndexRoute: typeof AuthenticatedAppEipsIndexRoute
@@ -1190,7 +1191,6 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppLoadBalancersIndexRoute: typeof AuthenticatedAppLoadBalancersIndexRoute
   AuthenticatedAppObjectsIndexRoute: typeof AuthenticatedAppObjectsIndexRoute
   AuthenticatedAppOverviewComputeIndexRoute: typeof AuthenticatedAppOverviewComputeIndexRoute
-  AuthenticatedAppRegistryIndexRoute: typeof AuthenticatedAppRegistryIndexRoute
   AuthenticatedAppSandboxesIndexRoute: typeof AuthenticatedAppSandboxesIndexRoute
   AuthenticatedAppSecurityGroupsIndexRoute: typeof AuthenticatedAppSecurityGroupsIndexRoute
   AuthenticatedAppSubnetsIndexRoute: typeof AuthenticatedAppSubnetsIndexRoute
@@ -1246,6 +1246,8 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppAiModelsIndexRoute: AuthenticatedAppAiModelsIndexRoute,
   AuthenticatedAppAiTrainingIndexRoute: AuthenticatedAppAiTrainingIndexRoute,
   AuthenticatedAppApiKeysIndexRoute: AuthenticatedAppApiKeysIndexRoute,
+  AuthenticatedAppContainerImagesIndexRoute:
+    AuthenticatedAppContainerImagesIndexRoute,
   AuthenticatedAppContainersIndexRoute: AuthenticatedAppContainersIndexRoute,
   AuthenticatedAppDevIndexRoute: AuthenticatedAppDevIndexRoute,
   AuthenticatedAppEipsIndexRoute: AuthenticatedAppEipsIndexRoute,
@@ -1261,7 +1263,6 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppObjectsIndexRoute: AuthenticatedAppObjectsIndexRoute,
   AuthenticatedAppOverviewComputeIndexRoute:
     AuthenticatedAppOverviewComputeIndexRoute,
-  AuthenticatedAppRegistryIndexRoute: AuthenticatedAppRegistryIndexRoute,
   AuthenticatedAppSandboxesIndexRoute: AuthenticatedAppSandboxesIndexRoute,
   AuthenticatedAppSecurityGroupsIndexRoute:
     AuthenticatedAppSecurityGroupsIndexRoute,

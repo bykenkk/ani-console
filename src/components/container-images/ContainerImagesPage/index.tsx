@@ -18,7 +18,7 @@ import RegisterImageModal from "../RegisterImageModal";
 import EditImageRegistrationModal from "../EditImageRegistrationModal";
 import ManageImageSpaceModal from "../ManageImageSpaceModal";
 
-export default function RegistryPage() {
+export default function ContainerImagesPage() {
   const [scope, setScope] = useState<ImageRegistrationScope>("tenant");
   const [search, setSearch] = useState("");
   const [purposes, setPurposes] = useState<string[]>([]);
@@ -201,8 +201,8 @@ export default function RegistryPage() {
       <ListPageFrame
         header={{
           iconClassName: "icon-moxing",
-          title: "镜像仓库",
-          subtitle: "管理镜像空间、发布凭证与镜像登记",
+          title: "容器镜像",
+          subtitle: "管理容器镜像空间、发布凭证与镜像登记",
           extra: (
             <Space>
               <Button onClick={() => setManage(true)}>空间与凭证</Button>
