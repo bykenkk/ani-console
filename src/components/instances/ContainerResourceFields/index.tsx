@@ -11,7 +11,7 @@ import {
   validateVolumeMounts,
 } from "./utils";
 
-type InstanceCreateResourceFieldsProps = {
+type ContainerResourceFieldsProps = {
   values: {
     workspace_mount_path: string;
     vpc_id: string;
@@ -22,10 +22,10 @@ type InstanceCreateResourceFieldsProps = {
   onVpcChange: (id: string) => void;
 };
 
-export default function InstanceCreateResourceFields({
+export default function ContainerResourceFields({
   values,
   onVpcChange,
-}: InstanceCreateResourceFieldsProps) {
+}: ContainerResourceFieldsProps) {
   return (
     <>
       <div className="grid grid-cols-2 items-start gap-4">

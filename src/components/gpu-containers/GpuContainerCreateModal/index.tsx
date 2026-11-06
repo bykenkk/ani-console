@@ -11,9 +11,9 @@ import {
 } from "@/api/instances";
 import type { ImageRegistration } from "@/api/images";
 import { WizardSteps } from "@/components/common";
-import InstanceCreateBasicFields from "@/components/instances/InstanceCreateBasicFields";
-import InstanceCreateResourceFields from "@/components/instances/InstanceCreateResourceFields";
-import InstanceCreateSummary from "@/components/instances/InstanceCreateSummary";
+import ContainerBasicFields from "@/components/instances/ContainerBasicFields";
+import ContainerResourceFields from "@/components/instances/ContainerResourceFields";
+import ContainerSummary from "@/components/instances/ContainerSummary";
 import { validateForm } from "@/lib/form";
 import { showMessage } from "@/lib/feedback";
 
@@ -201,10 +201,10 @@ export default function GpuContainerCreateModal({
         onValuesChange={(changed) => setValues((current) => ({ ...current, ...changed }))}
       >
         <div hidden={step !== 0}>
-          <InstanceCreateBasicFields computeType="gpu" />
+          <ContainerBasicFields computeType="gpu" />
         </div>
         <div hidden={step !== 1}>
-          <InstanceCreateResourceFields
+          <ContainerResourceFields
             values={values}
             onVpcChange={(id) => {
               form.setFieldsValue({ vpc_id: id, subnet_id: "" });
@@ -212,7 +212,7 @@ export default function GpuContainerCreateModal({
             }}
           />
         </div>
-        {step === 2 && <InstanceCreateSummary values={values} />}
+        {step === 2 && <ContainerSummary values={values} />}
       </Form>
     </Modal>
   );

@@ -3,7 +3,7 @@
 import { applyInstanceLifecycle, type InstanceRecord } from "@/api/instances/legacy";
 import { Form, Modal } from "@arco-design/web-react";
 import { useMutation } from "@tanstack/react-query";
-import InstanceRegistryImageSelect from "@/components/instances/InstanceRegistryImageSelect";
+import ContainerRegistryImageSelect from "@/components/instances/ContainerRegistryImageSelect";
 
 import { validateForm } from "@/lib/form";
 
@@ -56,7 +56,7 @@ export default function GpuContainerUpdateImageModal({
       unmountOnExit
     >
       <Form form={form} layout="vertical">
-        <InstanceRegistryImageSelect field="imageId" enabled instanceKind="gpu_container" />
+        <ContainerRegistryImageSelect field="imageId" enabled instanceKind="gpu_container" />
       </Form>
     </Modal>
   );

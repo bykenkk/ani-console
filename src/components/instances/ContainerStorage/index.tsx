@@ -2,8 +2,8 @@ import { Button } from "@arco-design/web-react";
 import { DataTable } from "@/components/common";
 import type { InstanceConfigurationData, InstanceRecord } from "@/api/instances";
 import { useIsMutating } from "@tanstack/react-query";
-import InstanceAttachPvcModal from "@/components/instances/InstanceAttachPvcModal";
-import InstanceDetachPvcModal from "@/components/instances/InstanceDetachPvcModal";
+import ContainerAttachPvcModal from "@/components/instances/ContainerAttachPvcModal";
+import ContainerDetachPvcModal from "@/components/instances/ContainerDetachPvcModal";
 import { instanceIntentUnavailable } from "@/lib/instances";
 import { useState } from "react";
 
@@ -81,14 +81,14 @@ export default function ContainerStorage({
         ]}
       />
       {dialog?.action === "attach" && (
-        <InstanceAttachPvcModal
+        <ContainerAttachPvcModal
           instance={dialog.instance}
           onCancel={() => setDialog(undefined)}
           onSubmitted={() => setDialog(undefined)}
         />
       )}
       {dialog?.action === "detach" && (
-        <InstanceDetachPvcModal
+        <ContainerDetachPvcModal
           instance={dialog.instance}
           mountPath={dialog.mountPath}
           onCancel={() => setDialog(undefined)}

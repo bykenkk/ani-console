@@ -18,7 +18,7 @@ import InstanceLogs from "@/components/instances/InstanceLogs";
 import InstanceVersions from "@/components/instances/InstanceVersions";
 import InstanceEvents from "@/components/instances/InstanceEvents";
 import InstanceConfiguration from "@/components/instances/InstanceConfiguration";
-import ContainerStorage from "@/components/containers/ContainerStorage";
+import ContainerStorage from "@/components/instances/ContainerStorage";
 import ContainerNetwork from "@/components/instances/ContainerNetwork";
 import InstanceMetrics from "@/components/instances/InstanceMetrics";
 import InstanceOperations from "@/components/instances/InstanceOperations";

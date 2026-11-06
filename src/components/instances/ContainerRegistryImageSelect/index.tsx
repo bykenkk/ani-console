@@ -4,17 +4,17 @@ import { useQuery } from "@tanstack/react-query";
 import { listRegistryImages } from "@/api/registry";
 import { ImageNameText } from "@/components/common";
 
-type InstanceRegistryImageSelectProps = {
+type ContainerRegistryImageSelectProps = {
   field: string;
   enabled: boolean;
   instanceKind: "container" | "gpu_container";
 };
 
-export default function InstanceRegistryImageSelect({
+export default function ContainerRegistryImageSelect({
   field,
   enabled,
   instanceKind,
-}: InstanceRegistryImageSelectProps) {
+}: ContainerRegistryImageSelectProps) {
   const purpose = instanceKind === "gpu_container" ? "gpu" : "container";
   const images = useQuery({
     meta: {

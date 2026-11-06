@@ -11,6 +11,8 @@
 - `src/layouts/`：应用级布局、导航与壳层组件，使用 `src/layouts/<LayoutName>/index.tsx`；布局专用组件与私有样式随所属布局维护。
 - `src/components/`：页面与业务组件按 page scope 组织，组件必须使用 `<scope>/<ComponentName>/index.tsx`，子组件放在所属组件目录的 `<SubComponentName>/index.tsx`；私有样式使用组件同目录的 `index.{css,less}` 或 `index.module.{css,less}`。禁止在 scope 目录平铺组件或样式文件。
 - 跨页面、跨领域复用的通用组件统一放在 `src/components/common/<ComponentName>/index.tsx`；业务组件放在对应 page scope。scope 级 `index.ts` 仅作为导出清单，不承载组件实现。
+- `src/components/containers/`：仅放普通容器专用的页面与业务组件，不承载容器公共或实例公共组件。
+- `src/components/instances/`：统一放容器公共和实例公共组件。容器公共组件用于容器范围内的复用，实例公共组件用于不同实例类型间的复用；组件命名、Props 与复用边界必须体现实际适用范围，不得仅因位于 `instances` 下就将容器公共组件视为实例公共组件。
 - 新建或改造的业务模态框统一放在 `src/components/<domain>/<ComponentName>Modal/index.tsx`，目录名与导出名保持一致；组件边界、挂载方式和复用接口遵循 [UI 开发约定](./UI-CONVENTIONS.md)。
 - `src/api/`：按业务资源组织的 API 请求函数、静态类型与 Axios 公共请求基础设施。
 - `src/stores/`：客户端状态。

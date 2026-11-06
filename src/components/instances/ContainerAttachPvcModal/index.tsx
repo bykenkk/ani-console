@@ -12,25 +12,25 @@ import { validateForm } from "@/lib/form";
 import { withId } from "@/lib/id";
 import { validatePvcMountPath } from "./utils";
 
-type InstanceAttachPvcModalProps = {
+type ContainerAttachPvcModalProps = {
   instance: InstanceRecord;
   onCancel: () => void;
   onSubmitted: () => void;
 };
-type InstanceAttachPvcFormValues = {
+type ContainerAttachPvcFormValues = {
   pvc_name: string;
   mount_path: string;
   read_only: boolean;
   restart_if_running: boolean;
 };
 
-export default function InstanceAttachPvcModal({
+export default function ContainerAttachPvcModal({
   instance,
   onCancel,
   onSubmitted,
-}: InstanceAttachPvcModalProps) {
+}: ContainerAttachPvcModalProps) {
   const qc = useQueryClient();
-  const [form] = Form.useForm<InstanceAttachPvcFormValues>();
+  const [form] = Form.useForm<ContainerAttachPvcFormValues>();
   const configuration = useQuery({
     queryKey: ["instance-configuration", instance.id],
     queryFn: ({ signal }) => getInstanceConfiguration(instance.id, signal),
@@ -45,7 +45,7 @@ export default function InstanceAttachPvcModal({
   const mutation = useMutation({
     mutationKey: ["instance-command", instance.id, "attach-pvc"],
     retry: false,
-    mutationFn: async (input: InstanceAttachPvcFormValues) => {
+    mutationFn: async (input: ContainerAttachPvcFormValues) => {
       const latest = await getInstance(instance.id);
       if (latest.activeOperationId || latest.desiredState === "deleted") {
         throw new Error("实例已有进行中的操作或正在删除，请刷新后确认");
@@ -87,7 +87,7 @@ export default function InstanceAttachPvcModal({
       }}
       onOk={async () => {
         if (disabled) return;
-        const values = await validateForm<InstanceAttachPvcFormValues>(form);
+        const values = await validateForm<ContainerAttachPvcFormValues>(form);
         mutation.mutate({
           pvc_name: values.pvc_name,
           mount_path: values.mount_path,

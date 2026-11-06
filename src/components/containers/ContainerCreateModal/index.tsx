@@ -13,9 +13,9 @@ import type { ImageRegistration } from "@/api/images";
 import { WizardSteps } from "@/components/common";
 import { validateForm } from "@/lib/form";
 import { showMessage } from "@/lib/feedback";
-import InstanceCreateBasicFields from "@/components/instances/InstanceCreateBasicFields";
-import InstanceCreateResourceFields from "@/components/instances/InstanceCreateResourceFields";
-import InstanceCreateSummary from "@/components/instances/InstanceCreateSummary";
+import ContainerBasicFields from "@/components/instances/ContainerBasicFields";
+import ContainerResourceFields from "@/components/instances/ContainerResourceFields";
+import ContainerSummary from "@/components/instances/ContainerSummary";
 import { buildContainerCreateInput } from "./utils";
 
 type ContainerCreateModalProps = {
@@ -175,10 +175,10 @@ export default function ContainerCreateModal({ onCancel, onCreated }: ContainerC
         onValuesChange={(changed) => setValues((current) => ({ ...current, ...changed }))}
       >
         <div hidden={step !== 0}>
-          <InstanceCreateBasicFields computeType="cpu" />
+          <ContainerBasicFields computeType="cpu" />
         </div>
         <div hidden={step !== 1}>
-          <InstanceCreateResourceFields
+          <ContainerResourceFields
             values={values}
             onVpcChange={(id) => {
               form.setFieldsValue({ vpc_id: id, subnet_id: "" });
@@ -186,7 +186,7 @@ export default function ContainerCreateModal({ onCancel, onCreated }: ContainerC
             }}
           />
         </div>
-        {step === 2 && <InstanceCreateSummary values={values} />}
+        {step === 2 && <ContainerSummary values={values} />}
       </Form>
     </Modal>
   );

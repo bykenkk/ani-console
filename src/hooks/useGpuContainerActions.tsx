@@ -1,7 +1,7 @@
 import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
 import ContainerRestartModal from "@/components/instances/ContainerRestartModal";
-import InstanceAttachPvcModal from "@/components/instances/InstanceAttachPvcModal";
-import InstanceDetachPvcModal from "@/components/instances/InstanceDetachPvcModal";
+import ContainerAttachPvcModal from "@/components/instances/ContainerAttachPvcModal";
+import ContainerDetachPvcModal from "@/components/instances/ContainerDetachPvcModal";
 import ContainerChangeSecurityGroupsModal from "@/components/instances/ContainerChangeSecurityGroupsModal";
 import { useState } from "react";
 import { startInstance, type InstanceRecord } from "@/api/instances";
@@ -151,14 +151,14 @@ export function useGpuContainerActions(onDeleted?: () => void) {
         />
       )}
       {dialog?.action === "attach" && (
-        <InstanceAttachPvcModal
+        <ContainerAttachPvcModal
           instance={dialog.instance}
           onCancel={() => setDialog(undefined)}
           onSubmitted={submitted}
         />
       )}
       {dialog?.action === "detach" && (
-        <InstanceDetachPvcModal
+        <ContainerDetachPvcModal
           instance={dialog.instance}
           onCancel={() => setDialog(undefined)}
           onSubmitted={submitted}

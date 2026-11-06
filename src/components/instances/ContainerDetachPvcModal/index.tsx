@@ -10,22 +10,22 @@ import { instanceIntentUnavailable } from "@/lib/instances";
 import { validateForm } from "@/lib/form";
 import { withId } from "@/lib/id";
 
-type InstanceDetachPvcModalProps = {
+type ContainerDetachPvcModalProps = {
   instance: InstanceRecord;
   mountPath?: string;
   onCancel: () => void;
   onSubmitted: () => void;
 };
-type InstanceDetachPvcFormValues = { mount_path: string; restart_if_running: boolean };
+type ContainerDetachPvcFormValues = { mount_path: string; restart_if_running: boolean };
 
-export default function InstanceDetachPvcModal({
+export default function ContainerDetachPvcModal({
   instance,
   mountPath,
   onCancel,
   onSubmitted,
-}: InstanceDetachPvcModalProps) {
+}: ContainerDetachPvcModalProps) {
   const qc = useQueryClient();
-  const [form] = Form.useForm<InstanceDetachPvcFormValues>();
+  const [form] = Form.useForm<ContainerDetachPvcFormValues>();
   const configuration = useQuery({
     queryKey: ["instance-configuration", instance.id],
     queryFn: ({ signal }) => getInstanceConfiguration(instance.id, signal),
@@ -40,7 +40,7 @@ export default function InstanceDetachPvcModal({
   const mutation = useMutation({
     mutationKey: ["instance-command", instance.id, "detach-pvc"],
     retry: false,
-    mutationFn: async (input: InstanceDetachPvcFormValues) => {
+    mutationFn: async (input: ContainerDetachPvcFormValues) => {
       const latest = await getInstance(instance.id);
       if (latest.activeOperationId || latest.desiredState === "deleted") {
         throw new Error("实例已有进行中的操作或正在删除，请刷新后确认");
@@ -81,7 +81,7 @@ export default function InstanceDetachPvcModal({
       }}
       onOk={async () => {
         if (disabled) return;
-        const values = await validateForm<InstanceDetachPvcFormValues>(form);
+        const values = await validateForm<ContainerDetachPvcFormValues>(form);
         mutation.mutate({
           mount_path: values.mount_path,
           restart_if_running: values.restart_if_running,

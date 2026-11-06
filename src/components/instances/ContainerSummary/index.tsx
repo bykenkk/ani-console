@@ -2,7 +2,7 @@ import { Descriptions } from "@arco-design/web-react";
 import type { InstanceEnvVar, InstancePreset, InstanceVolumeMount } from "@/api/instances";
 import type { ImageRegistration } from "@/api/images";
 
-type InstanceCreateSummaryProps = {
+type ContainerSummaryProps = {
   values: {
     name: string;
     preset?: InstancePreset;
@@ -18,7 +18,7 @@ type InstanceCreateSummaryProps = {
   };
 };
 
-export default function InstanceCreateSummary({ values }: InstanceCreateSummaryProps) {
+export default function ContainerSummary({ values }: ContainerSummaryProps) {
   const { preset, image } = values;
   return (
     <Descriptions

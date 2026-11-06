@@ -3,11 +3,11 @@ import type { ComputeType, InstancePreset } from "@/api/instances";
 import RegisteredImageSelect from "@/components/common/RegisteredImageSelect";
 import InstanceComputeSelect from "@/components/instances/InstanceComputeSelect";
 
-type InstanceCreateBasicFieldsProps = {
+type ContainerBasicFieldsProps = {
   computeType: ComputeType;
 };
 
-export default function InstanceCreateBasicFields({ computeType }: InstanceCreateBasicFieldsProps) {
+export default function ContainerBasicFields({ computeType }: ContainerBasicFieldsProps) {
   const { form } = Form.useFormContext();
   return (
     <>
