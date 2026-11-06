@@ -1,7 +1,7 @@
 import { VpcSelect, SubnetSelect } from "@/components/common";
 import { Collapse, Form, Input } from "@arco-design/web-react";
 import type { InstanceEnvVar } from "@/api/instances";
-import SecurityGroupSelect from "@/components/security-groups/SecurityGroupSelect";
+import SecurityGroupSelect from "@/components/common/SecurityGroupSelect";
 import InstanceKeyValueEditor from "@/components/instances/InstanceKeyValueEditor";
 import InstanceVolumeMountEditor from "@/components/instances/InstanceVolumeMountEditor";
 import {

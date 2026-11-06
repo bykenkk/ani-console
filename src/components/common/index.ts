@@ -26,3 +26,5 @@ export { default as WizardSteps } from "./WizardSteps";
 export { default as VnicSelect } from "./VnicSelect";
 export { default as VpcSelect } from "./VpcSelect";
 export { default as SubnetSelect } from "./SubnetSelect";
+export { default as SecurityGroupSelect } from "./SecurityGroupSelect";
+export { default as ComputePresetSelect } from "./ComputePresetSelect";

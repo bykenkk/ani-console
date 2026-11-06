@@ -37,10 +37,10 @@ export default function VpcSelect({
     <Select
       placeholder="请选择 VPC"
       {...props}
-      onChange={(id) =>
+      onChange={(id, option) =>
         onChange?.(
           id,
-          vpcs.data?.items.find((vpc) => vpc.id === id),
+          Array.isArray(option) ? undefined : (option?.extra as NetworkVPC | undefined),
         )
       }
       disabled={disabled}
@@ -50,6 +50,7 @@ export default function VpcSelect({
       onSearch={setName}
       options={(vpcs.data?.items ?? []).map((vpc) => ({
         value: vpc.id,
+        extra: vpc,
         label: `${vpc.name}${vpc.owner_scope === "platform" ? " · 平台基础网络" : ""} · ${vpc.cidr || "-"}`,
       }))}
     />

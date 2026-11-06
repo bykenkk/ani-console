@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Radio } from "@arco-design/web-react";
 import type { ComputeType, InstancePreset } from "@/api/instances";
-import PresetSelect, { type PresetSelectProps } from "./PresetSelect";
+import ComputePresetSelect, {
+  type ComputePresetSelectProps,
+} from "@/components/common/ComputePresetSelect";
 
 type InstanceComputeSelectProps = {
-  usage?: PresetSelectProps["usage"];
+  usage?: ComputePresetSelectProps["usage"];
   computeType?: ComputeType;
   value?: InstancePreset;
   onChange?: (preset?: InstancePreset) => void;
@@ -50,7 +52,7 @@ export default function InstanceComputeSelect({
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <PresetSelect
+        <ComputePresetSelect
           key={selectedType}
           usage={usage}
           computeType={selectedType}

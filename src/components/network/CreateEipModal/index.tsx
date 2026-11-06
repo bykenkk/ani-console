@@ -2,7 +2,7 @@ import { Form, Input, InputNumber, Modal, Typography } from "@arco-design/web-re
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createNetworkEip, type CreateNetworkEipInput } from "@/api/network";
 import { validateForm } from "@/lib/form";
-import SecurityGroupSelect from "@/components/security-groups/SecurityGroupSelect";
+import SecurityGroupSelect from "@/components/common/SecurityGroupSelect";
 
 type CreateEipModalProps = {
   onCancel: () => void;

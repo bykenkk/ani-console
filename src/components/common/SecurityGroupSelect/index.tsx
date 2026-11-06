@@ -1,13 +1,13 @@
 import { Select } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { listNetworkSecurityGroups } from "@/api/network";
+import { listNetworkSecurityGroups, type NetworkSecurityGroup } from "@/api/network";
 import { withFirst100 } from "@/api/pagination";
 
 const listOptions = withFirst100(listNetworkSecurityGroups);
 type SecurityGroupSelectProps = {
   value?: string[];
-  onChange?: (ids: string[]) => void;
+  onChange?: (ids: string[], groups: NetworkSecurityGroup[]) => void;
   disabled?: boolean;
 };
 export default function SecurityGroupSelect({
@@ -25,7 +25,14 @@ export default function SecurityGroupSelect({
     <Select
       mode="multiple"
       value={value}
-      onChange={onChange}
+      onChange={(ids: string[], options) =>
+        onChange?.(
+          ids,
+          (Array.isArray(options) ? options : []).flatMap((option) =>
+            option.extra ? [option.extra as NetworkSecurityGroup] : [],
+          ),
+        )
+      }
       disabled={disabled}
       loading={groups.isFetching}
       allowClear
@@ -35,7 +42,8 @@ export default function SecurityGroupSelect({
       placeholder="选择安全组，最多 16 个"
       options={(groups.data?.items ?? []).map((group) => ({
         value: group.id,
-        label: `${group.name} · ${group.id}`,
+        extra: group,
+        label: group.name,
         disabled:
           !value?.includes(group.id) && (group.state !== "available" || (value?.length ?? 0) >= 16),
       }))}

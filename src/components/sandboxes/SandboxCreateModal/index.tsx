@@ -8,7 +8,7 @@ import type { InstancePreset } from "@/api/instances";
 import { createSandbox } from "@/api/sandboxes";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Form, Input, InputNumber, Modal } from "@arco-design/web-react";
-import PresetSelect from "@/components/instances/InstanceComputeSelect/PresetSelect";
+import ComputePresetSelect from "@/components/common/ComputePresetSelect";
 import { validateForm } from "@/lib/form";
 
 // TODO(sandbox-legacy): 旧模板向导及其类型仅作迁移参考，新资源不调用旧实例接口。
@@ -90,9 +90,9 @@ export default function SandboxCreateModal({ onCancel, onCreated }: SandboxCreat
         </Form.Item>
         <Form.Item
           field="image_reference"
-          label="镜像引用"
-          extra="填写已登记且有拉取权限的 Linux amd64 镜像引用。"
-          rules={[{ required: true, message: "请输入镜像引用" }]}
+          label="镜像"
+          extra="填写已登记且有拉取权限的 Linux amd64 镜像。"
+          rules={[{ required: true, message: "请输入镜像地址" }]}
         >
           <Input placeholder="registry.example/project/image:tag" />
         </Form.Item>
@@ -111,7 +111,7 @@ export default function SandboxCreateModal({ onCancel, onCreated }: SandboxCreat
             },
           ]}
         >
-          <PresetSelect usage="SANDBOX" computeType="cpu" />
+          <ComputePresetSelect usage="SANDBOX" computeType="cpu" />
         </Form.Item>
         <Form.Item
           field="workspace_size_gib"

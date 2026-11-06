@@ -69,7 +69,7 @@ export default function SandboxesPage() {
     },
     {
       key: "image",
-      title: "镜像引用",
+      title: "镜像",
       width: 260,
       dataIndex: "snapshot.image_reference",
       ellipsis: true,

@@ -5,6 +5,7 @@ import styles from "./index.module.css";
 
 type WizardModalProps = {
   title: string;
+  width?: number;
   current: number;
   steps: readonly string[];
   busy?: boolean;
@@ -17,6 +18,7 @@ type WizardModalProps = {
 
 export default function WizardModal({
   title,
+  width = 720,
   current,
   steps,
   busy = false,
@@ -30,7 +32,7 @@ export default function WizardModal({
     <Modal
       visible
       title={title}
-      style={{ width: 720, maxWidth: "calc(100vw - 48px)" }}
+      style={{ width, maxWidth: "calc(100vw - 48px)" }}
       className={styles.modal}
       closable={!busy}
       escToExit={!busy}

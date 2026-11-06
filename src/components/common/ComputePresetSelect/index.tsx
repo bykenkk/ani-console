@@ -11,7 +11,7 @@ import { withId } from "@/lib/id";
 import { withFirst100 } from "@/api/pagination";
 import { closeNotification, showNotification } from "@/lib/feedback";
 
-export type PresetSelectProps = {
+export type ComputePresetSelectProps = {
   usage?: "CONTAINER_INSTANCE" | "INFERENCE" | "TRAINING" | "VIRTUAL_MACHINE" | "SANDBOX";
   computeType?: ComputeType;
   value?: InstancePreset;
@@ -32,13 +32,13 @@ const listOptionsByUsage = {
   SANDBOX: listSandboxPresetOptions,
 };
 
-export default function PresetSelect({
+export default function ComputePresetSelect({
   usage = "CONTAINER_INSTANCE",
   computeType,
   value,
   onChange,
   disabled,
-}: PresetSelectProps) {
+}: ComputePresetSelectProps) {
   const [search, setSearch] = useState("");
   const scope = `${usage}-${computeType ?? "all"}`;
   const query = useQuery({
@@ -100,6 +100,7 @@ export default function PresetSelect({
         const unavailable = !item.enabled || !item.selectable;
         return {
           value: item.id,
+          extra: item,
           label: (
             <span className="inline-flex max-w-full items-center gap-2 align-middle">
               <Tooltip
@@ -136,7 +137,11 @@ export default function PresetSelect({
           disabled: unavailable,
         };
       })}
-      onChange={(id) => onChange?.(options.find((item) => item.id === id))}
+      onChange={(_, option) =>
+        onChange?.(
+          Array.isArray(option) ? undefined : (option?.extra as InstancePreset | undefined),
+        )
+      }
     />
   );
 }

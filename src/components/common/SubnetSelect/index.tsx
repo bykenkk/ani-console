@@ -1,14 +1,14 @@
 import { Select, type SelectProps } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { listNetworkSubnets } from "@/api/network";
+import { listNetworkSubnets, type NetworkSubnet } from "@/api/network";
 
 type SubnetSelectProps = Pick<
   SelectProps,
   "disabled" | "allowClear" | "placeholder" | "onBlur" | "className" | "style"
 > & {
   value?: string;
-  onChange?: (id: string | undefined) => void;
+  onChange?: (id: string | undefined, subnet: NetworkSubnet | undefined) => void;
   "aria-label"?: string;
   vpcId?: string;
   canUse?: boolean;
@@ -20,6 +20,7 @@ export default function SubnetSelect({
   canUse,
   canManage,
   disabled,
+  onChange,
   ...props
 }: SubnetSelectProps) {
   const [name, setName] = useState("");
@@ -41,6 +42,12 @@ export default function SubnetSelect({
     <Select
       placeholder="请选择子网"
       {...props}
+      onChange={(id, option) =>
+        onChange?.(
+          id,
+          Array.isArray(option) ? undefined : (option?.extra as NetworkSubnet | undefined),
+        )
+      }
       disabled={disabled}
       loading={subnets.isFetching}
       showSearch
@@ -48,6 +55,7 @@ export default function SubnetSelect({
       onSearch={setName}
       options={(subnets.data?.items ?? []).map((subnet) => ({
         value: subnet.id,
+        extra: subnet,
         label: `${subnet.name}${subnet.owner_scope === "platform" ? " · 平台基础网络" : ""} · ${subnet.cidr || "-"}`,
       }))}
     />

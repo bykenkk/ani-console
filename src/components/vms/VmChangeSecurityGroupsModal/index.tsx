@@ -1,7 +1,7 @@
 import { Form, Modal, Spin } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getVm, setVmSecurityGroups } from "@/api/vms";
-import SecurityGroupSelect from "@/components/security-groups/SecurityGroupSelect";
+import SecurityGroupSelect from "@/components/common/SecurityGroupSelect";
 import { validateForm } from "@/lib/form";
 import { withId } from "@/lib/id";
 
