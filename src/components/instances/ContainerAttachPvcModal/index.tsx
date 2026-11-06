@@ -1,11 +1,6 @@
 import { Form, Input, Modal, Switch } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  attachInstancePvc,
-  getInstance,
-  getInstanceConfiguration,
-  type InstanceRecord,
-} from "@/api/instances";
+import { attachInstancePvc, getInstanceConfiguration, type InstanceRecord } from "@/api/instances";
 import { instanceIntentUnavailable } from "@/lib/instances";
 import InstancePvcSelect from "@/components/instances/InstancePvcSelect";
 import { validateForm } from "@/lib/form";
@@ -45,13 +40,8 @@ export default function ContainerAttachPvcModal({
   const mutation = useMutation({
     mutationKey: ["instance-command", instance.id, "attach-pvc"],
     retry: false,
-    mutationFn: async (input: ContainerAttachPvcFormValues) => {
-      const latest = await getInstance(instance.id);
-      if (latest.activeOperationId || latest.desiredState === "deleted") {
-        throw new Error("实例已有进行中的操作或正在删除，请刷新后确认");
-      }
-      await attachInstancePvc(instance.id, { ...input, expectedVersion: latest.version });
-    },
+    mutationFn: (input: ContainerAttachPvcFormValues) =>
+      attachInstancePvc(instance.id, { ...input, expectedVersion: instance.version }),
     meta: {
       feedback: {
         channel: "message",

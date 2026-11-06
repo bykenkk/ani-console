@@ -1,5 +1,5 @@
 import { Modal } from "@arco-design/web-react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { NetworkVnic } from "@/api/network";
 import { getVmNetworkInterfaces, setVmNetworkInterface } from "@/api/vms";
 import { getInstanceNetworkInterfaces, setInstanceNetworkInterface } from "@/api/instances";
@@ -18,24 +18,24 @@ export default function UnbindVnicModal({ vnic, onCancel }: UnbindVnicModalProps
     instanceKind === "vm" ? "vm-network-interfaces" : "container-network-interfaces",
     instanceId,
   ];
+  const network = useQuery({
+    queryKey: networkQueryKey,
+    queryFn: ({ signal }) =>
+      instanceKind === "vm"
+        ? getVmNetworkInterfaces(instanceId, signal)
+        : getInstanceNetworkInterfaces(instanceId, signal),
+    meta: {
+      errorNotification: {
+        id: withId(networkQueryKey[0], instanceId),
+        action: "实例网卡配置加载",
+      },
+    },
+  });
   const save = useMutation({
     mutationKey: [instanceKind === "vm" ? "vm-write" : "instance-command", "network", instanceId],
-    mutationFn: async () => {
-      const network = await qc.fetchQuery({
-        queryKey: networkQueryKey,
-        queryFn: ({ signal }) =>
-          instanceKind === "vm"
-            ? getVmNetworkInterfaces(instanceId, signal)
-            : getInstanceNetworkInterfaces(instanceId, signal),
-        staleTime: 0,
-        meta: {
-          errorNotification: {
-            id: withId(networkQueryKey[0], instanceId),
-            action: "实例网卡配置加载",
-          },
-        },
-      });
-      const input = { mode: "automatic" as const, expected_version: network.version };
+    mutationFn: () => {
+      if (!network.data) throw new Error("请等待实例网卡配置加载");
+      const input = { mode: "automatic" as const, expected_version: network.data.version };
       return instanceKind === "vm"
         ? setVmNetworkInterface(instanceId, "primary", input)
         : setInstanceNetworkInterface(instanceId, "primary", input);
@@ -59,17 +59,13 @@ export default function UnbindVnicModal({ vnic, onCancel }: UnbindVnicModalProps
       ]);
       onCancel();
     },
-    onError: () =>
-      qc.invalidateQueries({
-        queryKey: networkQueryKey,
-      }),
   });
   return (
     <Modal
       visible
       title="解绑实例"
       okText="解绑"
-      okButtonProps={{ status: "danger" }}
+      okButtonProps={{ status: "danger", disabled: !network.data || network.isFetching }}
       confirmLoading={save.isPending}
       cancelButtonProps={{ disabled: save.isPending }}
       onCancel={onCancel}

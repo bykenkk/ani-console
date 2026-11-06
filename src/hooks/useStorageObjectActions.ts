@@ -1,10 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Modal } from "@arco-design/web-react";
-import {
-  deleteStorageObject,
-  getStorageObject,
-  getStorageObjectDownload,
-} from "@/api/storage/objects";
+import { deleteStorageObject, getStorageObjectDownload } from "@/api/storage/objects";
 import type { RowAction } from "@/components/common";
 import { reserveExternalWindow } from "@/lib/browser";
 import { copyToClipboard } from "@/lib/clipboard";
@@ -25,13 +21,10 @@ export function useStorageObjectActions(bucketId: string, onDeleted?: () => void
       },
     },
     mutationFn: async (item: StorageObjectTarget) => {
-      const object = item.etag
-        ? item
-        : await getStorageObject({ bucket_id: bucketId, key: item.key });
       await deleteStorageObject({
         bucket_id: bucketId,
         key: item.key,
-        expected_etag: object.etag || undefined,
+        expected_etag: item.etag,
       });
     },
     onSuccess: async (_, item) => {

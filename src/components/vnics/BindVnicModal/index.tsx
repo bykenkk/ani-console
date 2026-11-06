@@ -49,7 +49,6 @@ export default function BindVnicModal({ vnic, onCancel }: BindVnicModalProps) {
       ]);
       onCancel();
     },
-    onError: () => qc.invalidateQueries({ queryKey: networkQueryKey }),
   });
   return (
     <Modal

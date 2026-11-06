@@ -49,7 +49,6 @@ export default function VmNetworkInterfaces({ vm }: VmNetworkInterfacesProps) {
         qc.invalidateQueries({ queryKey: ["network-vnic"] }),
       ]);
     },
-    onError: () => qc.invalidateQueries({ queryKey: ["vm-network-interfaces", instanceId] }),
   });
   const ownerMutations = useIsMutating({
     mutationKey: ["vm-write"],

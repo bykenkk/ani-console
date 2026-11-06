@@ -1,11 +1,6 @@
 import { Checkbox, Form, Modal, Select } from "@arco-design/web-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  detachInstancePvc,
-  getInstance,
-  getInstanceConfiguration,
-  type InstanceRecord,
-} from "@/api/instances";
+import { detachInstancePvc, getInstanceConfiguration, type InstanceRecord } from "@/api/instances";
 import { instanceIntentUnavailable } from "@/lib/instances";
 import { validateForm } from "@/lib/form";
 import { withId } from "@/lib/id";
@@ -40,13 +35,8 @@ export default function ContainerDetachPvcModal({
   const mutation = useMutation({
     mutationKey: ["instance-command", instance.id, "detach-pvc"],
     retry: false,
-    mutationFn: async (input: ContainerDetachPvcFormValues) => {
-      const latest = await getInstance(instance.id);
-      if (latest.activeOperationId || latest.desiredState === "deleted") {
-        throw new Error("实例已有进行中的操作或正在删除，请刷新后确认");
-      }
-      await detachInstancePvc(instance.id, { ...input, expectedVersion: latest.version });
-    },
+    mutationFn: (input: ContainerDetachPvcFormValues) =>
+      detachInstancePvc(instance.id, { ...input, expectedVersion: instance.version }),
     meta: {
       feedback: {
         channel: "message",

@@ -1,7 +1,7 @@
 import { Modal } from "@arco-design/web-react";
 import { useState } from "react";
 import { useIsMutating, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getVm, startVm, restartVm, deleteVm, type VirtualMachine } from "@/api/vms";
+import { startVm, restartVm, deleteVm, type VirtualMachine } from "@/api/vms";
 import { unavailableAction, type RowAction } from "@/components/common/DataTable";
 import VmCreateSnapshotModal from "@/components/vms/VmCreateSnapshotModal";
 import VmShutdownModal from "@/components/vms/VmShutdownModal";
@@ -27,9 +27,7 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
     mutationKey: ["vm-write", "power"],
     retry: false,
     mutationFn: async ({ action, vm }: { action: VmPowerAction; vm: VirtualMachine }) => {
-      const input = {
-        expected_version: action === "restart" ? (await getVm(vm.id)).version : vm.version,
-      };
+      const input = { expected_version: vm.version };
       await { start: startVm, restart: restartVm, delete: deleteVm }[action](vm.id, input);
     },
     meta: {

@@ -52,7 +52,6 @@ export default function ContainerNetworkInterfaces({ instance }: ContainerNetwor
         qc.invalidateQueries({ queryKey: ["network-vnic"] }),
       ]);
     },
-    onError: () => qc.invalidateQueries({ queryKey: ["container-network-interfaces", instanceId] }),
   });
   const ownerMutations = useIsMutating({
     mutationKey: ["instance-command"],

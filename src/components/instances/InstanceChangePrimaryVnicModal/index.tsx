@@ -58,7 +58,6 @@ export default function InstanceChangePrimaryVnicModal({
       ]);
       onCancel();
     },
-    onError: () => qc.invalidateQueries({ queryKey: networkQueryKey }),
   });
   return (
     <Modal

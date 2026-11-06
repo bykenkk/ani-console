@@ -4,7 +4,7 @@ import ContainerAttachPvcModal from "@/components/instances/ContainerAttachPvcMo
 import ContainerDetachPvcModal from "@/components/instances/ContainerDetachPvcModal";
 import ContainerChangeSecurityGroupsModal from "@/components/instances/ContainerChangeSecurityGroupsModal";
 import { useState } from "react";
-import { getInstance, startInstance, type InstanceRecord } from "@/api/instances";
+import { startInstance, type InstanceRecord } from "@/api/instances";
 import { unavailableAction, type RowAction } from "@/components/common/DataTable";
 import { instanceIntentUnavailable, openInstanceTerminalWindow } from "@/lib/instances";
 import ContainerStopModal from "@/components/containers/ContainerStopModal";
@@ -31,9 +31,9 @@ export function useContainerActions(onDeleted?: () => void) {
   }>();
   const submitting = useIsMutating({ mutationKey: ["instance-command"] }) > 0;
   const start = useMutation({
-    mutationFn: async (instance: InstanceRecord) =>
+    mutationFn: (instance: InstanceRecord) =>
       startInstance(instance.id, {
-        expected_version: instance.version ?? (await getInstance(instance.id)).version,
+        expected_version: instance.version,
       }),
     meta: {
       feedback: {

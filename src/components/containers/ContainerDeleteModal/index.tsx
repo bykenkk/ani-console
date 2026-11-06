@@ -1,10 +1,10 @@
 import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { getInstance, deleteInstance } from "@/api/instances";
+import { deleteInstance } from "@/api/instances";
 import { withId } from "@/lib/id";
 
 type ContainerDeleteModalProps = {
-  instance: { id: string; name: string; version?: string };
+  instance: { id: string; name: string; version: string };
   onCancel: () => void;
   onSubmitted: () => void;
 };
@@ -16,10 +16,7 @@ export default function ContainerDeleteModal({
 }: ContainerDeleteModalProps) {
   const qc = useQueryClient();
   const mutation = useMutation({
-    mutationFn: async () => {
-      const version = instance.version ?? (await getInstance(instance.id)).version;
-      return deleteInstance(instance.id, { expected_version: version });
-    },
+    mutationFn: () => deleteInstance(instance.id, { expected_version: instance.version }),
     meta: {
       feedback: {
         channel: "notification",

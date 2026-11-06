@@ -1,6 +1,6 @@
 import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { restartInstance, getInstance, type InstanceRecord } from "@/api/instances";
+import { restartInstance, type InstanceRecord } from "@/api/instances";
 import { withId } from "@/lib/id";
 
 type ContainerRestartModalProps = {
@@ -18,13 +18,7 @@ export default function ContainerRestartModal({
   const mutation = useMutation({
     mutationKey: ["instance-command", instance.id, "restart"],
     retry: false,
-    mutationFn: async () => {
-      const latest = await getInstance(instance.id);
-      if (latest.activeOperationId || latest.desiredState === "deleted") {
-        throw new Error("实例已有进行中的操作或正在删除，请刷新后确认");
-      }
-      await restartInstance(instance.id, { expectedVersion: latest.version });
-    },
+    mutationFn: () => restartInstance(instance.id, { expectedVersion: instance.version }),
     meta: {
       feedback: {
         channel: "notification",
