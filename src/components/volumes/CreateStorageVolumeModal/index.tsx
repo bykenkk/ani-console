@@ -74,7 +74,7 @@ export default function CreateStorageVolumeModal({ onCancel }: CreateStorageVolu
           <Input placeholder="请输入卷名称" maxLength={128} showWordLimit />
         </Form.Item>
         <Form.Item
-          label="容量 (GB)"
+          label="容量"
           field="sizeGb"
           required
           rules={[
@@ -85,7 +85,7 @@ export default function CreateStorageVolumeModal({ onCancel }: CreateStorageVolu
                     value > 0 &&
                     value <= STORAGE_VOLUME_MAX_CAPACITY_GB
                     ? undefined
-                    : `容量须为 1–${STORAGE_VOLUME_MAX_CAPACITY_GB} 的整数（GB）`,
+                    : `容量须为 1–${STORAGE_VOLUME_MAX_CAPACITY_GB} GB 之间的整数`,
                 ),
             },
           ]}
@@ -94,6 +94,7 @@ export default function CreateStorageVolumeModal({ onCancel }: CreateStorageVolu
             min={1}
             max={STORAGE_VOLUME_MAX_CAPACITY_GB}
             precision={0}
+            suffix="GB"
             className="w-full"
           />
         </Form.Item>

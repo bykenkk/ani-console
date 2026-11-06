@@ -31,7 +31,15 @@ export default function VolumeDetailPage({ volumeId, tab, onTabChange }: VolumeD
         title={volume.display_name || volume.pvc_name}
         status={volume.phase}
         icon={<AliIcon name="kuaicunchu" size={28} />}
-        headerItems={[{ label: "容量 (GB)", value: volume.requested_capacity_gb }]}
+        headerItems={[
+          {
+            label: "容量",
+            value:
+              volume.requested_capacity_gb == null || volume.requested_capacity_gb === ""
+                ? "-"
+                : `${volume.requested_capacity_gb} GB`,
+          },
+        ]}
         actions={
           <ResourceActionMenu
             record={volume}

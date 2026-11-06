@@ -53,7 +53,7 @@ export default function FilesystemDetailPage({ filesystemId }: FilesystemDetailP
         title={filesystem.name}
         status={filesystemStatus}
         icon={<AliIcon name="wenjiancunchu" size={28} />}
-        headerItems={[{ label: "容量 (GiB)", value: String(filesystem.size_gib) }]}
+        headerItems={[{ label: "容量", value: `${filesystem.size_gib} GiB` }]}
         actions={<ResourceActionMenu record={filesystem} actions={actions} />}
         cards={[
           {
@@ -71,7 +71,7 @@ export default function FilesystemDetailPage({ filesystemId }: FilesystemDetailP
                       ? "吞吐型"
                       : "-",
               },
-              { label: "容量 (GiB)", value: filesystem.size_gib },
+              { label: "容量", value: `${filesystem.size_gib} GiB` },
               {
                 label: "创建时间",
                 value: formatDateTime(filesystem.created_at),

@@ -47,7 +47,7 @@ export default function ExpandStorageVolumeModal({
         initialValues={{ capacityGb: currentCapacity + 1 }}
       >
         <Form.Item
-          label="新容量 (GB)"
+          label="新容量"
           field="capacityGb"
           required
           rules={[
@@ -58,7 +58,7 @@ export default function ExpandStorageVolumeModal({
                     value > currentCapacity &&
                     value <= STORAGE_VOLUME_MAX_CAPACITY_GB
                     ? undefined
-                    : `新容量须为大于当前申请容量且不超过 ${STORAGE_VOLUME_MAX_CAPACITY_GB} 的整数`,
+                    : `新容量须为大于当前申请容量且不超过 ${STORAGE_VOLUME_MAX_CAPACITY_GB} GB 的整数`,
                 ),
             },
           ]}
@@ -67,6 +67,7 @@ export default function ExpandStorageVolumeModal({
             min={currentCapacity + 1}
             max={STORAGE_VOLUME_MAX_CAPACITY_GB}
             precision={0}
+            suffix="GB"
             className="w-full"
           />
         </Form.Item>

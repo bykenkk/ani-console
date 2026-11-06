@@ -69,7 +69,12 @@ export default function VmSnapshotDetailModal({
                 { title: "名称", width: 200, dataIndex: "name", ellipsis: true },
                 { title: "磁盘 ID", width: 220, dataIndex: "diskId", ellipsis: true },
                 { title: "角色", width: 120, dataIndex: "role" },
-                { title: "容量 (GB)", width: 140, dataIndex: "sizeGb" },
+                {
+                  title: "容量",
+                  width: 140,
+                  dataIndex: "sizeGb",
+                  render: (value) => (value == null || value === "" ? "-" : `${value} GB`),
+                },
                 { title: "准备状态", width: 120, dataIndex: "preparationState" },
                 { title: "原因", width: 220, dataIndex: "reason", ellipsis: true },
               ]}

@@ -51,10 +51,10 @@ export default function VmCreateDiskModal({ vm, onCancel, onSubmitted }: VmCreat
         </Form.Item>
         <Form.Item
           field="sizeGb"
-          label="容量 (GB)"
+          label="容量"
           rules={[{ required: true, type: "number", min: 1, message: "请输入正整数容量" }]}
         >
-          <InputNumber min={1} max={9223372036} precision={0} />
+          <InputNumber min={1} max={9223372036} precision={0} suffix="GB" />
         </Form.Item>
       </Form>
     </Modal>

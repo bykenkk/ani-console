@@ -49,7 +49,13 @@ export default function VolumesPage() {
       width: 120,
       render: (_, item) => <StatusBadge status={item.phase} />,
     },
-    { key: "size", title: "容量 (GB)", width: 100, dataIndex: "requested_capacity_gb" },
+    {
+      key: "size",
+      title: "容量",
+      width: 150,
+      dataIndex: "requested_capacity_gb",
+      render: (value) => (value == null || value === "" ? "-" : `${value} GB`),
+    },
     {
       key: "storageClass",
       title: "类型",

@@ -115,11 +115,11 @@ export default function SandboxCreateModal({ onCancel, onCreated }: SandboxCreat
         </Form.Item>
         <Form.Item
           field="workspace_size_gib"
-          label="工作区容量 (GiB)"
+          label="工作区容量"
           extra="工作区挂载到 /workspace。暂停保留文件，销毁时删除工作区数据。"
           rules={[{ required: true, message: "请输入工作区容量" }]}
         >
-          <InputNumber min={1} precision={0} />
+          <InputNumber min={1} precision={0} suffix="GiB" />
         </Form.Item>
       </Form>
     </Modal>

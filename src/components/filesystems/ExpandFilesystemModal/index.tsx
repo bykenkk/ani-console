@@ -49,11 +49,12 @@ export default function ExpandFilesystemModal({
         content={`当前容量 ${filesystem?.size_gib ?? "-"} GiB；文件存储只支持扩容，不支持缩容。`}
       />
       <Form layout="vertical" className="mt-2">
-        <Form.Item label="新容量 (GiB)" required>
+        <Form.Item label="新容量" required>
           <InputNumber
             value={sizeGiB}
             min={(filesystem?.size_gib ?? 0) + 1}
             precision={0}
+            suffix="GiB"
             className="w-full"
             onChange={(value) => setSizeGiB(Number(value ?? 1))}
           />

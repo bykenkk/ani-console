@@ -68,8 +68,7 @@ export default function CreateVolumeModal({ onCancel, onCreated }: CreateVolumeM
     mutationFn: async ({ name, sizeGiB }: CreateVolumeFormValues) => {
       const trimmedName = name.trim();
       if (!trimmedName) throw new Error("请输入卷名称");
-      if (!Number.isInteger(sizeGiB) || sizeGiB < 1)
-        throw new Error("容量必须是大于 0 的整数（GiB）");
+      if (!Number.isInteger(sizeGiB) || sizeGiB < 1) throw new Error("容量必须是大于 0 的整数");
       if (!storageClass.trim()) throw new Error("请选择云盘类型");
       const selectedInstance = instanceItems.find((item) => item.id === mountInstanceId);
       const submitData = {
@@ -112,21 +111,19 @@ export default function CreateVolumeModal({ onCancel, onCreated }: CreateVolumeM
           <Input placeholder="请输入卷名称" maxLength={64} showWordLimit />
         </Form.Item>
         <Form.Item
-          label="容量 (GiB)"
+          label="容量"
           required
           field="sizeGiB"
           rules={[
             {
               validator: (value, callback) =>
                 callback(
-                  Number.isInteger(value) && value >= 1
-                    ? undefined
-                    : "容量必须是大于 0 的整数（GiB）",
+                  Number.isInteger(value) && value >= 1 ? undefined : "容量必须是大于 0 的整数",
                 ),
             },
           ]}
         >
-          <InputNumber min={1} precision={0} className="w-full" />
+          <InputNumber min={1} precision={0} suffix="GiB" className="w-full" />
         </Form.Item>
         <Form.Item label="云盘类型" required>
           <Select value={storageClass} onChange={setStorageClass} placeholder="请选择云盘类型">

@@ -56,7 +56,14 @@ export default function ModelDevExecutionArtifacts({
         columns={[
           { title: "文件名", dataIndex: "filename", width: 200, ellipsis: true },
           { title: "类型", dataIndex: "role", width: 160, ellipsis: true },
-          { title: "大小（字节）", dataIndex: "size_bytes", width: 150 },
+          {
+            title: "大小",
+            width: 150,
+            render: (_, artifact) =>
+              artifact.size_bytes == null || artifact.size_bytes === ""
+                ? "-"
+                : `${artifact.size_bytes} 字节`,
+          },
           { title: "校验时间", dataIndex: "verified_at", width: 180, render: formatDateTime },
           {
             title: "操作",

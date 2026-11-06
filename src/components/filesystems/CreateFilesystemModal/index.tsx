@@ -38,8 +38,7 @@ export default function CreateFilesystemModal({ onCancel, onCreated }: CreateFil
     mutationFn: async (_: undefined) => {
       const trimmedName = name.trim();
       if (!trimmedName) throw new Error("请输入文件存储名称");
-      if (!Number.isInteger(sizeGiB) || sizeGiB < 1)
-        throw new Error("容量必须是大于 0 的整数（GiB）");
+      if (!Number.isInteger(sizeGiB) || sizeGiB < 1) throw new Error("容量必须是大于 0 的整数");
       if (!vpcId) throw new Error("请选择 VPC");
       if (!subnetId) throw new Error("请选择子网");
       const createData = {
@@ -89,11 +88,12 @@ export default function CreateFilesystemModal({ onCancel, onCreated }: CreateFil
             <Select.Option value="throughput">吞吐型</Select.Option>
           </Select>
         </Form.Item>
-        <Form.Item label="容量 (GiB)" required>
+        <Form.Item label="容量" required>
           <InputNumber
             value={sizeGiB}
             min={1}
             precision={0}
+            suffix="GiB"
             className="w-full"
             onChange={(value) => setSizeGiB(Number(value ?? 1))}
           />
