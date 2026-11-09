@@ -57,10 +57,7 @@ export function DataTable<T>({
   scroll,
   rowActions,
 }: DataTableProps<T>) {
-  const hasConfiguredRowActions = Boolean(rowActions?.length);
-  const hasRowActions = Boolean(
-    rowActions?.some((action) => data.some((record) => action.visible?.(record) !== false)),
-  );
+  const hasConfiguredRowActions = rowActions !== undefined;
   if (
     hasConfiguredRowActions &&
     columns.some((column) => column.key === "__actions" || column.key === "actions")
@@ -69,7 +66,7 @@ export function DataTable<T>({
   }
 
   const columnsWithActions: Array<TableColumnProps<T>> =
-    hasRowActions && rowActions
+    hasConfiguredRowActions && rowActions
       ? [
           ...columns,
           {
@@ -87,7 +84,7 @@ export function DataTable<T>({
           },
         ]
       : columns;
-  const resolvedColumns = hasRowActions
+  const resolvedColumns = hasConfiguredRowActions
     ? normalizeDataTableColumns(columnsWithActions)
     : columnsWithActions;
   // 固定表头与表体必须共用明确的宽度，避免 max-content 分别按内容撑宽。

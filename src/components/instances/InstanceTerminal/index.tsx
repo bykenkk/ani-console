@@ -213,7 +213,11 @@ export default function InstanceTerminal({
         if (typeof WebSocket === "undefined") {
           throw new Error("当前浏览器不支持 WebSocket 终端");
         }
-        const socket = new WebSocket(resolveWebSocketUrl(data.wsUrl), TERMINAL_SUBPROTOCOL);
+        const ticket = new URL(data.wsUrl, window.location.href).searchParams.get("ticket") ?? "";
+        const socket = new WebSocket(
+          resolveWebSocketUrl(data.sessionId, ticket),
+          TERMINAL_SUBPROTOCOL,
+        );
         socket.binaryType = "arraybuffer";
         socketRef.current = socket;
 

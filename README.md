@@ -11,7 +11,12 @@ pnpm dev
 
 开发服务默认访问 `http://localhost:5173`。
 
-环境变量按 [Vite 的 Env Variables and Modes](https://v6.vite.dev/guide/env-and-mode) 约定配置；本地覆盖可写入不提交的 `.env.local`。
+环境变量参考 [.env.example](./.env.example)，本地配置写入不提交的 `.env.local`。
+
+| 环境变量 | 用途 |
+| --- | --- |
+| `VITE_API_PROXY_TARGET` | 本地开发的 API 代理地址。 |
+| `VITE_SESSION_GATEWAY_PROXY_TARGET` | 本地开发的会话网关 WebSocket 代理地址。 |
 
 ## 常用命令
 

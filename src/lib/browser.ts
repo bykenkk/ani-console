@@ -1,13 +1,11 @@
-export function resolveWebSocketUrl(value: string): string {
-  const url = new URL(value, window.location.href);
-  if (url.username || url.password) throw new Error("WebSocket 连接地址不能包含凭据");
-
-  if (url.protocol === "http:") url.protocol = "ws:";
-  if (url.protocol === "https:") url.protocol = "wss:";
-  if (window.location.protocol === "https:" && url.protocol === "ws:") url.protocol = "wss:";
-  if (url.protocol !== "ws:" && url.protocol !== "wss:") {
-    throw new Error("WebSocket 连接地址协议无效");
-  }
+export function resolveWebSocketUrl(sessionId: string, ticket: string): string {
+  if (!sessionId || !ticket) throw new Error("会话 ID 或连接票据缺失，请重新申请");
+  const url = new URL(
+    `/api/console-sessions/${encodeURIComponent(sessionId)}`,
+    window.location.href,
+  );
+  url.protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  url.searchParams.set("ticket", ticket);
   return url.href;
 }
 

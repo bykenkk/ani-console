@@ -82,22 +82,27 @@ export function ConfiguredDataTableRowActions<T>({
     </Menu>
   ) : null;
 
-  if (!menu) return "-";
+  const button = (
+    <Button
+      type="text"
+      size="small"
+      disabled={!menu}
+      aria-label="更多操作"
+      title="更多操作"
+      style={{
+        paddingInline: ACTION_BUTTON_HORIZONTAL_PADDING / 2,
+        borderWidth: ACTION_BUTTON_BORDER_WIDTH,
+      }}
+    >
+      <IconMoreVertical style={{ width: MORE_ICON_WIDTH, height: MORE_ICON_WIDTH }} />
+    </Button>
+  );
+
+  if (!menu) return button;
 
   return (
     <Dropdown droplist={menu} trigger="click" position="br">
-      <Button
-        type="text"
-        size="small"
-        aria-label="更多操作"
-        title="更多操作"
-        style={{
-          paddingInline: ACTION_BUTTON_HORIZONTAL_PADDING / 2,
-          borderWidth: ACTION_BUTTON_BORDER_WIDTH,
-        }}
-      >
-        <IconMoreVertical style={{ width: MORE_ICON_WIDTH, height: MORE_ICON_WIDTH }} />
-      </Button>
+      {button}
     </Dropdown>
   );
 }

@@ -99,8 +99,7 @@ export default function InstanceVnc({ instanceId }: InstanceVncProps) {
 
       try {
         const data = await createVmConsoleSession(instanceId, abortController.signal);
-        const connectUrl = data.wsUrl;
-        if (!connectUrl) throw new Error("控制台连接地址为空");
+        if (!data.wsUrl) throw new Error("控制台连接地址为空");
         expiresAtRef.current = data.expiresAt ?? null;
         if (isExpired(data.expiresAt)) {
           throw new Error("控制台会话已过期，请重新申请");
@@ -110,7 +109,10 @@ export default function InstanceVnc({ instanceId }: InstanceVncProps) {
         if (typeof WebSocket === "undefined") {
           throw new Error("当前浏览器不支持 WebSocket 控制台");
         }
-        rfb = new RFB(host, resolveWebSocketUrl(connectUrl), { wsProtocols: [VNC_SUBPROTOCOL] });
+        const ticket = new URL(data.wsUrl, window.location.href).searchParams.get("ticket") ?? "";
+        rfb = new RFB(host, resolveWebSocketUrl(data.sessionId, ticket), {
+          wsProtocols: [VNC_SUBPROTOCOL],
+        });
         applyViewMode(rfb, viewModeRef.current);
         rfb.background = "#0b0e16";
         rfb.addEventListener("connect", () => {
