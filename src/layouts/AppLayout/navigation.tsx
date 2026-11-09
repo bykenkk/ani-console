@@ -158,6 +158,7 @@ export const menuItems: readonly MenuItem[] = [
         icon: <IconFile />,
         children: [
           { key: "/container-images", label: "容器镜像", icon: <AliIcon name="Harbor" /> },
+          { key: "/vm-images", label: "虚拟机镜像", icon: <AliIcon name="yunzhuji" /> },
         ],
       },
       {
@@ -246,6 +247,7 @@ const PATH_SUBMENU: { prefix: string; key: string }[] = [
   { prefix: "/security-groups", key: "network-management" },
   { prefix: "/load-balancers", key: "network-management" },
   { prefix: "/container-images", key: "image-management" },
+  { prefix: "/vm-images", key: "image-management" },
   { prefix: "/api-keys", key: "security-identity" },
 ];
 

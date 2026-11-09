@@ -16,6 +16,7 @@ pnpm dev
 | 环境变量 | 用途 |
 | --- | --- |
 | `VITE_API_PROXY_TARGET` | 本地开发的 API 代理地址。 |
+| `VITE_VM_IMAGE_UPLOAD_PROXY_TARGET` | 本地开发的虚拟机镜像上传代理地址。 |
 | `VITE_SESSION_GATEWAY_PROXY_TARGET` | 本地开发的会话网关 WebSocket 代理地址。 |
 
 ## 常用命令

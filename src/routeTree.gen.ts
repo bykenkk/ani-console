@@ -56,6 +56,7 @@ import { Route as AuthenticatedAppSubnetsIndexRouteImport } from './routes/_auth
 import { Route as AuthenticatedAppSubnetsSubnetIdRouteImport } from './routes/_authenticated/_app/subnets/$subnetId'
 import { Route as AuthenticatedAppVectorStoresIndexRouteImport } from './routes/_authenticated/_app/vector-stores/index'
 import { Route as AuthenticatedAppVectorStoresVectorStoreIdRouteImport } from './routes/_authenticated/_app/vector-stores/$vectorStoreId'
+import { Route as AuthenticatedAppVmImagesIndexRouteImport } from './routes/_authenticated/_app/vm-images/index'
 import { Route as AuthenticatedAppVmsIndexRouteImport } from './routes/_authenticated/_app/vms/index'
 import { Route as AuthenticatedAppVmsInstanceIdRouteImport } from './routes/_authenticated/_app/vms/$instanceId'
 import { Route as AuthenticatedAppVnicsIndexRouteImport } from './routes/_authenticated/_app/vnics/index'
@@ -337,6 +338,12 @@ const AuthenticatedAppVectorStoresVectorStoreIdRoute =
     path: '/vector-stores/$vectorStoreId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
+const AuthenticatedAppVmImagesIndexRoute =
+  AuthenticatedAppVmImagesIndexRouteImport.update({
+    id: '/vm-images/',
+    path: '/vm-images/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
 const AuthenticatedAppVmsIndexRoute =
   AuthenticatedAppVmsIndexRouteImport.update({
     id: '/vms/',
@@ -442,6 +449,7 @@ export interface FileRoutesByFullPath {
   '/security-groups/': typeof AuthenticatedAppSecurityGroupsIndexRoute
   '/subnets/': typeof AuthenticatedAppSubnetsIndexRoute
   '/vector-stores/': typeof AuthenticatedAppVectorStoresIndexRoute
+  '/vm-images/': typeof AuthenticatedAppVmImagesIndexRoute
   '/vms/': typeof AuthenticatedAppVmsIndexRoute
   '/vnics/': typeof AuthenticatedAppVnicsIndexRoute
   '/volumes/': typeof AuthenticatedAppVolumesIndexRoute
@@ -496,6 +504,7 @@ export interface FileRoutesByTo {
   '/security-groups': typeof AuthenticatedAppSecurityGroupsIndexRoute
   '/subnets': typeof AuthenticatedAppSubnetsIndexRoute
   '/vector-stores': typeof AuthenticatedAppVectorStoresIndexRoute
+  '/vm-images': typeof AuthenticatedAppVmImagesIndexRoute
   '/vms': typeof AuthenticatedAppVmsIndexRoute
   '/vnics': typeof AuthenticatedAppVnicsIndexRoute
   '/volumes': typeof AuthenticatedAppVolumesIndexRoute
@@ -555,6 +564,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/security-groups/': typeof AuthenticatedAppSecurityGroupsIndexRoute
   '/_authenticated/_app/subnets/': typeof AuthenticatedAppSubnetsIndexRoute
   '/_authenticated/_app/vector-stores/': typeof AuthenticatedAppVectorStoresIndexRoute
+  '/_authenticated/_app/vm-images/': typeof AuthenticatedAppVmImagesIndexRoute
   '/_authenticated/_app/vms/': typeof AuthenticatedAppVmsIndexRoute
   '/_authenticated/_app/vnics/': typeof AuthenticatedAppVnicsIndexRoute
   '/_authenticated/_app/volumes/': typeof AuthenticatedAppVolumesIndexRoute
@@ -613,6 +623,7 @@ export interface FileRouteTypes {
     | '/security-groups/'
     | '/subnets/'
     | '/vector-stores/'
+    | '/vm-images/'
     | '/vms/'
     | '/vnics/'
     | '/volumes/'
@@ -667,6 +678,7 @@ export interface FileRouteTypes {
     | '/security-groups'
     | '/subnets'
     | '/vector-stores'
+    | '/vm-images'
     | '/vms'
     | '/vnics'
     | '/volumes'
@@ -725,6 +737,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/security-groups/'
     | '/_authenticated/_app/subnets/'
     | '/_authenticated/_app/vector-stores/'
+    | '/_authenticated/_app/vm-images/'
     | '/_authenticated/_app/vms/'
     | '/_authenticated/_app/vnics/'
     | '/_authenticated/_app/volumes/'
@@ -1068,6 +1081,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppVectorStoresVectorStoreIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
+    '/_authenticated/_app/vm-images/': {
+      id: '/_authenticated/_app/vm-images/'
+      path: '/vm-images'
+      fullPath: '/vm-images/'
+      preLoaderRoute: typeof AuthenticatedAppVmImagesIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
     '/_authenticated/_app/vms/': {
       id: '/_authenticated/_app/vms/'
       path: '/vms'
@@ -1195,6 +1215,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppSecurityGroupsIndexRoute: typeof AuthenticatedAppSecurityGroupsIndexRoute
   AuthenticatedAppSubnetsIndexRoute: typeof AuthenticatedAppSubnetsIndexRoute
   AuthenticatedAppVectorStoresIndexRoute: typeof AuthenticatedAppVectorStoresIndexRoute
+  AuthenticatedAppVmImagesIndexRoute: typeof AuthenticatedAppVmImagesIndexRoute
   AuthenticatedAppVmsIndexRoute: typeof AuthenticatedAppVmsIndexRoute
   AuthenticatedAppVnicsIndexRoute: typeof AuthenticatedAppVnicsIndexRoute
   AuthenticatedAppVolumesIndexRoute: typeof AuthenticatedAppVolumesIndexRoute
@@ -1269,6 +1290,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppSubnetsIndexRoute: AuthenticatedAppSubnetsIndexRoute,
   AuthenticatedAppVectorStoresIndexRoute:
     AuthenticatedAppVectorStoresIndexRoute,
+  AuthenticatedAppVmImagesIndexRoute: AuthenticatedAppVmImagesIndexRoute,
   AuthenticatedAppVmsIndexRoute: AuthenticatedAppVmsIndexRoute,
   AuthenticatedAppVnicsIndexRoute: AuthenticatedAppVnicsIndexRoute,
   AuthenticatedAppVolumesIndexRoute: AuthenticatedAppVolumesIndexRoute,

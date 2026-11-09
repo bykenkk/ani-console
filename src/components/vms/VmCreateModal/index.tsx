@@ -86,7 +86,6 @@ export default function VmCreateModal({ onCancel, onCreated }: VmCreateModalProp
   const canInitialize =
     selected?.kind === "DISK_IMAGE" &&
     selected.osFamily === "linux" &&
-    selected.initializationVerified &&
     selected.initializationCapability === "CLOUD_INIT_NOCLOUD";
   const dnsFields: VmCreateFieldKey[] =
     values.dns_mode === "CUSTOM"

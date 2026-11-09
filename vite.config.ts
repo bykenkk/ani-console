@@ -72,6 +72,20 @@ export default defineConfig(({ command, mode }) => {
           },
         },
         {
+          path: "/api/uploads/vm-images",
+          exact: true,
+          target: env.VITE_VM_IMAGE_UPLOAD_PROXY_TARGET,
+          upstreamPath: "/v1beta1/upload-async",
+          changeOrigin: true,
+          secure: false,
+          timeout: 3600000,
+          proxyTimeout: 3600000,
+          configure: (proxy) => {
+            // 同源请求可能携带浏览器 Cookie，上传上游只接收票据 Token。
+            proxy.on("proxyReq", (request) => request.removeHeader("cookie"));
+          },
+        },
+        {
           path: "/api/",
           target: env.VITE_API_PROXY_TARGET,
           changeOrigin: true,

@@ -136,6 +136,8 @@ export interface VmListResponse {
   items: VirtualMachine[];
   total: string;
 }
+export type VmInitializationCapability = "NONE" | "CLOUD_INIT_NOCLOUD";
+
 export interface VmMedia {
   mediaKey: string;
   name: string;
@@ -151,8 +153,7 @@ export interface VmMedia {
   persistentUefi: boolean;
   driverMediaKey?: string;
   virtualCapacityBytes: string;
-  initializationCapability: string;
-  initializationVerified: boolean;
+  initializationCapability?: VmInitializationCapability | "";
 }
 export interface VmInitialDisk {
   client_disk_key: string;
