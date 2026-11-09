@@ -1,5 +1,5 @@
 import { Alert, Descriptions } from "@arco-design/web-react";
-import type { VirtualMachine } from "@/api/vms";
+import type { VmRuntime } from "@/api/vms";
 import { DataTable, StatusBadge } from "@/components/common";
 import { formatBytes, formatDateTime } from "@/lib/format";
 
@@ -7,10 +7,9 @@ function bytes(value?: string) {
   return value == null ? "-" : formatBytes(Number(value));
 }
 
-type VmGuestInfoProps = { vm: VirtualMachine };
+type VmGuestInfoProps = { runtime?: VmRuntime };
 
-export default function VmGuestInfo({ vm }: VmGuestInfoProps) {
-  const runtime = vm.runtime;
+export default function VmGuestInfo({ runtime }: VmGuestInfoProps) {
   let alertType: "info" | "success" | "warning" = "info";
   let alertContent = "暂未获取系统信息";
   switch (runtime?.state) {

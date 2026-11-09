@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@arco-design/web-react";
-import { getVm } from "@/api/vms";
+import { Button, Spin } from "@arco-design/web-react";
+import { getVm, getVmRuntime } from "@/api/vms";
 import {
   AliIcon,
   DetailPageFrame,
@@ -39,6 +39,13 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
     queryKey: ["vms", instanceId],
     queryFn: ({ signal }) => getVm(instanceId, signal),
     meta: { errorNotification: { id: withId("vm", instanceId), action: "云主机详情加载" } },
+  });
+  const runtime = useQuery({
+    queryKey: ["vms", instanceId, "runtime"],
+    queryFn: ({ signal }) => getVmRuntime(instanceId, signal),
+    meta: {
+      errorNotification: { id: withId("vm-runtime", instanceId), action: "云主机运行态加载" },
+    },
   });
   const { actions, dialogNode } = useVMActions(detail.data ? [detail.data] : [], goBack);
   if (!detail.data) return <DetailPagePlaceholder loading={detail.isLoading} />;
@@ -88,7 +95,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
                 label: "操作系统",
                 value: vm.sourceMedia?.name || "-",
               },
-              { label: "所在节点", value: vm.runtime?.nodeName || "-" },
+              { label: "所在节点", value: runtime.data?.nodeName || "-" },
               {
                 label: "IP 地址",
                 value:
@@ -107,7 +114,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
                       : "-",
               },
               { label: "创建时间", value: formatDateTime(vm.createdAt) },
-              { label: "启动时间", value: formatDateTime(vm.runtime?.startedAt) },
+              { label: "启动时间", value: formatDateTime(runtime.data?.startedAt) },
             ],
           },
           {
@@ -158,7 +165,15 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
           //   label: "远程连接",
           //   content: <VmSshAccess vm={vm} onOpenConsole={() => openInstanceVncWindow(vm.id)} />,
           // },
-          { key: "guest", label: "系统信息", content: <VmGuestInfo vm={vm} /> },
+          {
+            key: "guest",
+            label: "系统信息",
+            content: (
+              <Spin loading={runtime.isLoading} className="w-full">
+                <VmGuestInfo runtime={runtime.data} />
+              </Spin>
+            ),
+          },
           { key: "configuration", label: "初始化配置", content: <VmConfiguration vm={vm} /> },
           { key: "media", label: "启动与介质", content: <VmMediaDevices vm={vm} /> },
           {

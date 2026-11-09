@@ -33,7 +33,13 @@ export interface VmResourceReference {
   state: "RESOLVED" | "NOT_FOUND" | "UNAVAILABLE" | "NOT_QUERIED";
 }
 export interface VmRuntime {
-  state: "AVAILABLE" | "NOT_RUNNING" | "AGENT_NOT_CONNECTED" | "UNAVAILABLE" | "CHANGED";
+  state:
+    | "AVAILABLE"
+    | "NOT_RUNNING"
+    | "AGENT_NOT_CONNECTED"
+    | "UNAVAILABLE"
+    | "CHANGED"
+    | "NOT_QUERIED";
   agentState: "CONNECTED" | "NOT_CONNECTED" | "UNKNOWN";
   observedAt?: string;
   nodeName?: string;

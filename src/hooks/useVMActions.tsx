@@ -51,6 +51,7 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
         await Promise.all([
           qc.invalidateQueries({ queryKey: ["vms", "list"] }),
           qc.invalidateQueries({ queryKey: ["vms", vm.id], exact: true }),
+          qc.invalidateQueries({ queryKey: ["vms", vm.id, "runtime"] }),
           qc.invalidateQueries({ queryKey: ["vm-network-interfaces", vm.id] }),
           qc.invalidateQueries({ queryKey: ["network-vnics"] }),
           qc.invalidateQueries({ queryKey: ["network-vnic"] }),

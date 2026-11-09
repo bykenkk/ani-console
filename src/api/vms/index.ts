@@ -23,6 +23,7 @@ import type {
   VmSnapshotRestoreInput,
   VmConsoleSession,
   VmLogParams,
+  VmRuntime,
 } from "./types";
 
 const createScope = createIdempotencyScope("vm-create", ["POST"]);
@@ -54,7 +55,13 @@ export function listVms(params: VmListParams, signal?: AbortSignal) {
   return coreRequest<VmListResponse>("/virtual-machines", { method: "GET", params, signal });
 }
 export function getVm(id: string, signal?: AbortSignal) {
-  return coreRequest<VirtualMachine>(vmPath(id), { method: "GET", signal });
+  return coreRequest<VirtualMachine>(vmPath(id), {
+    method: "GET",
+    signal,
+  });
+}
+export function getVmRuntime(id: string, signal?: AbortSignal) {
+  return coreRequest<VmRuntime>(`${vmPath(id)}/runtime`, { method: "GET", signal });
 }
 export function streamVmLogs(id: string, params: VmLogParams, signal: AbortSignal) {
   return coreRequest<ReadableStream<Uint8Array>>(`${vmPath(id)}/logs`, {

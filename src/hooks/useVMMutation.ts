@@ -25,6 +25,7 @@ export function useVMMutation<TVariables = void>({
   const refresh = () =>
     Promise.all([
       client.invalidateQueries({ queryKey: ["vms", vmId], exact: true }),
+      client.invalidateQueries({ queryKey: ["vms", vmId, "runtime"] }),
       client.invalidateQueries({ queryKey: ["vms", "list"] }),
       ...refreshQueryKeys.map((queryKey) => client.invalidateQueries({ queryKey })),
     ]);
