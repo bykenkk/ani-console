@@ -58,12 +58,6 @@ export function DataTable<T>({
   rowActions,
 }: DataTableProps<T>) {
   const hasConfiguredRowActions = rowActions !== undefined;
-  if (
-    hasConfiguredRowActions &&
-    columns.some((column) => column.key === "__actions" || column.key === "actions")
-  ) {
-    throw new Error("DataTable cannot combine rowActions with a manual actions column");
-  }
 
   const columnsWithActions: Array<TableColumnProps<T>> =
     hasConfiguredRowActions && rowActions
