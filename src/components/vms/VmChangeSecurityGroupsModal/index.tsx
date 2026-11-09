@@ -1,12 +1,11 @@
-import { Form, Modal, Spin } from "@arco-design/web-react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { getVm, setVmSecurityGroups } from "@/api/vms";
+import { Form, Modal } from "@arco-design/web-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { setVmSecurityGroups, type VirtualMachine } from "@/api/vms";
 import SecurityGroupSelect from "@/components/common/SecurityGroupSelect";
 import { validateForm } from "@/lib/form";
-import { withId } from "@/lib/id";
 
 type VmChangeSecurityGroupsModalProps = {
-  instance: { id: string; name: string };
+  instance: Pick<VirtualMachine, "id" | "name" | "version" | "security_group_ids">;
   onCancel: () => void;
   onSubmitted?: () => void;
 };
@@ -20,18 +19,9 @@ export default function VmChangeSecurityGroupsModal({
   const { id, name } = instance;
   const [form] = Form.useForm<VmChangeSecurityGroupsFormValues>();
   const qc = useQueryClient();
-  const current = useQuery({
-    queryKey: ["security-group-selection", "vm", id],
-    queryFn: ({ signal }) => getVm(id, signal),
-    refetchOnWindowFocus: false,
-    meta: {
-      errorNotification: { id: withId("security-group-selection", id), action: "安全组绑定加载" },
-    },
-  });
   const update = useMutation({
     mutationFn: async (values: VmChangeSecurityGroupsFormValues) => {
-      if (!current.data) throw new Error("请等待绑定信息加载");
-      const previous = current.data;
+      const previous = instance;
       await setVmSecurityGroups(id, {
         expected_version: previous.version,
         security_group_ids: values.security_group_ids ?? [],
@@ -57,7 +47,6 @@ export default function VmChangeSecurityGroupsModal({
             queryKey: ["network-security-group-bindings", securityGroupId],
           }),
         ),
-        qc.invalidateQueries({ queryKey: ["security-group-selection", "vm", id] }),
         qc.invalidateQueries({ queryKey: ["vms", "list"] }),
         qc.invalidateQueries({ queryKey: ["vms", id], exact: true }),
       ]);
@@ -71,30 +60,24 @@ export default function VmChangeSecurityGroupsModal({
       title={`更换安全组 · ${name}`}
       onCancel={onCancel}
       confirmLoading={update.isPending}
-      okButtonProps={{ disabled: !current.data || current.isFetching }}
       onOk={async () =>
         update.mutateAsync(await validateForm<VmChangeSecurityGroupsFormValues>(form))
       }
     >
-      <Spin loading={current.isLoading} className="w-full">
-        {current.data && (
-          <Form
-            key={current.data.version}
-            form={form}
-            layout="vertical"
-            initialValues={{ security_group_ids: current.data.security_group_ids ?? [] }}
-            disabled={update.isPending}
-          >
-            <Form.Item
-              field="security_group_ids"
-              label="安全组"
-              extra="可多选；清空选择表示解除全部安全组。"
-            >
-              <SecurityGroupSelect />
-            </Form.Item>
-          </Form>
-        )}
-      </Spin>
+      <Form
+        form={form}
+        layout="vertical"
+        initialValues={{ security_group_ids: instance.security_group_ids ?? [] }}
+        disabled={update.isPending}
+      >
+        <Form.Item
+          field="security_group_ids"
+          label="安全组"
+          extra="可多选；清空选择表示解除全部安全组。"
+        >
+          <SecurityGroupSelect />
+        </Form.Item>
+      </Form>
     </Modal>
   );
 }
