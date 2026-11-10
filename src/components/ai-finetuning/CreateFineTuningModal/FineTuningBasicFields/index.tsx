@@ -1,9 +1,9 @@
 import { Card, Form, Input } from "@arco-design/web-react";
-import type { ModelDevImplementation, ModelDevInputVersion } from "@/api/modeldev";
+import type { ModelDevImplementation, DatasetVersion } from "@/api/modeldev";
 import type { Model, ModelVersion } from "@/api/models";
 import ModelDevImplementationField from "@/components/modeldev/ModelDevImplementationField";
 import InstanceComputeSelect from "@/components/instances/InstanceComputeSelect";
-import ModelDevInputField from "@/components/modeldev/ModelDevInputField";
+import ModelDevDatasetVersionFields from "@/components/modeldev/ModelDevDatasetVersionFields";
 import type { CreateFineTuningFormValues } from "../index";
 import FineTuningBaseModelFields from "../FineTuningBaseModelFields";
 import FineTuningRegistrationFields from "../FineTuningRegistrationFields";
@@ -11,7 +11,7 @@ import FineTuningRegistrationFields from "../FineTuningRegistrationFields";
 type FineTuningBasicFieldsProps = {
   values: CreateFineTuningFormValues;
   onImplementationSelect: (implementation: ModelDevImplementation | undefined) => void;
-  onInputSelect: (version: ModelDevInputVersion | undefined) => void;
+  onInputSelect: (version: DatasetVersion | undefined) => void;
   onBaseModelSelect: (model: Model | undefined) => void;
   onTargetModelSelect: (model: Model | undefined) => void;
   onBaseVersionChange: (id: string, version?: ModelVersion, modelName?: string) => void;
@@ -68,7 +68,7 @@ export default function FineTuningBasicFields({
         selectedId={values.method}
         onResolve={onImplementationSelect}
       />
-      <ModelDevInputField field="dataset" format="JSON" onSelect={onInputSelect} />
+      <ModelDevDatasetVersionFields datasetId={values.datasetId} onSelect={onInputSelect} />
       <FineTuningRegistrationFields
         mode={values.registrationMode}
         onTargetModelSelect={onTargetModelSelect}

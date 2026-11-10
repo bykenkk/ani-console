@@ -148,7 +148,7 @@ export interface ModelDevInputVersion {
   format?: string;
   size_bytes?: string;
   sha256?: string;
-  row_count?: number;
+  row_count?: string;
   feature_count?: number;
   created_at?: string;
 }
@@ -226,7 +226,6 @@ export interface ModelDevExecution {
   accepted_at?: string;
   deadline_at?: string;
   observed_at?: string;
-  // TODO(modeldev-list-contract): 测试环境列表已返回步骤和微调配置，待后端主分支合同合并后同步核对。
   steps: ModelDevExecutionStep[];
   managed_settings: ModelDevManagedSettings | null;
   base_model: {
@@ -322,5 +321,202 @@ export interface ModelDevArtifact {
 }
 export interface ModelDevArtifactListResponse {
   items: ModelDevArtifact[];
+  total: string;
+}
+
+export type DatasetState = "ACTIVE" | "ARCHIVED";
+export type DatasetSourceProvider = "HUGGINGFACE" | "MODELSCOPE";
+
+export interface DatasetSourceSelection {
+  provider: DatasetSourceProvider;
+  repo_id: string;
+  requested_revision: string;
+  file_path: string;
+  lock_kind: "IMMUTABLE_REVISION" | "FILE_SHA256";
+  resolved_revision: string;
+  expected_size_bytes: string;
+  expected_file_sha256: string;
+}
+
+export interface DatasetSourceSnapshot {
+  selection: DatasetSourceSelection | null;
+  resolved_at: string;
+  snapshot_sha256: string;
+}
+
+export interface DatasetImportSummary {
+  import_task_id: string;
+  dataset_id: string;
+  reserved_input_version_id: string;
+  version_number: string;
+  state: "QUEUED" | "RUNNING" | "FAILED" | "CANCELING" | "CANCELLED" | "SUCCEEDED";
+  phase: string;
+  source: DatasetSourceSnapshot | null;
+  accepted_at: string;
+  attempt_count: string;
+  recovery_generation: string;
+  progress: {
+    stage: string;
+    bytes_total: string;
+    bytes_done: string;
+    files_total: string;
+    files_done: string;
+    updated_at: string;
+  } | null;
+  failure: {
+    code: string;
+    safe_message: string;
+    retryable: boolean;
+    stage: string;
+    detail: Record<string, string>;
+  } | null;
+  input_version_id: string;
+}
+
+export interface Dataset {
+  dataset_id: string;
+  name: string;
+  description: string;
+  modality: "TEXT";
+  schema_kind: "ALPACA";
+  state: DatasetState;
+  revision: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  ready_version_count: string;
+  latest_ready_version_number: string;
+  latest_import: DatasetImportSummary | null;
+}
+
+export interface DatasetListParams extends PageParams {
+  state?: DatasetState | "ALL";
+  name?: string;
+}
+export interface DatasetListResponse {
+  items: Dataset[];
+  total: string;
+}
+export interface CreateDatasetInput {
+  name: string;
+  description?: string;
+}
+export interface CreateDatasetRequest {
+  idempotency_key: string;
+  data: CreateDatasetInput;
+}
+export interface UpdateDatasetInput {
+  name?: string;
+  description?: string;
+  expected_revision: string;
+}
+export interface UpdateDatasetRequest {
+  idempotency_key: string;
+  update_mask: string;
+  data: UpdateDatasetInput;
+}
+export interface DatasetRevisionInput {
+  expected_revision: string;
+}
+export interface DatasetRevisionRequest {
+  idempotency_key: string;
+  data: DatasetRevisionInput;
+}
+
+export interface InspectDatasetSourceInput {
+  provider: DatasetSourceProvider;
+  repo_id: string;
+  revision: string;
+  file_path: string;
+}
+export interface InspectDatasetSourceResponse {
+  resolved_revision: string;
+  files_page: {
+    items: { path: string; size_bytes: string; directory: boolean }[];
+    next_page_token: string;
+    has_more: boolean;
+  } | null;
+  selection: DatasetSourceSelection | null;
+  selection_fingerprint: string;
+}
+export interface ImportDatasetVersionInput {
+  source: DatasetSourceSelection;
+  selection_fingerprint: string;
+}
+export interface ImportDatasetVersionRequest {
+  idempotency_key: string;
+  data: ImportDatasetVersionInput;
+}
+
+export interface DatasetInputVersion {
+  input_version_id: string;
+  state: string;
+  format: string;
+  size_bytes: string;
+  sha256: string;
+  row_count: string;
+  feature_count: number;
+  created_at: string;
+}
+export interface DatasetVersion {
+  input_version_id: string;
+  dataset_id: string;
+  import_task_id: string;
+  version_number: string;
+  published_at: string;
+  preview_available: boolean;
+  input_version: DatasetInputVersion | null;
+  source: DatasetSourceSnapshot | null;
+}
+export interface DatasetVersionListResponse {
+  items: DatasetVersion[];
+  total: string;
+}
+export interface DatasetPreviewRecord {
+  sample_index: string;
+  instruction: string;
+  input: string;
+  output: string;
+  truncated_fields: string[];
+}
+export interface DatasetPreview {
+  input_version_id: string;
+  total_rows: string;
+  records: DatasetPreviewRecord[];
+  preview_truncated: boolean;
+  max_records: string;
+  max_field_characters: string;
+}
+
+export type DatasetOperationEvent =
+  | "DATASET_CREATED"
+  | "DATASET_UPDATED"
+  | "DATASET_ARCHIVED"
+  | "DATASET_RESTORED"
+  | "IMPORT_ACCEPTED"
+  | "IMPORT_RETRY_ACCEPTED"
+  | "IMPORT_CANCEL_REQUESTED"
+  | "IMPORT_SUCCEEDED"
+  | "IMPORT_FAILED"
+  | "IMPORT_CANCELLED";
+export interface DatasetOperation {
+  operation_id: string;
+  event_type: DatasetOperationEvent;
+  actor: string;
+  occurred_at: string;
+  result: string;
+  import_task_id: string;
+  import_attempt_id: string;
+  receipt_id: string;
+  revision: string;
+  recovery_generation: string;
+  failure_code: string;
+}
+export interface DatasetOperationListParams extends PageParams {
+  event_type?: DatasetOperationEvent;
+  import_task_id?: string;
+}
+export interface DatasetOperationListResponse {
+  items: DatasetOperation[];
   total: string;
 }

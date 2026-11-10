@@ -6,7 +6,7 @@ import {
   checkFineTuningReadiness,
   createFineTuningExecution,
   type ModelDevImplementation,
-  type ModelDevInputVersion,
+  type DatasetVersion,
 } from "@/api/modeldev";
 import type { Model, ModelVersion } from "@/api/models";
 import WizardModal from "@/components/common/WizardModal";
@@ -29,6 +29,7 @@ export type CreateFineTuningFormValues = {
   targetModelId: string;
   newModelName: string;
   dataset: string;
+  datasetId: string;
   parameters: string[];
   finetuning_template: string;
 };
@@ -42,6 +43,7 @@ const STEP_FIELDS: (keyof CreateFineTuningFormValues)[][] = [
     "preset",
     "method",
     "dataset",
+    "datasetId",
     "registrationMode",
     "finetuning_template",
   ],
@@ -58,6 +60,7 @@ const INITIAL_VALUES: CreateFineTuningFormValues = {
   targetModelId: "",
   newModelName: "",
   dataset: "",
+  datasetId: "",
   parameters: [],
   finetuning_template: "",
 };
@@ -74,7 +77,7 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
   >();
   const [values, setValues] = useState<CreateFineTuningFormValues>(INITIAL_VALUES);
   const [implementation, setImplementation] = useState<ModelDevImplementation>();
-  const [inputVersion, setInputVersion] = useState<ModelDevInputVersion>();
+  const [inputVersion, setInputVersion] = useState<DatasetVersion>();
   const [baseModel, setBaseModel] = useState<Model>();
   const [targetModel, setTargetModel] = useState<Model>();
   const [baseVersion, setBaseVersion] = useState<ModelVersion>();
@@ -209,8 +212,9 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
             if (
               !inputVersion ||
               inputVersion.input_version_id !== submitted.dataset ||
-              inputVersion.state !== "READY" ||
-              inputVersion.format !== "JSON"
+              inputVersion.dataset_id !== submitted.datasetId ||
+              inputVersion.input_version?.state !== "READY" ||
+              inputVersion.input_version.format !== "JSON"
             )
               errors.dataset = { error: { message: "请选择已就绪的 JSON 数据集版本" } };
             if (Object.keys(errors).length) {
@@ -326,6 +330,11 @@ export default function CreateFineTuningModal({ onCancel }: CreateFineTuningModa
             reset.targetModelId = "";
             reset.newModelName = "";
             setTargetModel(undefined);
+          }
+          if ("datasetId" in changed) {
+            form.clearFields(["dataset"]);
+            reset.dataset = "";
+            setInputVersion(undefined);
           }
           form.setFieldsValue(reset);
           setValues((current) => ({ ...current, ...next, ...reset }));

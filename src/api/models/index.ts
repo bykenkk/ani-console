@@ -41,8 +41,6 @@ export function deleteModel(id: string) {
   });
 }
 
-// FIXME(model-contract): 现有外部搜索分页及候选字段尚未与目标部署版本和当前索引完成对齐。
-// TODO(model-contract): 确认对应后端版本的 page/pageSize、items/hasMore 与候选唯一性后联调搜索及取消。
 export function searchExternalModels(
   params: SearchExternalModelsParams,
   signal?: AbortSignal,
@@ -54,7 +52,6 @@ export function searchExternalModels(
   });
 }
 
-// FIXME(model-pagination): 当前后端将 page 误限为 1–100；待解除页码上限后复核直接跳页，不在前端截断 total 或模拟分页。
 export function listModelVersions(
   id: string,
   params: ModelVersionListParams = {},
@@ -66,7 +63,6 @@ export function listModelVersions(
     signal,
   });
 }
-// FIXME(model-pagination): 当前后端将操作记录的 page 误限为 1–100，超出会返回 400；待后端修复后复核。
 // 不将 accepted 展示为完成。
 export function listModelOperations(
   id: string,
@@ -79,8 +75,7 @@ export function listModelOperations(
     signal,
   });
 }
-// FIXME(model-contract): 原分支保留 model/version 组合响应；目标部署版本及关联资源响应仍待确认。
-// TODO(model-contract): 核对目标版本详情字段、模型归属和错误响应后联调。
+// 同时返回模型归属和版本信息，供关联资源判断所属模型。
 export function getModelVersion(id: string, signal?: AbortSignal) {
   return coreRequest<ModelVersionResponse>(`/model-versions/${encodeURIComponent(id)}`, {
     method: "GET",

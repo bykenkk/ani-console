@@ -11,7 +11,7 @@ import { formatModelDevInputVersion } from "@/lib/modeldev";
 const listOptions = withFirst100(listModelDevInputVersions);
 type ModelDevInputFieldProps = {
   field: string;
-  format: NonNullable<ModelDevInputVersionListParams["format"]>;
+  format?: ModelDevInputVersionListParams["format"];
   onSelect: (version: ModelDevInputVersion | undefined) => void;
 };
 
@@ -31,6 +31,7 @@ export default function ModelDevInputField({ field, format, onSelect }: ModelDev
     <Form.Item
       field={field}
       label="数据集版本"
+      extra={format ? undefined : "支持 CSV 和 JSON 数据集"}
       formatter={(value) => value || undefined}
       rules={[{ required: true, message: "请选择数据集版本" }]}
     >

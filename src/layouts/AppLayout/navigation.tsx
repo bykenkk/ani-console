@@ -134,6 +134,7 @@ export const menuItems: readonly MenuItem[] = [
         icon: <AliIcon name="tuili" />,
         children: [
           { key: "/ai-models", label: "模型仓库", icon: <AliIcon name="moxing" /> },
+          { key: "/ai-datasets", label: "数据集管理", icon: <IconFile /> },
           { key: "/ai-inference", label: "推理服务", icon: <AliIcon name="tuili" /> },
           {
             key: "/ai-inference-policies",

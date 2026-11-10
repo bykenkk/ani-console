@@ -121,9 +121,11 @@ export default function TrainingTaskCreateModal({
               !inputVersion ||
               inputVersion.input_version_id !== submitted.dataset_version_id ||
               inputVersion.state !== "READY" ||
-              inputVersion.format !== "CSV"
+              (inputVersion.format !== "CSV" && inputVersion.format !== "JSON")
             )
-              errors.dataset_version_id = { error: { message: "请选择已就绪的 CSV 数据集版本" } };
+              errors.dataset_version_id = {
+                error: { message: "请选择已就绪的 CSV 或 JSON 数据集版本" },
+              };
             if (Object.keys(errors).length) {
               form.setFields(errors);
               throw new Error("训练提交选项校验失败");

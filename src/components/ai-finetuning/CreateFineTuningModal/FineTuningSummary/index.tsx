@@ -1,13 +1,9 @@
 import type { CreateFineTuningFormValues } from "../index";
-import type {
-  ModelDevImplementation,
-  ModelDevInputVersion,
-  FineTuningReadiness,
-} from "@/api/modeldev";
+import type { ModelDevImplementation, DatasetVersion, FineTuningReadiness } from "@/api/modeldev";
 import type { InstancePreset } from "@/api/instances";
 import type { Model, ModelVersion } from "@/api/models";
 import ModelDevSummary from "@/components/modeldev/ModelDevSummary";
-import { formatModelDevComputeResources, formatModelDevInputVersion } from "@/lib/modeldev";
+import { formatModelDevComputeResources } from "@/lib/modeldev";
 import { formatDateTime } from "@/lib/format";
 import { REGISTRATION_OPTIONS } from "../constants";
 
@@ -18,7 +14,7 @@ type FineTuningSummaryProps = {
   baseVersion?: ModelVersion;
   baseModel?: Model;
   targetModel?: Model;
-  inputVersion?: ModelDevInputVersion;
+  inputVersion?: DatasetVersion;
   readiness?: FineTuningReadiness;
 };
 
@@ -58,7 +54,9 @@ export default function FineTuningSummary({
     { label: "模型最大序列长度", value: readiness?.context_limit || "-" },
     {
       label: "数据集版本",
-      value: inputVersion ? formatModelDevInputVersion(inputVersion) : values.dataset || "-",
+      value: inputVersion
+        ? `版本 ${inputVersion.version_number} · ${inputVersion.input_version_id}`
+        : values.dataset || "-",
     },
     {
       label: "训练结果登记",

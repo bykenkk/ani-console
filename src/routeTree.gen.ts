@@ -17,6 +17,8 @@ import { Route as AuthenticatedVncRouteImport } from './routes/_authenticated/vn
 import { Route as LoginIndexRouteImport } from './routes/login.index'
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated/_app/index'
 import { Route as AuthenticatedAppAiApiKeysIndexRouteImport } from './routes/_authenticated/_app/ai-api-keys/index'
+import { Route as AuthenticatedAppAiDatasetsIndexRouteImport } from './routes/_authenticated/_app/ai-datasets/index'
+import { Route as AuthenticatedAppAiDatasetsDatasetIdRouteImport } from './routes/_authenticated/_app/ai-datasets/$datasetId'
 import { Route as AuthenticatedAppAiFinetuningIndexRouteImport } from './routes/_authenticated/_app/ai-finetuning/index'
 import { Route as AuthenticatedAppAiFinetuningExecutionIdRouteImport } from './routes/_authenticated/_app/ai-finetuning/$executionId'
 import { Route as AuthenticatedAppAiInferencePoliciesIndexRouteImport } from './routes/_authenticated/_app/ai-inference-policies/index'
@@ -104,6 +106,18 @@ const AuthenticatedAppAiApiKeysIndexRoute =
   AuthenticatedAppAiApiKeysIndexRouteImport.update({
     id: '/ai-api-keys/',
     path: '/ai-api-keys/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppAiDatasetsIndexRoute =
+  AuthenticatedAppAiDatasetsIndexRouteImport.update({
+    id: '/ai-datasets/',
+    path: '/ai-datasets/',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppAiDatasetsDatasetIdRoute =
+  AuthenticatedAppAiDatasetsDatasetIdRouteImport.update({
+    id: '/ai-datasets/$datasetId',
+    path: '/ai-datasets/$datasetId',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppAiFinetuningIndexRoute =
@@ -405,6 +419,7 @@ export interface FileRoutesByFullPath {
   '/terminal': typeof AuthenticatedTerminalRoute
   '/vnc': typeof AuthenticatedVncRoute
   '/login/': typeof LoginIndexRoute
+  '/ai-datasets/$datasetId': typeof AuthenticatedAppAiDatasetsDatasetIdRoute
   '/ai-finetuning/$executionId': typeof AuthenticatedAppAiFinetuningExecutionIdRoute
   '/ai-inference-policies/$policyId': typeof AuthenticatedAppAiInferencePoliciesPolicyIdRoute
   '/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
@@ -427,6 +442,7 @@ export interface FileRoutesByFullPath {
   '/volumes/$volumeId': typeof AuthenticatedAppVolumesVolumeIdRoute
   '/vpcs/$vpcId': typeof AuthenticatedAppVpcsVpcIdRoute
   '/ai-api-keys/': typeof AuthenticatedAppAiApiKeysIndexRoute
+  '/ai-datasets/': typeof AuthenticatedAppAiDatasetsIndexRoute
   '/ai-finetuning/': typeof AuthenticatedAppAiFinetuningIndexRoute
   '/ai-inference-policies/': typeof AuthenticatedAppAiInferencePoliciesIndexRoute
   '/ai-inference/': typeof AuthenticatedAppAiInferenceIndexRoute
@@ -461,6 +477,7 @@ export interface FileRoutesByTo {
   '/terminal': typeof AuthenticatedTerminalRoute
   '/vnc': typeof AuthenticatedVncRoute
   '/login': typeof LoginIndexRoute
+  '/ai-datasets/$datasetId': typeof AuthenticatedAppAiDatasetsDatasetIdRoute
   '/ai-finetuning/$executionId': typeof AuthenticatedAppAiFinetuningExecutionIdRoute
   '/ai-inference-policies/$policyId': typeof AuthenticatedAppAiInferencePoliciesPolicyIdRoute
   '/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
@@ -482,6 +499,7 @@ export interface FileRoutesByTo {
   '/volumes/$volumeId': typeof AuthenticatedAppVolumesVolumeIdRoute
   '/vpcs/$vpcId': typeof AuthenticatedAppVpcsVpcIdRoute
   '/ai-api-keys': typeof AuthenticatedAppAiApiKeysIndexRoute
+  '/ai-datasets': typeof AuthenticatedAppAiDatasetsIndexRoute
   '/ai-finetuning': typeof AuthenticatedAppAiFinetuningIndexRoute
   '/ai-inference-policies': typeof AuthenticatedAppAiInferencePoliciesIndexRoute
   '/ai-inference': typeof AuthenticatedAppAiInferenceIndexRoute
@@ -520,6 +538,7 @@ export interface FileRoutesById {
   '/_authenticated/vnc': typeof AuthenticatedVncRoute
   '/login/': typeof LoginIndexRoute
   '/_authenticated/_app/': typeof AuthenticatedAppIndexRoute
+  '/_authenticated/_app/ai-datasets/$datasetId': typeof AuthenticatedAppAiDatasetsDatasetIdRoute
   '/_authenticated/_app/ai-finetuning/$executionId': typeof AuthenticatedAppAiFinetuningExecutionIdRoute
   '/_authenticated/_app/ai-inference-policies/$policyId': typeof AuthenticatedAppAiInferencePoliciesPolicyIdRoute
   '/_authenticated/_app/ai-inference/$serviceId': typeof AuthenticatedAppAiInferenceServiceIdRoute
@@ -542,6 +561,7 @@ export interface FileRoutesById {
   '/_authenticated/_app/volumes/$volumeId': typeof AuthenticatedAppVolumesVolumeIdRoute
   '/_authenticated/_app/vpcs/$vpcId': typeof AuthenticatedAppVpcsVpcIdRoute
   '/_authenticated/_app/ai-api-keys/': typeof AuthenticatedAppAiApiKeysIndexRoute
+  '/_authenticated/_app/ai-datasets/': typeof AuthenticatedAppAiDatasetsIndexRoute
   '/_authenticated/_app/ai-finetuning/': typeof AuthenticatedAppAiFinetuningIndexRoute
   '/_authenticated/_app/ai-inference-policies/': typeof AuthenticatedAppAiInferencePoliciesIndexRoute
   '/_authenticated/_app/ai-inference/': typeof AuthenticatedAppAiInferenceIndexRoute
@@ -579,6 +599,7 @@ export interface FileRouteTypes {
     | '/terminal'
     | '/vnc'
     | '/login/'
+    | '/ai-datasets/$datasetId'
     | '/ai-finetuning/$executionId'
     | '/ai-inference-policies/$policyId'
     | '/ai-inference/$serviceId'
@@ -601,6 +622,7 @@ export interface FileRouteTypes {
     | '/volumes/$volumeId'
     | '/vpcs/$vpcId'
     | '/ai-api-keys/'
+    | '/ai-datasets/'
     | '/ai-finetuning/'
     | '/ai-inference-policies/'
     | '/ai-inference/'
@@ -635,6 +657,7 @@ export interface FileRouteTypes {
     | '/terminal'
     | '/vnc'
     | '/login'
+    | '/ai-datasets/$datasetId'
     | '/ai-finetuning/$executionId'
     | '/ai-inference-policies/$policyId'
     | '/ai-inference/$serviceId'
@@ -656,6 +679,7 @@ export interface FileRouteTypes {
     | '/volumes/$volumeId'
     | '/vpcs/$vpcId'
     | '/ai-api-keys'
+    | '/ai-datasets'
     | '/ai-finetuning'
     | '/ai-inference-policies'
     | '/ai-inference'
@@ -693,6 +717,7 @@ export interface FileRouteTypes {
     | '/_authenticated/vnc'
     | '/login/'
     | '/_authenticated/_app/'
+    | '/_authenticated/_app/ai-datasets/$datasetId'
     | '/_authenticated/_app/ai-finetuning/$executionId'
     | '/_authenticated/_app/ai-inference-policies/$policyId'
     | '/_authenticated/_app/ai-inference/$serviceId'
@@ -715,6 +740,7 @@ export interface FileRouteTypes {
     | '/_authenticated/_app/volumes/$volumeId'
     | '/_authenticated/_app/vpcs/$vpcId'
     | '/_authenticated/_app/ai-api-keys/'
+    | '/_authenticated/_app/ai-datasets/'
     | '/_authenticated/_app/ai-finetuning/'
     | '/_authenticated/_app/ai-inference-policies/'
     | '/_authenticated/_app/ai-inference/'
@@ -806,6 +832,20 @@ declare module '@tanstack/react-router' {
       path: '/ai-api-keys'
       fullPath: '/ai-api-keys/'
       preLoaderRoute: typeof AuthenticatedAppAiApiKeysIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/ai-datasets/': {
+      id: '/_authenticated/_app/ai-datasets/'
+      path: '/ai-datasets'
+      fullPath: '/ai-datasets/'
+      preLoaderRoute: typeof AuthenticatedAppAiDatasetsIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/_app/ai-datasets/$datasetId': {
+      id: '/_authenticated/_app/ai-datasets/$datasetId'
+      path: '/ai-datasets/$datasetId'
+      fullPath: '/ai-datasets/$datasetId'
+      preLoaderRoute: typeof AuthenticatedAppAiDatasetsDatasetIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/_app/ai-finetuning/': {
@@ -1171,6 +1211,7 @@ const AuthenticatedAppObjectsBucketIdRouteWithChildren =
 
 interface AuthenticatedAppRouteChildren {
   AuthenticatedAppIndexRoute: typeof AuthenticatedAppIndexRoute
+  AuthenticatedAppAiDatasetsDatasetIdRoute: typeof AuthenticatedAppAiDatasetsDatasetIdRoute
   AuthenticatedAppAiFinetuningExecutionIdRoute: typeof AuthenticatedAppAiFinetuningExecutionIdRoute
   AuthenticatedAppAiInferencePoliciesPolicyIdRoute: typeof AuthenticatedAppAiInferencePoliciesPolicyIdRoute
   AuthenticatedAppAiInferenceServiceIdRoute: typeof AuthenticatedAppAiInferenceServiceIdRoute
@@ -1193,6 +1234,7 @@ interface AuthenticatedAppRouteChildren {
   AuthenticatedAppVolumesVolumeIdRoute: typeof AuthenticatedAppVolumesVolumeIdRoute
   AuthenticatedAppVpcsVpcIdRoute: typeof AuthenticatedAppVpcsVpcIdRoute
   AuthenticatedAppAiApiKeysIndexRoute: typeof AuthenticatedAppAiApiKeysIndexRoute
+  AuthenticatedAppAiDatasetsIndexRoute: typeof AuthenticatedAppAiDatasetsIndexRoute
   AuthenticatedAppAiFinetuningIndexRoute: typeof AuthenticatedAppAiFinetuningIndexRoute
   AuthenticatedAppAiInferencePoliciesIndexRoute: typeof AuthenticatedAppAiInferencePoliciesIndexRoute
   AuthenticatedAppAiInferenceIndexRoute: typeof AuthenticatedAppAiInferenceIndexRoute
@@ -1224,6 +1266,8 @@ interface AuthenticatedAppRouteChildren {
 
 const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppIndexRoute: AuthenticatedAppIndexRoute,
+  AuthenticatedAppAiDatasetsDatasetIdRoute:
+    AuthenticatedAppAiDatasetsDatasetIdRoute,
   AuthenticatedAppAiFinetuningExecutionIdRoute:
     AuthenticatedAppAiFinetuningExecutionIdRoute,
   AuthenticatedAppAiInferencePoliciesPolicyIdRoute:
@@ -1259,6 +1303,7 @@ const AuthenticatedAppRouteChildren: AuthenticatedAppRouteChildren = {
   AuthenticatedAppVolumesVolumeIdRoute: AuthenticatedAppVolumesVolumeIdRoute,
   AuthenticatedAppVpcsVpcIdRoute: AuthenticatedAppVpcsVpcIdRoute,
   AuthenticatedAppAiApiKeysIndexRoute: AuthenticatedAppAiApiKeysIndexRoute,
+  AuthenticatedAppAiDatasetsIndexRoute: AuthenticatedAppAiDatasetsIndexRoute,
   AuthenticatedAppAiFinetuningIndexRoute:
     AuthenticatedAppAiFinetuningIndexRoute,
   AuthenticatedAppAiInferencePoliciesIndexRoute:
