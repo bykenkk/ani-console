@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button, Modal } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { deleteVmSnapshot, listVmSnapshots, type VirtualMachine, type VmSnapshot } from "@/api/vms";
-import { DataTable, ResourceNameId, StatusBadge, type RowAction } from "@/components/common";
+import { DataTable, ResourceIdentity, StatusBadge, type RowAction } from "@/components/common";
 import VmCreateSnapshotModal from "@/components/vms/VmCreateSnapshotModal";
 import VmRestoreSnapshotModal from "@/components/vms/VmRestoreSnapshotModal";
 import VmSnapshotDetailModal from "@/components/vms/VmSnapshotDetailModal";
@@ -83,7 +83,7 @@ export default function VmSnapshots({ vm }: VmSnapshotsProps) {
             width: 200,
             fixed: "left",
             render: (_, snapshot) => (
-              <ResourceNameId
+              <ResourceIdentity
                 name={snapshot.name || "-"}
                 id={snapshot.snapshotId}
                 openable={false}

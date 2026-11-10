@@ -5,7 +5,7 @@ import { useListPagination } from "@/hooks/useListPagination";
 import { useStorageVolumeActions } from "@/hooks/useStorageVolumeActions";
 import CreateStorageVolumeModal from "@/components/volumes/CreateStorageVolumeModal";
 import {
-  ResourceNameId,
+  ResourceIdentity,
   ListPageFrame,
   ListDataTable,
   StatusBadge,
@@ -40,7 +40,7 @@ export default function VolumesPage() {
       width: 200,
       fixed: "left",
       render: (_, item) => (
-        <ResourceNameId name={item.display_name} id={item.pvc_name} type="volume" />
+        <ResourceIdentity name={item.display_name} id={item.pvc_name} type="volume" />
       ),
     },
     {

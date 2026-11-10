@@ -3,7 +3,12 @@ import { useSubnetActions } from "@/hooks/useSubnetActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { getNetworkSubnet, type NetworkSubnet } from "@/api/network";
-import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
+import {
+  AliIcon,
+  DetailPageFrame,
+  DetailPagePlaceholder,
+  ResourceIdentity,
+} from "@/components/common";
 import { withId } from "@/lib/id";
 
 import { useQuery } from "@tanstack/react-query";
@@ -55,10 +60,10 @@ export default function SubnetDetailPage({ subnetId, tab, onTabChange }: SubnetD
           key: "basic",
           title: "基本信息",
           fields: [
-            { label: "ID", value: <ResourceId value={subnet.id} /> },
+            { label: "ID", value: <ResourceIdentity display="id" id={subnet.id} /> },
             {
               label: "VPC",
-              value: <ResourceId value={subnet.vpc_id} />,
+              value: <ResourceIdentity display="id" id={subnet.vpc_id} />,
             },
             { label: "CIDR", value: subnet.cidr || "-" },
             { label: "网关", value: subnet.gateway || "-" },

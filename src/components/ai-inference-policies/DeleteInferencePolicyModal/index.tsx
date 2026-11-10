@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Modal } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteInferencePolicy, type InferencePolicy } from "@/api/inference-policies";
-import { ResourceNameId } from "@/components/common";
+import { ResourceIdentity } from "@/components/common";
 import { withId } from "@/lib/id";
 
 type DeleteInferencePolicyModalProps = {
@@ -69,7 +69,7 @@ export default function DeleteInferencePolicyModal({
       cancelButtonProps={{ disabled: remove.isPending }}
     >
       <div className="flex w-full flex-col gap-4">
-        <ResourceNameId name={policy.name} id={policy.id} openable={false} />
+        <ResourceIdentity name={policy.name} id={policy.id} openable={false} />
         <div>删除后不可恢复。仍被 API Key 绑定的策略无法删除。</div>
       </div>
     </Modal>

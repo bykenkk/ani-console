@@ -1,6 +1,6 @@
 import { Card, Descriptions, Empty } from "@arco-design/web-react";
 import type { ModelDevExecutionDetail } from "@/api/modeldev";
-import { ResourceId } from "@/components/common";
+import { ResourceIdentity } from "@/components/common";
 
 type ModelDevFineTuningConfigurationProps = {
   baseModel: ModelDevExecutionDetail["base_model"];
@@ -51,8 +51,14 @@ export default function ModelDevFineTuningConfiguration({
           <Descriptions
             column={1}
             data={[
-              { label: "模型 ID", value: <ResourceId value={baseModel.model_id} /> },
-              { label: "版本 ID", value: <ResourceId value={baseModel.version_id} /> },
+              {
+                label: "模型 ID",
+                value: <ResourceIdentity display="id" id={baseModel.model_id} />,
+              },
+              {
+                label: "版本 ID",
+                value: <ResourceIdentity display="id" id={baseModel.version_id} />,
+              },
               { label: "模型族", value: baseModel.family || "-" },
               { label: "权重格式", value: baseModel.format || "-" },
             ]}

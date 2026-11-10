@@ -5,7 +5,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useVpcActions } from "@/hooks/useVpcActions";
 import { useState } from "react";
 import { listNetworkVpcs, type NetworkVPC, type NetworkResourceStateFilter } from "@/api/network";
-import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
+import {
+  ResourceIdentity,
+  ListPageFrame,
+  type ListColumn,
+  ListDataTable,
+} from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import CreateVpcModal from "../CreateVpcModal";
 import BindVpcEipModal from "../BindVpcEipModal";
@@ -49,7 +54,7 @@ export default function VpcsPage() {
       width: 200,
       fixed: "left",
       render: (_, vpc) => (
-        <ResourceNameId
+        <ResourceIdentity
           name={vpc.name}
           id={vpc.id}
           type="vpc"

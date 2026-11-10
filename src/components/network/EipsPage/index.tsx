@@ -4,8 +4,7 @@ import { listNetworkEips, type NetworkEip, type NetworkResourceStateFilter } fro
 import {
   ListPageFrame,
   ListDataTable,
-  ResourceNameId,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
   type ListColumn,
 } from "@/components/common";
@@ -45,13 +44,13 @@ export default function EipsPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => <ResourceNameId name={item.name} id={item.id} openable={false} />,
+      render: (_, item) => <ResourceIdentity name={item.name} id={item.id} openable={false} />,
     },
     {
       key: "address",
       title: "IP 地址",
       dataIndex: "address",
-      render: (_, item) => <ResourceId value={item.address} />,
+      render: (_, item) => <ResourceIdentity display="id" id={item.address} />,
       ellipsis: true,
       width: 180,
     },

@@ -14,7 +14,7 @@ import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
   type DetailCard,
 } from "@/components/common";
@@ -64,7 +64,7 @@ export default function ModelDetailPage({ modelId, tab, onTabChange }: ModelDeta
       key: "basic",
       title: "基本信息",
       fields: [
-        { label: "ID", value: <ResourceId value={item.id} /> },
+        { label: "ID", value: <ResourceIdentity display="id" id={item.id} /> },
         { label: "来源", value: MODEL_SOURCE_LABELS[item.source ?? ""] ?? item.source ?? "-" },
         {
           label: "任务",

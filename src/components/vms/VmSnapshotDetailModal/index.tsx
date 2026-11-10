@@ -1,7 +1,7 @@
 import { Button, Descriptions, Empty, Modal, Space, Spin } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { getVmSnapshot } from "@/api/vms";
-import { DataTable, ResourceId, StatusBadge } from "@/components/common";
+import { DataTable, ResourceIdentity, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
 
@@ -40,8 +40,11 @@ export default function VmSnapshotDetailModal({
               column={1}
               data={[
                 { label: "名称", value: snapshot.name || "-" },
-                { label: "ID", value: <ResourceId value={snapshot.snapshotId} /> },
-                { label: "来源 VM", value: <ResourceId value={snapshot.sourceVmId} /> },
+                { label: "ID", value: <ResourceIdentity display="id" id={snapshot.snapshotId} /> },
+                {
+                  label: "来源 VM",
+                  value: <ResourceIdentity display="id" id={snapshot.sourceVmId} />,
+                },
                 { label: "来源 VM UID", value: snapshot.sourceVmUid || "-" },
                 {
                   label: "状态",

@@ -3,7 +3,12 @@ import { useVpcActions } from "@/hooks/useVpcActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { withId } from "@/lib/id";
-import { DetailPageFrame, DetailPagePlaceholder, AliIcon, ResourceId } from "@/components/common";
+import {
+  DetailPageFrame,
+  DetailPagePlaceholder,
+  AliIcon,
+  ResourceIdentity,
+} from "@/components/common";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -57,7 +62,7 @@ export default function VpcDetailPage({ vpcId, tab, onTabChange }: VpcDetailPage
             key: "basic",
             title: "基本信息",
             fields: [
-              { label: "ID", value: <ResourceId value={vpc.id} /> },
+              { label: "ID", value: <ResourceIdentity display="id" id={vpc.id} /> },
               { label: "CIDR", value: vpc.cidr || "-" },
               {
                 label: "公网 IP",

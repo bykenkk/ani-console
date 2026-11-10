@@ -1,5 +1,5 @@
 import { listNetworkVpcAssociatedInstances, type NetworkAssociatedInstance } from "@/api/network";
-import { DataTable, ResourceNameId, StatusBadge, type ListColumn } from "@/components/common";
+import { DataTable, ResourceIdentity, StatusBadge, type ListColumn } from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { withId } from "@/lib/id";
 import { Tag } from "@arco-design/web-react";
@@ -21,7 +21,7 @@ const columns: Array<ListColumn<NetworkAssociatedInstance>> = [
     ellipsis: true,
     fixed: "left",
     render: (_, item) => (
-      <ResourceNameId name={item.consumer_name || "-"} id={item.consumer_id} openable={false} />
+      <ResourceIdentity name={item.consumer_name || "-"} id={item.consumer_id} openable={false} />
     ),
   },
   {

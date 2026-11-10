@@ -5,7 +5,7 @@ import { listVmImages, type VmImage, type VmImageKind, type VmImageState } from 
 import {
   ListDataTable,
   ListPageFrame,
-  ResourceNameId,
+  ResourceIdentity,
   StatusBadge,
   type ListColumn,
 } from "@/components/common";
@@ -60,7 +60,7 @@ export default function VmImagesPage() {
       width: 200,
       fixed: "left",
       render: (_, image) => (
-        <ResourceNameId name={image.name} id={image.imageId} openable={false} />
+        <ResourceIdentity name={image.name} id={image.imageId} openable={false} />
       ),
     },
     {

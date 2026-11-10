@@ -6,7 +6,7 @@ import {
   DetailPageFrame,
   DetailPagePlaceholder,
   AliIcon,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
 } from "@/components/common";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
@@ -68,7 +68,7 @@ export default function SecurityGroupDetailPage({
             key: "basic",
             title: "基本信息",
             fields: [
-              { label: "ID", value: <ResourceId value={securityGroup.id} /> },
+              { label: "ID", value: <ResourceIdentity display="id" id={securityGroup.id} /> },
               { label: "配置版本", value: securityGroup.version },
               { label: "描述", value: securityGroup.description || "-" },
               {

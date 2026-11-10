@@ -10,7 +10,12 @@ import {
 } from "@/api/images";
 import { ApiError } from "@/api/request";
 import type { ListPagination } from "@/components/common/DataTable";
-import { ListPageFrame, ListDataTable, ResourceNameId, type ListColumn } from "@/components/common";
+import {
+  ListPageFrame,
+  ListDataTable,
+  ResourceIdentity,
+  type ListColumn,
+} from "@/components/common";
 import { copyToClipboard } from "@/lib/clipboard";
 import { formatDateTime } from "@/lib/format";
 import { IMAGE_ACCELERATORS, IMAGE_PURPOSES } from "../options";
@@ -140,7 +145,7 @@ export default function ContainerImagesPage() {
       fixed: "left",
       width: 200,
       render: (_, image) => (
-        <ResourceNameId name={image.displayName} id={image.image_id} openable={false} />
+        <ResourceIdentity name={image.displayName} id={image.image_id} openable={false} />
       ),
     },
     { key: "repository", title: "仓库", dataIndex: "repository", ellipsis: true, width: 180 },

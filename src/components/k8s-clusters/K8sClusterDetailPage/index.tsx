@@ -6,7 +6,7 @@ import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
   type RowAction,
 } from "@/components/common";
@@ -102,7 +102,7 @@ export default function K8sClusterDetailPage({
           key: "basic",
           title: "基本信息",
           fields: [
-            { label: "ID", value: <ResourceId value={cluster.id ?? clusterId} /> },
+            { label: "ID", value: <ResourceIdentity display="id" id={cluster.id ?? clusterId} /> },
             { label: "区域", value: "-" },
             { label: "K8s 版本", value: cluster.version ?? "-" },
             { label: "节点数", value: nodeCount },

@@ -1,6 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { getModelDevExecution } from "@/api/modeldev";
-import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
+import {
+  AliIcon,
+  DetailPageFrame,
+  DetailPagePlaceholder,
+  ResourceIdentity,
+} from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import ModelDevExecutionPipeline from "@/components/modeldev/ModelDevExecutionPipeline";
 import ModelDevTrainingMetrics from "@/components/modeldev/ModelDevTrainingMetrics";
@@ -54,21 +59,24 @@ export default function FineTuningTaskDetailPage({
           key: "basic",
           title: "基本信息",
           fields: [
-            { label: "ID", value: <ResourceId value={task.execution_id} /> },
+            { label: "ID", value: <ResourceIdentity display="id" id={task.execution_id} /> },
             { label: "训练阶段", value: task.managed_settings?.stage || "-" },
             { label: "微调方法", value: task.managed_settings?.finetuning_type || "-" },
             {
               label: "微调实现",
-              value: <ResourceId value={task.implementation_id} />,
+              value: <ResourceIdentity display="id" id={task.implementation_id} />,
             },
-            { label: "算力规格", value: <ResourceId value={task.compute_preset_id} /> },
+            {
+              label: "算力规格",
+              value: <ResourceIdentity display="id" id={task.compute_preset_id} />,
+            },
             {
               label: "数据集版本",
-              value: <ResourceId value={task.input_version_id} />,
+              value: <ResourceIdentity display="id" id={task.input_version_id} />,
             },
             {
               label: "镜像版本",
-              value: <ResourceId value={task.image_version_id} />,
+              value: <ResourceIdentity display="id" id={task.image_version_id} />,
             },
             { label: "当前阶段", value: task.current_step || "-" },
             { label: "停止已请求", value: task.stop_requested ? "是" : "否" },
@@ -84,11 +92,11 @@ export default function FineTuningTaskDetailPage({
           fields: [
             {
               label: "模型 ID",
-              value: <ResourceId value={task.base_model?.model_id} />,
+              value: <ResourceIdentity display="id" id={task.base_model?.model_id} />,
             },
             {
               label: "版本 ID",
-              value: <ResourceId value={task.base_model?.version_id} />,
+              value: <ResourceIdentity display="id" id={task.base_model?.version_id} />,
             },
             { label: "模型族", value: task.base_model?.family || "-" },
             { label: "权重格式", value: task.base_model?.format || "-" },

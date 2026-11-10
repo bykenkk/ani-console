@@ -3,7 +3,7 @@ import { Button, Select, Space } from "@arco-design/web-react";
 import { useState } from "react";
 import { IconCopy } from "@arco-design/web-react/icon";
 import { listModelVersions, type ModelVersion, type ModelVersionStatus } from "@/api/models";
-import { DataTable, ResourceNameId, StatusBadge } from "@/components/common";
+import { DataTable, ResourceIdentity, StatusBadge } from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { copyToClipboard } from "@/lib/clipboard";
 import { formatBytes, formatDateTime } from "@/lib/format";
@@ -68,7 +68,7 @@ export default function ModelVersions({ modelId }: ModelVersionsProps) {
           title: "版本 / ID",
           width: 200,
           fixed: "left",
-          render: (_, version) => <ResourceNameId name={version.version} id={version.id} />,
+          render: (_, version) => <ResourceIdentity name={version.version} id={version.id} />,
         },
         {
           title: "状态",

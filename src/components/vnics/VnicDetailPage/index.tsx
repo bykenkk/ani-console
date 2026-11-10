@@ -5,7 +5,7 @@ import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
 } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
@@ -40,7 +40,7 @@ export default function VnicDetailPage({ vnicId }: VnicDetailPageProps) {
             key: "basic",
             title: "基本信息",
             fields: [
-              { label: "ID", value: <ResourceId value={vnic.id} /> },
+              { label: "ID", value: <ResourceIdentity display="id" id={vnic.id} /> },
               { label: "描述", value: vnic.description || "-" },
               {
                 label: "VPC",

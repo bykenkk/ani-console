@@ -4,7 +4,7 @@ import { listInferenceServices, type InferenceService } from "@/api/inference";
 import { useInferenceActions } from "@/hooks/useInferenceActions";
 import type { ListPagination } from "@/components/common/DataTable";
 import {
-  ResourceNameId,
+  ResourceIdentity,
   ListPageFrame,
   type ListColumn,
   ListDataTable,
@@ -58,7 +58,7 @@ export default function InferencePage() {
       width: 200,
       fixed: "left",
       render: (_, item) => (
-        <ResourceNameId name={item.name} id={item.id} type="inference-service" />
+        <ResourceIdentity name={item.name} id={item.id} type="inference-service" />
       ),
     },
     {

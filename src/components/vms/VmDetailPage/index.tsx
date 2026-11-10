@@ -5,7 +5,7 @@ import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
 } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
@@ -75,7 +75,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
             key: "basic",
             title: "基本信息",
             fields: [
-              { label: "ID", value: <ResourceId value={vm.id} /> },
+              { label: "ID", value: <ResourceIdentity display="id" id={vm.id} /> },
               {
                 label: "规格",
                 value: <span title={vm.presetName}>{vm.presetName || "-"}</span>,

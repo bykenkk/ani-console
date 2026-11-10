@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listVms, type VirtualMachine, type VmStateFilter } from "@/api/vms";
 import {
-  ResourceNameId,
+  ResourceIdentity,
   ListPageFrame,
   ListDataTable,
   StatusBadge,
@@ -46,7 +46,7 @@ export default function VmsPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, vm) => <ResourceNameId type="vm-instance" name={vm.name} id={vm.id} />,
+      render: (_, vm) => <ResourceIdentity type="vm-instance" name={vm.name} id={vm.id} />,
     },
     {
       key: "state",

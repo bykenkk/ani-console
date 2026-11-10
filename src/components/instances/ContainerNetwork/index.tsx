@@ -1,5 +1,5 @@
 import { Descriptions } from "@arco-design/web-react";
-import { ResourceId } from "@/components/common";
+import { ResourceIdentity } from "@/components/common";
 import type { InstanceConfigurationData, InstanceRecord } from "@/api/instances";
 import ContainerNetworkInterfaces from "../ContainerNetworkInterfaces";
 
@@ -20,11 +20,11 @@ export default function ContainerNetwork({ configuration, instance }: ContainerN
         data={[
           {
             label: "VPC",
-            value: <ResourceId value={configuration?.network?.vpc_id} />,
+            value: <ResourceIdentity display="id" id={configuration?.network?.vpc_id} />,
           },
           {
             label: "子网",
-            value: <ResourceId value={configuration?.network?.subnet_id} />,
+            value: <ResourceIdentity display="id" id={configuration?.network?.subnet_id} />,
           },
           // FIXME(instance-network-address): Pod IP 不等价于私网 IP 或访问地址；当前契约没有返回这两个字段。
           // TODO(instance-network-address): 保留字段位置，待 Governance 开放等价数据后接入。

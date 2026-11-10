@@ -6,7 +6,7 @@ import { listNetworkVnics, type NetworkVnic } from "@/api/network";
 import {
   ListPageFrame,
   ListDataTable,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
   SubnetSelect,
   type ListColumn,
@@ -52,7 +52,7 @@ export default function VnicsPage() {
           <Link to="/vnics/$vnicId" params={{ vnicId: item.id }} className="truncate">
             {item.name}
           </Link>
-          <ResourceId value={item.id} />
+          <ResourceIdentity display="id" id={item.id} />
         </div>
       ),
     },

@@ -8,7 +8,7 @@ import { listVectorStores, type VectorStore } from "@/api/storage/vector-stores"
 
 import CreateVectorStoreModal from "@/components/vector-stores/CreateVectorStoreModal";
 import {
-  ResourceNameId,
+  ResourceIdentity,
   ListPageFrame,
   type ListColumn,
   StatusBadge,
@@ -61,7 +61,7 @@ export default function VectorStoresPage() {
       fixed: "left",
       // TODO(feature-visibility): 待向量存储支持后移除 openable={false}，恢复资源名称跳转。
       render: (_, item) => (
-        <ResourceNameId name={item.name} id={item.id} type="vector-store" openable={false} />
+        <ResourceIdentity name={item.name} id={item.id} type="vector-store" openable={false} />
       ),
     },
     {

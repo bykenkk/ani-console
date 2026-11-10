@@ -1,5 +1,5 @@
 import { createElement } from "react";
-import { ResourceNameId, type ListColumn } from "@/components/common";
+import { ResourceIdentity, type ListColumn } from "@/components/common";
 import type { ModelDevExecution } from "@/api/modeldev";
 import { formatDateTime } from "@/lib/date";
 import { formatModelDevComputeResources, formatModelDevExecutionDuration } from "@/lib/modeldev";
@@ -12,7 +12,7 @@ export function taskColumns(): ListColumn<ModelDevExecution>[] {
       width: 200,
       fixed: "left",
       render: (_, task) =>
-        createElement(ResourceNameId, {
+        createElement(ResourceIdentity, {
           name: task.name,
           id: task.execution_id,
           type: "training-task",

@@ -5,7 +5,12 @@ import {
   type StorageBucketRecord,
   type StorageBucketStats,
 } from "@/api/storage/buckets";
-import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
+import {
+  ResourceIdentity,
+  ListPageFrame,
+  type ListColumn,
+  ListDataTable,
+} from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { useStorageBucketActions } from "@/hooks/useStorageBucketActions";
 import CreateBucketModal from "@/components/objects/CreateBucketModal";
@@ -39,7 +44,7 @@ export default function ObjectsPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="bucket" />,
+      render: (_, item) => <ResourceIdentity name={item.name} id={item.id} type="bucket" />,
     },
     { key: "acl", dataIndex: "acl", title: "权限", width: 100 },
     { key: "storageClass", dataIndex: "storage_class", title: "存储类型", width: 100 },

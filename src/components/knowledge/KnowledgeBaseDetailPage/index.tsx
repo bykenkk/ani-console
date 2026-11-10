@@ -11,7 +11,7 @@ import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
 } from "@/components/common";
 import KnowledgeChat from "@/components/knowledge/KnowledgeChat";
@@ -75,7 +75,7 @@ export default function KnowledgeBaseDetailPage({
           key: "basic",
           title: "基本信息",
           fields: [
-            { label: "ID", value: <ResourceId value={kb.id} /> },
+            { label: "ID", value: <ResourceIdentity display="id" id={kb.id} /> },
             { label: "描述", value: kb.description || "-" },
             { label: "向量化模型", value: kb.embedding_model || "-" },
             {

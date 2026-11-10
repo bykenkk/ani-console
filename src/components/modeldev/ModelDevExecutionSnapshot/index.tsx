@@ -1,6 +1,6 @@
 import { Card, Descriptions, Table } from "@arco-design/web-react";
 import type { ModelDevExecutionDetail } from "@/api/modeldev";
-import { ResourceId } from "@/components/common";
+import { ResourceIdentity } from "@/components/common";
 import { formatDateTime } from "@/lib/date";
 import ModelDevFineTuningConfiguration from "../ModelDevFineTuningConfiguration";
 
@@ -16,7 +16,7 @@ export default function ModelDevExecutionSnapshot({ task }: ModelDevExecutionSna
         <Descriptions
           column={1}
           data={[
-            { label: "操作 ID", value: <ResourceId value={task.operation_id} /> },
+            { label: "操作 ID", value: <ResourceIdentity display="id" id={task.operation_id} /> },
             { label: "参数契约版本", value: task.parameter_contract_version || "-" },
             { label: "配置摘要", value: task.resolved_configuration_sha256 || "-" },
             { label: "算力选择摘要", value: task.compute?.selection_digest || "-" },
@@ -74,15 +74,15 @@ export default function ModelDevExecutionSnapshot({ task }: ModelDevExecutionSna
             { label: "登记状态", value: registration?.state || "无登记记录" },
             {
               label: "登记 ID",
-              value: <ResourceId value={registration?.registration_id} />,
+              value: <ResourceIdentity display="id" id={registration?.registration_id} />,
             },
             {
               label: "模型 ID",
-              value: <ResourceId value={registration?.model_id} />,
+              value: <ResourceIdentity display="id" id={registration?.model_id} />,
             },
             {
               label: "版本 ID",
-              value: <ResourceId value={registration?.model_version_id} />,
+              value: <ResourceIdentity display="id" id={registration?.model_version_id} />,
             },
             { label: "失败原因", value: registration?.failure_code || "-" },
           ]}

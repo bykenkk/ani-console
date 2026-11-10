@@ -8,7 +8,7 @@ import {
   type VirtualMachine,
   type VmDisk,
 } from "@/api/vms";
-import { DataTable, ResourceNameId, StatusBadge, type RowAction } from "@/components/common";
+import { DataTable, ResourceIdentity, StatusBadge, type RowAction } from "@/components/common";
 import VmCreateDiskModal from "@/components/vms/VmCreateDiskModal";
 import VmDetachDiskModal from "@/components/vms/VmDetachDiskModal";
 import { useVMMutation } from "@/hooks/useVMMutation";
@@ -104,7 +104,7 @@ export default function VmDisks({ vm }: VmDisksProps) {
             width: 200,
             fixed: "left",
             render: (_, disk) => (
-              <ResourceNameId name={disk.name || "-"} id={disk.diskId} openable={false} />
+              <ResourceIdentity name={disk.name || "-"} id={disk.diskId} openable={false} />
             ),
           },
           {

@@ -6,7 +6,12 @@ import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { withId } from "@/lib/id";
 import { formatBytes } from "@/lib/format";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
-import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
+import {
+  AliIcon,
+  DetailPageFrame,
+  DetailPagePlaceholder,
+  ResourceIdentity,
+} from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import VolumeConsumers from "./VolumeConsumers";
 import VolumeObservations from "./VolumeObservations";
@@ -59,8 +64,8 @@ export default function VolumeDetailPage({ volumeId, tab, onTabChange }: VolumeD
             key: "basic",
             title: "基本信息",
             fields: [
-              { label: "ID", value: <ResourceId value={volume.pvc_name} /> },
-              { label: "UID", value: <ResourceId value={volume.uid} /> },
+              { label: "ID", value: <ResourceIdentity display="id" id={volume.pvc_name} /> },
+              { label: "UID", value: <ResourceIdentity display="id" id={volume.uid} /> },
               { label: "用途", value: volume.volume_mode === "Block" ? "块设备" : "文件系统" },
               {
                 label: "容量 / 类型",

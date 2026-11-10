@@ -5,7 +5,7 @@ import { listKnowledgeBases, type KnowledgeBase } from "@/api/knowledge";
 
 import CreateKnowledgeBaseModal from "@/components/knowledge/CreateKnowledgeBaseModal";
 import {
-  ResourceNameId,
+  ResourceIdentity,
   ListPageFrame,
   type ListColumn,
   StatusBadge,
@@ -52,7 +52,7 @@ export default function KnowledgeBasesPage() {
       fixed: "left",
       // TODO(feature-visibility): 待知识库管理支持后移除 openable={false}，恢复资源名称跳转。
       render: (_, item) => (
-        <ResourceNameId name={item.name} id={item.id} type="knowledge-base" openable={false} />
+        <ResourceIdentity name={item.name} id={item.id} type="knowledge-base" openable={false} />
       ),
     },
     {

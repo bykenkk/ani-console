@@ -9,7 +9,7 @@ import {
 } from "@/api/knowledge";
 import {
   DataTable,
-  ResourceNameId,
+  ResourceIdentity,
   StatusBadge,
   type ListColumn,
   type RowAction,
@@ -172,7 +172,7 @@ export default function KnowledgeDocuments({ kbId, action }: KnowledgeDocumentsP
       title: "文档 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => <ResourceNameId name={item.file_name} id={item.id} openable={false} />,
+      render: (_, item) => <ResourceIdentity name={item.file_name} id={item.id} openable={false} />,
     },
     {
       title: "类型",

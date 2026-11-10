@@ -6,7 +6,7 @@ import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
 } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
@@ -104,7 +104,7 @@ export default function ContainerDetailPage({
             key: "basic",
             title: "基本信息",
             fields: [
-              { label: "ID", value: <ResourceId value={record.id} /> },
+              { label: "ID", value: <ResourceIdentity display="id" id={record.id} /> },
               { label: "所在节点", value: runtime.data?.pod?.nodeName ?? "-" },
               { label: "创建时间", value: formatDateTime(record.createdAt) },
               // FIXME(container-basic): 当前详情无更新时间和终止保护，不能从其他实例契约补齐。
@@ -125,11 +125,13 @@ export default function ContainerDetailPage({
               { label: "访问地址", value: "-" },
               {
                 label: "VPC",
-                value: <ResourceId value={configuration.data?.network?.vpc_id} />,
+                value: <ResourceIdentity display="id" id={configuration.data?.network?.vpc_id} />,
               },
               {
                 label: "子网",
-                value: <ResourceId value={configuration.data?.network?.subnet_id} />,
+                value: (
+                  <ResourceIdentity display="id" id={configuration.data?.network?.subnet_id} />
+                ),
               },
               { label: "更新时间", value: "-" },
               { label: "终止保护", value: "-" },

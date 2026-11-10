@@ -4,7 +4,7 @@ import { useQueries, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { listInferenceServices, type InferenceService } from "@/api/inference";
 import { getModelVersion, type Model } from "@/api/models";
-import { DataTable, ResourceNameId, StatusBadge } from "@/components/common";
+import { DataTable, ResourceIdentity, StatusBadge } from "@/components/common";
 import type { ListPagination } from "@/components/common/DataTable";
 import { formatDateTime } from "@/lib/format";
 import { withId } from "@/lib/id";
@@ -78,7 +78,7 @@ export default function ModelRelatedResources({ model }: ModelRelatedResourcesPr
             width: 200,
             fixed: "left",
             render: (_, service) => (
-              <ResourceNameId name={service.name} id={service.id} type="inference-service" />
+              <ResourceIdentity name={service.name} id={service.id} type="inference-service" />
             ),
           },
           {

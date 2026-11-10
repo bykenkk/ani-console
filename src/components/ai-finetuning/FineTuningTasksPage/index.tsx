@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { listModelDevExecutions, type ModelDevExecution } from "@/api/modeldev";
-import { ListDataTable, ListPageFrame, ResourceNameId, type ListColumn } from "@/components/common";
+import {
+  ListDataTable,
+  ListPageFrame,
+  ResourceIdentity,
+  type ListColumn,
+} from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { useTrainingTaskActions } from "@/hooks/useTrainingTaskActions";
 import { formatDateTime } from "@/lib/date";
@@ -17,7 +22,7 @@ const columns: ListColumn<ModelDevExecution>[] = [
     width: 200,
     fixed: "left",
     render: (_, task) => (
-      <ResourceNameId name={task.name} id={task.execution_id} type="finetuning-task" />
+      <ResourceIdentity name={task.name} id={task.execution_id} type="finetuning-task" />
     ),
   },
   { key: "status", title: "任务状态", dataIndex: "compute_state", width: 120, ellipsis: true },

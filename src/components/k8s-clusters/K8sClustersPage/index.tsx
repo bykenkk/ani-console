@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { getK8sClusterKubeconfig, listK8sClusters, type K8sCluster } from "@/api/k8s-clusters";
 import {
   StatusBadge,
-  ResourceNameId,
+  ResourceIdentity,
   ListPageFrame,
   type ListColumn,
   ListDataTable,
@@ -92,7 +92,7 @@ export default function K8sClustersPage() {
       width: 200,
       fixed: "left",
       render: (_, cluster) => (
-        <ResourceNameId
+        <ResourceIdentity
           name={cluster.name ?? cluster.id ?? "-"}
           id={cluster.id}
           type="k8s-cluster"

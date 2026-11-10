@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Empty, Tag } from "@arco-design/web-react";
 import { getBucketStats, type StorageBucketListResponse } from "@/api/storage/buckets";
-import { AliIcon, DetailPageFrame, ResourceId } from "@/components/common";
+import { AliIcon, DetailPageFrame, ResourceIdentity } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { useStorageBucketActions } from "@/hooks/useStorageBucketActions";
 import { formatBytes, formatDateTime } from "@/lib/format";
@@ -60,7 +60,7 @@ export default function BucketDetailPage({ bucketId, tab, onTabChange }: BucketD
             key: "basic",
             title: "基本信息",
             fields: [
-              { label: "存储桶ID", value: <ResourceId value={bucket.id} /> },
+              { label: "存储桶ID", value: <ResourceIdentity display="id" id={bucket.id} /> },
               { label: "存储桶名称", value: bucket.name },
               { label: "权限", value: cachedBucket?.acl || "-" },
               { label: "存储类型", value: cachedBucket?.storage_class || "-" },

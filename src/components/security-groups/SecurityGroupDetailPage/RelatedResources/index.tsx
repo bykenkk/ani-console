@@ -7,7 +7,7 @@ import {
   type NetworkSecurityGroupBinding,
   type NetworkSecurityGroupBindingTargetType,
 } from "@/api/network";
-import { DataTable, ResourceId, StatusBadge } from "@/components/common";
+import { DataTable, ResourceIdentity, StatusBadge } from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { withId } from "@/lib/id";
 
@@ -80,7 +80,7 @@ export default function RelatedResources({ securityGroupId }: RelatedResourcesPr
           width: 240,
           fixed: "left",
           ellipsis: true,
-          render: (_, item) => <ResourceId value={item.target_id} />,
+          render: (_, item) => <ResourceIdentity display="id" id={item.target_id} />,
         },
         { title: "资源类型", width: 120, render: (_, item) => TYPES[item.target_type] },
         {

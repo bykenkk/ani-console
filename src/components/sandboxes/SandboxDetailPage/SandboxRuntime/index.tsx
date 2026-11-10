@@ -1,6 +1,6 @@
 import { Descriptions } from "@arco-design/web-react";
 import type { Sandbox } from "@/api/sandboxes";
-import { ResourceId, StatusBadge } from "@/components/common";
+import { ResourceIdentity, StatusBadge } from "@/components/common";
 import { formatDateTime } from "@/lib/format";
 
 type SandboxRuntimeProps = { sandbox: Sandbox };
@@ -24,12 +24,12 @@ export default function SandboxRuntime({ sandbox }: SandboxRuntimeProps) {
           { label: "状态观测时间", value: formatDateTime(sandbox.observed_at) },
           {
             label: "集群 ID",
-            value: <ResourceId value={sandbox.snapshot?.cluster_id} />,
+            value: <ResourceIdentity display="id" id={sandbox.snapshot?.cluster_id} />,
           },
           { label: "命名空间", value: sandbox.snapshot?.namespace || "-" },
           { label: "RuntimeClass", value: sandbox.snapshot?.runtime_class || "-" },
           { label: "Pod 名称", value: refs?.pod_name || "-" },
-          { label: "Pod UID", value: <ResourceId value={refs?.pod_uid} /> },
+          { label: "Pod UID", value: <ResourceIdentity display="id" id={refs?.pod_uid} /> },
           { label: "Pod 资源版本", value: refs?.pod_resource_version || "-" },
         ]}
       />

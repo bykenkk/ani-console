@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { listSandboxes, type Sandbox } from "@/api/sandboxes";
 import {
-  ResourceNameId,
+  ResourceIdentity,
   ListPageFrame,
   StatusBadge,
   type ListColumn,
@@ -40,7 +40,7 @@ export default function SandboxesPage() {
       width: 200,
       fixed: "left",
       render: (_, sandbox) => (
-        <ResourceNameId
+        <ResourceIdentity
           name={sandbox.snapshot?.name || sandbox.id}
           id={sandbox.id}
           type="sandbox-instance"

@@ -7,7 +7,7 @@ import type {
   NetworkLoadBalancerListener,
   NetworkLoadBalancerListenerResource,
 } from "@/api/network";
-import { DataTable, ResourceNameId, StatusBadge } from "@/components/common";
+import { DataTable, ResourceIdentity, StatusBadge } from "@/components/common";
 import { listenerInput, loadBalancerLabel } from "@/lib/load-balancers";
 import { loadBalancerListeners } from "@/lib/load-balancers";
 
@@ -56,7 +56,7 @@ export default function LoadBalancerListeners({
             fixed: "left",
             width: 200,
             render: (_, row) => (
-              <ResourceNameId name={row.name || "-"} id={row.id} openable={false} />
+              <ResourceIdentity name={row.name || "-"} id={row.id} openable={false} />
             ),
           },
           {

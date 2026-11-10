@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { listInstances, type InstanceRecord, type ObservedState } from "@/api/instances";
 import {
   ListPageFrame,
-  ResourceNameId,
+  ResourceIdentity,
   StatusBadge,
   ListDataTable,
   type ListColumn,
@@ -64,7 +64,9 @@ export default function ContainersPage() {
       title: "名称 / ID",
       fixed: "left",
       width: 200,
-      render: (_, row) => <ResourceNameId name={row.name} id={row.id} type="container-instance" />,
+      render: (_, row) => (
+        <ResourceIdentity name={row.name} id={row.id} type="container-instance" />
+      ),
     },
     {
       key: "state",

@@ -6,7 +6,7 @@ import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
 } from "@/components/common";
 import { withId } from "@/lib/id";
@@ -60,7 +60,7 @@ export default function FilesystemDetailPage({ filesystemId }: FilesystemDetailP
             key: "basic",
             title: "基本信息",
             fields: [
-              { label: "ID", value: <ResourceId value={filesystem.id} /> },
+              { label: "ID", value: <ResourceIdentity display="id" id={filesystem.id} /> },
               { label: "协议", value: filesystem.protocol.toUpperCase() },
               {
                 label: "性能模式",

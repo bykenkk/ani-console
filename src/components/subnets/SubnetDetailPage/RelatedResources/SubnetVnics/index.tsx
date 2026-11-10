@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { listNetworkVnics } from "@/api/network";
-import { DataTable, ResourceNameId, StatusBadge } from "@/components/common";
+import { DataTable, ResourceIdentity, StatusBadge } from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { withId } from "@/lib/id";
 
@@ -28,7 +28,7 @@ export default function SubnetVnics({ subnetId }: SubnetVnicsProps) {
         {
           title: "名称 / ID",
           width: 200,
-          render: (_, vnic) => <ResourceNameId name={vnic.name} id={vnic.id} openable={false} />,
+          render: (_, vnic) => <ResourceIdentity name={vnic.name} id={vnic.id} openable={false} />,
         },
         {
           title: "分配状态",

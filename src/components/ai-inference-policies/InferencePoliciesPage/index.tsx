@@ -2,7 +2,12 @@ import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { listInferencePolicies, type InferencePolicy } from "@/api/inference-policies";
-import { ListPageFrame, ListDataTable, ResourceNameId, type ListColumn } from "@/components/common";
+import {
+  ListPageFrame,
+  ListDataTable,
+  ResourceIdentity,
+  type ListColumn,
+} from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { showMessage } from "@/lib/feedback";
 import SaveInferencePolicyModal from "../SaveInferencePolicyModal";
@@ -13,7 +18,7 @@ const columns: ListColumn<InferencePolicy>[] = [
     title: "名称 / ID",
     width: 200,
     fixed: "left",
-    render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="inference-policy" />,
+    render: (_, item) => <ResourceIdentity name={item.name} id={item.id} type="inference-policy" />,
   },
   {
     title: "授权模型",

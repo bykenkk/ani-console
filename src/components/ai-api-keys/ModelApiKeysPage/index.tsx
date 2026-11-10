@@ -2,7 +2,12 @@ import { useState } from "react";
 import { Tag } from "@arco-design/web-react";
 import { useQuery } from "@tanstack/react-query";
 import { listInferenceKeys, type InferenceKey } from "@/api/inference-keys";
-import { ListDataTable, ListPageFrame, ResourceNameId, type ListColumn } from "@/components/common";
+import {
+  ListDataTable,
+  ListPageFrame,
+  ResourceIdentity,
+  type ListColumn,
+} from "@/components/common";
 import { useListPagination } from "@/hooks/useListPagination";
 import { formatDateTime, isDateTimeExpired } from "@/lib/date";
 import { showMessage } from "@/lib/feedback";
@@ -23,7 +28,7 @@ const columns: ListColumn<InferenceKey>[] = [
     title: "名称 / ID",
     width: 200,
     fixed: "left",
-    render: (_, item) => <ResourceNameId name={item.name} id={item.id} openable={false} />,
+    render: (_, item) => <ResourceIdentity name={item.name} id={item.id} openable={false} />,
   },
   {
     title: "Key 前缀",

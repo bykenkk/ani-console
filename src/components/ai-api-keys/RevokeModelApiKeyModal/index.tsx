@@ -2,7 +2,7 @@ import { useRef } from "react";
 import { Modal, Space } from "@arco-design/web-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { revokeInferenceKey, type InferenceKey } from "@/api/inference-keys";
-import { ResourceNameId } from "@/components/common";
+import { ResourceIdentity } from "@/components/common";
 import { withId } from "@/lib/id";
 
 type RevokeModelApiKeyModalProps = {
@@ -73,7 +73,7 @@ export default function RevokeModelApiKeyModal({
       cancelButtonProps={{ disabled: revoke.isPending }}
     >
       <Space direction="vertical" size={16} className="w-full">
-        <ResourceNameId name={apiKey.name} id={apiKey.id} openable={false} />
+        <ResourceIdentity name={apiKey.name} id={apiKey.id} openable={false} />
         <div>撤销后，此 Key 将无法调用推理服务，历史记录仍会保留。</div>
       </Space>
     </Modal>

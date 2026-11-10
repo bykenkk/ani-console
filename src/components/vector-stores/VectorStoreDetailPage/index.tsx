@@ -11,7 +11,7 @@ import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
 } from "@/components/common";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
@@ -60,7 +60,7 @@ export default function VectorStoreDetailPage({
           key: "basic",
           title: "基本信息",
           fields: [
-            { label: "ID", value: <ResourceId value={store.id} /> },
+            { label: "ID", value: <ResourceIdentity display="id" id={store.id} /> },
             { label: "向量维度", value: store.dimension },
             { label: "距离度量", value: store.metric.toUpperCase() },
             { label: "向量化模型", value: store.embedding_model || "-" },

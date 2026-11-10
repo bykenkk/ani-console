@@ -6,7 +6,12 @@ import { useState } from "react";
 import { listNetworkLoadBalancers, type NetworkLoadBalancer } from "@/api/network";
 
 import CreateLoadBalancerModal from "@/components/load-balancers/CreateLoadBalancerModal";
-import { ResourceNameId, ListPageFrame, type ListColumn, ListDataTable } from "@/components/common";
+import {
+  ResourceIdentity,
+  ListPageFrame,
+  type ListColumn,
+  ListDataTable,
+} from "@/components/common";
 import { loadBalancerListeners } from "@/lib/load-balancers";
 import { formatDateTime } from "@/lib/format";
 
@@ -82,7 +87,7 @@ export default function LoadBalancersPage() {
       title: "名称 / ID",
       fixed: "left",
       width: 200,
-      render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="load-balancer" />,
+      render: (_, item) => <ResourceIdentity name={item.name} id={item.id} type="load-balancer" />,
     },
     {
       key: "state",

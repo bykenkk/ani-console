@@ -8,8 +8,7 @@ import { useState } from "react";
 import { listNetworkSubnets, type NetworkSubnet } from "@/api/network";
 
 import {
-  ResourceId,
-  ResourceNameId,
+  ResourceIdentity,
   ListPageFrame,
   type ListColumn,
   ListDataTable,
@@ -63,7 +62,7 @@ export default function SubnetsPage() {
       width: 200,
       fixed: "left",
       render: (_, subnet) => (
-        <ResourceNameId
+        <ResourceIdentity
           name={subnet.name}
           id={subnet.id}
           type="subnet"
@@ -90,7 +89,7 @@ export default function SubnetsPage() {
       title: "VPC",
       width: 200,
       ellipsis: true,
-      render: (_, subnet) => <ResourceId value={subnet.vpc_id} />,
+      render: (_, subnet) => <ResourceIdentity display="id" id={subnet.vpc_id} />,
     },
     {
       key: "cidr",

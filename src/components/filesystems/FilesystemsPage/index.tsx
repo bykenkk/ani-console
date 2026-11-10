@@ -6,7 +6,7 @@ import { listFilesystems, type StorageFilesystem } from "@/api/storage/filesyste
 import CreateFilesystemModal from "@/components/filesystems/CreateFilesystemModal";
 
 import {
-  ResourceNameId,
+  ResourceIdentity,
   ListPageFrame,
   type ListColumn,
   StatusBadge,
@@ -57,7 +57,7 @@ export default function FilesystemsPage() {
       fixed: "left",
       // TODO(feature-visibility): 待文件存储支持后移除 openable={false}，恢复资源名称跳转。
       render: (_, item) => (
-        <ResourceNameId name={item.name} id={item.id} type="filesystem" openable={false} />
+        <ResourceIdentity name={item.name} id={item.id} type="filesystem" openable={false} />
       ),
     },
     {

@@ -1,7 +1,7 @@
 import { StatusBadge } from "@/components/common";
 import { Tag } from "@arco-design/web-react";
 import { listNetworkSubnets, type NetworkSubnet } from "@/api/network";
-import { DataTable, ResourceNameId, type ListColumn } from "@/components/common";
+import { DataTable, ResourceIdentity, type ListColumn } from "@/components/common";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
 
@@ -24,7 +24,7 @@ export default function VpcRelatedSubnets({ vpcId }: VpcRelatedSubnetsProps) {
       width: 200,
       ellipsis: true,
       render: (_, resource) => (
-        <ResourceNameId
+        <ResourceIdentity
           name={resource.name || "-"}
           id={resource.id}
           openable={false}

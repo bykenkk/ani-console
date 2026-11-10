@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { InferenceService } from "@/api/inference";
 import { getModelVersion } from "@/api/models";
-import { DataTable, ResourceNameId } from "@/components/common";
+import { DataTable, ResourceIdentity } from "@/components/common";
 import { withId } from "@/lib/id";
 
 type InferenceRelatedResourcesProps = { service: InferenceService };
@@ -32,7 +32,7 @@ export default function InferenceRelatedResources({ service }: InferenceRelatedR
           title: "模型",
           width: 200,
           render: (_, item) => (
-            <ResourceNameId name={item.model.name} id={item.model.id} openable={false} />
+            <ResourceIdentity name={item.model.name} id={item.model.id} openable={false} />
           ),
         },
         { title: "版本", width: 200, render: (_, item) => item.version.version },

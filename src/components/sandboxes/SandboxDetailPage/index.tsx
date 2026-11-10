@@ -7,7 +7,7 @@ import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
 } from "@/components/common";
 import SandboxActions from "@/components/sandboxes/SandboxActions";
@@ -82,13 +82,13 @@ export default function SandboxDetailPage({
           key: "basic",
           title: "基本信息",
           fields: [
-            { label: "ID", value: <ResourceId value={sandbox.id} /> },
+            { label: "ID", value: <ResourceIdentity display="id" id={sandbox.id} /> },
             { label: "版本", value: sandbox.version },
             { label: "期望状态", value: sandbox.desired_state },
             { label: "算力规格", value: snapshot?.preset_name || snapshot?.preset_code || "-" },
             {
               label: "算力规格 ID",
-              value: <ResourceId value={snapshot?.preset_id} />,
+              value: <ResourceIdentity display="id" id={snapshot?.preset_id} />,
             },
             { label: "镜像", value: snapshot?.image_reference || "-" },
             { label: "计算类型", value: snapshot?.compute_type || "-" },

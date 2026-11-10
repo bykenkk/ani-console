@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
+import {
+  AliIcon,
+  DetailPageFrame,
+  DetailPagePlaceholder,
+  ResourceIdentity,
+} from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { getInferencePolicy } from "@/api/inference-policies";
@@ -60,7 +65,7 @@ export default function InferencePolicyDetailPage({ policyId }: InferencePolicyD
             title: "基本信息",
             fields: [
               { label: "名称", value: item.name },
-              { label: "ID", value: <ResourceId value={item.id} /> },
+              { label: "ID", value: <ResourceIdentity display="id" id={item.id} /> },
               { label: "版本", value: item.version },
             ],
           },

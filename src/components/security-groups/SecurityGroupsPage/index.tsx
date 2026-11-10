@@ -4,7 +4,7 @@ import { listNetworkSecurityGroups, type NetworkSecurityGroup } from "@/api/netw
 import { useListPagination } from "@/hooks/useListPagination";
 import { useSecurityGroupActions } from "@/hooks/useSecurityGroupActions";
 import {
-  ResourceNameId,
+  ResourceIdentity,
   ListPageFrame,
   ListDataTable,
   StatusBadge,
@@ -42,7 +42,7 @@ export default function SecurityGroupsPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="security-group" />,
+      render: (_, item) => <ResourceIdentity name={item.name} id={item.id} type="security-group" />,
     },
     {
       key: "state",

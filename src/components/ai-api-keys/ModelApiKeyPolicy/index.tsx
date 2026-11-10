@@ -1,4 +1,4 @@
-import { ResourceNameId } from "@/components/common";
+import { ResourceIdentity } from "@/components/common";
 import { getInferencePolicy } from "@/api/inference-policies";
 import { useQuery } from "@tanstack/react-query";
 import { withId } from "@/lib/id";
@@ -20,6 +20,6 @@ export default function ModelApiKeyPolicy({ policyId }: ModelApiKeyPolicyProps) 
   });
   if (!policyId) return <>未绑定策略</>;
   return (
-    <ResourceNameId name={policy.data?.name ?? policyId} id={policyId} type="inference-policy" />
+    <ResourceIdentity name={policy.data?.name ?? policyId} id={policyId} type="inference-policy" />
   );
 }

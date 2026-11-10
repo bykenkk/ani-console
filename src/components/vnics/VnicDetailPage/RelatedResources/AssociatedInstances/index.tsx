@@ -1,4 +1,4 @@
-import { DataTable, ResourceNameId } from "@/components/common";
+import { DataTable, ResourceIdentity } from "@/components/common";
 import type { NetworkVnicBinding } from "@/api/network";
 import { Tag } from "@arco-design/web-react";
 
@@ -18,7 +18,7 @@ export default function AssociatedInstances({ bindings }: AssociatedInstancesPro
           ellipsis: true,
           fixed: "left",
           render: (_, item) => (
-            <ResourceNameId
+            <ResourceIdentity
               name={item.consumer_name || "-"}
               id={item.consumer_id}
               openable={false}

@@ -9,7 +9,7 @@ import { listModels, type ModelCapability } from "@/api/models";
 
 import ImportModelModal from "./ImportModelModal";
 import {
-  ResourceNameId,
+  ResourceIdentity,
   ListPageFrame,
   StatusBadge,
   type ListColumn,
@@ -77,7 +77,7 @@ export default function ModelsPage() {
       title: "名称 / ID",
       width: 200,
       fixed: "left",
-      render: (_, item) => <ResourceNameId name={item.name} id={item.id} type="model" />,
+      render: (_, item) => <ResourceIdentity name={item.name} id={item.id} type="model" />,
     },
     {
       key: "status",

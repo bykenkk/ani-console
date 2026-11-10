@@ -3,7 +3,12 @@ import { useLoadBalancerActions } from "@/hooks/useLoadBalancerActions";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 
 import { withId } from "@/lib/id";
-import { DetailPageFrame, DetailPagePlaceholder, AliIcon, ResourceId } from "@/components/common";
+import {
+  DetailPageFrame,
+  DetailPagePlaceholder,
+  AliIcon,
+  ResourceIdentity,
+} from "@/components/common";
 import { useBackOrFallback } from "@/hooks/useBackOrFallback";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -181,7 +186,7 @@ export default function LoadBalancerDetailPage({
           key: "basic",
           title: "基本信息",
           fields: [
-            { label: "ID", value: <ResourceId value={item.id} /> },
+            { label: "ID", value: <ResourceIdentity display="id" id={item.id} /> },
             { label: "IP 地址", value: item.private_ip || "-" },
             {
               label: "类型",

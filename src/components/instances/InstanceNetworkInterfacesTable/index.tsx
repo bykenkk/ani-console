@@ -1,7 +1,7 @@
 import { Alert, Button } from "@arco-design/web-react";
 import { IconRefresh } from "@arco-design/web-react/icon";
 import type { InstanceNetworkInterface } from "@/api/network";
-import { DataTable, ResourceNameId, StatusBadge } from "@/components/common";
+import { DataTable, ResourceIdentity, StatusBadge } from "@/components/common";
 
 type InstanceNetworkInterfacesTableProps = {
   items: InstanceNetworkInterface[];
@@ -90,7 +90,7 @@ export default function InstanceNetworkInterfacesTable({
               <div className="flex min-w-0 flex-col gap-1">
                 <span>{item.slot === "primary" ? "主网卡" : item.slot}</span>
                 {item.applied.mode === "manual" && (
-                  <ResourceNameId
+                  <ResourceIdentity
                     name={item.applied.vnic_name || item.applied.vnic_id || "-"}
                     id={item.applied.vnic_id}
                     openable={false}

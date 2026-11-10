@@ -1,6 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { getModelDevExecution } from "@/api/modeldev";
-import { AliIcon, DetailPageFrame, DetailPagePlaceholder, ResourceId } from "@/components/common";
+import {
+  AliIcon,
+  DetailPageFrame,
+  DetailPagePlaceholder,
+  ResourceIdentity,
+} from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { useTrainingTaskActions } from "@/hooks/useTrainingTaskActions";
@@ -53,20 +58,23 @@ export default function TrainingTaskDetailPage({
           key: "basic",
           title: "基本信息",
           fields: [
-            { label: "ID", value: <ResourceId value={task.execution_id} /> },
+            { label: "ID", value: <ResourceIdentity display="id" id={task.execution_id} /> },
             { label: "任务类型", value: task.kind || "-" },
             {
               label: "训练实现",
-              value: <ResourceId value={task.implementation_id} />,
+              value: <ResourceIdentity display="id" id={task.implementation_id} />,
             },
-            { label: "算力规格", value: <ResourceId value={task.compute_preset_id} /> },
+            {
+              label: "算力规格",
+              value: <ResourceIdentity display="id" id={task.compute_preset_id} />,
+            },
             {
               label: "数据集版本",
-              value: <ResourceId value={task.input_version_id} />,
+              value: <ResourceIdentity display="id" id={task.input_version_id} />,
             },
             {
               label: "镜像版本",
-              value: <ResourceId value={task.image_version_id} />,
+              value: <ResourceIdentity display="id" id={task.image_version_id} />,
             },
             { label: "当前阶段", value: task.current_step || "-" },
             { label: "停止已请求", value: task.stop_requested ? "是" : "否" },

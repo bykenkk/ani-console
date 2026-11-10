@@ -1,6 +1,6 @@
 import { StatusBadge } from "@/components/common";
 import { listNetworkLoadBalancers, type NetworkLoadBalancer } from "@/api/network";
-import { DataTable, ResourceNameId, type ListColumn } from "@/components/common";
+import { DataTable, ResourceIdentity, type ListColumn } from "@/components/common";
 import { useCursorPaginatedQuery } from "@/hooks/useCursorPaginatedQuery";
 import { withId } from "@/lib/id";
 
@@ -23,7 +23,7 @@ export default function VpcRelatedLoadBalancers({ vpcId }: VpcRelatedLoadBalance
       width: 200,
       ellipsis: true,
       render: (_, resource) => (
-        <ResourceNameId name={resource.name || "-"} id={resource.id} openable={false} />
+        <ResourceIdentity name={resource.name || "-"} id={resource.id} openable={false} />
       ),
     },
     {

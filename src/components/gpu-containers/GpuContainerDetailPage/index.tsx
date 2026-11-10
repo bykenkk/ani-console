@@ -6,7 +6,7 @@ import {
   AliIcon,
   DetailPageFrame,
   DetailPagePlaceholder,
-  ResourceId,
+  ResourceIdentity,
   StatusBadge,
 } from "@/components/common";
 import ResourceActionMenu from "@/components/common/ResourceActionMenu";
@@ -113,13 +113,13 @@ export default function GpuContainerDetailPage({
             key: "basic",
             title: "基本信息",
             fields: [
-              { label: "ID", value: <ResourceId value={record.id} /> },
+              { label: "ID", value: <ResourceIdentity display="id" id={record.id} /> },
               // FIXME(instance-basic): 当前实例合同未提供保护、Provider、发布、身份、安全组、负载均衡和调用地址，保留字段空态。
               // TODO(instance-basic): 上述正式字段对齐并联调验证后逐项接入，不补查其他系统实例。
               { label: "终止保护", value: "-" },
               {
                 label: "镜像",
-                value: <ResourceId value={record.imageId} />,
+                value: <ResourceIdentity display="id" id={record.imageId} />,
               },
               { label: "Provider", value: "-" },
               { label: "所在节点", value: runtime.data?.pod?.nodeName ?? "-" },
