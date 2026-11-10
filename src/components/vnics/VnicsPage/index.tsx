@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Select } from "@arco-design/web-react";
-import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { listNetworkVnics, type NetworkVnic } from "@/api/network";
 import {
@@ -45,16 +44,9 @@ export default function VnicsPage() {
   const columns: ListColumn<NetworkVnic>[] = [
     {
       title: "名称 / ID",
-      width: 250,
+      width: 200,
       fixed: "left",
-      render: (_, item) => (
-        <div className="flex min-w-0 flex-col">
-          <Link to="/vnics/$vnicId" params={{ vnicId: item.id }} className="truncate">
-            {item.name}
-          </Link>
-          <ResourceIdentity display="id" id={item.id} />
-        </div>
-      ),
+      render: (_, item) => <ResourceIdentity name={item.name} id={item.id} type="vnic" />,
     },
     {
       title: "状态",

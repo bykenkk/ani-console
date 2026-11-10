@@ -2,7 +2,8 @@
 // TODO(governance-migration): 等关联查询对齐后迁移，不能将旧 kind 直接替换为新 compute_type。
 import { type InstanceRecord } from "@/api/instances/legacy";
 import { Space } from "@arco-design/web-react";
-import { DataTable } from "@/components/common";
+import type { ReactNode } from "react";
+import { DataTable, ResourceIdentity } from "@/components/common";
 import { getImageDisplayName } from "@/lib/render";
 
 type InstanceResourceAssociationsProps = { instance: Instance };
@@ -20,11 +21,13 @@ type SecurityRow = {
 type StorageRow = {
   key: string;
   type: string;
-  name: string;
+  name: ReactNode;
 };
 
 function resourceLabel(name?: string | null, id?: string | null) {
-  if (name && id && name !== id) return `${name} · ${id}`;
+  if (name && id && name !== id) {
+    return <ResourceIdentity name={name} id={id} openable={false} />;
+  }
   return name ?? id ?? "-";
 }
 

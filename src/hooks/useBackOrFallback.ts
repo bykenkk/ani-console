@@ -18,6 +18,7 @@ const resourceListRoutes = {
   "knowledge-base": "/",
   vpc: "/vpcs",
   subnet: "/subnets",
+  vnic: "/vnics",
   "security-group": "/security-groups",
   "load-balancer": "/load-balancers",
   volume: "/volumes",

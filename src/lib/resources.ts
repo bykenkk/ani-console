@@ -14,6 +14,7 @@ export type ResourceDetailType =
   | "knowledge-base"
   | "vpc"
   | "subnet"
+  | "vnic"
   | "security-group"
   | "load-balancer"
   | "volume"
@@ -75,6 +76,9 @@ export function navigateToResourceDetail(
       return;
     case "subnet":
       navigate({ to: "/subnets/$subnetId", params: { subnetId: resource.id } });
+      return;
+    case "vnic":
+      navigate({ to: "/vnics/$vnicId", params: { vnicId: resource.id } });
       return;
     case "security-group":
       navigate({

@@ -65,7 +65,6 @@ export default function VolumeDetailPage({ volumeId, tab, onTabChange }: VolumeD
             title: "基本信息",
             fields: [
               { label: "ID", value: <ResourceIdentity display="id" id={volume.pvc_name} /> },
-              { label: "UID", value: <ResourceIdentity display="id" id={volume.uid} /> },
               { label: "用途", value: volume.volume_mode === "Block" ? "块设备" : "文件系统" },
               {
                 label: "容量 / 类型",
