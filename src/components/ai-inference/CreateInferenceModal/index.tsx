@@ -9,7 +9,6 @@ import RegisteredImageSelect from "@/components/common/RegisteredImageSelect";
 import InstanceComputeSelect from "@/components/instances/InstanceComputeSelect";
 import { showMessage } from "@/lib/feedback";
 import { validateForm } from "@/lib/form";
-import { randomString } from "@/lib/random";
 import { EngineSelect, ModelSelect, ModelVersionSelect } from "@/components/ai-models";
 
 interface CreateInferenceFormValues {
@@ -41,7 +40,6 @@ export default function CreateInferenceModal({
   const [form] = Form.useForm<CreateInferenceFormValues>();
   const qc = useQueryClient();
   const submitting = useRef(false);
-  const servedModelName = useRef<{ modelId: string; modelName: string; value: string }>();
   const [preset, setPreset] = useState<InstancePreset>();
   const [distributed, setDistributed] = useState(false);
   const [modelId, setModelId] = useState(initialModelId ?? "");
@@ -114,22 +112,10 @@ export default function CreateInferenceModal({
         return;
       }
 
-      // 同一次部署失败后再次提交时复用名称，避免改变幂等请求内容。
-      if (
-        servedModelName.current?.modelId !== modelId ||
-        servedModelName.current.modelName !== modelName
-      ) {
-        servedModelName.current = {
-          modelId,
-          modelName,
-          value: `${modelName}-${randomString(7)}`,
-        };
-      }
-
       await create.mutateAsync({
         name: values.name.trim(),
         model_version_id: version.id,
-        served_model_name: servedModelName.current.value,
+        served_model_name: modelName,
         image_id: values.image.image_id,
         image_scope: values.image.scope,
         engine_type: values.engine_type.trim(),
