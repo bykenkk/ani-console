@@ -4,6 +4,7 @@ import TrainingTaskDetailPage from "@/components/ai-training/TrainingTaskDetailP
 export const Route = createFileRoute("/_authenticated/_app/ai-training/$executionId")({
   validateSearch: (search: Record<string, unknown>): { tab?: string } => ({
     tab:
+      search.tab === "overview" ||
       search.tab === "pipeline" ||
       search.tab === "metrics" ||
       search.tab === "logs" ||

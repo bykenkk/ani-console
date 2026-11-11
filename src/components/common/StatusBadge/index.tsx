@@ -38,7 +38,7 @@ const STATUS_APPEARANCE: Record<string, { tone: StatusBadgeTone; loading?: boole
   pending: { tone: "warning", loading: true },
   accepted: { tone: "warning", loading: true },
   provisioning: { tone: "primary", loading: true },
-  starting: { tone: "primary", loading: true },
+  starting: { tone: "warning", loading: true },
   creating: { tone: "primary", loading: true },
   progressing: { tone: "primary", loading: true },
   deploying: { tone: "primary", loading: true },

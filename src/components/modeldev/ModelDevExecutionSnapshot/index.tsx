@@ -1,18 +1,15 @@
-import { Card, Descriptions, Table } from "@arco-design/web-react";
+import { Card, Descriptions } from "@arco-design/web-react";
 import type { ModelDevExecutionDetail } from "@/api/modeldev";
 import { ResourceIdentity } from "@/components/common";
 import { formatDateTime } from "@/lib/date";
-import ModelDevFineTuningConfiguration from "../ModelDevFineTuningConfiguration";
 
 type ModelDevExecutionSnapshotProps = { task: ModelDevExecutionDetail };
 
 export default function ModelDevExecutionSnapshot({ task }: ModelDevExecutionSnapshotProps) {
-  const registration = task.model_registration;
   const history = task.history;
-  const explicit = task.explicit_parameters;
   return (
     <div className="flex flex-col gap-4">
-      <Card title="受理配置" bordered={false}>
+      <Card title="执行配置快照" bordered={false}>
         <Descriptions
           column={1}
           data={[
@@ -20,6 +17,11 @@ export default function ModelDevExecutionSnapshot({ task }: ModelDevExecutionSna
             { label: "参数契约版本", value: task.parameter_contract_version || "-" },
             { label: "配置摘要", value: task.resolved_configuration_sha256 || "-" },
             { label: "算力选择摘要", value: task.compute?.selection_digest || "-" },
+            // FIXME(modeldev-image): image_version_id 已废弃，待镜像契约迁移时改用 image_id / image_version。
+            {
+              label: "镜像版本",
+              value: <ResourceIdentity display="id" id={task.image_version_id} />,
+            },
             {
               label: "CPU / 内存",
               value: task.compute
@@ -41,54 +43,7 @@ export default function ModelDevExecutionSnapshot({ task }: ModelDevExecutionSna
           ].map((item) => ({ ...item, value: <span className="break-all">{item.value}</span> }))}
         />
       </Card>
-      <Card title="训练参数" bordered={false}>
-        <Table
-          rowKey="name"
-          pagination={false}
-          data={task.resolved_parameters ?? []}
-          columns={[
-            { title: "参数", dataIndex: "name", width: 220 },
-            { title: "类型", dataIndex: "type", width: 120 },
-            { title: "生效值", dataIndex: "value", width: 180 },
-            {
-              title: "显式提交值",
-              width: 180,
-              render: (_, row) =>
-                explicit && Object.prototype.hasOwnProperty.call(explicit, row.name)
-                  ? String(explicit[row.name as keyof typeof explicit])
-                  : "未指定",
-            },
-          ]}
-        />
-      </Card>
-      {task.kind === "FINETUNING" && (
-        <ModelDevFineTuningConfiguration
-          baseModel={task.base_model}
-          managedSettings={task.managed_settings}
-        />
-      )}
-      <Card title="模型登记" bordered={false}>
-        <Descriptions
-          column={1}
-          data={[
-            { label: "登记状态", value: registration?.state || "无登记记录" },
-            {
-              label: "登记 ID",
-              value: <ResourceIdentity display="id" id={registration?.registration_id} />,
-            },
-            {
-              label: "模型 ID",
-              value: <ResourceIdentity display="id" id={registration?.model_id} />,
-            },
-            {
-              label: "版本 ID",
-              value: <ResourceIdentity display="id" id={registration?.model_version_id} />,
-            },
-            { label: "失败原因", value: registration?.failure_code || "-" },
-          ]}
-        />
-      </Card>
-      <Card title="原执行历史" bordered={false}>
+      <Card title="执行历史" bordered={false}>
         <Descriptions
           column={1}
           data={[

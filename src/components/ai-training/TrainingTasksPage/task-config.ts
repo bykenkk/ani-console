@@ -3,6 +3,7 @@ import { ResourceIdentity, type ListColumn } from "@/components/common";
 import type { ModelDevExecution } from "@/api/modeldev";
 import { formatDateTime } from "@/lib/date";
 import { formatModelDevComputeResources, formatModelDevExecutionDuration } from "@/lib/modeldev";
+import ModelDevExecutionStatus from "@/components/modeldev/ModelDevExecutionStatus";
 
 export function taskColumns(): ListColumn<ModelDevExecution>[] {
   return [
@@ -18,20 +19,26 @@ export function taskColumns(): ListColumn<ModelDevExecution>[] {
           type: "training-task",
         }),
     },
-    ...(
-      [
-        ["compute_state", "任务状态"],
-        ["delivery_state", "发布状态"],
-        ["close_state", "关闭状态"],
-        ["resource_state", "资源状态"],
-      ] as const
-    ).map(([key, title]) => ({
-      key,
-      title,
-      dataIndex: key,
+    {
+      key: "status",
+      title: "任务状态",
       width: 120,
+      render: (_, task) => createElement(ModelDevExecutionStatus, { task }),
+    },
+    {
+      key: "implementation",
+      title: "训练实现",
+      dataIndex: "implementation_id",
+      width: 200,
       ellipsis: true,
-    })),
+    },
+    {
+      key: "datasetVersion",
+      title: "数据集版本 ID",
+      dataIndex: "input_version_id",
+      width: 200,
+      ellipsis: true,
+    },
     { title: "当前步骤", dataIndex: "current_step", width: 140, ellipsis: true },
     {
       key: "resources",
@@ -48,6 +55,5 @@ export function taskColumns(): ListColumn<ModelDevExecution>[] {
       ellipsis: true,
       render: (_, task) => formatModelDevExecutionDuration(task),
     },
-    { title: "截止时间", dataIndex: "deadline_at", width: 180, render: formatDateTime },
   ];
 }

@@ -5,7 +5,6 @@ import {
   // IconCloud,
   IconCodeSandbox,
   IconDashboard,
-  IconFile,
   IconLock,
   // TODO(feature-visibility): 待知识库管理支持后恢复分组图标。
   // IconMessage,
@@ -134,7 +133,7 @@ export const menuItems: readonly MenuItem[] = [
         icon: <AliIcon name="tuili" />,
         children: [
           { key: "/ai-models", label: "模型仓库", icon: <AliIcon name="moxing" /> },
-          { key: "/ai-datasets", label: "数据集管理", icon: <IconFile /> },
+          { key: "/ai-datasets", label: "数据集管理", icon: <AliIcon name="file" /> },
           { key: "/ai-inference", label: "推理服务", icon: <AliIcon name="tuili" /> },
           {
             key: "/ai-inference-policies",
@@ -156,7 +155,7 @@ export const menuItems: readonly MenuItem[] = [
       {
         key: "image-management",
         label: "镜像管理",
-        icon: <IconFile />,
+        icon: <AliIcon name="file" />,
         children: [
           { key: "/container-images", label: "容器镜像", icon: <AliIcon name="Harbor" /> },
           { key: "/vm-images", label: "虚拟机镜像", icon: <AliIcon name="yunzhuji" /> },

@@ -12,6 +12,8 @@ import ModelDevTrainingMetrics from "@/components/modeldev/ModelDevTrainingMetri
 import ModelDevExecutionLogs from "@/components/modeldev/ModelDevExecutionLogs";
 import ModelDevExecutionSnapshot from "@/components/modeldev/ModelDevExecutionSnapshot";
 import ModelDevExecutionArtifacts from "@/components/modeldev/ModelDevExecutionArtifacts";
+import ModelDevExecutionOverview from "@/components/modeldev/ModelDevExecutionOverview";
+import ModelDevExecutionStatus from "@/components/modeldev/ModelDevExecutionStatus";
 import { useTrainingTaskActions } from "@/hooks/useTrainingTaskActions";
 import { navigationBreadcrumbsForPath } from "@/layouts/AppLayout/navigation";
 import { formatDateTime } from "@/lib/date";
@@ -50,8 +52,13 @@ export default function FineTuningTaskDetailPage({
     <DetailPageFrame
       breadcrumbs={[...navigationBreadcrumbsForPath("/ai-finetuning"), { label: task.name }]}
       title={task.name}
+      status={<ModelDevExecutionStatus task={task} />}
       icon={<AliIcon name="moxing" size={28} />}
-      headerItems={[]}
+      headerItems={[
+        { label: "训练目标", value: task.managed_settings?.stage?.toUpperCase() || "-" },
+        { label: "当前步骤", value: task.current_step || "-" },
+        { label: "运行时长", value: formatModelDevExecutionDuration(task) },
+      ]}
       onBack={onBack}
       actions={<ResourceActionMenu record={task} actions={actions} />}
       cards={[
@@ -60,53 +67,31 @@ export default function FineTuningTaskDetailPage({
           title: "基本信息",
           fields: [
             { label: "ID", value: <ResourceIdentity display="id" id={task.execution_id} /> },
-            { label: "训练阶段", value: task.managed_settings?.stage || "-" },
-            { label: "微调方法", value: task.managed_settings?.finetuning_type || "-" },
-            {
-              label: "微调实现",
-              value: <ResourceIdentity display="id" id={task.implementation_id} />,
-            },
-            {
-              label: "算力规格",
-              value: <ResourceIdentity display="id" id={task.compute_preset_id} />,
-            },
-            {
-              label: "数据集版本",
-              value: <ResourceIdentity display="id" id={task.input_version_id} />,
-            },
-            {
-              label: "镜像版本",
-              value: <ResourceIdentity display="id" id={task.image_version_id} />,
-            },
-            { label: "当前阶段", value: task.current_step || "-" },
-            { label: "停止已请求", value: task.stop_requested ? "是" : "否" },
-            { label: "受理时间", value: formatDateTime(task.accepted_at) },
-            { label: "运行时长", value: formatModelDevExecutionDuration(task) },
+            { label: "创建时间", value: formatDateTime(task.accepted_at) },
             { label: "截止时间", value: formatDateTime(task.deadline_at) },
             { label: "观测时间", value: formatDateTime(task.observed_at) },
           ],
         },
         {
-          key: "base-model",
-          title: "基座模型",
+          key: "states",
+          title: "执行状态",
           fields: [
-            {
-              label: "模型 ID",
-              value: <ResourceIdentity display="id" id={task.base_model?.model_id} />,
-            },
-            {
-              label: "版本 ID",
-              value: <ResourceIdentity display="id" id={task.base_model?.version_id} />,
-            },
-            { label: "模型族", value: task.base_model?.family || "-" },
-            { label: "权重格式", value: task.base_model?.format || "-" },
+            { label: "发布状态", value: task.delivery_state || "-" },
+            { label: "关闭状态", value: task.close_state || "-" },
+            { label: "资源状态", value: task.resource_state || "-" },
+            { label: "已请求停止", value: task.stop_requested ? "是" : "否" },
           ],
         },
       ]}
       tabs={[
         {
+          key: "overview",
+          label: "概览",
+          content: <ModelDevExecutionOverview task={task} />,
+        },
+        {
           key: "pipeline",
-          label: "流水线",
+          label: "执行步骤",
           content: <ModelDevExecutionPipeline steps={task.steps} failure={task.failure} />,
         },
         {
@@ -128,7 +113,7 @@ export default function FineTuningTaskDetailPage({
         },
         {
           key: "snapshot",
-          label: "配置与记录",
+          label: "执行记录",
           content: <ModelDevExecutionSnapshot task={task} />,
         },
         {

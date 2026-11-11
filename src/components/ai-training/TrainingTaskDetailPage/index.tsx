@@ -15,8 +15,10 @@ import ModelDevExecutionArtifacts from "@/components/modeldev/ModelDevExecutionA
 import ModelDevExecutionSnapshot from "@/components/modeldev/ModelDevExecutionSnapshot";
 import ModelDevExecutionPipeline from "@/components/modeldev/ModelDevExecutionPipeline";
 import ModelDevTrainingMetrics from "@/components/modeldev/ModelDevTrainingMetrics";
+import ModelDevExecutionOverview from "@/components/modeldev/ModelDevExecutionOverview";
+import ModelDevExecutionStatus from "@/components/modeldev/ModelDevExecutionStatus";
 import { formatDateTime } from "@/lib/date";
-import { shouldObserveModelDevExecution } from "@/lib/modeldev";
+import { formatModelDevExecutionDuration, shouldObserveModelDevExecution } from "@/lib/modeldev";
 
 type TrainingTaskDetailPageProps = {
   executionId: string;
@@ -49,8 +51,13 @@ export default function TrainingTaskDetailPage({
     <DetailPageFrame
       breadcrumbs={[...navigationBreadcrumbsForPath("/ai-training"), { label: task.name }]}
       title={task.name}
+      status={<ModelDevExecutionStatus task={task} />}
       icon={<AliIcon name="moxing" size={28} />}
-      headerItems={[]}
+      headerItems={[
+        { label: "任务类型", value: "普通训练" },
+        { label: "当前步骤", value: task.current_step || "-" },
+        { label: "运行时长", value: formatModelDevExecutionDuration(task) },
+      ]}
       onBack={onBack}
       actions={<ResourceActionMenu record={task} actions={actions} />}
       cards={[
@@ -59,35 +66,31 @@ export default function TrainingTaskDetailPage({
           title: "基本信息",
           fields: [
             { label: "ID", value: <ResourceIdentity display="id" id={task.execution_id} /> },
-            { label: "任务类型", value: task.kind || "-" },
-            {
-              label: "训练实现",
-              value: <ResourceIdentity display="id" id={task.implementation_id} />,
-            },
-            {
-              label: "算力规格",
-              value: <ResourceIdentity display="id" id={task.compute_preset_id} />,
-            },
-            {
-              label: "数据集版本",
-              value: <ResourceIdentity display="id" id={task.input_version_id} />,
-            },
-            {
-              label: "镜像版本",
-              value: <ResourceIdentity display="id" id={task.image_version_id} />,
-            },
-            { label: "当前阶段", value: task.current_step || "-" },
-            { label: "停止已请求", value: task.stop_requested ? "是" : "否" },
-            { label: "受理时间", value: formatDateTime(task.accepted_at) },
+            { label: "创建时间", value: formatDateTime(task.accepted_at) },
             { label: "截止时间", value: formatDateTime(task.deadline_at) },
             { label: "观测时间", value: formatDateTime(task.observed_at) },
+          ],
+        },
+        {
+          key: "states",
+          title: "执行状态",
+          fields: [
+            { label: "发布状态", value: task.delivery_state || "-" },
+            { label: "关闭状态", value: task.close_state || "-" },
+            { label: "资源状态", value: task.resource_state || "-" },
+            { label: "已请求停止", value: task.stop_requested ? "是" : "否" },
           ],
         },
       ]}
       tabs={[
         {
+          key: "overview",
+          label: "概览",
+          content: <ModelDevExecutionOverview task={task} />,
+        },
+        {
           key: "pipeline",
-          label: "流水线",
+          label: "执行步骤",
           content: <ModelDevExecutionPipeline steps={task.steps} failure={task.failure} />,
         },
         {
@@ -109,7 +112,7 @@ export default function TrainingTaskDetailPage({
         },
         {
           key: "snapshot",
-          label: "配置与记录",
+          label: "执行记录",
           content: <ModelDevExecutionSnapshot task={task} />,
         },
         {

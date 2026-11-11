@@ -11,9 +11,16 @@ import { useListPagination } from "@/hooks/useListPagination";
 import { useTrainingTaskActions } from "@/hooks/useTrainingTaskActions";
 import { formatDateTime } from "@/lib/date";
 import { formatModelDevComputeResources, formatModelDevExecutionDuration } from "@/lib/modeldev";
+import ModelDevExecutionStatus from "@/components/modeldev/ModelDevExecutionStatus";
 import CreateFineTuningModal from "../CreateFineTuningModal";
 
 const filters = { kind: "FINETUNING" } as const;
+
+const FINETUNING_METHOD_LABELS: Record<string, string> = {
+  lora: "LoRA",
+  qlora: "QLoRA",
+  full: "全参数",
+};
 
 const columns: ListColumn<ModelDevExecution>[] = [
   {
@@ -25,27 +32,51 @@ const columns: ListColumn<ModelDevExecution>[] = [
       <ResourceIdentity name={task.name} id={task.execution_id} type="finetuning-task" />
     ),
   },
-  { key: "status", title: "任务状态", dataIndex: "compute_state", width: 120, ellipsis: true },
+  {
+    key: "status",
+    title: "任务状态",
+    width: 120,
+    render: (_, task) => <ModelDevExecutionStatus task={task} />,
+  },
   {
     key: "baseModel",
-    title: "基础模型",
-    dataIndex: "base_model.family",
+    title: "基础模型 / 版本",
     width: 200,
-    ellipsis: true,
+    render: (_, task) => (
+      <ResourceIdentity
+        name={task.base_model?.model_id}
+        id={task.base_model?.version_id}
+        openable={false}
+      />
+    ),
   },
-  // TODO(finetuning-framework): 接口尚未提供训练框架字段，待合同补齐后接入。
-  { key: "framework", title: "训练框架", width: 160, ellipsis: true },
   {
     key: "stage",
-    title: "训练阶段",
+    title: "训练目标",
     dataIndex: "managed_settings.stage",
     width: 140,
     ellipsis: true,
+    render: (value) => value?.toUpperCase() || "-",
   },
   {
     key: "method",
-    title: "微调方法",
+    title: "参数更新方式",
     dataIndex: "managed_settings.finetuning_type",
+    width: 140,
+    ellipsis: true,
+    render: (value) => FINETUNING_METHOD_LABELS[value] || value || "-",
+  },
+  {
+    key: "datasetVersion",
+    title: "数据集版本 ID",
+    dataIndex: "input_version_id",
+    width: 200,
+    ellipsis: true,
+  },
+  {
+    key: "currentStep",
+    title: "当前步骤",
+    dataIndex: "current_step",
     width: 140,
     ellipsis: true,
   },
