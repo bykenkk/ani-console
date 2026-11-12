@@ -52,9 +52,7 @@ export default function VmsPage() {
       key: "state",
       title: "状态",
       width: 120,
-      render: (_, vm) => (
-        <StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />
-      ),
+      render: (_, vm) => <StatusBadge status={vm.observedState} reason={vm.reason} />,
     },
     {
       key: "compute",
@@ -69,7 +67,16 @@ export default function VmsPage() {
       width: 140,
       render: (_, vm) => (vm.systemDiskSizeGb ? `${vm.systemDiskSizeGb} GB` : "-"),
     },
-    { key: "image", title: "镜像", width: 180, dataIndex: "mediaKey", ellipsis: true },
+    {
+      key: "image",
+      title: "系统来源",
+      width: 180,
+      ellipsis: true,
+      render: (_, vm) =>
+        vm.sourceKind === "VM_CLONE"
+          ? `克隆自 ${vm.cloneSource?.sourceName || vm.cloneSource?.sourceVmId || "-"}`
+          : vm.mediaKey,
+    },
     {
       key: "ip",
       title: "IP 地址",

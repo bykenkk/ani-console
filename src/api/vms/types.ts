@@ -1,6 +1,7 @@
 import type { PageParams } from "@/api/types";
 
-export type VmSourceKind = "DISK_IMAGE" | "INSTALL_ISO";
+export type VmMediaKind = "DISK_IMAGE" | "INSTALL_ISO" | "DRIVER_ISO";
+export type VmSourceKind = "DISK_IMAGE" | "INSTALL_ISO" | "VM_CLONE";
 export type VmMediaSlot = "INSTALL" | "DRIVER";
 export type VmBootDevice = "SYSTEM_DISK" | "INSTALL_MEDIA";
 export interface VmDns {
@@ -98,8 +99,8 @@ export interface VirtualMachine {
     persistentUefi: boolean;
   };
   initialization?: { method: string; username: string; sshKeyFingerprint?: string };
-  sourceMedia?: VmMedia;
-  runtime?: VmRuntime;
+  sourceMedia?: VmSourceMedia | null;
+  runtime?: VmRuntime | null;
   relations?: {
     vpc?: VmResourceReference;
     subnet?: VmResourceReference;
@@ -110,6 +111,11 @@ export interface VirtualMachine {
   memoryMib: string;
   systemDiskSizeGb: string;
   sourceKind: VmSourceKind;
+  cloneSource?: {
+    sourceVmId: string;
+    expectedSourceVersion: string;
+    sourceName: string;
+  } | null;
   mediaKey: string;
   dns?: VmDns;
 }
@@ -141,7 +147,7 @@ export type VmInitializationCapability = "NONE" | "CLOUD_INIT_NOCLOUD";
 export interface VmMedia {
   mediaKey: string;
   name: string;
-  kind: VmSourceKind | "DRIVER_ISO";
+  kind: VmMediaKind;
   osFamily: string;
   osVersion: string;
   architecture: string;
@@ -155,23 +161,40 @@ export interface VmMedia {
   virtualCapacityBytes: string;
   initializationCapability?: VmInitializationCapability | "";
 }
+// 克隆冻结的是机器描述，介质身份字段可为空。
+export interface VmSourceMedia extends Omit<VmMedia, "kind"> {
+  kind: VmMediaKind | "";
+}
 export interface VmInitialDisk {
   client_disk_key: string;
   name: string;
   size_gb: string;
 }
-export interface CreateVmInput {
-  security_group_ids?: string[];
+export type CreateVmInput =
+  | {
+      name: string;
+      source_kind: "DISK_IMAGE" | "INSTALL_ISO";
+      preset_id: string;
+      media_key: string;
+      system_disk_size_gb: string;
+      data_disks: VmInitialDisk[];
+      network: { vpc_id: string; subnet_id: string };
+      security_group_ids?: string[];
+      start_after_create: boolean;
+      guest_initialization?: { username: string; password?: string; ssh_public_key?: string };
+      dns?: VmDns;
+    }
+  | {
+      name: string;
+      source_kind: "VM_CLONE";
+      clone_source: Pick<CloneVmInput, "source_vm_id" | "expected_source_version">;
+      start_after_create: boolean;
+    };
+export interface CloneVmInput {
   name: string;
-  preset_id: string;
-  source_kind: VmSourceKind;
-  media_key: string;
-  system_disk_size_gb: string;
-  data_disks: VmInitialDisk[];
-  network: { vpc_id: string; subnet_id: string };
+  source_vm_id: string;
+  expected_source_version: number;
   start_after_create: boolean;
-  guest_initialization?: { username: string; password?: string; ssh_public_key?: string };
-  dns?: VmDns;
 }
 export interface VmChangeInput {
   expected_version: string;

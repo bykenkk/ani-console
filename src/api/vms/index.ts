@@ -5,6 +5,7 @@ import { createIdempotencyScope, type IdempotencyScope } from "@/lib/idempotency
 import type { InstancePresetListParams, InstancePresetListResponse } from "@/api/instances";
 import type {
   CreateVmInput,
+  CloneVmInput,
   VirtualMachine,
   VmListParams,
   VmListResponse,
@@ -90,6 +91,18 @@ export function createVm(input: CreateVmInput): Promise<void> {
     await coreRequest("/virtual-machines", { method: "POST", data: { data } });
   });
 }
+export function cloneVm(input: CloneVmInput): Promise<void> {
+  return createVm({
+    name: input.name,
+    source_kind: "VM_CLONE",
+    clone_source: {
+      source_vm_id: input.source_vm_id,
+      expected_source_version: input.expected_source_version,
+    },
+    start_after_create: input.start_after_create,
+  });
+}
+
 function changeVm(
   scope: IdempotencyScope,
   path: string,

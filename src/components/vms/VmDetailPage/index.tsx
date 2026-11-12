@@ -49,7 +49,7 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
       <DetailPageFrame
         breadcrumbs={[...navigationBreadcrumbsForPath("/vms"), { label: vm.name }]}
         title={vm.name}
-        status={<StatusBadge status={vm.observedState} reason={vm.reason} loading={false} />}
+        status={<StatusBadge status={vm.observedState} reason={vm.reason} />}
         icon={<AliIcon name="yunzhuji" size={28} />}
         headerItems={[{ label: "规格", value: vm.presetName || "-" }]}
         actions={
@@ -86,7 +86,15 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
               },
               {
                 label: "操作系统",
-                value: vm.sourceMedia?.name || "-",
+                value:
+                  vm.sourceMedia?.name ||
+                  [
+                    vm.sourceMedia?.osFamily || vm.osFamily,
+                    vm.sourceMedia?.osVersion || vm.osVersion,
+                  ]
+                    .filter(Boolean)
+                    .join(" ") ||
+                  "-",
               },
               {
                 label: "IP 地址",
@@ -103,8 +111,24 @@ export default function VmDetailPage({ instanceId, tab, onTabChange }: VmDetailP
                     ? "系统镜像"
                     : vm.sourceKind === "INSTALL_ISO"
                       ? "安装光盘（ISO）"
-                      : "-",
+                      : vm.sourceKind === "VM_CLONE"
+                        ? "虚拟机克隆"
+                        : "-",
               },
+              ...(vm.cloneSource
+                ? [
+                    {
+                      label: "克隆来源",
+                      value: (
+                        <ResourceIdentity
+                          type="vm-instance"
+                          name={vm.cloneSource.sourceName}
+                          id={vm.cloneSource.sourceVmId}
+                        />
+                      ),
+                    },
+                  ]
+                : []),
               { label: "创建时间", value: formatDateTime(vm.createdAt) },
             ],
           },

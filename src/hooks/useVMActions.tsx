@@ -6,12 +6,16 @@ import { unavailableAction, type RowAction } from "@/components/common/DataTable
 import VmCreateSnapshotModal from "@/components/vms/VmCreateSnapshotModal";
 import VmShutdownModal from "@/components/vms/VmShutdownModal";
 import VmChangeSecurityGroupsModal from "@/components/vms/VmChangeSecurityGroupsModal";
+import VmCloneModal from "@/components/vms/VmCloneModal";
 import { openInstanceVncWindow } from "@/lib/instances";
-import { vmIsClosed } from "@/lib/vms";
+import { vmCloneCanStart, vmCloneIsPreparing, vmIsClosed } from "@/lib/vms";
 import { withId } from "@/lib/id";
 
 type VmPowerAction = "start" | "restart" | "delete";
-type VmActionDialog = { action: "stop" | "snapshot" | "security-groups"; vm: VirtualMachine };
+type VmActionDialog = {
+  action: "stop" | "snapshot" | "security-groups" | "clone";
+  vm: VirtualMachine;
+};
 const LABELS: Record<VmPowerAction, string> = {
   start: "开机",
   restart: "重启",
@@ -80,7 +84,9 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
     {
       key: "lifecycle",
       label: (vm) => (vm.observedState === "Running" ? "关机" : "开机"),
-      disabled: unavailable,
+      disabled: (vm) =>
+        unavailable(vm) ||
+        (vm.sourceKind === "VM_CLONE" && vm.observedState !== "Running" && !vmCloneCanStart(vm)),
       onClick: (vm) => {
         if (vm.observedState === "Running") setDialog({ action: "stop", vm });
         else confirm("start", vm);
@@ -94,6 +100,12 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
     },
     unavailableAction("resize", "变配"),
     unavailableAction("rebuild", "重建"),
+    {
+      key: "clone",
+      label: "克隆",
+      disabled: (vm) => unavailable(vm) || vmCloneIsPreparing(vm),
+      onClick: (vm) => setDialog({ action: "clone", vm }),
+    },
     {
       key: "snapshot",
       label: "创建快照",
@@ -130,6 +142,8 @@ export function useVMActions(records: VirtualMachine[], onDeleted?: () => void) 
         <VmShutdownModal vm={dialogVm} onCancel={closeDialog} onSubmitted={closeDialog} />
       ) : dialog.action === "security-groups" ? (
         <VmChangeSecurityGroupsModal instance={dialogVm} onCancel={closeDialog} />
+      ) : dialog.action === "clone" ? (
+        <VmCloneModal vm={dialogVm} onCancel={closeDialog} onSubmitted={closeDialog} />
       ) : (
         <VmCreateSnapshotModal vm={dialogVm} onCancel={closeDialog} onSubmitted={closeDialog} />
       )
