@@ -1,8 +1,9 @@
 import { createVmConsoleSession } from "@/api/vms";
 import { StatusBadge, type StatusBadgeTone } from "@/components/common";
+import VncSendTextModal from "@/components/instances/VncSendTextModal";
 import { useEffect, useRef, useState } from "react";
 import RFB from "@novnc/novnc/lib/rfb";
-import { Button, Dropdown, Menu, Radio, Spin } from "@arco-design/web-react";
+import { Button, Dropdown, Menu, Modal, Radio, Spin } from "@arco-design/web-react";
 import { IconDown } from "@arco-design/web-react/icon";
 import clsx from "clsx";
 import { resolveWebSocketUrl } from "@/lib/browser";
@@ -27,10 +28,6 @@ const WIN_KEY: VncKey = { keysym: 0xffeb, code: "MetaLeft" };
 const ESC_KEY: VncKey = { keysym: 0xff1b, code: "Escape" };
 
 const KEY_SHORTCUTS: { label: string; keys: VncKey[] }[] = [
-  {
-    label: "Ctrl+Alt+Del",
-    keys: [CONTROL_KEY, ALT_KEY, { keysym: 0xffff, code: "Delete" }],
-  },
   {
     label: "Ctrl+Shift+Esc",
     keys: [CONTROL_KEY, { keysym: 0xffe1, code: "ShiftLeft" }, ESC_KEY],
@@ -75,6 +72,7 @@ export default function InstanceVnc({ instanceId }: InstanceVncProps) {
   const [status, setStatus] = useState<ConsoleStatus>("connecting");
   const [reconnectKey, setReconnectKey] = useState(0);
   const [viewMode, setViewMode] = useState<ViewMode>("fit");
+  const [textModalOpen, setTextModalOpen] = useState(false);
 
   useEffect(() => {
     viewModeRef.current = viewMode;
@@ -93,6 +91,7 @@ export default function InstanceVnc({ instanceId }: InstanceVncProps) {
 
     const connect = async () => {
       setStatus("connecting");
+      setTextModalOpen(false);
       closeNotification(withId("instance-vnc", instanceId));
       await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()));
       if (disposed) return;
@@ -123,6 +122,7 @@ export default function InstanceVnc({ instanceId }: InstanceVncProps) {
         });
         rfb.addEventListener("disconnect", () => {
           if (disposed) return;
+          setTextModalOpen(false);
           if (isExpired(expiresAtRef.current)) {
             setStatus("expired");
             showNotification({
@@ -137,6 +137,7 @@ export default function InstanceVnc({ instanceId }: InstanceVncProps) {
         });
         rfb.addEventListener("securityfailure", (event) => {
           if (disposed) return;
+          setTextModalOpen(false);
           setStatus("error");
           const detail = event instanceof CustomEvent ? event.detail : undefined;
           showNotification({
@@ -190,10 +191,37 @@ export default function InstanceVnc({ instanceId }: InstanceVncProps) {
       <div className="flex h-10 shrink-0 items-center justify-between border-b border-white/10 px-3">
         <div className="truncate text-sm text-gray-300">VNC 控制台</div>
         <div className="flex items-center gap-2">
+          <Button
+            size="mini"
+            disabled={status !== "connected" || textModalOpen}
+            onClick={() => setTextModalOpen(true)}
+          >
+            发送文字
+          </Button>
+          <Button
+            size="mini"
+            disabled={status !== "connected" || textModalOpen}
+            onClick={() => {
+              const session = rfbRef.current;
+              Modal.confirm({
+                title: "发送 Ctrl+Alt+Del",
+                content:
+                  "将向当前远端机器发送 Ctrl+Alt+Del，可能打开安全选项或触发系统重启，请确认后继续。",
+                okText: "确认发送",
+                cancelText: "取消",
+                onOk: () => {
+                  if (rfbRef.current !== session) return;
+                  sendKeys([CONTROL_KEY, ALT_KEY, { keysym: 0xffff, code: "Delete" }]);
+                },
+              });
+            }}
+          >
+            Ctrl+Alt+Del
+          </Button>
           <Dropdown
             trigger="click"
             position="br"
-            disabled={status !== "connected"}
+            disabled={status !== "connected" || textModalOpen}
             droplist={
               <Menu>
                 {KEY_SHORTCUTS.map((shortcut) => (
@@ -211,7 +239,7 @@ export default function InstanceVnc({ instanceId }: InstanceVncProps) {
               </Menu>
             }
           >
-            <Button size="mini" disabled={status !== "connected"}>
+            <Button size="mini" disabled={status !== "connected" || textModalOpen}>
               发送按键 <IconDown />
             </Button>
           </Dropdown>
@@ -256,6 +284,9 @@ export default function InstanceVnc({ instanceId }: InstanceVncProps) {
           }
         />
       </div>
+      {textModalOpen && status === "connected" ? (
+        <VncSendTextModal rfbRef={rfbRef} onCancel={() => setTextModalOpen(false)} />
+      ) : null}
     </div>
   );
 }
