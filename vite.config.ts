@@ -53,8 +53,11 @@ export default defineConfig(({ command, mode }) => {
     ],
     resolve: {
       alias: {
-        "@novnc/novnc/lib/rfb": path.resolve(__dirname, "./node_modules/@novnc/novnc/core/rfb.js"),
-        "@": path.resolve(__dirname, "./src"),
+        "@novnc/novnc/lib/rfb": path.resolve(
+          import.meta.dirname,
+          "./node_modules/@novnc/novnc/core/rfb.js",
+        ),
+        "@": path.resolve(import.meta.dirname, "./src"),
       },
     },
     server: {
@@ -94,17 +97,18 @@ export default defineConfig(({ command, mode }) => {
     },
     optimizeDeps: {
       include: ["@novnc/novnc/lib/rfb"],
-      esbuildOptions: {
-        target: "esnext",
+      rolldownOptions: {
+        transform: {
+          target: "esnext",
+        },
       },
     },
     build: {
       target: "esnext",
-      rollupOptions: {
+      rolldownOptions: {
         output: {
-          manualChunks(id) {
-            if (!id.includes("node_modules")) return;
-            if (id.includes("@tanstack")) return "vendor-tanstack";
+          codeSplitting: {
+            groups: [{ name: "vendor-tanstack", test: /node_modules.*@tanstack/ }],
           },
         },
       },

@@ -2,6 +2,17 @@
 
 ANI Console 前端。
 
+## 开发环境
+
+- Node.js 版本以 [.nvmrc](./.nvmrc) 为准。
+- pnpm 版本以 [package.json](./package.json) 的 `packageManager` 声明为准。
+
+Node.js 26 不内置 Corepack，无需额外安装。已有 Corepack 时可用其选择 pnpm 版本；否则在项目根目录执行以下命令，直接安装项目声明的 pnpm：
+
+```bash
+npm install --global "$(node -p 'require("./package.json").packageManager')"
+```
+
 ## 开发
 
 ```bash
