@@ -108,7 +108,10 @@ export default defineConfig(({ command, mode }) => {
       rolldownOptions: {
         output: {
           codeSplitting: {
-            groups: [{ name: "vendor-tanstack", test: /node_modules.*@tanstack/ }],
+            groups: [
+              { name: "vendor-tanstack", test: /node_modules.*@tanstack/ },
+              { name: "vendor-arco", test: /node_modules.*@arco-design[\\/]web-react[\\/]/ },
+            ],
           },
         },
       },
